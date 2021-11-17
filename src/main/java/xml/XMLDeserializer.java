@@ -20,14 +20,45 @@ public class XMLDeserializer {
     //TODO : refactoring
     //TODO : serializing for requests
     public static void main(String[] args) throws Exception {
-        File file = new File("src/main/resources/smallMap.xml");
+
+        XMLDeserializer xmlDeserializer = new XMLDeserializer();
+
+        xmlDeserializer.deserializeMap();
+    }
+
+    public Document extractDocument(File file) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(file);
-        NodeList nodeIntersection = document.getElementsByTagName("intersection");
+        return document;
+    }
+
+    public CityMap deserializeMap() {
+
+        File file = new File("src/main/resources/smallMap.xml");
+
+        Document document = null;
+        try {
+            document = extractDocument(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         CityMap cityMap = new CityMap();
+
+    /*
+        listXMLIntersection
+        listXMLSegments
+     */
+        return cityMap;
+    }
+
+    public void listXMLIntersection(CityMap citymap) {
+
+
         Map<Long,Intersection> intersectionMap = new HashMap<>();
+        NodeList intersectionNodes = document.getElementsByTagName("intersection");
+        NodeList segmentNodes = document.getElementsByTagName("segment");
 
         //************* INTERSECTION **************
         for (int x = 0, size = nodeIntersection.getLength(); x < size; x++) {
