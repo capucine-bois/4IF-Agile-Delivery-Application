@@ -11,6 +11,7 @@ public class Main {
      * @param args the arguments
      */
     public static void main(String[] args) throws IOException, FontFormatException {
-        new Window();
+        Window w = new Window();
+        w.displayMap();
     }
 }

@@ -2,10 +2,14 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
-public class Window extends JFrame {
+public class Window extends JFrame implements ComponentListener {
 
     // Titles of window buttons
     protected final static String LOAD_MAP = "Load a map";
@@ -18,6 +22,8 @@ public class Window extends JFrame {
     private ButtonListener buttonListener;
     private MouseListener mouseListener;
     private KeyboardListener keyboardListener;
+    private int windowWidth = 800;
+    private int windowHeight = 550;
 
     private final String[] buttonTexts = new String[]{LOAD_MAP, LOAD_REQUEST, COMPUTE_TOUR};
 
@@ -25,13 +31,16 @@ public class Window extends JFrame {
         //TODO: Add map when implemented
         //TODO: Add controller when implemented
         createHeader();
+        //TODO: Add intermediate JPanel before graphicalView and textualView
         graphicalView = new GraphicalView(this);
         textualView = new TextualView(this);
         //TODO: Add mouse listener
         //TODO: Add keyboard listener
+        setMinimumSize(new Dimension(windowWidth, windowHeight));
         setWindowSize();
         setVisible(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        addComponentListener(this);
     }
 
     private void createHeader() throws IOException, FontFormatException {
@@ -72,13 +81,55 @@ public class Window extends JFrame {
     }
 
     private void setWindowSize() {
-        int windowWidth = 800;
-        int windowHeight = 550;
-        setMinimumSize(new Dimension(windowWidth, windowHeight));
         int headerHeight = 50;
         int textualViewWidth = 300;
+        setPreferredSize(new Dimension(windowWidth, windowHeight));
         header.setPreferredSize(new Dimension(windowWidth, headerHeight));
         textualView.setPreferredSize(new Dimension(textualViewWidth, windowHeight - headerHeight));
+        graphicalView.setPreferredSize(new Dimension(windowWidth - textualViewWidth, windowHeight - headerHeight));
     }
 
+    @Override
+    public void componentResized(ComponentEvent e) {
+        windowWidth = e.getComponent().getSize().width;
+        windowHeight = e.getComponent().getSize().height;
+        setWindowSize();
+    }
+
+    @Override
+    public void componentMoved(ComponentEvent e) {
+
+    }
+
+    @Override
+    public void componentShown(ComponentEvent e) {
+
+    }
+
+    @Override
+    public void componentHidden(ComponentEvent e) {
+
+    }
+
+    public void displayMap() {
+        /////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////
+
+        // THIS SHOULD BE DONE IN THE CONTROLLER WHEN WE WANT TO LOAD A MAP
+
+        // TODO: replace with intersections and segments coming from CityMap
+        java.util.List<double[]> intersectionsTest = new ArrayList<>();
+        intersectionsTest.add(new double[]{45.75406, 4.857418, 1});
+        intersectionsTest.add(new double[]{45.75244, 4.862118, 2});
+        intersectionsTest.add(new double[]{45.75466, 4.861418, 3});
+        intersectionsTest.add(new double[]{45.74806, 4.872218, 4});
+        intersectionsTest.add(new double[]{45.75606, 4.850841, 5});
+        intersectionsTest.add(new double[]{45.74934, 4.864663, 6});
+        graphicalView.initIntersectionViewList(intersectionsTest);
+
+        /////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////
+    }
 }
