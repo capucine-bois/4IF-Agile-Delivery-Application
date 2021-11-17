@@ -8,16 +8,16 @@ public class Tour {
 
     private double tourLength;
     private Intersection depotAddress;
+    private String departureTime;
     private ArrayList<Request> planningRequests;
     private ArrayList<ShortestPath> listShortestPaths;
 
     /* CONSTRUCTORS */
 
-    public Tour(double tourLength, Intersection depotAddress, ArrayList<Request> planningRequests, ArrayList<ShortestPath> listShortestPaths) {
-        this.tourLength = tourLength;
+    public Tour(Intersection depotAddress, String departureTime, ArrayList<Request> planningRequests) {
         this.depotAddress = depotAddress;
+        this.departureTime = departureTime;
         this.planningRequests = planningRequests;
-        this.listShortestPaths = listShortestPaths;
     }
 
     /* GETTERS */
