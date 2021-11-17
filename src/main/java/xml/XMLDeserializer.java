@@ -1,6 +1,7 @@
 package xml;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,64 +18,74 @@ import org.w3c.dom.NodeList;
 
 public class XMLDeserializer {
 
-    //TODO : refactoring
     //TODO : serializing for requests
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args){
 
         XMLDeserializer xmlDeserializer = new XMLDeserializer();
-
         xmlDeserializer.deserializeMap();
     }
+
 
     public Document extractDocument(File file) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
-        Document document = db.parse(file);
-        return document;
+        return db.parse(file);
     }
 
+
     public CityMap deserializeMap() {
+        CityMap cityMap = new CityMap();
+        ArrayList<Intersection> listXMLIntersections;
+        Map<Long, Intersection> intersectionMap = new HashMap<>();
+        ArrayList<Segment> listXMLSegments;
 
-        File file = new File("src/main/resources/smallMap.xml");
-
+        File file = new File("src/main/resources/fichiersXML2020/smallMap.xml");
         Document document = null;
         try {
             document = extractDocument(file);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if(document != null) {
+            listXMLIntersections = parseXMLIntersections(document);
+            for (Intersection i : listXMLIntersections) {
+                cityMap.addIntersection(i);
+                intersectionMap.put(i.getId(), i);
+            }
 
-        CityMap cityMap = new CityMap();
+            listXMLSegments = parseXMLSegments(document);
+            for (Segment s : listXMLSegments) {
+                cityMap.addSegment(s, intersectionMap.get(s.getOrigin()));
+            }
 
-    /*
-        listXMLIntersection
-        listXMLSegments
-     */
+        /*Iterator it = cityMap.getAdjacenceMap().entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<Intersection, ArrayList<Segment>> entry = (Map.Entry) it.next();
+            System.out.println(entry.getKey().getId() + " = " + entry.getValue());
+        }*/
+        }
         return cityMap;
     }
 
-    public void listXMLIntersection(CityMap citymap) {
 
+    public ArrayList<Intersection> parseXMLIntersections(Document document) {
 
-        Map<Long,Intersection> intersectionMap = new HashMap<>();
         NodeList intersectionNodes = document.getElementsByTagName("intersection");
-        NodeList segmentNodes = document.getElementsByTagName("segment");
-
-        //************* INTERSECTION **************
-        for (int x = 0, size = nodeIntersection.getLength(); x < size; x++) {
-            long id = Long.parseLong(nodeIntersection.item(x).getAttributes().getNamedItem("id").getNodeValue());
-            double latitude = Double.parseDouble(nodeIntersection.item(x).getAttributes().getNamedItem("latitude").getNodeValue());
-
-            double longitude = Double.parseDouble(nodeIntersection.item(x).getAttributes().getNamedItem("longitude").getNodeValue());
-
-            Intersection i = new Intersection(id, latitude, longitude);
-            cityMap.addIntersection(i);
-            intersectionMap.put(id,i);
+        ArrayList<Intersection> listIntersections = new ArrayList<>();
+        for (int x = 0, size = intersectionNodes.getLength(); x < size; x++) {
+            long id = Long.parseLong(intersectionNodes.item(x).getAttributes().getNamedItem("id").getNodeValue());
+            double latitude = Double.parseDouble(intersectionNodes.item(x).getAttributes().getNamedItem("latitude").getNodeValue());
+            double longitude = Double.parseDouble(intersectionNodes.item(x).getAttributes().getNamedItem("longitude").getNodeValue());
+            listIntersections.add(new Intersection(id, latitude, longitude));
         }
+        return listIntersections;
+    }
 
 
-        //************* SEGMENT **************
+    public ArrayList<Segment> parseXMLSegments(Document document) {
+
         NodeList nodeSegment = document.getElementsByTagName("segment");
+        ArrayList<Segment> listSegments = new ArrayList<>();
         for (int x = 0, size = nodeSegment.getLength(); x < size; x++) {
             long destination = Long.parseLong(nodeSegment.item(x).getAttributes().getNamedItem("destination").getNodeValue());
             double length = Double.parseDouble(nodeSegment.item(x).getAttributes().getNamedItem("length").getNodeValue());
@@ -82,13 +93,9 @@ public class XMLDeserializer {
             long origin = Long.parseLong(nodeSegment.item(x).getAttributes().getNamedItem("origin").getNodeValue());
 
             Segment s = new Segment(length, name, destination, origin);
-            cityMap.addSegment(s,intersectionMap.get(origin));
+            listSegments.add(s);
         }
-
-        /*Iterator it = cityMap.getAdjacenceMap().entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<Intersection, ArrayList<Segment>> entry = (Map.Entry)it.next();
-            System.out.println(entry.getKey().getId() + " = " + entry.getValue());
-        }*/
+        return listSegments;
     }
+
 }
