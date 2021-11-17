@@ -10,9 +10,10 @@ import org.w3c.dom.NodeList;
 public class XMLDeserializer {
 
     public static void main(String[] args) throws Exception {
+        File file= new File("src/main/resources/smallMap.xml");
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
-        Document document = db.parse(new File("./../../resources/smallMap.xml"));
+        Document document = db.parse(file);
         NodeList nodeList = document.getElementsByTagName("intersection");
         for(int x=0,size= nodeList.getLength(); x<size; x++) {
             System.out.println(nodeList.item(x).getAttributes().getNamedItem("id").getNodeValue());

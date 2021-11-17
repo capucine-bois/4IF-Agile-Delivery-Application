@@ -1,5 +1,5 @@
 package xml;
-
+/*
 import java.io.File;
 import java.util.Iterator;
 
@@ -17,11 +17,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import model.Circle;
-import model.Visitor;
-import model.Plan;
-import model.Rectangle;
-import model.Shape;
 
 public class XMLserializer implements Visitor{// Singleton
 	
@@ -42,7 +37,7 @@ public class XMLserializer implements Visitor{// Singleton
 	 * @throws TransformerFactoryConfigurationError
 	 * @throws TransformerException
 	 * @throws ExceptionXML
-	 */
+	 *//*
 	public void save(Plan plan) throws ParserConfigurationException, TransformerFactoryConfigurationError, TransformerException, ExceptionXML{
 		File xml = XMLfileOpenerSolnon.getInstance().open(false);
   		StreamResult result = new StreamResult(xml);
@@ -89,3 +84,4 @@ public class XMLserializer implements Visitor{// Singleton
         createAttribute(shapeRoot,"height",Integer.toString(r.getHeight()));
 	}
 }
+*/
