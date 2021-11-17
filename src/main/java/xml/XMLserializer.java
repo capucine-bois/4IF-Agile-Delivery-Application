@@ -44,7 +44,7 @@ public class XMLserializer implements Visitor{// Singleton
 	 * @throws ExceptionXML
 	 */
 	public void save(Plan plan) throws ParserConfigurationException, TransformerFactoryConfigurationError, TransformerException, ExceptionXML{
-		File xml = XMLfileOpener.getInstance().open(false);
+		File xml = XMLfileOpenerSolnon.getInstance().open(false);
   		StreamResult result = new StreamResult(xml);
        	document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
        	document.appendChild(createPlanElt(plan));

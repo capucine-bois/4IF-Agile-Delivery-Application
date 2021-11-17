@@ -4,12 +4,12 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.*;
 
-public class XMLfileOpener extends FileFilter {// Singleton
+public class XMLfileOpenerSolnon extends FileFilter {// Singleton
 	
-	private static XMLfileOpener instance = null;
-	private XMLfileOpener(){}
-	protected static XMLfileOpener getInstance(){
-		if (instance == null) instance = new XMLfileOpener();
+	private static XMLfileOpenerSolnon instance = null;
+	private XMLfileOpenerSolnon(){}
+	protected static XMLfileOpenerSolnon getInstance(){
+		if (instance == null) instance = new XMLfileOpenerSolnon();
 		return instance;
 	}
 
