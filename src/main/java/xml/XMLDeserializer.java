@@ -1,45 +1,63 @@
 package xml;
+
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import model.CityMap;
+import model.Intersection;
+import model.Segment;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 public class XMLDeserializer {
 
+    //TODO : refactoring
+    //TODO : serializing for requests
     public static void main(String[] args) throws Exception {
-        File file= new File("src/main/resources/smallMap.xml");
+        File file = new File("src/main/resources/smallMap.xml");
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(file);
         NodeList nodeIntersection = document.getElementsByTagName("intersection");
-        //************* INTERSECTION **************
-        for(int x=0,size= nodeIntersection.getLength(); x<size; x++) {
-            System.out.print("id : ");
-            System.out.print(nodeIntersection.item(x).getAttributes().getNamedItem("id").getNodeValue());
-            System.out.print("    latitude :    ");
-            System.out.print(nodeIntersection.item(x).getAttributes().getNamedItem("latitude").getNodeValue());
-            System.out.print("    longitude :    ");
-            System.out.print(nodeIntersection.item(x).getAttributes().getNamedItem("longitude").getNodeValue());
-            System.out.println();
 
+        CityMap cityMap = new CityMap();
+        Map<Long,Intersection> intersectionMap = new HashMap<>();
+
+        //************* INTERSECTION **************
+        for (int x = 0, size = nodeIntersection.getLength(); x < size; x++) {
+            long id = Long.parseLong(nodeIntersection.item(x).getAttributes().getNamedItem("id").getNodeValue());
+            double latitude = Double.parseDouble(nodeIntersection.item(x).getAttributes().getNamedItem("latitude").getNodeValue());
+
+            double longitude = Double.parseDouble(nodeIntersection.item(x).getAttributes().getNamedItem("longitude").getNodeValue());
+
+            Intersection i = new Intersection(id, latitude, longitude);
+            cityMap.addIntersection(i);
+            intersectionMap.put(id,i);
         }
-        System.out.println();
+
+
         //************* SEGMENT **************
         NodeList nodeSegment = document.getElementsByTagName("segment");
-        for(int x=0,size= nodeSegment.getLength(); x<size; x++) {
-            System.out.print("destination : ");
-            System.out.print(nodeSegment.item(x).getAttributes().getNamedItem("destination").getNodeValue());
-            System.out.print("    length :    ");
-            System.out.print(nodeSegment.item(x).getAttributes().getNamedItem("length").getNodeValue());
-            System.out.print("    name :    ");
-            System.out.print(nodeSegment.item(x).getAttributes().getNamedItem("name").getNodeValue());
-            System.out.print("    origin :    ");
-            System.out.println(nodeSegment.item(x).getAttributes().getNamedItem("origin").getNodeValue());
-            System.out.println();
+        for (int x = 0, size = nodeSegment.getLength(); x < size; x++) {
+            long destination = Long.parseLong(nodeSegment.item(x).getAttributes().getNamedItem("destination").getNodeValue());
+            double length = Double.parseDouble(nodeSegment.item(x).getAttributes().getNamedItem("length").getNodeValue());
+            String name = nodeSegment.item(x).getAttributes().getNamedItem("name").getNodeValue();
+            long origin = Long.parseLong(nodeSegment.item(x).getAttributes().getNamedItem("origin").getNodeValue());
 
+            Segment s = new Segment(length, name, destination, origin);
+            cityMap.addSegment(s,intersectionMap.get(origin));
         }
+
+        /*Iterator it = cityMap.getAdjacenceMap().entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<Intersection, ArrayList<Segment>> entry = (Map.Entry)it.next();
+            System.out.println(entry.getKey().getId() + " = " + entry.getValue());
+        }*/
     }
 }

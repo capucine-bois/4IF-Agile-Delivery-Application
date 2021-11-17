@@ -5,17 +5,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CityMap {
-    private Map<Intersection, ArrayList<Segment>> adjacenceMap = new HashMap<>();
+    private Map<Intersection, ArrayList<Segment>> adjacenceMap;
 
-    public CityMap(Map<Intersection, ArrayList<Segment>> adjacenceMap) {
-        this.adjacenceMap = adjacenceMap;
+    public CityMap() {
+        this.adjacenceMap = new HashMap<>();
     }
 
     public Map<Intersection, ArrayList<Segment>> getAdjacenceMap() {
         return adjacenceMap;
     }
 
-    public void setAdjacenceMap(Map<Intersection, ArrayList<Segment>> adjacenceMap) {
-        this.adjacenceMap = adjacenceMap;
+    public void addIntersection(Intersection i) {
+        adjacenceMap.put(i, new ArrayList<>());
     }
+
+    public void addSegment(Segment s, Intersection i) {
+        adjacenceMap.get(i).add(s);
+    }
+
+
 }

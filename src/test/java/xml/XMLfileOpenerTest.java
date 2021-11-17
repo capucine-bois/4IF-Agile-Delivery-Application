@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("XMLfileOpener test case")
 class XMLfileOpenerTest {
 
-    XMLfileOpener xmlOpener;
+    XMLFileOpener xmlOpener;
     File file = new File("testMap.xml");
 
     /*
