@@ -1,10 +1,12 @@
 package model;
 
+import observer.Observable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CityMap {
+public class CityMap extends Observable {
     private Map<Intersection, ArrayList<Segment>> adjacenceMap;
 
     public CityMap() {

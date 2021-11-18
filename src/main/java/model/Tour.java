@@ -1,8 +1,10 @@
 package model;
 
+import observer.Observable;
+
 import java.util.ArrayList;
 
-public class Tour {
+public class Tour extends Observable {
 
     /* ATTRIBUTES */
 

@@ -1,4 +1,6 @@
 package view;
+import observer.Observable;
+import observer.Observer;
 
 public class IntersectionView {
     private int coordinateX;

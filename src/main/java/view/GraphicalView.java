@@ -1,6 +1,8 @@
 package view;
 
 import com.sun.tools.jconsole.JConsoleContext;
+import observer.Observable;
+import observer.Observer;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -8,7 +10,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-public class GraphicalView extends JPanel {
+public class GraphicalView extends JPanel implements Observer {
 
     private Map<Long, IntersectionView> intersectionViewMap;
     private List<SegmentView> segmentViewList = new ArrayList<>();
@@ -103,4 +105,8 @@ public class GraphicalView extends JPanel {
         g.setColor(Color.blue);
     }
 
+    @Override
+    public void update(Observable observed, Object arg) {
+
+    }
 }
