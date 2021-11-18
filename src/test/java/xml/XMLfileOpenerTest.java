@@ -1,5 +1,11 @@
 package xml;
 import java.io.File;
+import java.text.MessageFormat;
+import java.time.Duration;
+import java.time.Instant;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -8,8 +14,26 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("XMLfileOpener test case")
 class XMLfileOpenerTest {
 
+
+    static Instant startedAt;
+
+    @BeforeAll
+    static public void initStartingTime() {
+        System.out.println("Appel avant tous les tests");
+        startedAt = Instant.now();
+    }
+
+    @AfterAll
+    static public void showTestDuration() {
+        System.out.println("Appel après tous les tests");
+        Instant endedAt = Instant.now();
+        long duration = Duration.between(startedAt, endedAt).toMillis();
+        System.out.println(MessageFormat.format("Durée des tests : {0} ms", duration));
+    }
+
+
     XMLFileOpener xmlOpener;
-    File file = new File("testMap.xml");
+    File file = new File("../../resources/testMap.xml");
 
     /*
      * Method to test:
@@ -22,7 +46,7 @@ class XMLfileOpenerTest {
     @Test
     @DisplayName("Test on accept()")
     void accept() {
-        File wrongFile = new File("test.xnl");
+        File wrongFile = new File("../../resources/test.xnl");
         boolean firstTest = xmlOpener.accept(wrongFile);
         assertFalse(firstTest,"accept function does not filter only XML");
         boolean secondTest = xmlOpener.accept(file);
