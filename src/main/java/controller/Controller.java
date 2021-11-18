@@ -13,24 +13,15 @@ import view.Window;
  */
 public class Controller {
 
-    /* ATTRIBUTES */
-
     private State currentState;
     private Window window;
     private CityMap cityMap;
     private Tour tour;
 
-    // Instances of each state
+    // Instances associated with each possible state of the controller
     protected final InitialState initState = new InitialState();
     protected final MapLoadedState mapLoadedState = new MapLoadedState();
 
-    /* CONSTRUCTORS */
-
-    /**
-     * Default constructor
-     */
-    public Controller() {
-    }
 
     /** Constructor taking already filled cityMap and tour structures
      * @param cityMap filled cityMap structure
@@ -43,7 +34,16 @@ public class Controller {
         this.tour = tour;
     }
 
-    /* METHODS */
+    /**
+     * Change the current state of the controller
+     * @param state the new current state
+     */
+    public void setCurrentState(State state) {
+        this.currentState = state;
+    }
+
+
+    // Methods corresponding to user events
 
     /**
      * Loading a map (intersections and segments) from XML file.
@@ -73,25 +73,5 @@ public class Controller {
      */
     public void computeTour() {
         // TODO implement here
-    }
-
-    /* GETTERS */
-
-    /**
-     * Getter for window attribute
-     * @return window
-     */
-    public Window getWindow() {
-        return window;
-    }
-
-    /* SETTERS */
-
-    /**
-     * Setter for currentState attribute
-     * @param currentState wanted state
-     */
-    public void setCurrentState(State currentState) {
-        this.currentState = currentState;
     }
 }

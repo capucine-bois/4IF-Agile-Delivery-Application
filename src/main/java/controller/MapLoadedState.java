@@ -15,50 +15,23 @@ import java.io.IOException;
  */
 public class MapLoadedState implements State {
 
-    /**
-     * Default constructor
-     */
-    public MapLoadedState() {
-    }
-
-    /**
-     * 
-     */
-    public void MapLoadedState() {
-        // TODO implement here
-    }
-
-
     @Override
     public void loadMap(CityMap cityMap, Window window, Controller controller) {
-
+        try {
+            XMLDeserializer.load(cityMap);
+        } catch (Exception e) {
+            // TODO afficher un message sur la fenetre
+        }
+        controller.setCurrentState(controller.mapLoadedState);
     }
 
     @Override
     public void loadRequests(Tour tour, CityMap cityMap, Window window, Controller controller) {
         try {
             XMLDeserializer.load(tour, cityMap);
-        } catch (ParserConfigurationException
-                | SAXException | IOException
-                | ExceptionXML | NumberFormatException e) {
-            // TODO afficher un message sur la fenetre
         } catch (Exception e) {
+            // TODO afficher un message sur la fenetre
             e.printStackTrace();
         }
     }
-
-    /**
-     * 
-     */
-    public void closeError() {
-        // TODO implement here
-    }
-
-    /**
-     * 
-     */
-    public void computeTour() {
-        // TODO implement here
-    }
-
 }

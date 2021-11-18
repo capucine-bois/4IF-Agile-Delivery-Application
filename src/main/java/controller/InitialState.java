@@ -15,63 +15,13 @@ import java.io.IOException;
  */
 public class InitialState implements State {
 
-    /**
-     * Default constructor
-     */
-    public InitialState() {
-    }
-
-    /**
-     * 
-     */
-    public void InitialState() {
-        // TODO implement here
-    }
-
-    /**
-     * Loading a map (intersections and segments) from XML file.
-     * Deserialize XML map file selected by user and returned by GUI window.
-     * @param cityMap the map structure to fill
-     * @param window the window where to show map and popup messages
-     * @param controller application controller
-     */
     public void loadMap(CityMap cityMap, Window window, Controller controller) {
         try {
             XMLDeserializer.load(cityMap);
-        } catch (ParserConfigurationException
-                | SAXException | IOException
-                | ExceptionXML | NumberFormatException e) {
-            // TODO afficher un message sur la fenetre
         } catch (Exception e) {
-            e.printStackTrace();
+            // TODO afficher un message sur la fenetre
         }
         controller.setCurrentState(controller.mapLoadedState);
-
-    }
-
-    /**
-     * Loading requests when the application is in initial state is forbidden and raises an error.
-     * @param tour the tour structure to fill
-     * @param window the window where to show map and popup messages
-     * @param controller application controller
-     */
-    @Override
-    public void loadRequests(Tour tour, CityMap cityMap, Window window, Controller controller) {
-
-    }
-
-    /**
-     * 
-     */
-    public void closeError() {
-        // TODO implement here
-    }
-
-    /**
-     * 
-     */
-    public void computeTour() {
-        // TODO implement here
     }
 
 }
