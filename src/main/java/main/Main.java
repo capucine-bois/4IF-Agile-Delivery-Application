@@ -17,6 +17,7 @@ public class Main {
         CityMap cityMap = new CityMap();
         Tour tour = new Tour();
         Controller controller = new Controller(cityMap, tour);
+        // TODO: implement design pattern observer instead of force displayMap
         Thread.sleep(100);
         controller.getWindow().displayMap();
     }

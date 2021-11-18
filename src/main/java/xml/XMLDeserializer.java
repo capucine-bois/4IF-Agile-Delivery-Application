@@ -25,7 +25,7 @@ public class XMLDeserializer {
         Document document = extractDocument(file);
         Element racine = document.getDocumentElement();
         if (racine.getNodeName().equals("map")) {
-            cityMap = deserializeMap(file, document);
+            deserializeMap(cityMap, document);
         } else {
             throw new ExceptionXML("Bad document");
         }
@@ -36,7 +36,7 @@ public class XMLDeserializer {
         Document document = extractDocument(file);
         Element racine = document.getDocumentElement();
         if (racine.getNodeName().equals("planningRequest")) {
-            tour = deserializeRequests(file, document);
+            deserializeRequests(tour, document);
         } else {
             throw new ExceptionXML("Bad document");
         }
@@ -49,8 +49,7 @@ public class XMLDeserializer {
     }
 
 
-    public static CityMap deserializeMap(File file, Document document) {
-        CityMap cityMap = new CityMap();
+    public static CityMap deserializeMap(CityMap cityMap, Document document) {
         ArrayList<Intersection> listXMLIntersections;
         ArrayList<Segment> listXMLSegments;
 
@@ -64,12 +63,6 @@ public class XMLDeserializer {
             for (Segment s : listXMLSegments) {
                 cityMap.addSegment(s, intersectionMap.get(s.getOrigin()));
             }
-
-        /*Iterator it = cityMap.getAdjacenceMap().entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<Intersection, ArrayList<Segment>> entry = (Map.Entry) it.next();
-            System.out.println(entry.getKey().getId() + " = " + entry.getValue());
-        }*/
         }
         return cityMap;
     }
@@ -104,9 +97,8 @@ public class XMLDeserializer {
     }
 
 
-    public static Tour deserializeRequests(File file, Document document){
+    public static void deserializeRequests(Tour tour, Document document){
         ArrayList<Request> listXMLRequests;
-        Tour tour = null;
         if(document != null) {
             listXMLRequests = parseXMLRequests(document);
             // parse XMLDepot
@@ -115,15 +107,11 @@ public class XMLDeserializer {
             String departureTime = nodeDepot.item(0).getAttributes().getNamedItem("departureTime").getNodeValue();
             Intersection depotAdress = intersectionMap.get(address);
 
-            // create the Tour object
-             tour = new Tour(depotAdress, departureTime, listXMLRequests);
-             /*System.out.println(address + "   " + depotAdress);
-             System.out.println(departureTime);
-             for(Request r : listXMLRequests){
-                 System.out.println(r.getDeliveryAddress().getId());
-             }*/
+            // set the Tour object
+            tour.setDepotAddress(depotAdress);
+            tour.setDepartureTime(departureTime);
+            tour.setPlanningRequests(listXMLRequests);
         }
-        return tour;
     }
 
 

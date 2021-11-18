@@ -16,12 +16,6 @@ public class Tour {
 
     public Tour(){}
 
-    public Tour(Intersection depotAddress, String departureTime, ArrayList<Request> planningRequests) {
-        this.depotAddress = depotAddress;
-        this.departureTime = departureTime;
-        this.planningRequests = planningRequests;
-    }
-
     /* GETTERS */
 
     public double getTourLength() {
@@ -30,6 +24,10 @@ public class Tour {
 
     public Intersection getDepotAddress() {
         return depotAddress;
+    }
+
+    public String getDepartureTime() {
+        return departureTime;
     }
 
     public ArrayList<Request> getPlanningRequests() {
@@ -48,6 +46,10 @@ public class Tour {
 
     public void setDepotAddress(Intersection depotAddress) {
         this.depotAddress = depotAddress;
+    }
+
+    public void setDepartureTime(String departureTime) {
+        this.departureTime = departureTime;
     }
 
     public void setPlanningRequests(ArrayList<Request> planningRequests) {

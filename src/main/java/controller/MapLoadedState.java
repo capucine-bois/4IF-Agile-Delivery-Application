@@ -61,18 +61,4 @@ public class MapLoadedState implements State {
         // TODO implement here
     }
 
-    /**
-     *
-     */
-    public void loadRequests(Tour tour, Window window) {
-        try {
-            XMLDeserializer.load(tour);
-        } catch (ParserConfigurationException
-                | SAXException | IOException
-                | ExceptionXML | NumberFormatException e) {
-            // TODO afficher un message sur la fenetre
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }
