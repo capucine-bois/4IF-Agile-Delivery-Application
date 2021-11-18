@@ -31,7 +31,6 @@ public class Window extends JFrame implements ComponentListener {
         //TODO: Add map when implemented
         //TODO: Add controller when implemented
         createHeader();
-        //TODO: Add intermediate JPanel before graphicalView and textualView
         graphicalView = new GraphicalView(this);
         textualView = new TextualView(this);
         //TODO: Add mouse listener

@@ -10,8 +10,9 @@ public class Main {
     /**
      * @param args the arguments
      */
-    public static void main(String[] args) throws IOException, FontFormatException {
+    public static void main(String[] args) throws IOException, FontFormatException, InterruptedException {
         Window w = new Window();
+        Thread.sleep(100);
         w.displayMap();
     }
 }
