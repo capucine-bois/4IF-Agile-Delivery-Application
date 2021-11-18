@@ -3,8 +3,8 @@ package model;
 public class Segment {
     private double length;
     private String name;
-    private long destination;
-    private long origin;
+    private Intersection destination;
+    private Intersection origin;
 
     /* CONSTRUCTORS */
 
@@ -15,7 +15,7 @@ public class Segment {
      * @param destination geographical destination
      * @param origin geographical origin
      */
-    public Segment(double length, String name, long destination, long origin) {
+    public Segment(double length, String name, Intersection destination, Intersection origin) {
         this.length = length;
         this.name = name;
         this.destination = destination;
@@ -44,7 +44,7 @@ public class Segment {
      * Getter for destination attribute
      * @return destination
      */
-    public long getDestination() {
+    public Intersection getDestination() {
         return destination;
     }
 
@@ -52,7 +52,7 @@ public class Segment {
      * Getter for origin attribute
      * @return origin
      */
-    public long getOrigin() {
+    public Intersection getOrigin() {
         return origin;
     }
 
@@ -78,7 +78,7 @@ public class Segment {
      * Setter for destination attribute
      * @param destination new value wanted for destination attribute
      */
-    public void setDestination(long destination) {
+    public void setDestination(Intersection destination) {
         this.destination = destination;
     }
 
@@ -86,7 +86,7 @@ public class Segment {
      * Setter for origin attribute
      * @param origin new value wanted for origin attribute
      */
-    public void setOrigin(long origin) {
+    public void setOrigin(Intersection origin) {
         this.origin = origin;
     }
 }
