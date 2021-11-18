@@ -1,8 +1,6 @@
 package view;
 
 import java.awt.*;
-import observer.Observable;
-import observer.Observer;
 
 public class SegmentView {
     private IntersectionView origin;

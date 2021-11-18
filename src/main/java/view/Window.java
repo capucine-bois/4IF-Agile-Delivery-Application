@@ -1,6 +1,7 @@
 package view;
 
 import controller.Controller;
+import model.CityMap;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,12 +30,12 @@ public class Window extends JFrame implements ComponentListener {
 
     private final String[] buttonTexts = new String[]{LOAD_MAP, LOAD_REQUEST, COMPUTE_TOUR};
 
-    public Window(Controller controller) throws IOException, FontFormatException {
+    public Window(CityMap cityMap, Controller controller) throws IOException, FontFormatException {
         //TODO: Add map when implemented
         //TODO: Add controller when implemented
         createHeader(controller);
         //TODO: Add intermediate JPanel before graphicalView and textualView
-        graphicalView = new GraphicalView(this);
+        graphicalView = new GraphicalView(cityMap, this);
         textualView = new TextualView(this);
         //TODO: Add mouse listener
         //TODO: Add keyboard listener
@@ -111,27 +112,5 @@ public class Window extends JFrame implements ComponentListener {
     @Override
     public void componentHidden(ComponentEvent e) {
 
-    }
-
-    public void displayMap() {
-        /////////////////////////////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////////////
-
-        // THIS SHOULD BE DONE IN THE CONTROLLER WHEN WE WANT TO LOAD A MAP
-
-        // TODO: replace with intersections and segments coming from CityMap
-        java.util.List<double[]> intersectionsTest = new ArrayList<>();
-        intersectionsTest.add(new double[]{45.75406, 4.857418, 1});
-        intersectionsTest.add(new double[]{45.75244, 4.862118, 2});
-        intersectionsTest.add(new double[]{45.75466, 4.861418, 3});
-        intersectionsTest.add(new double[]{45.74806, 4.872218, 4});
-        intersectionsTest.add(new double[]{45.75606, 4.850841, 5});
-        intersectionsTest.add(new double[]{45.74934, 4.864663, 6});
-        graphicalView.initIntersectionViewList(intersectionsTest);
-
-        /////////////////////////////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////////////
     }
 }

@@ -1,6 +1,8 @@
 package view;
 
-import com.sun.tools.jconsole.JConsoleContext;
+import model.CityMap;
+import model.Intersection;
+import model.Segment;
 import observer.Observable;
 import observer.Observer;
 
@@ -13,47 +15,61 @@ import java.util.List;
 public class GraphicalView extends JPanel implements Observer {
 
     private Map<Long, IntersectionView> intersectionViewMap;
-    private List<SegmentView> segmentViewList = new ArrayList<>();
+    private List<SegmentView> segmentViewList;
     private Graphics g;
     private final int firstBorder = 10;
     private final int secondBorder = 2;
+    private CityMap cityMap;
 
     /**
      * Create the graphical view
      * @param w the window
      */
-    public GraphicalView(Window w) {
+    public GraphicalView(CityMap cityMap, Window w) {
         setLayout(null);
         setBackground(Constants.COLOR_5);
         setBorder(new CompoundBorder(BorderFactory.createMatteBorder(firstBorder,firstBorder,firstBorder,5,Constants.COLOR_1),BorderFactory.createLineBorder(Constants.COLOR_4, secondBorder)));
         w.getContentPane().add(this, BorderLayout.CENTER);
+        cityMap.addObserver(this);
+        this.cityMap = cityMap;
+        segmentViewList = new ArrayList<>();
+        intersectionViewMap = new HashMap<>();
     }
 
-    public void initIntersectionViewList(List<double[]> intersectionsTest) {
-        double minLatitude = intersectionsTest.get(0)[0]; // getLatitude() instead of [0]
-        double maxLatitude = intersectionsTest.get(0)[0]; // getLatitude() instead of [0]
-        double minLongitude = intersectionsTest.get(0)[1]; // getLongitude() instead of [1]
-        double maxLongitude = intersectionsTest.get(0)[1]; // getLongitude() instead of [1]
+    public void displayCityMap(Map<Intersection, ArrayList<Segment>> adjacenceMap) {
+        intersectionViewMap.clear();
+        segmentViewList.clear();
 
-        for (double[] intersection : intersectionsTest) {
-            double latitude = intersection[0]; // getLatitude() instead of [0]
-            double longitude = intersection[1]; // getLongitude() instead of [1]
-            if (latitude < minLatitude) {
-                minLatitude = latitude;
-            } else if (latitude > maxLatitude) {
-                maxLatitude = latitude;
+        Set<Intersection> intersections = adjacenceMap.keySet();
+        Optional<Intersection> optionalIntersection = intersections.stream().findFirst();
+        if (optionalIntersection.isPresent()) {
+            Intersection firstIntersection = optionalIntersection.get();
+            double minLatitude = firstIntersection.getLatitude();
+            double maxLatitude = firstIntersection.getLatitude();
+            double minLongitude = firstIntersection.getLongitude();
+            double maxLongitude = firstIntersection.getLongitude();
+
+            for (Intersection intersection : intersections) {
+                double latitude = intersection.getLatitude();
+                double longitude = intersection.getLongitude();
+                if (latitude < minLatitude) {
+                    minLatitude = latitude;
+                } else if (latitude > maxLatitude) {
+                    maxLatitude = latitude;
+                }
+                if (longitude < minLongitude) {
+                    minLongitude = longitude;
+                } else if (longitude > maxLongitude) {
+                    maxLongitude = longitude;
+                }
             }
-            if (longitude < minLongitude) {
-                minLongitude = longitude;
-            } else if (longitude > maxLongitude) {
-                maxLongitude = longitude;
-            }
+
+            initIntersectionViewList(adjacenceMap, minLatitude, maxLatitude, minLongitude, maxLongitude);
+            initSegmentViewList(adjacenceMap.values());
         }
-
-        createAllIntersectionViews(intersectionsTest, minLatitude, maxLatitude, minLongitude, maxLongitude);
     }
 
-    private void createAllIntersectionViews(List<double[]> intersectionsTest, double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
+    private void initIntersectionViewList(Map<Intersection, ArrayList<Segment>> adjacenceMap, double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
         double latitudeLength = maxLatitude - minLatitude;
         double longitudeLength = maxLongitude - minLongitude;
 
@@ -61,34 +77,25 @@ public class GraphicalView extends JPanel implements Observer {
         double height = g.getClipBounds().height - (firstBorder * 2 + secondBorder * 2);
 
         intersectionViewMap = new HashMap<>();
-        for (double[] intersection : intersectionsTest) {
-            double coordinateLongitude = intersection[1] - minLongitude; // getLongitude() instead of [1]
-            double coordinateLatitude = intersection[0] - minLatitude; // getLatitude() instead of [0]
+        for (Intersection intersection : adjacenceMap.keySet()) {
+            double coordinateLongitude = intersection.getLongitude() - minLongitude;
+            double coordinateLatitude = intersection.getLatitude() - minLatitude;
             int coordinateX = (int) ((coordinateLongitude * width) / longitudeLength) + firstBorder + secondBorder;
             int coordinateY = (int) (height) - (int) ((coordinateLatitude * height) / latitudeLength) + firstBorder + secondBorder;
             IntersectionView intersectionView = new IntersectionView(coordinateX, coordinateY);
-            intersectionViewMap.put((long) intersection[2], intersectionView); // getId() instead of [2]
+            intersectionViewMap.put(intersection.getId(), intersectionView);
         }
-
-        List<long[]> segmentsTest = new ArrayList<>();
-        segmentsTest.add(new long[]{1, 3});
-        segmentsTest.add(new long[]{2, 4});
-        segmentsTest.add(new long[]{2, 3});
-        segmentsTest.add(new long[]{3, 2});
-        segmentsTest.add(new long[]{6, 5});
-        segmentsTest.add(new long[]{5, 1});
-        initSegmentViewList(segmentsTest);
     }
 
-    private void initSegmentViewList(List<long[]> segmentsTest) {
-        //segmentViewList = new ArrayList<>();
-        for (long[] segment : segmentsTest) {
-            IntersectionView origin = intersectionViewMap.get(segment[0]); // getOrigin() instead of [0]
-            IntersectionView destination = intersectionViewMap.get(segment[1]); // getDestination() instead of [1]
-            SegmentView segmentView = new SegmentView(origin, destination);
-            segmentViewList.add(segmentView);
+    private void initSegmentViewList(Collection<ArrayList<Segment>> segmentsCollection) {
+        for (List<Segment> segments : segmentsCollection) {
+            for (Segment segment : segments) {
+                IntersectionView origin = intersectionViewMap.get(segment.getOrigin());
+                IntersectionView destination = intersectionViewMap.get(segment.getDestination());
+                SegmentView segmentView = new SegmentView(origin, destination);
+                segmentViewList.add(segmentView);
+            }
         }
-        repaint();
     }
 
     /**
@@ -102,11 +109,13 @@ public class GraphicalView extends JPanel implements Observer {
         for (SegmentView segmentView : segmentViewList) {
             segmentView.paintComponent(g);
         }
-        g.setColor(Color.blue);
     }
 
     @Override
-    public void update(Observable observed, Object arg) {
-
+    public void update(Observable o, Object arg) {
+        if (o.equals(cityMap)) {
+            displayCityMap(cityMap.getAdjacenceMap());
+        }
+        repaint();
     }
 }

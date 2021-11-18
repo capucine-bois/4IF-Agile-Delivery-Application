@@ -25,5 +25,4 @@ public class CityMap extends Observable {
         adjacenceMap.get(i).add(s);
     }
 
-
 }

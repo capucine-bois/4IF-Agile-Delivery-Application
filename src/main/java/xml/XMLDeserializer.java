@@ -49,7 +49,7 @@ public class XMLDeserializer {
     }
 
 
-    public static CityMap deserializeMap(CityMap cityMap, Document document) {
+    public static void deserializeMap(CityMap cityMap, Document document) {
         ArrayList<Intersection> listXMLIntersections;
         ArrayList<Segment> listXMLSegments;
 
@@ -63,8 +63,8 @@ public class XMLDeserializer {
             for (Segment s : listXMLSegments) {
                 cityMap.addSegment(s, intersectionMap.get(s.getOrigin()));
             }
+            cityMap.notifyObservers();
         }
-        return cityMap;
     }
 
 

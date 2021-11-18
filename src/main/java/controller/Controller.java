@@ -33,7 +33,7 @@ public class Controller {
      * @param cityMap
      */
     public Controller(CityMap cityMap, Tour tour) throws IOException, FontFormatException {
-        this.window = new Window(this);
+        this.window = new Window(cityMap, this);
         this.currentState = initState;
         this.cityMap = cityMap;
         this.tour = tour;
