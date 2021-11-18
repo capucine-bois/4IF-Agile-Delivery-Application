@@ -14,6 +14,8 @@ public class Tour {
 
     /* CONSTRUCTORS */
 
+    public Tour(){}
+
     public Tour(Intersection depotAddress, String departureTime, ArrayList<Request> planningRequests) {
         this.depotAddress = depotAddress;
         this.departureTime = departureTime;

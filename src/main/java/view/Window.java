@@ -1,5 +1,7 @@
 package view;
 
+import controller.Controller;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -27,10 +29,10 @@ public class Window extends JFrame implements ComponentListener {
 
     private final String[] buttonTexts = new String[]{LOAD_MAP, LOAD_REQUEST, COMPUTE_TOUR};
 
-    public Window() throws IOException, FontFormatException {
+    public Window(Controller controller) throws IOException, FontFormatException {
         //TODO: Add map when implemented
         //TODO: Add controller when implemented
-        createHeader();
+        createHeader(controller);
         //TODO: Add intermediate JPanel before graphicalView and textualView
         graphicalView = new GraphicalView(this);
         textualView = new TextualView(this);
@@ -43,13 +45,13 @@ public class Window extends JFrame implements ComponentListener {
         addComponentListener(this);
     }
 
-    private void createHeader() throws IOException, FontFormatException {
+    private void createHeader(Controller controller) throws IOException, FontFormatException {
         header = new JPanel();
         FlowLayout headerLayout = new FlowLayout(FlowLayout.LEFT);
         header.setLayout(headerLayout);
         header.setBackground(Constants.COLOR_1);
         addAppName();
-        buttonListener = new ButtonListener();
+        buttonListener = new ButtonListener(controller);
         buttons = new ArrayList<>();
         for (String text : buttonTexts){
             JButton button = new JButton(text);

@@ -1,46 +1,59 @@
 package xml;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import model.*;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class XMLDeserializer {
-    private final Map<Long, Intersection> intersectionMap = new HashMap<>();
+    private static final Map<Long, Intersection> intersectionMap = new HashMap<>();
 
-    //TODO : make "opening file" generic
-    public static void main(String[] args){
-        XMLDeserializer xmlDeserializer = new XMLDeserializer();
-        xmlDeserializer.deserializeMap();
-        xmlDeserializer.deserializeRequests();
+    public static void load(CityMap cityMap) throws Exception {
+        File file = XMLFileOpener.getInstance().open(true);
+        Document document = extractDocument(file);
+        Element racine = document.getDocumentElement();
+        if (racine.getNodeName().equals("map")) {
+            cityMap = deserializeMap(file, document);
+        } else {
+            throw new ExceptionXML("Bad document");
+        }
     }
 
+    public static void load(Tour tour) throws Exception {
+        File file = XMLFileOpener.getInstance().open(true);
+        Document document = extractDocument(file);
+        Element racine = document.getDocumentElement();
+        if (racine.getNodeName().equals("planningRequest")) {
+            tour = deserializeRequests(file, document);
+        } else {
+            throw new ExceptionXML("Bad document");
+        }
+    }
 
-    public Document extractDocument(File file) throws Exception {
+    public static Document extractDocument(File file) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         return db.parse(file);
     }
 
 
-    public CityMap deserializeMap() {
+    public static CityMap deserializeMap(File file, Document document) {
         CityMap cityMap = new CityMap();
         ArrayList<Intersection> listXMLIntersections;
         ArrayList<Segment> listXMLSegments;
-        File file = new File("src/main/resources/fichiersXML2020/largeMap.xml");
-        Document document = null;
-        try {
-            document = extractDocument(file);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
         if(document != null) {
             listXMLIntersections = parseXMLIntersections(document);
             for (Intersection i : listXMLIntersections) {
@@ -62,7 +75,7 @@ public class XMLDeserializer {
     }
 
 
-    public ArrayList<Intersection> parseXMLIntersections(Document document) {
+    public static ArrayList<Intersection> parseXMLIntersections(Document document) {
         NodeList intersectionNodes = document.getElementsByTagName("intersection");
         ArrayList<Intersection> listIntersections = new ArrayList<>();
         for (int x = 0, size = intersectionNodes.getLength(); x < size; x++) {
@@ -76,7 +89,7 @@ public class XMLDeserializer {
     }
 
 
-    public ArrayList<Segment> parseXMLSegments(Document document) {
+    public static ArrayList<Segment> parseXMLSegments(Document document) {
         NodeList nodeSegment = document.getElementsByTagName("segment");
         ArrayList<Segment> listSegments = new ArrayList<>();
         for (int x = 0, size = nodeSegment.getLength(); x < size; x++) {
@@ -91,16 +104,9 @@ public class XMLDeserializer {
     }
 
 
-    public Tour deserializeRequests(){
+    public static Tour deserializeRequests(File file, Document document){
         ArrayList<Request> listXMLRequests;
         Tour tour = null;
-        File file = new File("src/main/resources/fichiersXML2020/requestsLarge9.xml");
-        Document document = null;
-        try {
-            document = extractDocument(file);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         if(document != null) {
             listXMLRequests = parseXMLRequests(document);
             // parse XMLDepot
@@ -121,7 +127,7 @@ public class XMLDeserializer {
     }
 
 
-    public ArrayList<Request> parseXMLRequests(Document document) {
+    public static ArrayList<Request> parseXMLRequests(Document document) {
         NodeList nodeRequest = document.getElementsByTagName("request");
         ArrayList<Request> listRequests = new ArrayList<>();
         for (int x = 0, size = nodeRequest.getLength(); x < size; x++) {
