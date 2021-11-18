@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CityMap extends Observable {
-public class CityMap {
 
     /* ATTRIBUTES */
 
