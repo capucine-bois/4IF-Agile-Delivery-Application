@@ -11,7 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 
 /**
- * 
+ * Map loaded state. State of the application when map has been loaded.
  */
 public class MapLoadedState implements State {
 
