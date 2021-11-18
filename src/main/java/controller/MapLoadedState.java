@@ -35,9 +35,9 @@ public class MapLoadedState implements State {
     }
 
     @Override
-    public void loadRequests(Tour tour, Window window, Controller controller) {
+    public void loadRequests(Tour tour, CityMap cityMap, Window window, Controller controller) {
         try {
-            XMLDeserializer.load(tour);
+            XMLDeserializer.load(tour, cityMap);
         } catch (ParserConfigurationException
                 | SAXException | IOException
                 | ExceptionXML | NumberFormatException e) {

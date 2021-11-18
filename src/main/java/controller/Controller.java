@@ -50,7 +50,7 @@ public class Controller {
      *
      */
     public void loadRequests() {
-        currentState.loadRequests(tour, window, this);
+        currentState.loadRequests(tour, cityMap, window, this);
     }
 
     /**

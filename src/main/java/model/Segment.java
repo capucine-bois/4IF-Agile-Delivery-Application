@@ -3,10 +3,10 @@ package model;
 public class Segment {
     private double length;
     private String name;
-    private long destination;
-    private long origin;
+    private Intersection destination;
+    private Intersection origin;
 
-    public Segment(double length, String name, long destination, long origin) {
+    public Segment(double length, String name, Intersection destination, Intersection origin) {
         this.length = length;
         this.name = name;
         this.destination = destination;
@@ -29,19 +29,19 @@ public class Segment {
         this.name = name;
     }
 
-    public long getDestination() {
+    public Intersection getDestination() {
         return destination;
     }
 
-    public void setDestination(long destination) {
+    public void setDestination(Intersection destination) {
         this.destination = destination;
     }
 
-    public long getOrigin() {
+    public Intersection getOrigin() {
         return origin;
     }
 
-    public void setOrigin(long origin) {
+    public void setOrigin(Intersection origin) {
         this.origin = origin;
     }
 }

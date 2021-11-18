@@ -19,7 +19,7 @@ public interface State {
     /**
      * 
      */
-    public void loadRequests(Tour tour, Window window, Controller controller);
+    public void loadRequests(Tour tour, CityMap cityMap, Window window, Controller controller);
 
     /**
      * 

@@ -61,4 +61,8 @@ public class Tour extends Observable {
     public void setListShortestPaths(ArrayList<ShortestPath> listShortestPaths) {
         this.listShortestPaths = listShortestPaths;
     }
+
+    public void addRequest(Request request) {
+        planningRequests.add(request);
+    }
 }
