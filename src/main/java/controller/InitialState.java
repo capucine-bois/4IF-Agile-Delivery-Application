@@ -11,7 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 
 /**
- * 
+ * Initial state. State of the application when its launches, and when map is not loaded.
  */
 public class InitialState implements State {
 
@@ -28,10 +28,12 @@ public class InitialState implements State {
         // TODO implement here
     }
 
-
     /**
-     *
-     * @param window
+     * Loading a map (intersections and segments) from XML file.
+     * Deserialize XML map file selected by user and returned by GUI window.
+     * @param cityMap the map structure to fill
+     * @param window the window where to show map and popup messages
+     * @param controller application controller
      */
     public void loadMap(CityMap cityMap, Window window, Controller controller) {
         try {
@@ -47,6 +49,12 @@ public class InitialState implements State {
 
     }
 
+    /**
+     * Loading requests when the application is in initial state is forbidden and raises an error.
+     * @param tour the tour structure to fill
+     * @param window the window where to show map and popup messages
+     * @param controller application controller
+     */
     @Override
     public void loadRequests(Tour tour, CityMap cityMap, Window window, Controller controller) {
 
