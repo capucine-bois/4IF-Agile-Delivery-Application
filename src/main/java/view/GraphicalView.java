@@ -90,8 +90,8 @@ public class GraphicalView extends JPanel implements Observer {
     private void initSegmentViewList(Collection<ArrayList<Segment>> segmentsCollection) {
         for (List<Segment> segments : segmentsCollection) {
             for (Segment segment : segments) {
-                IntersectionView origin = intersectionViewMap.get(segment.getOrigin());
-                IntersectionView destination = intersectionViewMap.get(segment.getDestination());
+                IntersectionView origin = intersectionViewMap.get(segment.getOrigin().getId());
+                IntersectionView destination = intersectionViewMap.get(segment.getDestination().getId());
                 SegmentView segmentView = new SegmentView(origin, destination);
                 segmentViewList.add(segmentView);
             }

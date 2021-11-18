@@ -19,7 +19,9 @@ public class XMLDeserializer {
         Element racine = document.getDocumentElement();
         if (racine.getNodeName().equals("map")) {
             deserializeMap(cityMap, document);
+            cityMap.notifyObservers();
         } else {
+            // TODO: manage cancel in file opener
             throw new ExceptionXML("Bad document");
         }
     }
@@ -31,6 +33,7 @@ public class XMLDeserializer {
         if (racine.getNodeName().equals("planningRequest")) {
             deserializeRequests(tour, cityMap, document);
         } else {
+            // TODO: manage cancel in file opener
             throw new ExceptionXML("Bad document");
         }
     }

@@ -13,10 +13,9 @@ public class ButtonListener implements ActionListener {
     }
     @Override
     public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()){
-            case Window.LOAD_MAP: controller.loadMap(); break;
-            case Window.LOAD_REQUEST: controller.loadRequests(); break;
-
+        switch (e.getActionCommand()) {
+            case Window.LOAD_MAP -> controller.loadMap();
+            case Window.LOAD_REQUEST -> controller.loadRequests();
         }
     }
 }

@@ -19,7 +19,7 @@ public class Controller {
     private Tour tour;
 
     // Instances associated with each possible state of the controller
-    protected final InitialState initState = new InitialState();
+    protected final InitialState initialState = new InitialState();
     protected final MapLoadedState mapLoadedState = new MapLoadedState();
 
 
@@ -29,7 +29,7 @@ public class Controller {
      */
     public Controller(CityMap cityMap, Tour tour) throws IOException, FontFormatException {
         this.window = new Window(cityMap, this);
-        this.currentState = initState;
+        this.currentState = initialState;
         this.cityMap = cityMap;
         this.tour = tour;
     }
