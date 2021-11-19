@@ -1,6 +1,9 @@
 package view;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
@@ -26,5 +29,9 @@ public class Constants {
      */
     public static Font getFont(String fileName, int size) throws IOException, FontFormatException {
         return Font.createFont(Font.TRUETYPE_FONT, new FileInputStream("src/main/resources/fonts/" + fileName)).deriveFont(Font.PLAIN, size);
+    }
+
+    public static BufferedImage getImage(String filename) throws IOException {
+        return ImageIO.read(new File("src/main/resources/img/" + filename));
     }
 }

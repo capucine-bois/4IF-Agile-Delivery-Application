@@ -4,12 +4,10 @@ import model.*;
 import observer.Observable;
 import observer.Observer;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
@@ -134,19 +132,49 @@ public class GraphicalView extends JPanel implements Observer {
             segmentView.paintSegment(g);
         }
         if (!requests.isEmpty()) {
+            List<Color> usedColors = new ArrayList<>();
             Iterator<IntersectionView> iterator = requests.iterator();
-            g.setColor(Color.black);
             IntersectionView depotAddress = iterator.next();
-            g.fillOval(depotAddress.getCoordinateX() - 5, depotAddress.getCoordinateY() - 5, 10, 10);
+            Color depotColor = Color.red;
+            usedColors.add(depotColor);
             while (iterator.hasNext()) {
                 IntersectionView pickupAddress = iterator.next();
                 IntersectionView deliveryAddress = iterator.next();
-                int red = (int) (Math.random() * 256);
-                int green = (int) (Math.random() * 256);
-                int blue = (int) (Math.random() * 256);
-                g.setColor(new Color(red, green, blue));
-                g.fillOval(pickupAddress.getCoordinateX() - 5, pickupAddress.getCoordinateY() - 5, 10, 10);
-                g.fillRect(deliveryAddress.getCoordinateX() - 5, deliveryAddress.getCoordinateY() - 5, 10, 10);
+                Color requestColor;
+                do {
+                    int red = (int) (Math.random() * 256);
+                    int green = (int) (Math.random() * 256);
+                    int blue = (int) (Math.random() * 256);
+                    requestColor = new Color(red, green, blue);
+                } while (usedColors.contains(requestColor));
+                drawIcon(requestColor, pickupAddress, "pickup-icon.png");
+                drawIcon(requestColor, deliveryAddress, "delivery-icon.png");
+            }
+            drawIcon(depotColor, depotAddress, "depot-icon.png");
+        }
+    }
+
+    private void drawIcon(Color color, IntersectionView address, String iconFileName) {
+        try {
+            BufferedImage image = Constants.getImage(iconFileName);
+            fillColorInImage(image, color);
+            g.drawImage(image, address.getCoordinateX() - 20, address.getCoordinateY() - 40, 40, 40, this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void fillColorInImage(BufferedImage image, Color finalColor) {
+        for (int i = 0; i < image.getWidth(); i++) {
+            for (int j = 0; j < image.getHeight(); j++) {
+                Color color = new Color(image.getRGB(i, j), true);
+                if (color.getAlpha() != 0) {
+                    double scale = ((double)color.getRed()) / ((double)255);
+                    int red = (int) (finalColor.getRed() * scale);
+                    int green = (int) (finalColor.getGreen() * scale);
+                    int blue = (int) (finalColor.getBlue() * scale);
+                    image.setRGB(i, j, new Color(red, green, blue).getRGB());
+                }
             }
         }
     }
