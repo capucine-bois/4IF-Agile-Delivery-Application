@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * GUI for the application.
+ */
 public class Window extends JFrame implements ComponentListener {
 
     // Titles of window buttons
@@ -22,14 +25,25 @@ public class Window extends JFrame implements ComponentListener {
     private JPanel header;
     private GraphicalView graphicalView;
     private TextualView textualView;
+
+    // Listeners
     private ButtonListener buttonListener;
     private MouseListener mouseListener;
     private KeyboardListener keyboardListener;
+
+    // Window size
     private int windowWidth = 800;
     private int windowHeight = 550;
 
     private final String[] buttonTexts = new String[]{LOAD_MAP, LOAD_REQUEST, COMPUTE_TOUR};
 
+    /**
+     * Complete constructor
+     * @param cityMap the map to show
+     * @param controller instance of application controller
+     * @throws IOException raised if GUI listeners fail
+     * @throws FontFormatException raised if text font can't be loaded
+     */
     public Window(CityMap cityMap, Controller controller) throws IOException, FontFormatException {
         //TODO: Add map when implemented
         //TODO: Add controller when implemented
@@ -46,6 +60,12 @@ public class Window extends JFrame implements ComponentListener {
         addComponentListener(this);
     }
 
+    /**
+     * Create header in GUI window with buttons for map loading, request loading, and computing tour.
+     * @param controller application controller
+     * @throws IOException raised if font file can't be found
+     * @throws FontFormatException raised if font can't be loaded
+     */
     private void createHeader(Controller controller) throws IOException, FontFormatException {
         header = new JPanel();
         FlowLayout headerLayout = new FlowLayout(FlowLayout.LEFT);
@@ -64,6 +84,11 @@ public class Window extends JFrame implements ComponentListener {
         getContentPane().add(header, BorderLayout.PAGE_START);
     }
 
+    /**
+     *
+     * @throws IOException
+     * @throws FontFormatException
+     */
     private void addAppName() throws IOException, FontFormatException {
         JLabel appNameLabel = new JLabel("Application Name");
         appNameLabel.setForeground(Constants.COLOR_3);
@@ -72,6 +97,12 @@ public class Window extends JFrame implements ComponentListener {
         header.add(appNameLabel);
     }
 
+    /**
+     * Set style (font, borders, colors...) to given button
+     * @param button the button to apply style
+     * @throws IOException raised if font file can't be found
+     * @throws FontFormatException raised if font can't be loaded
+     */
     private void setStyle(JButton button) throws IOException, FontFormatException {
         int buttonHeight = 40;
         button.setPreferredSize(new Dimension(button.getPreferredSize().width, buttonHeight));
@@ -83,6 +114,9 @@ public class Window extends JFrame implements ComponentListener {
         button.setFocusPainted(false);
     }
 
+    /**
+     * Set window size using windowWidth and windowHeight attributes.
+     */
     private void setWindowSize() {
         int headerHeight = 50;
         int textualViewWidth = 300;
@@ -92,6 +126,10 @@ public class Window extends JFrame implements ComponentListener {
         graphicalView.setPreferredSize(new Dimension(windowWidth - textualViewWidth, windowHeight - headerHeight));
     }
 
+    /**
+     * Event triggered when the window is resized.
+     * @param e event information
+     */
     @Override
     public void componentResized(ComponentEvent e) {
         windowWidth = e.getComponent().getSize().width;
@@ -99,16 +137,28 @@ public class Window extends JFrame implements ComponentListener {
         setWindowSize();
     }
 
+    /**
+     * Event triggered when the window is moved.
+     * @param e event information
+     */
     @Override
     public void componentMoved(ComponentEvent e) {
 
     }
 
+    /**
+     * Event triggers when the window shows up.
+     * @param e event information
+     */
     @Override
     public void componentShown(ComponentEvent e) {
 
     }
 
+    /**
+     * Event triggered when the window turns hidden.
+     * @param e event information
+     */
     @Override
     public void componentHidden(ComponentEvent e) {
 

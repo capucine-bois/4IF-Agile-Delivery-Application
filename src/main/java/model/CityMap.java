@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A map is a collection of segments and intersections.
+ * A city map is a collection of segments and intersections.
  */
 public class CityMap extends Observable {
 

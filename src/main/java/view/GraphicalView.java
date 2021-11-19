@@ -12,6 +12,10 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
+/**
+ * Graphical element on the GUI.
+ * Used to display map and tour (with their segments).
+ */
 public class GraphicalView extends JPanel implements Observer {
 
     private Map<Long, IntersectionView> intersectionViewMap;
@@ -36,6 +40,10 @@ public class GraphicalView extends JPanel implements Observer {
         intersectionViewMap = new HashMap<>();
     }
 
+    /**
+     * Display segments and intersections of a given map.
+     * @param adjacenceMap the map to display
+     */
     public void displayCityMap(Map<Intersection, ArrayList<Segment>> adjacenceMap) {
         intersectionViewMap.clear();
         segmentViewList.clear();
