@@ -17,7 +17,7 @@ import org.w3c.dom.NodeList;
 public class XMLDeserializer {
 
     /**
-     * Loading XML file into cityMap parameter.
+     * Load XML file, deserialize it, and fill cityMap parameter with parsed data.
      * Notify view through Observable design pattern.
      * @param cityMap structure to fill
      * @throws Exception raised if file can't be loaded
@@ -36,7 +36,7 @@ public class XMLDeserializer {
     }
 
     /**
-     * Loading XML file into tour parameter.
+     * Load XML file, deserialize it, and fill tour parameter with parsed data.
      * Check if requests use intersections of cityMap parameter.
      * Notify view through Observable design pattern.
      * @param tour structure to fill
@@ -55,13 +55,23 @@ public class XMLDeserializer {
         }
     }
 
+    /**
+     * Create a Document instance for file parameter.
+     * @param file the file
+     * @return the document
+     * @throws Exception raised if the file can't be parsed and converted into a Document instance.
+     */
     public static Document extractDocument(File file) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         return db.parse(file);
     }
 
-
+    /**
+     * Read a Document instance and fill list of intersections and list of segments with parsed data.
+     * @param cityMap city map to fill
+     * @param document document to parse
+     */
     public static void deserializeMap(CityMap cityMap, Document document) {
         if(document != null) {
             parseXMLIntersections(document, cityMap);
@@ -69,7 +79,12 @@ public class XMLDeserializer {
         }
     }
 
-
+    /**
+     * Get line in opened XML document, and parse it to instantiate an intersection.
+     * Store intersections in the list of intersections of cityMap parameter
+     * @param document document to parse
+     * @param cityMap structure to fill
+     */
     public static void parseXMLIntersections(Document document, CityMap cityMap) {
         NodeList intersectionNodes = document.getElementsByTagName("intersection");
         for (int x = 0, size = intersectionNodes.getLength(); x < size; x++) {
@@ -83,8 +98,8 @@ public class XMLDeserializer {
 
     /**
      * Get line in opened XML document, and parse it to instantiate a segment.
-     * Store segments in cityMap parameter.
-     * @param document opened XML file
+     * Store segments in the list of segments of cityMap parameter.
+     * @param document document to parse
      * @param cityMap structure to fill
      */
     public static void parseXMLSegments(Document document, CityMap cityMap) {
@@ -102,7 +117,15 @@ public class XMLDeserializer {
         }
     }
 
-
+    /**
+     * Read a Document instance and fill the list of requests of tour parameter with parsed data.
+     * Check if the depot exists, otherwise raise an ExceptionXML.
+     * @param tour structure to fill
+     * @param cityMap city map where the tour takes place
+     * @param document document to read
+     * @throws ExceptionXML raised if the depot address found in XML file do not correspond to an existing intersection
+     * in city map.
+     */
     public static void deserializeRequests(Tour tour, CityMap cityMap, Document document) throws ExceptionXML {
         if(document != null) {
             parseXMLRequests(tour, cityMap, document);
@@ -125,7 +148,7 @@ public class XMLDeserializer {
     /**
      * Get line in opened XML document, and parse it to instantiate a request.
      * Check if request intersections exist in cityMap parameter.
-     * Store request instances in tour parameter.
+     * Store request in the list of intersections of tour parameter.
      * @param tour structure to fill
      * @param cityMap city map where the tour takes place
      * @param document opened XML file
