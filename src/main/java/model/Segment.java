@@ -1,5 +1,9 @@
 package model;
 
+/**
+ * A segment is a road (or a part of a road) between two intersections: an origin and a destination.
+ * It has a length in meters, and a name (for example, “Rue de l’Arc-en-Ciel").
+ */
 public class Segment {
     private double length;
     private String name;

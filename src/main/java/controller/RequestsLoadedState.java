@@ -5,7 +5,7 @@ import model.Tour;
 import view.Window;
 
 /**
- * 
+ * Request loaded state. State when the application has successfully loaded requests.
  */
 public class RequestsLoadedState implements State {
 

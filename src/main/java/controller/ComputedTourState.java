@@ -5,7 +5,7 @@ import model.Tour;
 import view.Window;
 
 /**
- * 
+ * Computed tour state. State of the application when a tour has been computed.
  */
 public class ComputedTourState implements State {
 

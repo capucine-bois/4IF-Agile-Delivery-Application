@@ -11,8 +11,17 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+/**
+ * Deserializer for XML files. Used to load city and requests.
+ */
 public class XMLDeserializer {
 
+    /**
+     * Loading XML file into cityMap parameter.
+     * Notify view through Observable design pattern.
+     * @param cityMap structure to fill
+     * @throws Exception raised if file can't be loaded
+     */
     public static void load(CityMap cityMap) throws Exception {
         File file = XMLFileOpener.getInstance().open(true);
         Document document = extractDocument(file);
@@ -26,6 +35,14 @@ public class XMLDeserializer {
         }
     }
 
+    /**
+     * Loading XML file into tour parameter.
+     * Check if requests use intersections of cityMap parameter.
+     * Notify view through Observable design pattern.
+     * @param tour structure to fill
+     * @param cityMap city map where the tour takes place
+     * @throws Exception raised if file can't be loaded or if incoherence is caught
+     */
     public static void load(Tour tour, CityMap cityMap) throws Exception {
         File file = XMLFileOpener.getInstance().open(true);
         Document document = extractDocument(file);
@@ -64,7 +81,12 @@ public class XMLDeserializer {
         }
     }
 
-
+    /**
+     * Get line in opened XML document, and parse it to instantiate a segment.
+     * Store segments in cityMap parameter.
+     * @param document opened XML file
+     * @param cityMap structure to fill
+     */
     public static void parseXMLSegments(Document document, CityMap cityMap) {
         NodeList nodeSegment = document.getElementsByTagName("segment");
         for (int x = 0, size = nodeSegment.getLength(); x < size; x++) {
@@ -100,6 +122,15 @@ public class XMLDeserializer {
         }
     }
 
+    /**
+     * Get line in opened XML document, and parse it to instantiate a request.
+     * Check if request intersections exist in cityMap parameter.
+     * Store request instances in tour parameter.
+     * @param tour structure to fill
+     * @param cityMap city map where the tour takes place
+     * @param document opened XML file
+     * @throws ExceptionXML raised if requests intersections can't be found in cityMap parameter.
+     */
     public static void parseXMLRequests(Tour tour, CityMap cityMap, Document document) throws ExceptionXML {
         NodeList nodeRequest = document.getElementsByTagName("request");
         for (int x = 0, size = nodeRequest.getLength(); x < size; x++) {

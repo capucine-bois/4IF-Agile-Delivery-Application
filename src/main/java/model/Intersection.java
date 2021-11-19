@@ -1,5 +1,9 @@
 package model;
 
+/**
+ * An intersection is a geographical point.
+ * It has two coordinates (latitude and longitude, or x and y), and an identifier.
+ */
 public class Intersection {
 
     private long id;

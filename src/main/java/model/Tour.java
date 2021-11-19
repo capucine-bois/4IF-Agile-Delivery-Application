@@ -4,6 +4,12 @@ import observer.Observable;
 
 import java.util.ArrayList;
 
+/**
+ * A tour is composed of many (shortest) paths, all connected between them, to accomplish every request that must
+ * be made during the same trip. It has access to these requests.
+ * A tour also has a depot address where the delivery man starts and ends its travel, and a tour length in meters,
+ * which is the sum of the length of its paths.
+ */
 public class Tour extends Observable {
 
     /* ATTRIBUTES */

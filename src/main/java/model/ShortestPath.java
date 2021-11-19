@@ -2,6 +2,11 @@ package model;
 
 import java.util.ArrayList;
 
+/**
+ * A path is an ordered list of segments to connect one intersection to another by existing roads (segments).
+ * It is used to find the fastest way to accomplish a request, going from its pickup address to its delivery address.
+ * A path has a length in meters and is the sum of the duration of its segments.
+ */
 public class ShortestPath {
 
     /* ATTRIBUTES */

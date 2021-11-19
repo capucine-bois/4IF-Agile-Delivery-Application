@@ -1,5 +1,10 @@
 package model;
 
+/**
+ * A request represents pickup and delivery (both at the same time).
+ * A request has a pickup address (where to get the package), and a delivery address (where to deliver the package).
+ * For both addresses, a duration specifies the action’s process (pickup/delivery duration).
+ */
 public class Request {
 
     /* ATTRIBUTES */
