@@ -11,7 +11,7 @@ public class SegmentView {
         this.destination = destination;
     }
 
-    public void paintComponent(Graphics g) {
+    public void paintSegment(Graphics g) {
         g.drawLine(origin.getCoordinateX(), origin.getCoordinateY(), destination.getCoordinateX(), destination.getCoordinateY());
     }
 }
