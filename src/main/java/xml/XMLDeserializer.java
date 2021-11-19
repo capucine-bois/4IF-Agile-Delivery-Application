@@ -49,7 +49,9 @@ public class XMLDeserializer {
         Document document = extractDocument(file);
         Element racine = document.getDocumentElement();
         if (racine.getNodeName().equals("planningRequest")) {
+            tour.getPlanningRequests().clear();
             deserializeRequests(tour, cityMap, document);
+            tour.notifyObservers();
         } else {
             // TODO: manage cancel in file opener
             throw new ExceptionXML("Bad document");

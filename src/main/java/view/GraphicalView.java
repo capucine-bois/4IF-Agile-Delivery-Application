@@ -1,14 +1,16 @@
 package view;
 
-import model.CityMap;
-import model.Intersection;
-import model.Segment;
+import model.*;
 import observer.Observable;
 import observer.Observer;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
@@ -20,24 +22,29 @@ public class GraphicalView extends JPanel implements Observer {
 
     private Map<Long, IntersectionView> intersectionViewMap;
     private List<SegmentView> segmentViewList;
+    private List<IntersectionView> requests;
     private Graphics g;
     private final int firstBorder = 10;
     private final int secondBorder = 2;
     private CityMap cityMap;
+    private Tour tour;
 
     /**
      * Create the graphical view
      * @param w the window
      */
-    public GraphicalView(CityMap cityMap, Window w) {
+    public GraphicalView(CityMap cityMap, Tour tour, Window w) {
         setLayout(null);
         setBackground(Constants.COLOR_5);
         setBorder(new CompoundBorder(BorderFactory.createMatteBorder(firstBorder,firstBorder,firstBorder,5,Constants.COLOR_1),BorderFactory.createLineBorder(Constants.COLOR_4, secondBorder)));
         w.getContentPane().add(this, BorderLayout.CENTER);
         cityMap.addObserver(this);
+        tour.addObserver(this);
         this.cityMap = cityMap;
+        this.tour = tour;
         segmentViewList = new ArrayList<>();
         intersectionViewMap = new HashMap<>();
+        requests = new ArrayList<>();
     }
 
     /**
@@ -106,6 +113,15 @@ public class GraphicalView extends JPanel implements Observer {
         }
     }
 
+    private void displayTourIntersections(Intersection depotAddress, ArrayList<Request> planningRequests) {
+        requests.add(intersectionViewMap.get(depotAddress.getId()));
+
+        for (Request request : planningRequests) {
+            requests.add(intersectionViewMap.get(request.getPickupAddress().getId()));
+            requests.add(intersectionViewMap.get(request.getDeliveryAddress().getId()));
+        }
+    }
+
     /**
      * Method called each time this must be redrawn
      */
@@ -113,15 +129,35 @@ public class GraphicalView extends JPanel implements Observer {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         this.g = g;
-        displayCityMap(cityMap.getAdjacenceMap());
-        g.setColor(Color.red);
+        g.setColor(Color.gray);
         for (SegmentView segmentView : segmentViewList) {
             segmentView.paintSegment(g);
+        }
+        if (!requests.isEmpty()) {
+            Iterator<IntersectionView> iterator = requests.iterator();
+            g.setColor(Color.black);
+            IntersectionView depotAddress = iterator.next();
+            g.fillOval(depotAddress.getCoordinateX() - 5, depotAddress.getCoordinateY() - 5, 10, 10);
+            while (iterator.hasNext()) {
+                IntersectionView pickupAddress = iterator.next();
+                IntersectionView deliveryAddress = iterator.next();
+                int red = (int) (Math.random() * 256);
+                int green = (int) (Math.random() * 256);
+                int blue = (int) (Math.random() * 256);
+                g.setColor(new Color(red, green, blue));
+                g.fillOval(pickupAddress.getCoordinateX() - 5, pickupAddress.getCoordinateY() - 5, 10, 10);
+                g.fillRect(deliveryAddress.getCoordinateX() - 5, deliveryAddress.getCoordinateY() - 5, 10, 10);
+            }
         }
     }
 
     @Override
     public void update(Observable o, Object arg) {
+        if (o.equals(cityMap)) {
+            displayCityMap(cityMap.getAdjacenceMap());
+        } else if (o.equals(tour)) {
+            displayTourIntersections(tour.getDepotAddress(), tour.getPlanningRequests());
+        }
         repaint();
     }
 }
