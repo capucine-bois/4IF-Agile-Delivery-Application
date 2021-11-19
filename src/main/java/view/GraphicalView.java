@@ -105,17 +105,15 @@ public class GraphicalView extends JPanel implements Observer {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         this.g = g;
+        displayCityMap(cityMap.getAdjacenceMap());
         g.setColor(Color.red);
         for (SegmentView segmentView : segmentViewList) {
-            segmentView.paintComponent(g);
+            segmentView.paintSegment(g);
         }
     }
 
     @Override
     public void update(Observable o, Object arg) {
-        if (o.equals(cityMap)) {
-            displayCityMap(cityMap.getAdjacenceMap());
-        }
         repaint();
     }
 }
