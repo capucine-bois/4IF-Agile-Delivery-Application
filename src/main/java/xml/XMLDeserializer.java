@@ -27,6 +27,7 @@ public class XMLDeserializer {
         Document document = extractDocument(file);
         Element racine = document.getDocumentElement();
         if (racine.getNodeName().equals("map")) {
+            cityMap.getAdjacenceMap().clear();
             deserializeMap(cityMap, document);
             cityMap.notifyObservers();
         } else {
