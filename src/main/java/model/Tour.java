@@ -9,6 +9,7 @@ import java.util.ArrayList;
  * be made during the same trip. It has access to these requests.
  * A tour also has a depot address where the delivery man starts and ends its travel, and a tour length in meters,
  * which is the sum of the length of its paths.
+ * As it extends Observable, an instance can notify observer when their attributes change.
  */
 public class Tour extends Observable {
 
@@ -78,6 +79,7 @@ public class Tour extends Observable {
     public void setTourLength(double tourLength) {
         this.tourLength = tourLength;
     }
+
     /**
      * Setter for depotAddress attribute
      * @param depotAddress wanted attribute for depotAddress attribute
@@ -85,6 +87,7 @@ public class Tour extends Observable {
     public void setDepotAddress(Intersection depotAddress) {
         this.depotAddress = depotAddress;
     }
+
     /**
      * Setter for departureTime attribute
      * @param departureTime wanted attribute for departureTime attribute
@@ -92,6 +95,7 @@ public class Tour extends Observable {
     public void setDepartureTime(String departureTime) {
         this.departureTime = departureTime;
     }
+
     /**
      * Setter for planningRequests attribute
      * @param planningRequests wanted attribute for planningRequests attribute
@@ -99,6 +103,7 @@ public class Tour extends Observable {
     public void setPlanningRequests(ArrayList<Request> planningRequests) {
         this.planningRequests = planningRequests;
     }
+
     /**
      * Setter for listShortestPaths attribute
      * @param listShortestPaths wanted attribute for listShortestPaths attribute
@@ -107,6 +112,10 @@ public class Tour extends Observable {
         this.listShortestPaths = listShortestPaths;
     }
 
+    /**
+     * Adding a request in the planning requests.
+     * @param request the request to add
+     */
     public void addRequest(Request request) {
         planningRequests.add(request);
     }

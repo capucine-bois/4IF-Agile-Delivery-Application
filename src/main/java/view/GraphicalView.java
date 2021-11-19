@@ -77,6 +77,15 @@ public class GraphicalView extends JPanel implements Observer {
         }
     }
 
+    /**
+     * Initialize the list of intersections on the GUI.
+     * Parse the list of intersections to instantiate all the intersections for the GUI (IntersectionView).
+     * @param adjacenceMap map containing an intersection as key and a list of segments where they are part of as value
+     * @param minLatitude minimal geographical latitude of all intersections
+     * @param maxLatitude maximal geographical latitude of all intersections
+     * @param minLongitude minimal geographical longitude of all intersections
+     * @param maxLongitude maximal geographical longitude of all intersections
+     */
     private void initIntersectionViewList(Map<Intersection, ArrayList<Segment>> adjacenceMap, double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
         double latitudeLength = maxLatitude - minLatitude;
         double longitudeLength = maxLongitude - minLongitude;
@@ -95,6 +104,11 @@ public class GraphicalView extends JPanel implements Observer {
         }
     }
 
+    /**
+     * Initialize the list of segments on the GUI.
+     * Parse the list of segments to instantiate all the segments for the GUI (SegmentView).
+     * @param segmentsCollection all the segments
+     */
     private void initSegmentViewList(Collection<ArrayList<Segment>> segmentsCollection) {
         for (List<Segment> segments : segmentsCollection) {
             for (Segment segment : segments) {
@@ -107,7 +121,8 @@ public class GraphicalView extends JPanel implements Observer {
     }
 
     /**
-     * Method called each time this must be redrawn
+     * Draw the component on GUI.
+     * @param g parent component where the graphical view must be drawn.
      */
     @Override
     public void paintComponent(Graphics g) {
@@ -120,6 +135,12 @@ public class GraphicalView extends JPanel implements Observer {
         }
     }
 
+    /**
+     * Method called by observable instances when the graphical view must be updated.
+     * Redraw every element (by calling paintComponent method).
+     * @param o observable instance which send the notification
+     * @param arg notification data
+     */
     @Override
     public void update(Observable o, Object arg) {
         repaint();

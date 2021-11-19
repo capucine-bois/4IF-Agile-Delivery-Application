@@ -8,6 +8,7 @@ import java.util.Map;
 
 /**
  * A city map is a collection of segments and intersections.
+ * As it extends Observable, an instance can notify observer when their attributes change.
  */
 public class CityMap extends Observable {
 
