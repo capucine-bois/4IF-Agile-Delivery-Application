@@ -15,6 +15,13 @@ import java.io.IOException;
  */
 public class InitialState implements State {
 
+    /**
+     * Loading a map (intersections and segments) from XML file.
+     * Deserialize XML map file selected by user and returned by GUI window.
+     * @param cityMap the map structure to fill
+     * @param window the window where to show map and popup messages
+     * @param controller application controller
+     */
     public void loadMap(CityMap cityMap, Window window, Controller controller) {
         try {
             XMLDeserializer.load(cityMap);

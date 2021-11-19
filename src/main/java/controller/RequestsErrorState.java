@@ -8,6 +8,9 @@ import view.Window;
  */
 public class RequestsErrorState implements State {
 
+    /**
+     * Close error popup.
+     */
     public void closeError() {
         // TODO implement here
     }

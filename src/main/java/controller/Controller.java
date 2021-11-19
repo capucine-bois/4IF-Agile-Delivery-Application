@@ -62,14 +62,14 @@ public class Controller {
     }
 
     /**
-     *
+     * Close error popup.
      */
     public void closeError() {
         // TODO implement here
     }
 
     /**
-     *
+     * Compute tour to accomplish all the requests as fast as possible (solving TSP problem).
      */
     public void computeTour() {
         // TODO implement here

@@ -28,7 +28,7 @@ public interface State {
     public default void loadRequests(Tour tour, CityMap cityMap, Window window, Controller controller) {};
 
     /**
-     * Close error message.
+     * Close error popup.
      */
     public default void closeError() {};
 

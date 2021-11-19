@@ -9,6 +9,9 @@ import view.Window;
  */
 public class MapFileErrorState implements State {
 
+    /**
+     * Close error popup.
+     */
     public void closeError() {
         // TODO implement here
     }
