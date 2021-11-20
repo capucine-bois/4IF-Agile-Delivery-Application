@@ -20,11 +20,11 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
 
     private Map<Long, IntersectionView> intersectionViewMap;
     private List<SegmentView> segmentViewList;
-    private List<IntersectionView> requests;
+    private List<Long> requestsIntersections;
     private Graphics g;
     private final int firstBorder = 10;
     private final int secondBorder = 2;
-    private double scale = 1;
+    private int scale = 1;
     private int originX = firstBorder + secondBorder;
     private int originY = firstBorder + secondBorder;
     private CityMap cityMap;
@@ -45,7 +45,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         this.tour = tour;
         segmentViewList = new ArrayList<>();
         intersectionViewMap = new HashMap<>();
-        requests = new ArrayList<>();
+        requestsIntersections = new ArrayList<>();
         addMouseWheelListener(this);
     }
 
@@ -122,11 +122,11 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     }
 
     private void displayTourIntersections(Intersection depotAddress, ArrayList<Request> planningRequests) {
-        requests.add(intersectionViewMap.get(depotAddress.getId()));
+        requestsIntersections.add(depotAddress.getId());
 
         for (Request request : planningRequests) {
-            requests.add(intersectionViewMap.get(request.getPickupAddress().getId()));
-            requests.add(intersectionViewMap.get(request.getDeliveryAddress().getId()));
+            requestsIntersections.add(request.getPickupAddress().getId());
+            requestsIntersections.add(request.getDeliveryAddress().getId());
         }
     }
 
@@ -137,7 +137,6 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         this.g = g;
-        g.setColor(Color.gray);
         Graphics2D g2 = (Graphics2D) g;
         for (SegmentView segmentView : segmentViewList) {
             g2.setColor(Constants.COLOR_6);
@@ -147,14 +146,14 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
             g2.setStroke(new BasicStroke((int) scale));
             g2.drawLine(segmentView.getOrigin().getCoordinateX(), segmentView.getOrigin().getCoordinateY(), segmentView.getDestination().getCoordinateX(), segmentView.getDestination().getCoordinateY());
         }
-        if (!requests.isEmpty()) {
-            Iterator<IntersectionView> iterator = requests.iterator();
+        if (!requestsIntersections.isEmpty()) {
+            Iterator<Long> iterator = requestsIntersections.iterator();
             g.setColor(Color.black);
-            IntersectionView depotAddress = iterator.next();
+            IntersectionView depotAddress = intersectionViewMap.get(iterator.next());
             g.fillOval(depotAddress.getCoordinateX() - 5, depotAddress.getCoordinateY() - 5, 10, 10);
             while (iterator.hasNext()) {
-                IntersectionView pickupAddress = iterator.next();
-                IntersectionView deliveryAddress = iterator.next();
+                IntersectionView pickupAddress = intersectionViewMap.get(iterator.next());
+                IntersectionView deliveryAddress = intersectionViewMap.get(iterator.next());
                 int red = (int) (Math.random() * 256);
                 int green = (int) (Math.random() * 256);
                 int blue = (int) (Math.random() * 256);
@@ -177,7 +176,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        double zoomCoefficient = 2;
+        int zoomCoefficient = 2;
         if ((e.getWheelRotation() < 0 ) && scale < 20) {
             scale *= zoomCoefficient;
             originX -= (e.getX() - originX) * (zoomCoefficient - 1);
