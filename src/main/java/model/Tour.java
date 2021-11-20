@@ -124,7 +124,6 @@ public class Tour extends Observable {
         planningRequests.add(request);
     }
 
-    /* actual methods */
     /**
      * Method which calls dijkstra and then the TSP method
      * @param adjacenceMap the map with all intersections and the segments starting from this intersections
@@ -151,14 +150,22 @@ public class Tour extends Observable {
             ArrayList<ShortestPath> shortestPathsFromStartPoint = dijkstra(adjacenceMap,listUsefulEndPoints, startPoint);
             dist.put(startPoint,shortestPathsFromStartPoint);
         }
-        for(Intersection begin : dist.keySet()) {
-            for(ShortestPath chemin : dist.get(begin)) {
-                System.out.println(begin.getId() + " jusqu'à " + chemin.getEndAddress().getId() + " pour une duree de " + chemin.getPathLength());
-            }
-        }
 
-        // call TSP with dist
+        ArrayList<Node> listNodes = new ArrayList<>();
+        // We put the depot address in first position. Thus we will start and end our tour there
+        listNodes.add(new Node(depotAddress,dist.get(depotAddress),0));
+        int iteratorNumber = 1;
+        for(Intersection node : listUsefulPoints) {
+            if(node!=depotAddress) {
+                listNodes.add(new Node(node,dist.get(node),iteratorNumber));
+                iteratorNumber++;
+            }
+
+        }
+        RunTSP runTSP = new RunTSP();
+        runTSP.computeTour(listNodes,this);
     }
+
 
     /**
      * Algorithm dijkstra : compute all shortest paths between a point and the points in the list "listUsefulEndPoints"
@@ -193,7 +200,6 @@ public class Tour extends Observable {
             }
             color.replace(noeudGrisAvecDistMin, 2);
             if(listUsefulEndPoints.contains(noeudGrisAvecDistMin)) {
-                // questions : comment récupérer les segments depuis ici ? Le faire après "relacher" plutôt ?
                 Intersection tempoIntersection = noeudGrisAvecDistMin;
                 ArrayList<Segment> listSegments = new ArrayList<>();
                 while(parent.get(tempoIntersection)!=null) {

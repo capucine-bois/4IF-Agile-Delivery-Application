@@ -9,6 +9,7 @@ import xml.XMLDeserializer;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Map loaded state. State of the application when map has been loaded.
@@ -41,6 +42,7 @@ public class MapLoadedState implements State {
     @Override
     public void loadRequests(Tour tour, CityMap cityMap, Window window, Controller controller) {
         try {
+            tour.setPlanningRequests(new ArrayList<>());
             XMLDeserializer.load(tour, cityMap);
             tour.computeTour(cityMap.getAdjacenceMap());
         } catch (Exception e) {
