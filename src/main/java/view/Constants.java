@@ -17,7 +17,9 @@ public class Constants {
     public static final Color COLOR_2 = new Color(215, 215, 215); // Buttons background
     public static final Color COLOR_3 = new Color(65, 65, 65); // Text color
     public static final Color COLOR_4 = new Color(228, 228, 228); // Textual view background
-    public static final Color COLOR_5 = new Color(238, 240, 242); // Graphical view background
+    public static final Color COLOR_5 = new Color(244, 246, 247); // Graphical view background
+    public static final Color COLOR_6 = new Color(220, 222, 226); // Segments stroke
+    public static final Color COLOR_7 = new Color(255, 255, 255); // Segments background
 
     /**
      * Get Font instance for a given font name and a given font size

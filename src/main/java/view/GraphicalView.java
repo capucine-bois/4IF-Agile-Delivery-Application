@@ -9,6 +9,8 @@ import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.*;
 import java.util.List;
 
@@ -16,14 +18,17 @@ import java.util.List;
  * Graphical element on the GUI.
  * Used to display map and tour (with their segments).
  */
-public class GraphicalView extends JPanel implements Observer {
+public class GraphicalView extends JPanel implements Observer, MouseWheelListener {
 
     private Map<Long, IntersectionView> intersectionViewMap;
     private List<SegmentView> segmentViewList;
-    private List<IntersectionView> requests;
+    private List<Long> requestsIntersections;
     private Graphics g;
     private final int firstBorder = 10;
     private final int secondBorder = 2;
+    private int scale = 1;
+    private int originX = firstBorder + secondBorder;
+    private int originY = firstBorder + secondBorder;
     private CityMap cityMap;
     private Tour tour;
 
@@ -42,7 +47,8 @@ public class GraphicalView extends JPanel implements Observer {
         this.tour = tour;
         segmentViewList = new ArrayList<>();
         intersectionViewMap = new HashMap<>();
-        requests = new ArrayList<>();
+        requestsIntersections = new ArrayList<>();
+        addMouseWheelListener(this);
     }
 
     /**
@@ -86,15 +92,21 @@ public class GraphicalView extends JPanel implements Observer {
         double latitudeLength = maxLatitude - minLatitude;
         double longitudeLength = maxLongitude - minLongitude;
 
-        double width = g.getClipBounds().width - (firstBorder + (double) (firstBorder / 2) + secondBorder * 2);
-        double height = g.getClipBounds().height - (firstBorder * 2 + secondBorder * 2);
+        double viewWidth = g.getClipBounds().width - ((double) (firstBorder / 2) + secondBorder);
+        double width = viewWidth * scale;
+        double viewHeight = g.getClipBounds().height - (firstBorder + secondBorder);
+        double height = viewHeight * scale;
 
+        if (originX > 0) originX = 0;
+        if (originY > 0) originY = 0;
+        if (originX + width < viewWidth) originX = (int) (viewWidth - width);
+        if (originY + height < viewHeight) originY = (int) (viewHeight - height);
         intersectionViewMap = new HashMap<>();
         for (Intersection intersection : adjacenceMap.keySet()) {
             double coordinateLongitude = intersection.getLongitude() - minLongitude;
             double coordinateLatitude = intersection.getLatitude() - minLatitude;
-            int coordinateX = (int) ((coordinateLongitude * width) / longitudeLength) + firstBorder + secondBorder;
-            int coordinateY = (int) (height) - (int) ((coordinateLatitude * height) / latitudeLength) + firstBorder + secondBorder;
+            int coordinateX = (int) ((coordinateLongitude * width) / longitudeLength) + originX;
+            int coordinateY = (int) (height) - (int) ((coordinateLatitude * height) / latitudeLength) + originY;
             IntersectionView intersectionView = new IntersectionView(coordinateX, coordinateY);
             intersectionViewMap.put(intersection.getId(), intersectionView);
         }
@@ -112,11 +124,11 @@ public class GraphicalView extends JPanel implements Observer {
     }
 
     private void displayTourIntersections(Intersection depotAddress, ArrayList<Request> planningRequests) {
-        requests.add(intersectionViewMap.get(depotAddress.getId()));
+        requestsIntersections.add(depotAddress.getId());
 
         for (Request request : planningRequests) {
-            requests.add(intersectionViewMap.get(request.getPickupAddress().getId()));
-            requests.add(intersectionViewMap.get(request.getDeliveryAddress().getId()));
+            requestsIntersections.add(request.getPickupAddress().getId());
+            requestsIntersections.add(request.getDeliveryAddress().getId());
         }
     }
 
@@ -127,19 +139,24 @@ public class GraphicalView extends JPanel implements Observer {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         this.g = g;
-        g.setColor(Color.gray);
+        Graphics2D g2 = (Graphics2D) g;
         for (SegmentView segmentView : segmentViewList) {
-            segmentView.paintSegment(g);
+            g2.setColor(Constants.COLOR_6);
+            g2.setStroke(new BasicStroke((int) (scale + 2)));
+            g2.drawLine(segmentView.getOrigin().getCoordinateX(), segmentView.getOrigin().getCoordinateY(), segmentView.getDestination().getCoordinateX(), segmentView.getDestination().getCoordinateY());
+            g2.setColor(Constants.COLOR_7);
+            g2.setStroke(new BasicStroke((int) scale));
+            g2.drawLine(segmentView.getOrigin().getCoordinateX(), segmentView.getOrigin().getCoordinateY(), segmentView.getDestination().getCoordinateX(), segmentView.getDestination().getCoordinateY());
         }
-        if (!requests.isEmpty()) {
+        if (!requestsIntersections.isEmpty()) {
             List<Color> usedColors = new ArrayList<>();
-            Iterator<IntersectionView> iterator = requests.iterator();
-            IntersectionView depotAddress = iterator.next();
+            Iterator<Long> iterator = requestsIntersections.iterator();
+            IntersectionView depotAddress = intersectionViewMap.get(iterator.next());
             Color depotColor = Color.red;
             usedColors.add(depotColor);
             while (iterator.hasNext()) {
-                IntersectionView pickupAddress = iterator.next();
-                IntersectionView deliveryAddress = iterator.next();
+                IntersectionView pickupAddress = intersectionViewMap.get(iterator.next());
+                IntersectionView deliveryAddress = intersectionViewMap.get(iterator.next());
                 Color requestColor;
                 do {
                     int red = (int) (Math.random() * 256);
@@ -185,6 +202,23 @@ public class GraphicalView extends JPanel implements Observer {
             displayCityMap(cityMap.getAdjacenceMap());
         } else if (o.equals(tour)) {
             displayTourIntersections(tour.getDepotAddress(), tour.getPlanningRequests());
+        }
+        repaint();
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        int zoomCoefficient = 2;
+        if ((e.getWheelRotation() < 0 ) && scale < 20) {
+            scale *= zoomCoefficient;
+            originX -= (e.getX() - originX) * (zoomCoefficient - 1);
+            originY -= (e.getY() - originY) * (zoomCoefficient - 1);
+            displayCityMap(cityMap.getAdjacenceMap());
+        } else if (e.getWheelRotation() > 0 && scale > 1) {
+            scale /= zoomCoefficient;
+            originX += (e.getX() - originX) - (e.getX() - originX)/zoomCoefficient;
+            originY += (e.getY() - originY) - (e.getY() - originY)/zoomCoefficient;
+            displayCityMap(cityMap.getAdjacenceMap());
         }
         repaint();
     }
