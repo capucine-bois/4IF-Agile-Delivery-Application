@@ -30,8 +30,6 @@ class XMLfileOpenerTest {
     }
 
 
-    XMLFileOpener xmlOpener = new XMLFileOpener();
-    File file = new File("../../resources/testMap.xml");
 
     /*
      * Method to test:
@@ -45,9 +43,10 @@ class XMLfileOpenerTest {
     @DisplayName("Test on accept()")
     void accept() {
         File wrongFile = new File("../../resources/test.xnl");
-        boolean firstTest = xmlOpener.accept(wrongFile);
+        boolean firstTest = XMLFileOpener.getInstance().accept(wrongFile);
         assertFalse(firstTest,"accept function does not filter only XML");
-        boolean secondTest = xmlOpener.accept(file);
+        File file2 = new File("../../resources/testMap.xml");
+        boolean secondTest = XMLFileOpener.getInstance().accept(file2);
         assertTrue(secondTest, "accept function does not accept XML");
     }
 }

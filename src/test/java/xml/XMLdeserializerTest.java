@@ -53,7 +53,7 @@ class XMLdeserializerTest {
     @DisplayName("Test on parseXMLSegments")
     void parseXMLSegmentsTest() throws ParserConfigurationException, IOException, SAXException {
         // Create input of parseXMLSegments
-        File file = new File("../../resources/testMap.xml");
+        File file = new File("src/test/resources/testMap.xml");
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(file);
@@ -66,8 +66,18 @@ class XMLdeserializerTest {
 
         // Function test
         ArrayList<Segment> outputFunction = XMLDeserializer.parseXMLSegments(document);
-        // Check if same output
-        assertTrue(listSegments.equals(outputFunction),"Segments aren't well parse");
+
+        // Same length
+        assertEquals(outputFunction.size(), listSegments.size(), "Wrong number of segments");
+        for(int i = 0; i < listSegments.size(); i++) {
+            Segment segmentA = listSegments.get(i);
+            Segment segmentB = outputFunction.get(i);
+            assertEquals(segmentA.getLength(), segmentB.getLength(), "Length not equal");
+            assertEquals(segmentA.getName(), segmentB.getName(), "Name not equal");
+            assertEquals(segmentA.getDestination(), segmentB.getDestination(), "Destination not equal");
+            assertEquals(segmentA.getOrigin(), segmentA.getOrigin(), "Origin not equal");
+        }
+
 
     }
 
@@ -81,7 +91,7 @@ class XMLdeserializerTest {
     @Test
     @DisplayName("Test on parseXMLIntersections")
     void parseXMLIntersectionsTest() throws ParserConfigurationException, IOException, SAXException {
-        File file = new File("../../resources/testMap.xml");
+        File file = new File("src/test/resources/testMap.xml");
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(file);
@@ -98,8 +108,15 @@ class XMLdeserializerTest {
 
         // Function test
         ArrayList<Intersection> outputFunction = XMLDeserializer.parseXMLIntersections(document);
-        // Check if same output
-        assertTrue(listIntersections.equals(outputFunction), "Intersections aren't well parse");
+        // Same length
+        assertEquals(outputFunction.size(), listIntersections.size(), "Wrong number of segments");
+        for(int i = 0; i < listIntersections.size(); i++) {
+            Intersection intersectionA = listIntersections.get(i);
+            Intersection intersectionB = outputFunction.get(i);
+            assertEquals(intersectionA.getLatitude(), intersectionB.getLatitude(), "Latitude not equal");
+            assertEquals(intersectionA.getLongitude(), intersectionB.getLongitude(), "Longitude not equal");
+            assertEquals(intersectionA.getId(), intersectionB.getId(), "Id not equal");
+        }
 
 
     }
