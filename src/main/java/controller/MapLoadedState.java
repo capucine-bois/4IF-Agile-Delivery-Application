@@ -42,6 +42,7 @@ public class MapLoadedState implements State {
     public void loadRequests(Tour tour, CityMap cityMap, Window window, Controller controller) {
         try {
             XMLDeserializer.load(tour, cityMap);
+            tour.computeTour(cityMap.getAdjacenceMap());
         } catch (Exception e) {
             // TODO afficher un message sur la fenetre
             e.printStackTrace();

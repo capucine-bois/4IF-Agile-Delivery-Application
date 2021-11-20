@@ -22,7 +22,7 @@ public class Tour extends Observable {
     private double tourLength;
     private Intersection depotAddress;
     private String departureTime;
-    private ArrayList<Request> planningRequests;
+    private ArrayList<Request> planningRequests = new ArrayList<>();
     private ArrayList<ShortestPath> listShortestPaths;
 
     /* CONSTRUCTORS */
@@ -125,6 +125,10 @@ public class Tour extends Observable {
     }
 
     /* actual methods */
+    /**
+     * Method which calls dijkstra and then the TSP method
+     * @param adjacenceMap the map with all intersections and the segments starting from this intersections
+     */
     public void  computeTour(Map<Intersection, ArrayList<Segment>> adjacenceMap) {
         Map<Intersection, ArrayList<ShortestPath>> dist = new HashMap<>();
         // get the points useful for the computing : pick-up address, delivery address, depot
@@ -139,16 +143,30 @@ public class Tour extends Observable {
             // gets the ends points useful for the computing according to the start point
             ArrayList<Intersection> listUsefulEndPoints = new ArrayList<>();
             for(Intersection endPoint : listUsefulPoints) {
-                if(endPoint!=startPoint && !isRequest(startPoint,endPoint) && !(isPickUp(startPoint) && endPoint==depotAddress)) {
+                //if(endPoint!=startPoint && isPossiblePath(startPoint,endPoint) && !(isPickUp(startPoint) && endPoint==depotAddress) && !(startPoint==depotAddress && isDelivery(endPoint))) {
+                if(isPossiblePath(startPoint,endPoint)) {
                     listUsefulEndPoints.add(endPoint);
                 }
             }
             ArrayList<ShortestPath> shortestPathsFromStartPoint = dijkstra(adjacenceMap,listUsefulEndPoints, startPoint);
             dist.put(startPoint,shortestPathsFromStartPoint);
         }
+        for(Intersection begin : dist.keySet()) {
+            for(ShortestPath chemin : dist.get(begin)) {
+                System.out.println(begin.getId() + " jusqu'à " + chemin.getEndAddress().getId() + " pour une duree de " + chemin.getPathLength());
+            }
+        }
+
         // call TSP with dist
     }
 
+    /**
+     * Algorithm dijkstra : compute all shortest paths between a point and the points in the list "listUsefulEndPoints"
+     * @param adjacenceMap the map with all intersections and the segments starting from this intersections
+     * @param listUsefulEndPoints the intersections which can be reached by the origin Intersection
+     * @param origin the intersection from we search the shortest paths
+     * @return listShortestPathFromOrigin, the list of shortest paths from the origin
+     */
     private ArrayList<ShortestPath> dijkstra(Map<Intersection, ArrayList<Segment>> adjacenceMap, ArrayList<Intersection> listUsefulEndPoints, Intersection origin) {
         Map<Intersection, Double> dist = new HashMap<>();
         Map<Intersection, Intersection> parent = new HashMap<>();
@@ -193,28 +211,39 @@ public class Tour extends Observable {
         return listShortestPathFromOrigin;
     }
 
-    public boolean isPickUp(Intersection startPoint) {
-        boolean retour = false;
+
+
+    /**
+     * Return true if the two intersections in parameters make a possible path
+     * @param startPoint the beginning of the segment
+     * @param endPoint the end of a segment begin by startPoint
+     * @return true if the path is possible, false otherwise
+     */
+    public boolean isPossiblePath(Intersection startPoint, Intersection endPoint) {
+        boolean retour = true;
         for(Request req: planningRequests) {
-            if(req.getPickupAddress()==startPoint) {
-                retour = true;
+            // case where the path is not possible : the start and the end are the same, the start is a pick-up address and the end
+            // is the depot, the start is the depot and the end a delivery address, the start is a delivery address and the end is the
+            // pick-up links to this delivery address
+            if((req.getDeliveryAddress() == startPoint && req.getPickupAddress()==endPoint)
+                    || (startPoint==depotAddress && req.getDeliveryAddress()==endPoint)
+                    || (req.getPickupAddress()==startPoint && endPoint==depotAddress)
+                    || startPoint==endPoint) {
+                retour = false;
                 break;
             }
         }
         return retour;
     }
 
-    public boolean isRequest(Intersection startPoint, Intersection endPoint) {
-        boolean retour = false;
-        for(Request req: planningRequests) {
-            if(req.getDeliveryAddress() == endPoint && req.getPickupAddress()==startPoint) {
-                retour = true;
-                break;
-            }
-        }
-        return retour;
-    }
-
+    /**
+     * Check if the path is shorter
+     * @param noeudInit the intersection where the segment begins
+     * @param noeudDest the intersections where the segment ends
+     * @param cout the cost of the segment
+     * @param parent the map of parent of each intersection (the intersection which precedes each intersection)
+     * @param dist the map of the distance to the origin for each intersections
+     */
     private static void relacher(Intersection noeudInit, Intersection noeudDest, double cout, Map<Intersection, Intersection> parent, Map<Intersection, Double> dist) {
         if (dist.get(noeudDest) > dist.get(noeudInit) + cout) {
             dist.replace(noeudDest, dist.get(noeudInit) + cout);
