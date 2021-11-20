@@ -8,14 +8,14 @@ Ce projet a été réalisé dans le cadre de notre formation informatique à l'I
 
 Pour ce projet nous utilisons:
 
-###Main
+### Main
 * Java 15
 
 
-###Tests
+### Tests
 * GitLab CI
 * JUnit 5 
-###Agile
+### Agile
 * Jira
 ### IHM
 * Java Swing

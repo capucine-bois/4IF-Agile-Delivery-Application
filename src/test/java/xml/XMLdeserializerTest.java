@@ -20,6 +20,8 @@ import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -52,30 +54,55 @@ class XMLdeserializerTest {
     @Test
     @DisplayName("Test on parseXMLSegments")
     void parseXMLSegmentsTest() throws ParserConfigurationException, IOException, SAXException {
+        // Create cityMap to compare to
+        CityMap cityMap = new CityMap();
         // Create input of parseXMLSegments
+        CityMap cityMap2 = new CityMap();
         File file = new File("src/test/resources/testMap.xml");
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(file);
-        ArrayList<Segment> listSegments = new ArrayList<>();
-        listSegments.add(new Segment(23.662397, "Rue Léon Blum", 2, 1));
-        listSegments.add(new Segment(28.430933, "Avenue Édouard Herriot", 4,3));
-        listSegments.add(new Segment(233.383, "Avenue Edouard", 6, 5));
-        listSegments.add(new Segment(202.5549, "Rue des coquelicots", 8, 7));
+        ArrayList<Intersection> listIntersection =  new ArrayList<Intersection>();
+        listIntersection.add(new Intersection(1,45.750404,4.8744674));
+        listIntersection.add(new Intersection(2,45.75171,4.8718166));
+        listIntersection.add(new Intersection(3,45.754265,4.886816));
+        listIntersection.add(new Intersection(4,45.755234,4.8867016));
+        listIntersection.add(new Intersection(5,45.754894,4.8855863));
+        listIntersection.add(new Intersection(6,42.754894,4.1155863));
+        listIntersection.add(new Intersection(7,45.354894,4.4855863));
+        listIntersection.add(new Intersection(8,45.234244,4.5355862));
+        for(int i = 0 ; i < listIntersection.size(); i++) {
+            cityMap.addIntersection(listIntersection.get(i));
+            cityMap2.addIntersection(listIntersection.get(i));
+        }
+        Segment s1 = new Segment(23.662397, "Rue Léon Blum", listIntersection.get(1), listIntersection.get(0));
+        Segment s2 = new Segment(28.430933, "Avenue Édouard Herriot", listIntersection.get(3),listIntersection.get(2));
+        Segment s3 = new Segment(233.383, "Avenue Edouard", listIntersection.get(5), listIntersection.get(4));
+        Segment s4 = new Segment(202.5549, "Rue des coquelicots", listIntersection.get(7), listIntersection.get(6));
+        cityMap.addSegment(s1,listIntersection.get(0));
+        cityMap.addSegment(s2,listIntersection.get(2));
+        cityMap.addSegment(s3,listIntersection.get(4));
+        cityMap.addSegment(s4,listIntersection.get(6));
 
 
         // Function test
-        ArrayList<Segment> outputFunction = XMLDeserializer.parseXMLSegments(document);
+        XMLDeserializer.parseXMLSegments(document,cityMap2);
 
-        // Same length
-        assertEquals(outputFunction.size(), listSegments.size(), "Wrong number of segments");
-        for(int i = 0; i < listSegments.size(); i++) {
-            Segment segmentA = listSegments.get(i);
-            Segment segmentB = outputFunction.get(i);
-            assertEquals(segmentA.getLength(), segmentB.getLength(), "Length not equal");
-            assertEquals(segmentA.getName(), segmentB.getName(), "Name not equal");
-            assertEquals(segmentA.getDestination(), segmentB.getDestination(), "Destination not equal");
-            assertEquals(segmentA.getOrigin(), segmentA.getOrigin(), "Origin not equal");
+        for(int i = 0; i < cityMap.getAdjacenceMap().size(); i++) {
+            ArrayList<Segment> listSegments = cityMap.getAdjacenceMap().get(i);
+            ArrayList<Segment> listSegments2 = cityMap2.getAdjacenceMap().get(i);
+            if(listSegments != null ) {
+                for (int j = 0; j < listSegments.size(); j++) {
+                    Segment segmentA = listSegments.get(j);
+                    Segment segmentB = listSegments2.get(j);
+                    assertEquals(segmentA.getLength(), segmentB.getLength(), "Length not equal");
+                    assertEquals(segmentA.getName(), segmentB.getName(), "Name not equal");
+                    assertEquals(segmentA.getDestination(), segmentB.getDestination(), "Destination not equal");
+                    assertEquals(segmentA.getOrigin(), segmentA.getOrigin(), "Origin not equal");
+                }
+            }
+
+
         }
 
 
@@ -95,6 +122,7 @@ class XMLdeserializerTest {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(file);
+        CityMap cityMap = new CityMap();
         ArrayList<Intersection> listIntersections = new ArrayList<>();
         listIntersections.add(new Intersection(1,45.750404,4.8744674));
         listIntersections.add(new Intersection(2,45.75171,4.8718166));
@@ -107,15 +135,14 @@ class XMLdeserializerTest {
         listIntersections.add(new Intersection(9,45.221244,4.9955862));
 
         // Function test
-        ArrayList<Intersection> outputFunction = XMLDeserializer.parseXMLIntersections(document);
+        XMLDeserializer.parseXMLIntersections(document,cityMap);
         // Same length
-        assertEquals(outputFunction.size(), listIntersections.size(), "Wrong number of segments");
+        assertEquals(cityMap.getAdjacenceMap().size(), listIntersections.size(), "Wrong number of segments");
+        // Take all keys
+        List<Intersection> listIntersections2 = new ArrayList<>(cityMap.getAdjacenceMap().keySet());
+        // Check if keys are all good
         for(int i = 0; i < listIntersections.size(); i++) {
-            Intersection intersectionA = listIntersections.get(i);
-            Intersection intersectionB = outputFunction.get(i);
-            assertEquals(intersectionA.getLatitude(), intersectionB.getLatitude(), "Latitude not equal");
-            assertEquals(intersectionA.getLongitude(), intersectionB.getLongitude(), "Longitude not equal");
-            assertEquals(intersectionA.getId(), intersectionB.getId(), "Id not equal");
+            listIntersections.contains(listIntersections2.get(i));
         }
 
 
