@@ -1,14 +1,29 @@
 image: maven:3-jdk-8
 
 stages:
-  - build
+  - test
+
+include:
+  - template: Code-Quality.gitlab-ci.yml
+
+
+
+## On redéfinit les jobs des features de GitLab pour forcer le workflow
+code_quality:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
 
 
 JUnit5:
-    stage: build
-    script: "mvn package"
-    artifacts:
-        reports:
-            junit:
-                - target/sure-fire-reports/TEST-*.xml
-                - target/failsafe-reports/TEST-*.xml
+  stage: test
+  script:
+    - mvn verify
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+        - target/failsafe-reports/TEST-*.xml
