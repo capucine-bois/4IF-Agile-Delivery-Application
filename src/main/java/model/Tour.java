@@ -23,7 +23,7 @@ public class Tour extends Observable {
     /* CONSTRUCTORS */
 
     /**
-     * Default constructor
+     * Constructor initializing the planning requests and the list of the shortest paths
      */
     public Tour() {
         planningRequests = new ArrayList<>();

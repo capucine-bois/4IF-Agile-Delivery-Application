@@ -6,12 +6,10 @@ import model.Tour;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * GUI for the application.
@@ -43,6 +41,7 @@ public class Window extends JFrame implements ComponentListener {
     /**
      * Complete constructor
      * @param cityMap the map to show
+     * @param tour the tour
      * @param controller instance of application controller
      * @throws IOException raised if GUI listeners fail
      * @throws FontFormatException raised if text font can't be loaded
@@ -87,9 +86,9 @@ public class Window extends JFrame implements ComponentListener {
     }
 
     /**
-     *
-     * @throws IOException
-     * @throws FontFormatException
+     * Set the application name to display in the top left corner
+     * @throws IOException raised if font file can't be found
+     * @throws FontFormatException raised if font can't be loaded
      */
     private void addAppName() throws IOException, FontFormatException {
         JLabel appNameLabel = new JLabel("Application Name");
@@ -137,7 +136,7 @@ public class Window extends JFrame implements ComponentListener {
         windowWidth = e.getComponent().getSize().width;
         windowHeight = e.getComponent().getSize().height;
         setWindowSize();
-        graphicalView.displayCityMap(cityMap.getAdjacenceMap());
+        graphicalView.initCityMapView(cityMap.getAdjacenceMap());
         graphicalView.repaint();
     }
 

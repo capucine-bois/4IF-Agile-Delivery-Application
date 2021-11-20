@@ -33,6 +33,12 @@ public class Constants {
         return Font.createFont(Font.TRUETYPE_FONT, new FileInputStream("src/main/resources/fonts/" + fileName)).deriveFont(Font.PLAIN, size);
     }
 
+    /**
+     * Get image for a given image name
+     * @param filename name of the image file
+     * @return buffered image linked to the image
+     * @throws IOException raised if the file can not be read
+     */
     public static BufferedImage getImage(String filename) throws IOException {
         return ImageIO.read(new File("src/main/resources/img/" + filename));
     }

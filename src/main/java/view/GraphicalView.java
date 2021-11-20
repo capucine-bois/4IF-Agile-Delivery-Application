@@ -36,6 +36,8 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
 
     /**
      * Create the graphical view
+     * @param cityMap the city map
+     * @param tour the tour
      * @param w the window
      */
     public GraphicalView(CityMap cityMap, Tour tour, Window w) {
@@ -54,10 +56,10 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     }
 
     /**
-     * Display segments and intersections of a given map.
+     * Creates intersections and segments of a given map with coordinates X and Y
      * @param adjacenceMap the map to display
      */
-    public void displayCityMap(Map<Intersection, ArrayList<Segment>> adjacenceMap) {
+    public void initCityMapView(Map<Intersection, ArrayList<Segment>> adjacenceMap) {
         intersectionViewMap.clear();
         segmentViewList.clear();
 
@@ -85,12 +87,20 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
                 }
             }
 
-            initIntersectionViewList(adjacenceMap, minLatitude, maxLatitude, minLongitude, maxLongitude);
+            initIntersectionViewList(adjacenceMap.keySet(), minLatitude, maxLatitude, minLongitude, maxLongitude);
             initSegmentViewList(adjacenceMap.values());
         }
     }
 
-    private void initIntersectionViewList(Map<Intersection, ArrayList<Segment>> adjacenceMap, double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
+    /**
+     * Transform latitude and longitude of each intersection to coordinates X and Y
+     * @param listIntersections list of all intersections with latitude and longitude
+     * @param minLatitude lower latitude in all intersections
+     * @param maxLatitude bigger latitude in all intersections
+     * @param minLongitude lower longitude in all intersections
+     * @param maxLongitude bigger longitude in all intersections
+     */
+    private void initIntersectionViewList(Set<Intersection> listIntersections, double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
         double latitudeLength = maxLatitude - minLatitude;
         double longitudeLength = maxLongitude - minLongitude;
 
@@ -104,7 +114,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         if (originX + width - allBorders < viewWidth) originX = (int) (viewWidth - width + allBorders);
         if (originY + height - allBorders < viewHeight) originY = (int) (viewHeight - height + allBorders);
         intersectionViewMap = new HashMap<>();
-        for (Intersection intersection : adjacenceMap.keySet()) {
+        for (Intersection intersection : listIntersections) {
             double coordinateLongitude = intersection.getLongitude() - minLongitude;
             double coordinateLatitude = intersection.getLatitude() - minLatitude;
             int coordinateX = (int) ((coordinateLongitude * width) / longitudeLength) + originX;
@@ -114,6 +124,10 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         }
     }
 
+    /**
+     * Associate segments with intersections having coordinates X and Y
+     * @param segmentsCollection collection of all segments
+     */
     private void initSegmentViewList(Collection<ArrayList<Segment>> segmentsCollection) {
         for (List<Segment> segments : segmentsCollection) {
             for (Segment segment : segments) {
@@ -125,7 +139,12 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         }
     }
 
-    private void displayTourIntersections(Intersection depotAddress, ArrayList<Request> planningRequests) {
+    /**
+     * Associates depot, pickups and deliveries addresses with intersections having coordinates X and Y
+     * @param depotAddress depot address
+     * @param planningRequests list of all requests with for each a pickup address and a delivery address
+     */
+    private void initTourIntersectionsView(Intersection depotAddress, ArrayList<Request> planningRequests) {
         requestsIntersections.add(depotAddress.getId());
 
         for (Request request : planningRequests) {
@@ -167,6 +186,12 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         }
     }
 
+    /**
+     * Draw the icon for a depot, pickup or delivery address
+     * @param color color of the icon
+     * @param address address with coordinates X and Y
+     * @param iconFileName name of the icon file
+     */
     private void drawIcon(Color color, IntersectionView address, String iconFileName) {
         try {
             BufferedImage image = Constants.getImage(iconFileName);
@@ -177,6 +202,11 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         }
     }
 
+    /**
+     * Fill color in an icon
+     * @param image image of the icon
+     * @param finalColor wanted color for the icon
+     */
     private void fillColorInImage(BufferedImage image, Color finalColor) {
         for (int i = 0; i < image.getWidth(); i++) {
             for (int j = 0; j < image.getHeight(); j++) {
@@ -192,17 +222,23 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         }
     }
 
+    /**
+     * Method called by objects observed by this each time they are modified
+     */
     @Override
     public void update(Observable o, Object arg) {
         if (o.equals(cityMap)) {
             scale = 1;
-            displayCityMap(cityMap.getAdjacenceMap());
+            initCityMapView(cityMap.getAdjacenceMap());
         } else if (o.equals(tour)) {
-            displayTourIntersections(tour.getDepotAddress(), tour.getPlanningRequests());
+            initTourIntersectionsView(tour.getDepotAddress(), tour.getPlanningRequests());
         }
         repaint();
     }
 
+    /**
+     * Method called each time the mouse wheel is moved
+     */
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         int zoomCoefficient = 2;
@@ -212,13 +248,13 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
                 scale *= zoomCoefficient;
                 originX -= (e.getX() - originX) * (zoomCoefficient - 1);
                 originY -= (e.getY() - originY) * (zoomCoefficient - 1);
-                displayCityMap(cityMap.getAdjacenceMap());
+                initCityMapView(cityMap.getAdjacenceMap());
                 repaint();
             } else if (e.getWheelRotation() > 0 && scale > 1) {
                 scale /= zoomCoefficient;
                 originX += (e.getX() - originX) - (e.getX() - originX) / zoomCoefficient;
                 originY += (e.getY() - originY) - (e.getY() - originY) / zoomCoefficient;
-                displayCityMap(cityMap.getAdjacenceMap());
+                initCityMapView(cityMap.getAdjacenceMap());
                 repaint();
             }
         }
