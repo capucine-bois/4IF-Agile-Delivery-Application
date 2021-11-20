@@ -11,54 +11,40 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 
 /**
- * 
+ * Map loaded state. State of the application when map has been loaded.
  */
 public class MapLoadedState implements State {
 
     /**
-     * Default constructor
+     * Loading a map (intersections and segments) from XML file.
+     * Deserialize XML map file selected by user and returned by GUI window.
+     * @param cityMap the map structure to fill
+     * @param window the window where to show map and popup messages
+     * @param controller application controller
      */
-    public MapLoadedState() {
+    @Override
+    public void loadMap(CityMap cityMap, Window window, Controller controller) {
+        try {
+            XMLDeserializer.load(cityMap);
+        } catch (Exception e) {
+            // TODO afficher un message sur la fenetre
+        }
+        controller.setCurrentState(controller.mapLoadedState);
     }
 
     /**
-     * 
+     * Loading a planning requests (pickup and deliveries) from XML file.
+     * @param tour the tour structure to fill
+     * @param window the window where to show map and popup messages
+     * @param controller application controller
      */
-    public void MapLoadedState() {
-        // TODO implement here
-    }
-
-
-    @Override
-    public void loadMap(CityMap cityMap, Window window, Controller controller) {
-
-    }
-
     @Override
     public void loadRequests(Tour tour, CityMap cityMap, Window window, Controller controller) {
         try {
             XMLDeserializer.load(tour, cityMap);
-        } catch (ParserConfigurationException
-                | SAXException | IOException
-                | ExceptionXML | NumberFormatException e) {
-            // TODO afficher un message sur la fenetre
         } catch (Exception e) {
+            // TODO afficher un message sur la fenetre
             e.printStackTrace();
         }
     }
-
-    /**
-     * 
-     */
-    public void closeError() {
-        // TODO implement here
-    }
-
-    /**
-     * 
-     */
-    public void computeTour() {
-        // TODO implement here
-    }
-
 }

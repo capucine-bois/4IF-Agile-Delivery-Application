@@ -5,45 +5,14 @@ import model.Tour;
 import view.Window;
 
 /**
- * 
+ * Map file error state. State when the application fails to load XML map file.
  */
 public class MapFileErrorState implements State {
 
     /**
-     * Default constructor
-     */
-    public MapFileErrorState() {
-    }
-
-    /**
-     * 
-     */
-    public void MapFileErrorState() {
-        // TODO implement here
-    }
-
-
-    @Override
-    public void loadMap(CityMap cityMap, Window window, Controller controller) {
-
-    }
-
-    @Override
-    public void loadRequests(Tour tour, CityMap cityMap, Window window, Controller controller) {
-
-    }
-
-    /**
-     * 
+     * Close error popup.
      */
     public void closeError() {
-        // TODO implement here
-    }
-
-    /**
-     * 
-     */
-    public void computeTour() {
         // TODO implement here
     }
 
