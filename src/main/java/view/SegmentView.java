@@ -11,7 +11,19 @@ public class SegmentView {
         this.destination = destination;
     }
 
-    public void paintSegment(Graphics g) {
-        g.drawLine(origin.getCoordinateX(), origin.getCoordinateY(), destination.getCoordinateX(), destination.getCoordinateY());
+    public IntersectionView getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(IntersectionView origin) {
+        this.origin = origin;
+    }
+
+    public IntersectionView getDestination() {
+        return destination;
+    }
+
+    public void setDestination(IntersectionView destination) {
+        this.destination = destination;
     }
 }
