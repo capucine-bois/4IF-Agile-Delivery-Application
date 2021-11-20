@@ -141,14 +141,8 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         this.g = g;
-        Graphics2D g2 = (Graphics2D) g;
         for (SegmentView segmentView : segmentViewList) {
-            g2.setColor(Constants.COLOR_6);
-            g2.setStroke(new BasicStroke(scale + 2));
-            g2.drawLine(segmentView.getOrigin().getCoordinateX(), segmentView.getOrigin().getCoordinateY(), segmentView.getDestination().getCoordinateX(), segmentView.getDestination().getCoordinateY());
-            g2.setColor(Constants.COLOR_7);
-            g2.setStroke(new BasicStroke(scale));
-            g2.drawLine(segmentView.getOrigin().getCoordinateX(), segmentView.getOrigin().getCoordinateY(), segmentView.getDestination().getCoordinateX(), segmentView.getDestination().getCoordinateY());
+            segmentView.paintSegment(g, scale);
         }
         if (!requestsIntersections.isEmpty()) {
             List<Color> usedColors = new ArrayList<>();
