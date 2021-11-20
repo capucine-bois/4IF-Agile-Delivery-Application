@@ -28,7 +28,7 @@ public class Controller {
      * @param tour filled tour structure
      */
     public Controller(CityMap cityMap, Tour tour) throws IOException, FontFormatException {
-        this.window = new Window(cityMap, this);
+        this.window = new Window(cityMap, tour, this);
         this.currentState = initialState;
         this.cityMap = cityMap;
         this.tour = tour;

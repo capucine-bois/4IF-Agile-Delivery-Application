@@ -24,14 +24,18 @@ public class Tour extends Observable {
     /* CONSTRUCTORS */
 
     /**
-     * Default constructor
+     * Constructor initializing the planning requests and the list of the shortest paths
      */
-    public Tour(){}
+    public Tour() {
+        planningRequests = new ArrayList<>();
+        listShortestPaths = new ArrayList<>();
+    }
 
     /* GETTERS */
 
     /**
      * Getter for tour tourLength attribute
+     *
      * @return tour length
      */
     public double getTourLength() {
@@ -40,6 +44,7 @@ public class Tour extends Observable {
 
     /**
      * Getter for depotAddress attribute
+     *
      * @return depot address
      */
     public Intersection getDepotAddress() {
@@ -48,6 +53,7 @@ public class Tour extends Observable {
 
     /**
      * Getter for departureTime attribute
+     *
      * @return departure time
      */
     public String getDepartureTime() {
@@ -56,6 +62,7 @@ public class Tour extends Observable {
 
     /**
      * Getter for planningRequests attribute
+     *
      * @return planning of requests
      */
     public ArrayList<Request> getPlanningRequests() {
@@ -64,6 +71,7 @@ public class Tour extends Observable {
 
     /**
      * Getter for listShortestPaths attribute
+     *
      * @return list of shortest paths
      */
     public ArrayList<ShortestPath> getListShortestPaths() {
@@ -74,6 +82,7 @@ public class Tour extends Observable {
 
     /**
      * Setter for tourLength attribute
+     *
      * @param tourLength wanted attribute for tourLength attribute
      */
     public void setTourLength(double tourLength) {
@@ -82,6 +91,7 @@ public class Tour extends Observable {
 
     /**
      * Setter for depotAddress attribute
+     *
      * @param depotAddress wanted attribute for depotAddress attribute
      */
     public void setDepotAddress(Intersection depotAddress) {
@@ -90,6 +100,7 @@ public class Tour extends Observable {
 
     /**
      * Setter for departureTime attribute
+     *
      * @param departureTime wanted attribute for departureTime attribute
      */
     public void setDepartureTime(String departureTime) {
@@ -98,6 +109,7 @@ public class Tour extends Observable {
 
     /**
      * Setter for planningRequests attribute
+     *
      * @param planningRequests wanted attribute for planningRequests attribute
      */
     public void setPlanningRequests(ArrayList<Request> planningRequests) {
@@ -106,6 +118,7 @@ public class Tour extends Observable {
 
     /**
      * Setter for listShortestPaths attribute
+     *
      * @param listShortestPaths wanted attribute for listShortestPaths attribute
      */
     public void setListShortestPaths(ArrayList<ShortestPath> listShortestPaths) {
