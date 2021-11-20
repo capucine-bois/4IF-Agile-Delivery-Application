@@ -19,20 +19,18 @@ class XMLfileOpenerTest {
 
     @BeforeAll
     static public void initStartingTime() {
-        System.out.println("Appel avant tous les tests");
         startedAt = Instant.now();
     }
 
     @AfterAll
     static public void showTestDuration() {
-        System.out.println("Appel après tous les tests");
         Instant endedAt = Instant.now();
         long duration = Duration.between(startedAt, endedAt).toMillis();
-        System.out.println(MessageFormat.format("Durée des tests : {0} ms", duration));
+        System.out.println(MessageFormat.format("Test duration : {0} ms", duration));
     }
 
 
-    XMLFileOpener xmlOpener;
+    XMLFileOpener xmlOpener = new XMLFileOpener();
     File file = new File("../../resources/testMap.xml");
 
     /*
