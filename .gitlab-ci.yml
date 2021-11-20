@@ -1,4 +1,4 @@
-image: maven:3-jdk-8
+image: maven:3.8.3-amazoncorretto-16
 
 stages:
   - test
