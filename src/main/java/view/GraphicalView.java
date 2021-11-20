@@ -26,9 +26,11 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     private Graphics g;
     private final int firstBorder = 10;
     private final int secondBorder = 2;
+    private final int fakeBorder = 10;
+    private final int allBorders = firstBorder + secondBorder + fakeBorder;
     private int scale = 1;
-    private int originX = firstBorder + secondBorder;
-    private int originY = firstBorder + secondBorder;
+    private int originX = allBorders;
+    private int originY = allBorders;
     private CityMap cityMap;
     private Tour tour;
 
@@ -39,7 +41,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     public GraphicalView(CityMap cityMap, Tour tour, Window w) {
         setLayout(null);
         setBackground(Constants.COLOR_5);
-        setBorder(new CompoundBorder(BorderFactory.createMatteBorder(firstBorder,firstBorder,firstBorder,5,Constants.COLOR_1),BorderFactory.createLineBorder(Constants.COLOR_4, secondBorder)));
+        setBorder(new CompoundBorder(BorderFactory.createLineBorder(Constants.COLOR_1, firstBorder),BorderFactory.createLineBorder(Constants.COLOR_4, secondBorder)));
         w.getContentPane().add(this, BorderLayout.CENTER);
         cityMap.addObserver(this);
         tour.addObserver(this);
@@ -92,15 +94,15 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         double latitudeLength = maxLatitude - minLatitude;
         double longitudeLength = maxLongitude - minLongitude;
 
-        double viewWidth = g.getClipBounds().width - ((double) (firstBorder / 2) + secondBorder);
+        double viewWidth = g.getClipBounds().width - allBorders * 2;
         double width = viewWidth * scale;
-        double viewHeight = g.getClipBounds().height - (firstBorder + secondBorder);
+        double viewHeight = g.getClipBounds().height - allBorders * 2;
         double height = viewHeight * scale;
 
-        if (originX > 0) originX = 0;
-        if (originY > 0) originY = 0;
-        if (originX + width < viewWidth) originX = (int) (viewWidth - width);
-        if (originY + height < viewHeight) originY = (int) (viewHeight - height);
+        if (originX > allBorders) originX = allBorders;
+        if (originY > allBorders) originY = allBorders;
+        if (originX + width - allBorders < viewWidth) originX = (int) (viewWidth - width + allBorders);
+        if (originY + height - allBorders < viewHeight) originY = (int) (viewHeight - height + allBorders);
         intersectionViewMap = new HashMap<>();
         for (Intersection intersection : adjacenceMap.keySet()) {
             double coordinateLongitude = intersection.getLongitude() - minLongitude;
@@ -142,10 +144,10 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         Graphics2D g2 = (Graphics2D) g;
         for (SegmentView segmentView : segmentViewList) {
             g2.setColor(Constants.COLOR_6);
-            g2.setStroke(new BasicStroke((int) (scale + 2)));
+            g2.setStroke(new BasicStroke(scale + 2));
             g2.drawLine(segmentView.getOrigin().getCoordinateX(), segmentView.getOrigin().getCoordinateY(), segmentView.getDestination().getCoordinateX(), segmentView.getDestination().getCoordinateY());
             g2.setColor(Constants.COLOR_7);
-            g2.setStroke(new BasicStroke((int) scale));
+            g2.setStroke(new BasicStroke(scale));
             g2.drawLine(segmentView.getOrigin().getCoordinateX(), segmentView.getOrigin().getCoordinateY(), segmentView.getDestination().getCoordinateX(), segmentView.getDestination().getCoordinateY());
         }
         if (!requestsIntersections.isEmpty()) {
@@ -199,6 +201,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     @Override
     public void update(Observable o, Object arg) {
         if (o.equals(cityMap)) {
+            scale = 1;
             displayCityMap(cityMap.getAdjacenceMap());
         } else if (o.equals(tour)) {
             displayTourIntersections(tour.getDepotAddress(), tour.getPlanningRequests());
@@ -209,17 +212,21 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         int zoomCoefficient = 2;
-        if ((e.getWheelRotation() < 0 ) && scale < 20) {
-            scale *= zoomCoefficient;
-            originX -= (e.getX() - originX) * (zoomCoefficient - 1);
-            originY -= (e.getY() - originY) * (zoomCoefficient - 1);
-            displayCityMap(cityMap.getAdjacenceMap());
-        } else if (e.getWheelRotation() > 0 && scale > 1) {
-            scale /= zoomCoefficient;
-            originX += (e.getX() - originX) - (e.getX() - originX)/zoomCoefficient;
-            originY += (e.getY() - originY) - (e.getY() - originY)/zoomCoefficient;
-            displayCityMap(cityMap.getAdjacenceMap());
+        int zoomBorders = allBorders - fakeBorder;
+        if (e.getX() > zoomBorders && e.getX() < g.getClipBounds().width - zoomBorders && e.getY() > zoomBorders && e.getY() < g.getClipBounds().height - zoomBorders) {
+            if ((e.getWheelRotation() < 0) && scale < 20) {
+                scale *= zoomCoefficient;
+                originX -= (e.getX() - originX) * (zoomCoefficient - 1);
+                originY -= (e.getY() - originY) * (zoomCoefficient - 1);
+                displayCityMap(cityMap.getAdjacenceMap());
+                repaint();
+            } else if (e.getWheelRotation() > 0 && scale > 1) {
+                scale /= zoomCoefficient;
+                originX += (e.getX() - originX) - (e.getX() - originX) / zoomCoefficient;
+                originY += (e.getY() - originY) - (e.getY() - originY) / zoomCoefficient;
+                displayCityMap(cityMap.getAdjacenceMap());
+                repaint();
+            }
         }
-        repaint();
     }
 }
