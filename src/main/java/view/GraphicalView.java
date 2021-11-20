@@ -41,7 +41,6 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
      * @param w the window
      */
     public GraphicalView(CityMap cityMap, Tour tour, Window w) {
-        setLayout(null);
         setBackground(Constants.COLOR_5);
         setBorder(new CompoundBorder(BorderFactory.createLineBorder(Constants.COLOR_1, firstBorder),BorderFactory.createLineBorder(Constants.COLOR_4, secondBorder)));
         w.getContentPane().add(this, BorderLayout.CENTER);
@@ -62,6 +61,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     public void initCityMapView(Map<Intersection, ArrayList<Segment>> adjacenceMap) {
         intersectionViewMap.clear();
         segmentViewList.clear();
+        requestsIntersections.clear();
 
         Set<Intersection> intersections = adjacenceMap.keySet();
         Optional<Intersection> optionalIntersection = intersections.stream().findFirst();
@@ -95,7 +95,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     /**
      * Initialize the list of intersections on the GUI.
      * Parse the list of intersections to instantiate all the intersections for the GUI (IntersectionView) with coordinates X and Y.
-     * @param adjacenceMap map containing an intersection as key and a list of segments where they are part of as value
+     * @param listIntersections map containing an intersection as key and a list of segments where they are part of as value
      * @param minLatitude minimal geographical latitude of all intersections
      * @param maxLatitude maximal geographical latitude of all intersections
      * @param minLongitude minimal geographical longitude of all intersections
@@ -147,6 +147,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
      * @param planningRequests list of all requests with for each a pickup address and a delivery address
      */
     private void initTourIntersectionsView(Intersection depotAddress, ArrayList<Request> planningRequests) {
+        requestsIntersections.clear();
         requestsIntersections.add(depotAddress.getId());
 
         for (Request request : planningRequests) {

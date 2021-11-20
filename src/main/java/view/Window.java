@@ -24,6 +24,7 @@ public class Window extends JFrame implements ComponentListener {
     private JPanel header;
     private GraphicalView graphicalView;
     private TextualView textualView;
+    private ErrorView errorView;
     private CityMap cityMap;
     private Tour tour;
 
@@ -50,6 +51,7 @@ public class Window extends JFrame implements ComponentListener {
         createHeader(controller);
         graphicalView = new GraphicalView(cityMap, tour, this);
         textualView = new TextualView(this);
+        errorView = new ErrorView(this);
         this.cityMap = cityMap;
         this.tour = tour;
         //TODO: Add mouse listener
@@ -104,7 +106,7 @@ public class Window extends JFrame implements ComponentListener {
      * @throws IOException raised if font file can't be found
      * @throws FontFormatException raised if font can't be loaded
      */
-    private void setStyle(JButton button) throws IOException, FontFormatException {
+    public void setStyle(JButton button) throws IOException, FontFormatException {
         int buttonHeight = 40;
         button.setPreferredSize(new Dimension(button.getPreferredSize().width, buttonHeight));
         button.setBorder(BorderFactory.createEmptyBorder());
@@ -125,6 +127,14 @@ public class Window extends JFrame implements ComponentListener {
         header.setPreferredSize(new Dimension(windowWidth, headerHeight));
         textualView.setPreferredSize(new Dimension(textualViewWidth, windowHeight - headerHeight));
         graphicalView.setPreferredSize(new Dimension(windowWidth - textualViewWidth, windowHeight - headerHeight));
+    }
+
+    /**
+     * Displays an error message on the window
+     * @param message error message
+     */
+    public void displayErrorMessage(String message) {
+        errorView.showError(message);
     }
 
     /**

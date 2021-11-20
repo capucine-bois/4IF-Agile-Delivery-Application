@@ -26,10 +26,10 @@ public class MapLoadedState implements State {
     public void loadMap(CityMap cityMap, Window window, Controller controller) {
         try {
             XMLDeserializer.load(cityMap);
+            controller.setCurrentState(controller.mapLoadedState);
         } catch (Exception e) {
-            // TODO afficher un message sur la fenetre
+            window.displayErrorMessage(e.getMessage());
         }
-        controller.setCurrentState(controller.mapLoadedState);
     }
 
     /**
@@ -43,8 +43,7 @@ public class MapLoadedState implements State {
         try {
             XMLDeserializer.load(tour, cityMap);
         } catch (Exception e) {
-            // TODO afficher un message sur la fenetre
-            e.printStackTrace();
+            window.displayErrorMessage(e.getMessage());
         }
     }
 }
