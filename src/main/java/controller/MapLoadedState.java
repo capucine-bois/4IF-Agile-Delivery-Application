@@ -43,6 +43,7 @@ public class MapLoadedState implements State {
     public void loadRequests(Tour tour, CityMap cityMap, Window window, Controller controller) {
         try {
             XMLDeserializer.load(tour, cityMap);
+            controller.setCurrentState(controller.requestsLoadedState);
         } catch (Exception e) {
             if(!e.getMessage().equals("Problem when opening file"))
                 window.displayErrorMessage(e.getMessage());

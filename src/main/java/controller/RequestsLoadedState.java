@@ -3,6 +3,7 @@ package controller;
 import model.CityMap;
 import model.Tour;
 import view.Window;
+import xml.XMLDeserializer;
 
 /**
  * Request loaded state. State when the application has successfully loaded requests.
@@ -18,7 +19,13 @@ public class RequestsLoadedState implements State {
      */
     @Override
     public void loadMap(CityMap cityMap, Window window, Controller controller) {
-
+        try {
+            XMLDeserializer.load(cityMap);
+            controller.setCurrentState(controller.mapLoadedState);
+        } catch (Exception e) {
+            if(!e.getMessage().equals("Problem when opening file"))
+                window.displayErrorMessage(e.getMessage());
+        }
     }
 
     /**
@@ -29,7 +36,13 @@ public class RequestsLoadedState implements State {
      */
     @Override
     public void loadRequests(Tour tour, CityMap cityMap, Window window, Controller controller) {
-
+        try {
+            XMLDeserializer.load(tour, cityMap);
+            controller.setCurrentState(controller.requestsLoadedState);
+        } catch (Exception e) {
+            if(!e.getMessage().equals("Problem when opening file"))
+                window.displayErrorMessage(e.getMessage());
+        }
     }
 
     /**
