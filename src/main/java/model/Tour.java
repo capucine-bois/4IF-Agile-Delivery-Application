@@ -25,7 +25,6 @@ public class Tour extends Observable {
     private String departureTime;
     private ArrayList<Request> planningRequests = new ArrayList<>();
     private ArrayList<ShortestPath> listShortestPaths;
-    private Integer[] intersectionsOrder = null;
 
     /* CONSTRUCTORS */
 
@@ -84,14 +83,6 @@ public class Tour extends Observable {
         return listShortestPaths;
     }
 
-    /**
-     * Getter for intersectionsOrder attribute
-     * @return order of intersections to be visited
-     */
-    public Integer[] getIntersectionsOrder() {
-        return intersectionsOrder;
-    }
-
     /* SETTERS */
 
     /**
@@ -137,14 +128,6 @@ public class Tour extends Observable {
      */
     public void setListShortestPaths(ArrayList<ShortestPath> listShortestPaths) {
         this.listShortestPaths = listShortestPaths;
-    }
-
-    /**
-     * Setter for intersectionsOrder attribute
-     * @param intersectionsOrder wanted value for intersectionsOrder attribute
-     */
-    public void setIntersectionsOrder(Integer[] intersectionsOrder) {
-        this.intersectionsOrder = intersectionsOrder;
     }
 
     /* METHODS */
@@ -194,8 +177,10 @@ public class Tour extends Observable {
                 listNodes.add(new Node(node,dist.get(node),iteratorNumber));
                 iteratorNumber++;
             }
-
         }
+
+        //listNodes.add(new Node(depotAddress,dist.get(depotAddress),iteratorNumber));
+
 
         // Run Tour
         TSP tsp = new TSP1();
@@ -205,9 +190,36 @@ public class Tour extends Observable {
         System.out.print("Solution of cost "+tsp.getSolutionCost()+" found in "
                 +(System.currentTimeMillis() - startTime)+"ms : ");
 
-        intersectionsOrder = tsp.getBestSol();
+        Integer[] intersectionsOrder = tsp.getBestSol();
         for (Integer i: intersectionsOrder) System.out.print(intersectionsOrder[i] + " ");
         System.out.println("0");
+
+        Intersection previous = null;
+        for (Integer index: intersectionsOrder) {
+            Intersection currentIntersection;
+            if (index == 0)
+                currentIntersection = listUsefulPoints.get(listUsefulPoints.size()-1);
+            else
+                currentIntersection = listUsefulPoints.get(index-1);
+            if (previous != null) {
+                for (ShortestPath p: dist.get(previous)) {
+                    if (p.getEndAddress().equals(currentIntersection))
+                        listShortestPaths.add(p);
+                }
+            }
+            previous = currentIntersection;
+        }
+
+        for (ShortestPath p: dist.get(previous)) {
+            if (p.getEndAddress().equals(depotAddress))
+                listShortestPaths.add(p);
+        }
+
+        // print order
+        for (ShortestPath p: listShortestPaths) {
+            System.out.println(p.getStartAddress().getLatitude() + " " + p.getStartAddress().getLongitude() + " -> " +
+                    p.getEndAddress().getLatitude() + " " + p.getEndAddress().getLongitude());
+        }
 
         notifyObservers();
     }

@@ -236,7 +236,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
             initCityMapView(cityMap.getAdjacenceMap());
         } else if (o.equals(tour)) {
             initTourIntersectionsView(tour.getDepotAddress(), tour.getPlanningRequests());
-            if (tour.getIntersectionsOrder() != null) {
+            if (!tour.getListShortestPaths().isEmpty()) {
                 System.out.println("GraphicalView: update tour");
                 // TODO: display tour
             }
