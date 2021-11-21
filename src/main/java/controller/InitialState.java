@@ -25,10 +25,11 @@ public class InitialState implements State {
     public void loadMap(CityMap cityMap, Window window, Controller controller) {
         try {
             XMLDeserializer.load(cityMap);
+            controller.setCurrentState(controller.mapLoadedState);
         } catch (Exception e) {
-            // TODO afficher un message sur la fenetre
+            if(!e.getMessage().equals("Problem when opening file"))
+                window.displayErrorMessage(e.getMessage());
         }
-        controller.setCurrentState(controller.mapLoadedState);
     }
 
 }

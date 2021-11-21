@@ -9,7 +9,6 @@ import xml.XMLDeserializer;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Map loaded state. State of the application when map has been loaded.
@@ -27,10 +26,11 @@ public class MapLoadedState implements State {
     public void loadMap(CityMap cityMap, Window window, Controller controller) {
         try {
             XMLDeserializer.load(cityMap);
+            controller.setCurrentState(controller.mapLoadedState);
         } catch (Exception e) {
-            // TODO afficher un message sur la fenetre
+            if(!e.getMessage().equals("Problem when opening file"))
+                window.displayErrorMessage(e.getMessage());
         }
-        controller.setCurrentState(controller.mapLoadedState);
     }
 
     /**
@@ -42,12 +42,11 @@ public class MapLoadedState implements State {
     @Override
     public void loadRequests(Tour tour, CityMap cityMap, Window window, Controller controller) {
         try {
-            tour.setPlanningRequests(new ArrayList<>());
             XMLDeserializer.load(tour, cityMap);
-            tour.computeTour(cityMap.getAdjacenceMap());
+            controller.setCurrentState(controller.requestsLoadedState);
         } catch (Exception e) {
-            // TODO afficher un message sur la fenetre
-            e.printStackTrace();
+            if(!e.getMessage().equals("Problem when opening file"))
+                window.displayErrorMessage(e.getMessage());
         }
     }
 }

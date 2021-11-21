@@ -1,0 +1,29 @@
+image: maven:3.8.3-amazoncorretto-16
+
+stages:
+  - test
+
+include:
+  - template: Code-Quality.gitlab-ci.yml
+
+
+
+## On redéfinit les jobs des features de GitLab pour forcer le workflow
+code_quality:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+
+
+JUnit5:
+  stage: test
+  script:
+    - mvn verify
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+        - target/failsafe-reports/TEST-*.xml

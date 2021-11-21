@@ -17,7 +17,7 @@ public class TextualView extends JPanel implements Observer {
      */
     public TextualView(Window window){
         setBackground(Constants.COLOR_4);
-        setBorder(BorderFactory.createMatteBorder(10,5,10,10,Constants.COLOR_1));
+        setBorder(BorderFactory.createMatteBorder(10,0,10,10,Constants.COLOR_1));
         window.getContentPane().add(this, BorderLayout.LINE_END);
     }
 

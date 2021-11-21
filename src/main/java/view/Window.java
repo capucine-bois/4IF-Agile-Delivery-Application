@@ -2,15 +2,14 @@ package view;
 
 import controller.Controller;
 import model.CityMap;
+import model.Tour;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * GUI for the application.
@@ -25,6 +24,9 @@ public class Window extends JFrame implements ComponentListener {
     private JPanel header;
     private GraphicalView graphicalView;
     private TextualView textualView;
+    private ErrorView errorView;
+    private CityMap cityMap;
+    private Tour tour;
 
     // Listeners
     private ButtonListener buttonListener;
@@ -40,17 +42,18 @@ public class Window extends JFrame implements ComponentListener {
     /**
      * Complete constructor
      * @param cityMap the map to show
+     * @param tour the tour
      * @param controller instance of application controller
      * @throws IOException raised if GUI listeners fail
      * @throws FontFormatException raised if text font can't be loaded
      */
-    public Window(CityMap cityMap, Controller controller) throws IOException, FontFormatException {
-        //TODO: Add map when implemented
-        //TODO: Add controller when implemented
+    public Window(CityMap cityMap, Tour tour, Controller controller) throws IOException, FontFormatException {
         createHeader(controller);
-        //TODO: Add intermediate JPanel before graphicalView and textualView
-        graphicalView = new GraphicalView(cityMap, this);
+        graphicalView = new GraphicalView(cityMap, tour, this);
         textualView = new TextualView(this);
+        errorView = new ErrorView(this);
+        this.cityMap = cityMap;
+        this.tour = tour;
         //TODO: Add mouse listener
         //TODO: Add keyboard listener
         setMinimumSize(new Dimension(windowWidth, windowHeight));
@@ -85,9 +88,9 @@ public class Window extends JFrame implements ComponentListener {
     }
 
     /**
-     *
-     * @throws IOException
-     * @throws FontFormatException
+     * Set the application name to display in the top left corner
+     * @throws IOException raised if font file can't be found
+     * @throws FontFormatException raised if font can't be loaded
      */
     private void addAppName() throws IOException, FontFormatException {
         JLabel appNameLabel = new JLabel("Application Name");
@@ -103,7 +106,7 @@ public class Window extends JFrame implements ComponentListener {
      * @throws IOException raised if font file can't be found
      * @throws FontFormatException raised if font can't be loaded
      */
-    private void setStyle(JButton button) throws IOException, FontFormatException {
+    public void setStyle(JButton button) throws IOException, FontFormatException {
         int buttonHeight = 40;
         button.setPreferredSize(new Dimension(button.getPreferredSize().width, buttonHeight));
         button.setBorder(BorderFactory.createEmptyBorder());
@@ -127,6 +130,14 @@ public class Window extends JFrame implements ComponentListener {
     }
 
     /**
+     * Displays an error message on the window
+     * @param message error message
+     */
+    public void displayErrorMessage(String message) {
+        errorView.showError(message);
+    }
+
+    /**
      * Event triggered when the window is resized.
      * @param e event information
      */
@@ -135,6 +146,7 @@ public class Window extends JFrame implements ComponentListener {
         windowWidth = e.getComponent().getSize().width;
         windowHeight = e.getComponent().getSize().height;
         setWindowSize();
+        graphicalView.initCityMapView(cityMap.getAdjacenceMap());
         graphicalView.repaint();
     }
 

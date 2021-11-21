@@ -21,6 +21,7 @@ public class Controller {
     // Instances associated with each possible state of the controller
     protected final InitialState initialState = new InitialState();
     protected final MapLoadedState mapLoadedState = new MapLoadedState();
+    protected final RequestsLoadedState requestsLoadedState = new RequestsLoadedState();
 
 
     /** Constructor taking already filled cityMap and tour structures
@@ -28,7 +29,7 @@ public class Controller {
      * @param tour filled tour structure
      */
     public Controller(CityMap cityMap, Tour tour) throws IOException, FontFormatException {
-        this.window = new Window(cityMap, this);
+        this.window = new Window(cityMap, tour, this);
         this.currentState = initialState;
         this.cityMap = cityMap;
         this.tour = tour;
@@ -64,14 +65,10 @@ public class Controller {
     /**
      * Close error popup.
      */
-    public void closeError() {
-        // TODO implement here
-    }
+    public void closeError() { currentState.closeError(); }
 
     /**
      * Compute tour to accomplish all the requests as fast as possible (solving TSP problem).
      */
-    public void computeTour() {
-        // TODO implement here
-    }
+    public void computeTour() { currentState.computeTour(); }
 }

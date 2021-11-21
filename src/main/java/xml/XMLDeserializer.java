@@ -49,7 +49,9 @@ public class XMLDeserializer {
         Document document = extractDocument(file);
         Element racine = document.getDocumentElement();
         if (racine.getNodeName().equals("planningRequest")) {
+            tour.getPlanningRequests().clear();
             deserializeRequests(tour, cityMap, document);
+            tour.notifyObservers();
         } else {
             // TODO: manage cancel in file opener
             throw new ExceptionXML("Bad document");
@@ -60,12 +62,18 @@ public class XMLDeserializer {
      * Create a Document instance for file parameter.
      * @param file the file
      * @return the document
-     * @throws Exception raised if the file can't be parsed and converted into a Document instance.
+     * @throws Exception raised if the file can't be parsed and converted into a XML Document instance.
      */
     public static Document extractDocument(File file) throws Exception {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        return db.parse(file);
+        Document docParsed;
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            docParsed = db.parse(file);
+        }catch(Exception e) {
+            throw new ExceptionXML("Bad extension");
+        }
+        return docParsed;
     }
 
     /**
