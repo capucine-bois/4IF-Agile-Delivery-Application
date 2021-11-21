@@ -61,7 +61,6 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     public void initCityMapView(Map<Intersection, ArrayList<Segment>> adjacenceMap) {
         intersectionViewMap.clear();
         segmentViewList.clear();
-        requestsIntersections.clear();
 
         Set<Intersection> intersections = adjacenceMap.keySet();
         Optional<Intersection> optionalIntersection = intersections.stream().findFirst();
@@ -168,25 +167,22 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
             segmentView.paintSegment(g, scale);
         }
         if (!requestsIntersections.isEmpty()) {
-            List<Color> usedColors = new ArrayList<>();
             Iterator<Long> iterator = requestsIntersections.iterator();
             IntersectionView depotAddress = intersectionViewMap.get(iterator.next());
-            Color depotColor = Color.red;
-            usedColors.add(depotColor);
+            float[] hsv = new float[3];
+            Color initialColor = Color.red;
+            Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
+            double goldenRatioConjugate = 0.618033988749895;
             while (iterator.hasNext()) {
                 IntersectionView pickupAddress = intersectionViewMap.get(iterator.next());
                 IntersectionView deliveryAddress = intersectionViewMap.get(iterator.next());
-                Color requestColor;
-                do {
-                    int red = (int) (Math.random() * 256);
-                    int green = (int) (Math.random() * 256);
-                    int blue = (int) (Math.random() * 256);
-                    requestColor = new Color(red, green, blue);
-                } while (usedColors.contains(requestColor));
+                Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
                 drawIcon(requestColor, pickupAddress, "pickup-icon.png");
                 drawIcon(requestColor, deliveryAddress, "delivery-icon.png");
+                hsv[0] += goldenRatioConjugate;
+                hsv[0] %= 1;
             }
-            drawIcon(depotColor, depotAddress, "depot-icon.png");
+            drawIcon(null, depotAddress, "depot-icon.png");
         }
     }
 
@@ -199,7 +195,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     private void drawIcon(Color color, IntersectionView address, String iconFileName) {
         try {
             BufferedImage image = Constants.getImage(iconFileName);
-            fillColorInImage(image, color);
+            if (color != null) fillColorInImage(image, color);
             g.drawImage(image, address.getCoordinateX() - 20, address.getCoordinateY() - 40, 40, 40, this);
         } catch (IOException e) {
             e.printStackTrace();
@@ -236,6 +232,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     public void update(Observable o, Object arg) {
         if (o.equals(cityMap)) {
             scale = 1;
+            requestsIntersections.clear();
             initCityMapView(cityMap.getAdjacenceMap());
         } else if (o.equals(tour)) {
             initTourIntersectionsView(tour.getDepotAddress(), tour.getPlanningRequests());
