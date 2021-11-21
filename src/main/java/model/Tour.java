@@ -2,6 +2,7 @@ package model;
 
 import observer.Observable;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ public class Tour extends Observable {
     private String departureTime;
     private ArrayList<Request> planningRequests = new ArrayList<>();
     private ArrayList<ShortestPath> listShortestPaths;
+    private Integer[] intersectionsOrder = null;
 
     /* CONSTRUCTORS */
 
@@ -82,12 +84,20 @@ public class Tour extends Observable {
         return listShortestPaths;
     }
 
+    /**
+     * Getter for intersectionsOrder attribute
+     * @return order of intersections to be visited
+     */
+    public Integer[] getIntersectionsOrder() {
+        return intersectionsOrder;
+    }
+
     /* SETTERS */
 
     /**
      * Setter for tourLength attribute
      *
-     * @param tourLength wanted attribute for tourLength attribute
+     * @param tourLength wanted value for tourLength attribute
      */
     public void setTourLength(double tourLength) {
         this.tourLength = tourLength;
@@ -96,7 +106,7 @@ public class Tour extends Observable {
     /**
      * Setter for depotAddress attribute
      *
-     * @param depotAddress wanted attribute for depotAddress attribute
+     * @param depotAddress wanted value for depotAddress attribute
      */
     public void setDepotAddress(Intersection depotAddress) {
         this.depotAddress = depotAddress;
@@ -105,7 +115,7 @@ public class Tour extends Observable {
     /**
      * Setter for departureTime attribute
      *
-     * @param departureTime wanted attribute for departureTime attribute
+     * @param departureTime wanted value for departureTime attribute
      */
     public void setDepartureTime(String departureTime) {
         this.departureTime = departureTime;
@@ -114,7 +124,7 @@ public class Tour extends Observable {
     /**
      * Setter for planningRequests attribute
      *
-     * @param planningRequests wanted attribute for planningRequests attribute
+     * @param planningRequests wanted value for planningRequests attribute
      */
     public void setPlanningRequests(ArrayList<Request> planningRequests) {
         this.planningRequests = planningRequests;
@@ -123,11 +133,21 @@ public class Tour extends Observable {
     /**
      * Setter for listShortestPaths attribute
      *
-     * @param listShortestPaths wanted attribute for listShortestPaths attribute
+     * @param listShortestPaths wanted value for listShortestPaths attribute
      */
     public void setListShortestPaths(ArrayList<ShortestPath> listShortestPaths) {
         this.listShortestPaths = listShortestPaths;
     }
+
+    /**
+     * Setter for intersectionsOrder attribute
+     * @param intersectionsOrder wanted value for intersectionsOrder attribute
+     */
+    public void setIntersectionsOrder(Integer[] intersectionsOrder) {
+        this.intersectionsOrder = intersectionsOrder;
+    }
+
+    /* METHODS */
 
     /**
      * Adding a request in the planning requests.
@@ -142,8 +162,6 @@ public class Tour extends Observable {
      * @param adjacenceMap the map with all intersections and the segments starting from this intersections
      */
     public void  computeTour(Map<Intersection, ArrayList<Segment>> adjacenceMap) {
-
-        System.out.println("Tour.computeTour");
 
         Map<Intersection, ArrayList<ShortestPath>> dist = new HashMap<>();
         // get the points useful for the computing : pick-up address, delivery address, depot
@@ -186,11 +204,12 @@ public class Tour extends Observable {
         tsp.searchSolution(20000, g);
         System.out.print("Solution of cost "+tsp.getSolutionCost()+" found in "
                 +(System.currentTimeMillis() - startTime)+"ms : ");
-        for (int i=0; i<g.getNbVertices(); i++) System.out.print(tsp.getSolution(i)+" ");
-        System.out.println("0");
-        // TODO: store solution
-        // TODO: notify observer
 
+        intersectionsOrder = tsp.getBestSol();
+        for (Integer i: intersectionsOrder) System.out.print(intersectionsOrder[i] + " ");
+        System.out.println("0");
+
+        notifyObservers();
     }
 
 

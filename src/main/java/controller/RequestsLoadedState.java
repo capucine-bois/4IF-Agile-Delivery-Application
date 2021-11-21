@@ -49,8 +49,6 @@ public class RequestsLoadedState implements State {
      */
     @Override
     public void computeTour(CityMap cityMap, Tour tour) {
-        System.out.println("RequestsLoadedState.computeTour");
-
         tour.computeTour(cityMap.getAdjacenceMap());
     }
 
