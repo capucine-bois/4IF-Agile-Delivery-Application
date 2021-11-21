@@ -108,11 +108,8 @@ public class TextualView extends JPanel implements Observer {
         informationPanel.add(contentPanel);
 
         informationPanel.setBorder(BorderFactory.createMatteBorder(0,0,gap,0,Constants.COLOR_4));
-        if (color == Color.black) {
-            informationPanel.setMaximumSize(new Dimension(getPreferredSize().width - colorWidth, 52 + gap));
-        } else {
-            informationPanel.setMaximumSize(new Dimension(getPreferredSize().width - colorWidth, 104 + gap));
-        }
+        int maxLineHeight = 26;
+        informationPanel.setMaximumSize(new Dimension(getPreferredSize().width - colorWidth, informations.size()*maxLineHeight + gap));
         mainPanel.add(informationPanel);
     }
 
