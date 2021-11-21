@@ -142,6 +142,9 @@ public class Tour extends Observable {
      * @param adjacenceMap the map with all intersections and the segments starting from this intersections
      */
     public void  computeTour(Map<Intersection, ArrayList<Segment>> adjacenceMap) {
+
+        System.out.println("Tour.computeTour");
+
         Map<Intersection, ArrayList<ShortestPath>> dist = new HashMap<>();
         // get the points useful for the computing : pick-up address, delivery address, depot
         ArrayList<Intersection> listUsefulPoints = new ArrayList<>();
@@ -175,8 +178,19 @@ public class Tour extends Observable {
             }
 
         }
-        RunTSP runTSP = new RunTSP();
-        runTSP.computeTour(listNodes,this);
+
+        // Run Tour
+        TSP tsp = new TSP1();
+        Graph g = new CompleteGraph(listNodes, this);
+        long startTime = System.currentTimeMillis();
+        tsp.searchSolution(20000, g);
+        System.out.print("Solution of cost "+tsp.getSolutionCost()+" found in "
+                +(System.currentTimeMillis() - startTime)+"ms : ");
+        for (int i=0; i<g.getNbVertices(); i++) System.out.print(tsp.getSolution(i)+" ");
+        System.out.println("0");
+        // TODO: store solution
+        // TODO: notify observer
+
     }
 
 

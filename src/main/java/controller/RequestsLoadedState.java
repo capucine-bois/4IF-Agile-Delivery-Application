@@ -1,7 +1,6 @@
 package controller;
 
-import model.CityMap;
-import model.Tour;
+import model.*;
 import view.Window;
 import xml.XMLDeserializer;
 
@@ -49,8 +48,10 @@ public class RequestsLoadedState implements State {
      * Compute tour to accomplish all the requests as fast as possible (solving TSP problem).
      */
     @Override
-    public void computeTour() {
-        // TODO implement here
+    public void computeTour(CityMap cityMap, Tour tour) {
+        System.out.println("RequestsLoadedState.computeTour");
+
+        tour.computeTour(cityMap.getAdjacenceMap());
     }
 
 }

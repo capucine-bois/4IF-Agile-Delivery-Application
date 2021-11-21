@@ -46,19 +46,6 @@ public class CompleteGraph implements Graph {
         return retour;
     }
 
-    private boolean isPath(int i, int j) {
-        boolean retour = false;
-        Node node = listNodesGraph.get(i);
-        Intersection intersection = listNodesGraph.get(j).getIntersection();
-        for(ShortestPath shortPath : node.getListArcs()) {
-            if(shortPath.getEndAddress()==intersection) {
-                retour = true;
-                break;
-            }
-        }
-        return retour;
-    }
-
     @Override
     public int getNbVertices() {
         return nbVertices;

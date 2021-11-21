@@ -70,5 +70,5 @@ public class Controller {
     /**
      * Compute tour to accomplish all the requests as fast as possible (solving TSP problem).
      */
-    public void computeTour() { currentState.computeTour(); }
+    public void computeTour() { currentState.computeTour(cityMap, tour); }
 }

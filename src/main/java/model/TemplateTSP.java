@@ -88,4 +88,11 @@ public abstract class TemplateTSP implements TSP {
         }
     }
 
+    /**
+     * Getter for bestSol attribute.
+     * @return best solution
+     */
+    public Integer[] getBestSol() {
+        return bestSol;
+    }
 }

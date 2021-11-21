@@ -30,6 +30,7 @@ public class ButtonListener implements ActionListener {
         switch (e.getActionCommand()) {
             case Window.LOAD_MAP -> controller.loadMap();
             case Window.LOAD_REQUEST -> controller.loadRequests();
+            case Window.COMPUTE_TOUR -> controller.computeTour();
         }
     }
 }

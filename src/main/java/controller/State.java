@@ -35,6 +35,6 @@ public interface State {
     /**
      * Compute tour to accomplish all the requests as fast as possible (solving TSP problem).
      */
-    public default void computeTour() {};
+    public default void computeTour(CityMap cityMap, Tour tour) {};
 
 }
