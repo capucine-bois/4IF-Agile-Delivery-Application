@@ -205,37 +205,50 @@ public class Tour extends Observable {
         Map<Intersection, Double> dist = new HashMap<>();
         Map<Intersection, Intersection> parent = new HashMap<>();
         Map<Intersection, Integer> color = new HashMap<>(); // 0 = blanc, 1 = gris, 2 = noir
+        ArrayList<ObjectDijkstra> listDijkstra = new ArrayList<>();
         ArrayList<ShortestPath> listShortestPathFromOrigin = new ArrayList<>();
         for (Intersection noeud : adjacenceMap.keySet()) {
-            dist.put(noeud, Double.MAX_VALUE);
-            parent.put(noeud, null);
-            color.put(noeud, 0);
+            ObjectDijkstra object = new ObjectDijkstra(noeud,null,Double.MAX_VALUE,0);
+            listDijkstra.add(object);
         }
-        dist.replace(origin, (double) 0);
-        color.replace(origin, 1);
-        while (color.containsValue(1)) {
-            List<Intersection> noeudsGris = color.entrySet().stream().filter(x -> x.getValue() == 1).map(Map.Entry::getKey).collect(Collectors.toList());
-            Intersection noeudGrisAvecDistMin = dist.entrySet().stream().filter(x -> noeudsGris.contains(x.getKey())).min(Map.Entry.comparingByValue()).get().getKey();
-            for (Intersection noeudAdj : adjacenceMap.get(noeudGrisAvecDistMin).stream().map(Segment::getDestination).collect(Collectors.toList())) {
-                int colorNoeudAdj = color.get(noeudAdj);
-                if (colorNoeudAdj == 0 || colorNoeudAdj == 1 ) {
-                    relacher(noeudGrisAvecDistMin, noeudAdj, adjacenceMap.get(noeudGrisAvecDistMin).stream().filter(i -> i.getDestination() == noeudAdj).findFirst().get().getLength(),parent, dist);
-                    if (colorNoeudAdj == 0) {
-                        color.replace(noeudAdj, 1);
+
+        listDijkstra.stream().filter(x -> x.getIntersection()==origin).findFirst().get().setDist(0.0);
+        listDijkstra.stream().filter(x -> x.getIntersection()==origin).findFirst().get().setColor(1);
+
+        while (listDijkstra.contains(listDijkstra.stream().filter(x -> x.getColor() == 1).findFirst().get())) {
+            List<Intersection> noeudsGris = new ArrayList<>();
+            Double min  = Double.MAX_VALUE;
+            for(ObjectDijkstra obj : listDijkstra) {
+                if(obj.getColor()==1) {
+                    noeudsGris.add(obj.getIntersection());
+                    if(obj.getDist()<min) {
+                        min = obj.getDist();
                     }
                 }
             }
-            color.replace(noeudGrisAvecDistMin, 2);
+            Double finalMin = min;
+            Intersection noeudGrisAvecDistMin = listDijkstra.stream().filter(x -> x.getDist() == finalMin).findFirst().get().getIntersection();
+            for (Intersection noeudAdj : adjacenceMap.get(noeudGrisAvecDistMin).stream().map(Segment::getDestination).collect(Collectors.toList())) {
+                int colorNoeudAdj = listDijkstra.stream().filter(x -> x.getIntersection()==noeudAdj).findFirst().get().getColor();
+                if (colorNoeudAdj == 0 || colorNoeudAdj == 1 ) {
+                    relacher(noeudGrisAvecDistMin, noeudAdj, adjacenceMap.get(noeudGrisAvecDistMin).stream().filter(i -> i.getDestination() == noeudAdj).findFirst().get().getLength(),listDijkstra);
+                    if (colorNoeudAdj == 0) {
+                        listDijkstra.stream().filter(x -> x.getIntersection()==noeudAdj).findFirst().get().setColor(1);
+                    }
+                }
+            }
+            listDijkstra.stream().filter(x -> x.getIntersection()==noeudGrisAvecDistMin).findFirst().get().setColor(2);
             if(listUsefulEndPoints.contains(noeudGrisAvecDistMin)) {
                 Intersection tempoIntersection = noeudGrisAvecDistMin;
                 ArrayList<Segment> listSegments = new ArrayList<>();
-                while(parent.get(tempoIntersection)!=null) {
-                    Intersection tmpParent = parent.get(tempoIntersection);
-                    Intersection finalTempoIntersection = tempoIntersection;
-                    listSegments.add(0,adjacenceMap.get(tmpParent).stream().filter(s -> s.getDestination() == finalTempoIntersection).findFirst().get());
+                while(findParent(tempoIntersection,listDijkstra)!=null) {
+                    Intersection finalTempoIntersection1 = tempoIntersection;
+                    Intersection tmpParent = listDijkstra.stream().filter(x -> x.getIntersection() == finalTempoIntersection1).findFirst().get().getParent();
+                    Intersection finalTempoIntersection2 = tempoIntersection;
+                    listSegments.add(0,adjacenceMap.get(tmpParent).stream().filter(s -> s.getDestination() == finalTempoIntersection2).findFirst().get());
                     tempoIntersection = tmpParent;
                 }
-                ShortestPath shortestPath = new ShortestPath(dist.get(noeudGrisAvecDistMin),listSegments,origin,noeudGrisAvecDistMin);
+                ShortestPath shortestPath = new ShortestPath(listDijkstra.stream().filter(x -> x.getIntersection() == noeudGrisAvecDistMin).findFirst().get().getDist(),listSegments,origin,noeudGrisAvecDistMin);
                 listShortestPathFromOrigin.add((shortestPath));
                 if(listShortestPathFromOrigin.size()==listUsefulEndPoints.size())
                     break;
@@ -243,6 +256,7 @@ public class Tour extends Observable {
         }
         return listShortestPathFromOrigin;
     }
+
 
 
 
@@ -274,13 +288,69 @@ public class Tour extends Observable {
      * @param noeudInit the intersection where the segment begins
      * @param noeudDest the intersections where the segment ends
      * @param cout the cost of the segment
-     * @param parent the map of parent of each intersection (the intersection which precedes each intersection)
-     * @param dist the map of the distance to the origin for each intersections
+     * @param listDijkstra the list of Intersection with its infos (cost, parent and color)
      */
-    private static void relacher(Intersection noeudInit, Intersection noeudDest, double cout, Map<Intersection, Intersection> parent, Map<Intersection, Double> dist) {
-        if (dist.get(noeudDest) > dist.get(noeudInit) + cout) {
-            dist.replace(noeudDest, dist.get(noeudInit) + cout);
-            parent.replace(noeudDest, noeudInit);
+    private static void relacher(Intersection noeudInit, Intersection noeudDest, double cout, ArrayList<ObjectDijkstra> listDijkstra) {
+        if(listDijkstra.stream().filter(x -> x.getIntersection() == noeudDest).findFirst().get().getDist() > listDijkstra.stream().filter(x -> x.getIntersection() == noeudInit).findFirst().get().getDist() + cout) {
+            listDijkstra.stream().filter(x -> x.getIntersection() == noeudDest).findFirst().get().setDist(listDijkstra.stream().filter(x -> x.getIntersection() == noeudInit).findFirst().get().getDist() + cout);
+            listDijkstra.stream().filter(x -> x.getIntersection() == noeudDest).findFirst().get().setParent(noeudInit);
         }
+    }
+
+    public Intersection findParent(Intersection intersectionToFind, ArrayList<ObjectDijkstra> listDijkstra) {
+        for(ObjectDijkstra obj : listDijkstra) {
+            if(obj.getIntersection()==intersectionToFind) {
+                return obj.getParent();
+            }
+        }
+        return null;
+    }
+
+    class ObjectDijkstra {
+        private Intersection intersection;
+        private Intersection parent;
+        private Double dist;
+        private Integer color;
+
+        public Intersection getIntersection() {
+            return intersection;
+        }
+
+        public void setIntersection(Intersection intersection) {
+            this.intersection = intersection;
+        }
+
+        public Intersection getParent() {
+            return parent;
+        }
+
+        public void setParent(Intersection parent) {
+            this.parent = parent;
+        }
+
+        public Double getDist() {
+            return dist;
+        }
+
+        public void setDist(Double dist) {
+            this.dist = dist;
+        }
+
+        public Integer getColor() {
+            return color;
+        }
+
+        public void setColor(Integer color) {
+            this.color = color;
+        }
+
+        public ObjectDijkstra(Intersection intersection, Intersection parent, Double dist, Integer color) {
+            this.intersection = intersection;
+            this.parent = parent;
+            this.dist = dist;
+            this.color = color;
+        }
+
+
     }
 }
