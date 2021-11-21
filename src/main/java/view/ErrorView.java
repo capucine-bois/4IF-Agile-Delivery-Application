@@ -25,7 +25,6 @@ public class ErrorView implements ActionListener {
         errorPanel.setLayout(new BorderLayout());
 
         JPanel backgroundError = new JPanel();
-        System.out.println(window.getPreferredSize());
         backgroundError.setLayout(new GridBagLayout());
         backgroundError.setBackground(new Color(0,0,0,115));
         errorPanel.add(backgroundError);
