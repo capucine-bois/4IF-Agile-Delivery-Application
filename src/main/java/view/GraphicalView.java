@@ -164,7 +164,14 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         super.paintComponent(g);
         this.g = g;
         for (SegmentView segmentView : segmentViewList) {
+            segmentView.paintSegmentBorder(g, scale);
+        }
+        for (SegmentView segmentView : segmentViewList) {
             segmentView.paintSegment(g, scale);
+        }
+        g.setColor(Constants.COLOR_7);
+        for (IntersectionView intersectionView : intersectionViewMap.values()) {
+            g.fillOval(intersectionView.getCoordinateX() - scale/2, intersectionView.getCoordinateY() - scale/2, scale, scale);
         }
         if (!requestsIntersections.isEmpty()) {
             Iterator<Long> iterator = requestsIntersections.iterator();
