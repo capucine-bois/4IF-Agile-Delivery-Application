@@ -2,10 +2,10 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.List;
 
+import controller.Controller;
 import model.Request;
 import model.Tour;
 import observer.Observable;
@@ -20,18 +20,22 @@ public class TextualView extends JPanel implements Observer {
     private Tour tour;
     private final int gap = 20;
     private final int colorWidth = 10;
+    private MouseListener mouseListener;
+    private List<JPanel> requestPanels;
 
     /**
      * Create a textual view in window
      * @param w the GUI
      */
-    public TextualView(Tour tour, Window w){
+    public TextualView(Tour tour, Window w, Controller controller){
         setLayout(new BorderLayout());
         setBackground(Constants.COLOR_4);
         setBorder(BorderFactory.createMatteBorder(10,10,10,0,Constants.COLOR_1));
         w.getContentPane().add(this, BorderLayout.LINE_START);
         tour.addObserver(this);
         this.tour = tour;
+        requestPanels = new ArrayList<>();
+        mouseListener = new MouseListener(controller, this);
     }
 
     private void displayTextualRequests() {
@@ -63,7 +67,7 @@ public class TextualView extends JPanel implements Observer {
         String depotCoordinates = tour.getDepotAddress().getLatitude() + ", " + tour.getDepotAddress().getLongitude();
         depotInformation.put("Depot address", depotCoordinates);
         depotInformation.put("Departure time", tour.getDepartureTime());
-        displayInformation(mainPanel, depotInformation, Color.black);
+        displayInformation(mainPanel, depotInformation, Color.black, null);
     }
 
     private void displayRequestsInformation(JPanel mainPanel) {
@@ -71,6 +75,7 @@ public class TextualView extends JPanel implements Observer {
         Color initialColor = Color.red;
         Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
         double goldenRatioConjugate = 0.618033988749895;
+        requestPanels.clear();
         for (Request request : tour.getPlanningRequests()) {
             Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
             Map<String, String> requestInformation = new HashMap<>();
@@ -84,13 +89,13 @@ public class TextualView extends JPanel implements Observer {
             requestInformation.put("Pickup duration", pickupDuration);
             requestInformation.put("Delivery address", deliveryCoordinates);
             requestInformation.put("Delivery duration", deliveryDuration);
-            displayInformation(mainPanel, requestInformation, requestColor);
+            displayInformation(mainPanel, requestInformation, requestColor, request);
             hsv[0] += goldenRatioConjugate;
             hsv[0] %= 1;
         }
     }
 
-    private void displayInformation(JPanel mainPanel, Map<String, String> informations, Color color) {
+    private void displayInformation(JPanel mainPanel, Map<String, String> informations, Color color, Request request) {
         JPanel informationPanel = new JPanel();
         informationPanel.setLayout(new BorderLayout());
 
@@ -103,7 +108,11 @@ public class TextualView extends JPanel implements Observer {
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         for(Map.Entry<String, String> information : informations.entrySet()) {
-            addLine(contentPanel, information.getKey(), information.getValue());
+            addLine(contentPanel, information.getKey(), information.getValue(), request);
+        }
+        if (request != null) {
+            requestPanels.add(contentPanel);
+            contentPanel.addMouseListener(mouseListener);
         }
         informationPanel.add(contentPanel);
 
@@ -113,7 +122,7 @@ public class TextualView extends JPanel implements Observer {
         mainPanel.add(informationPanel);
     }
 
-    private void addLine(JPanel information, String fieldName, String fieldContent) {
+    private void addLine(JPanel information, String fieldName, String fieldContent, Request request) {
         JPanel line = new JPanel();
         line.setLayout(new FlowLayout(FlowLayout.LEFT));
         JLabel fieldNameLabel = new JLabel(fieldName + " : ");
@@ -123,8 +132,13 @@ public class TextualView extends JPanel implements Observer {
         setLabelStyle(fieldContentLabel, "DMSans-Regular.ttf");
         line.add(fieldContentLabel);
         line.setPreferredSize(new Dimension(information.getPreferredSize().width, line.getPreferredSize().height));
-        line.setBackground(Constants.COLOR_4);
-        line.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, Constants.COLOR_4));
+        if (request == null || !request.isSelected()) {
+            line.setBackground(Constants.COLOR_4);
+            line.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, Constants.COLOR_4));
+        } else {
+            line.setBackground(Constants.COLOR_2);
+            line.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, Constants.COLOR_2));
+        }
         information.add(line);
     }
 
@@ -135,6 +149,10 @@ public class TextualView extends JPanel implements Observer {
             e.printStackTrace();
         }
         label.setForeground(Constants.COLOR_3);
+    }
+
+    public List<JPanel> getRequestPanels() {
+        return requestPanels;
     }
 
     /**

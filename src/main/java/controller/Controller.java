@@ -2,7 +2,6 @@ package controller;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.*;
 
 import model.CityMap;
 import model.Request;
@@ -75,10 +74,16 @@ public class Controller {
      */
     public void computeTour() { currentState.computeTour(cityMap, tour); }
 
-    public void setRequestsVisibility(Request request){
-        request.setVisible(true);
-        for (Request r : tour.getPlanningRequests()){
-            if(!(r==request)) r.setVisible(false);
+    public void leftClick(int indexRequest) {
+        Request requestClicked = tour.getPlanningRequests().get(indexRequest);
+        if (requestClicked.isSelected()) {
+            requestClicked.setSelected(false);
+        } else {
+            requestClicked.setSelected(true);
+            for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
+                if (i != indexRequest) tour.getPlanningRequests().get(i).setSelected(false);
+            }
         }
+        tour.notifyObservers();
     }
 }
