@@ -188,7 +188,9 @@ public class Tour extends Observable {
                 +(System.currentTimeMillis() - startTime)+"ms : ");
 
         Integer[] intersectionsOrder = tsp.getBestSol();
-        for (Integer i: intersectionsOrder) System.out.print(intersectionsOrder[i] + " ");
+        for(int i = 0; i<intersectionsOrder.length; i++) {
+            System.out.print(intersectionsOrder[i] + "  ");
+        }
         System.out.println("0");
 
 /*
