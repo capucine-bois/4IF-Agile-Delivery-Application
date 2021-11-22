@@ -109,7 +109,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
                 int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setColor(Constants.COLOR_6);
-                g2.setStroke(new BasicStroke(scale + 2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
+                g2.setStroke(new BasicStroke(scale + 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                 g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
             }
         }
@@ -122,6 +122,32 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
                 int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setColor(Constants.COLOR_7);
+                g2.setStroke(new BasicStroke(scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+            }
+        }
+
+        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+            for (Segment segment : shortestPath.getListSegments()) {
+                int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
+                int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
+                int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
+                int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(Constants.COLOR_8);
+                g2.setStroke(new BasicStroke(scale + 4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+            }
+        }
+
+        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+            for (Segment segment : shortestPath.getListSegments()) {
+                int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
+                int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
+                int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
+                int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(Constants.COLOR_9);
                 g2.setStroke(new BasicStroke(scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                 g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
             }
