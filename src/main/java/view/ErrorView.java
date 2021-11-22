@@ -13,6 +13,7 @@ public class ErrorView implements ActionListener {
     private final JPanel errorPanel;
     private final JLabel message;
     private final JButton button;
+    private final Window window;
 
     /**
      * Constructor
@@ -53,6 +54,8 @@ public class ErrorView implements ActionListener {
         buttonPanel.add(button, new GridBagConstraints());
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
         error.add(buttonPanel, BorderLayout.PAGE_END);
+
+        this.window = window;
     }
 
     /**
@@ -62,6 +65,7 @@ public class ErrorView implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == button) {
+            window.resetDefaultButtonStates();
             errorPanel.setVisible(false);
         }
     }

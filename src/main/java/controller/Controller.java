@@ -41,8 +41,15 @@ public class Controller {
      */
     public void setCurrentState(State state) {
         this.currentState = state;
+        if (state == initialState) {
+            window.setDefaultButtonStates(new boolean[]{true, false, false});
+        } else if (state == mapLoadedState){
+            window.setDefaultButtonStates(new boolean[]{true, true, false});
+        } else {
+            window.setDefaultButtonStates(new boolean[]{true, true, true});
+        }
+        window.resetDefaultButtonStates();
     }
-
 
     // Methods corresponding to user events
 

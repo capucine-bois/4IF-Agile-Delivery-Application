@@ -38,6 +38,7 @@ public class Window extends JFrame implements ComponentListener {
     private int windowHeight = 550;
 
     private final String[] buttonTexts = new String[]{LOAD_MAP, LOAD_REQUEST, COMPUTE_TOUR};
+    private boolean[] defaultButtonStates = new boolean[]{true, false, false};
 
     /**
      * Complete constructor
@@ -85,6 +86,7 @@ public class Window extends JFrame implements ComponentListener {
             header.add(button);
         }
         getContentPane().add(header, BorderLayout.PAGE_START);
+        resetDefaultButtonStates();
     }
 
     /**
@@ -130,11 +132,32 @@ public class Window extends JFrame implements ComponentListener {
     }
 
     /**
-     * Displays an error message on the window
+     * Displays an error message on the window.
+     * Disable other buttons (load XML files and compute a tour).
      * @param message error message
      */
     public void displayErrorMessage(String message) {
+        setButtonsState(false);
         errorView.showError(message);
+    }
+
+    /**
+     * Reset buttons state corresponding to current state.
+     */
+    public void resetDefaultButtonStates() {
+        for (int i=0; i<defaultButtonStates.length; i++) {
+            buttons.get(i).setEnabled(defaultButtonStates[i]);
+        }
+    }
+
+    /**
+     * Set state (enable or disable) to all the buttons.
+     * @param state new state of the buttons
+     */
+    public void setButtonsState(boolean state) {
+        for (JButton b : buttons) {
+            b.setEnabled(state);
+        }
     }
 
     /**
@@ -175,5 +198,13 @@ public class Window extends JFrame implements ComponentListener {
     @Override
     public void componentHidden(ComponentEvent e) {
 
+    }
+
+    /**
+     * Setter for defaultButtonStates attribute.
+     * @param defaultButtonStates wanted value for defaultButtonStates attribute.
+     */
+    public void setDefaultButtonStates(boolean[] defaultButtonStates) {
+        this.defaultButtonStates = defaultButtonStates;
     }
 }
