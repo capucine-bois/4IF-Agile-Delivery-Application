@@ -3,10 +3,7 @@ package model;
 import observer.Observable;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -167,16 +164,20 @@ public class Tour extends Observable {
             }
             ArrayList<ShortestPath> shortestPathsFromStartPoint = dijkstra(adjacenceMap,listUsefulEndPoints, startPoint);
             Node nodeToAdd = null;
-            if(startPoint==depotAddress) {
-                nodeToAdd = new Node(startPoint,shortestPathsFromStartPoint,0);
-            } else {
+            if(startPoint!=depotAddress) {
                 nodeToAdd = new Node(startPoint,shortestPathsFromStartPoint,iteratorNumber);
+                listNodes.add(nodeToAdd);
                 iteratorNumber++;
+            } else {
+                listNodes.add(0,new Node(depotAddress,shortestPathsFromStartPoint,0));
             }
-            listNodes.add(nodeToAdd);
         }
 
 
+
+        for(Node noeuuud : listNodes) {
+            System.out.println(noeuuud.getIntersection().getId() + "    " + noeuuud.getNumber());
+        }
 
         // Run Tour
         TSP tsp = new TSP1();
@@ -190,6 +191,7 @@ public class Tour extends Observable {
         for (Integer i: intersectionsOrder) System.out.print(intersectionsOrder[i] + " ");
         System.out.println("0");
 
+/*
         Intersection previous = null;
         for (Integer index: intersectionsOrder) {
             Intersection currentIntersection;
@@ -215,10 +217,11 @@ public class Tour extends Observable {
 
         // print order
         for (ShortestPath p: listShortestPaths) {
-            System.out.println(p.getStartAddress().getLatitude() + " " + p.getStartAddress().getLongitude() + " -> " +
-                    p.getEndAddress().getLatitude() + " " + p.getEndAddress().getLongitude());
+            System.out.println(p.getStartAddress().getId() + " -> " +
+                    p.getEndAddress().getId());
         }
 
+*/
         notifyObservers();
     }
 
@@ -241,20 +244,8 @@ public class Tour extends Observable {
         listDijkstra.stream().filter(x -> x.getIntersection()==origin).findFirst().get().setDist(0.0);
         listDijkstra.stream().filter(x -> x.getIntersection()==origin).findFirst().get().setColor(1);
 
-        while (listDijkstra.contains(listDijkstra.stream().filter(x -> x.getColor() == 1).findFirst().get())) {
-            List<Intersection> noeudsGris = new ArrayList<>();
-            Double min  = Double.MAX_VALUE;
-            for(ObjectDijkstra obj : listDijkstra) {
-                if(obj.getColor()==1) {
-                    noeudsGris.add(obj.getIntersection());
-                    if(obj.getDist()<min) {
-                        min = obj.getDist();
-                    }
-                }
-            }
-            Double finalMin = min;
-            ObjectDijkstra noeudGrisAvecDistMin = listDijkstra.stream().filter(x -> x.getDist() == finalMin).findFirst().get();
-
+        while (listDijkstra.stream().anyMatch(x -> x.getColor() == 1)) {
+            ObjectDijkstra noeudGrisAvecDistMin = listDijkstra.stream().filter(x-> x.getColor() == 1).min(Comparator.comparing(ObjectDijkstra::getDist)).get();
             List<ObjectDijkstra> listDest = listDijkstra.stream()
                     .filter(x -> noeudGrisAvecDistMin.getIntersection().getAdjacentSegments()
                             .stream().map(Segment::getDestination).collect(Collectors.toList()).contains(x.getIntersection())).collect(Collectors.toList());
@@ -269,7 +260,6 @@ public class Tour extends Observable {
                         noeudAdj.setColor(1);
                     }
                 }
-
             }
             noeudGrisAvecDistMin.setColor(2);
             if(listUsefulEndPoints.contains(noeudGrisAvecDistMin.getIntersection())) {
@@ -325,9 +315,8 @@ public class Tour extends Observable {
      */
     private void relax(ObjectDijkstra noeudInit, ObjectDijkstra noeudDest, double cout, ArrayList<ObjectDijkstra> listDijkstra) {
         if(noeudDest.getDist() > noeudInit.getDist() + cout) {
-            noeudDest.setDist(noeudInit.getDist() + cout);
-            noeudDest.setParent(noeudInit);
-        }
+            listDijkstra.stream().filter(x -> x==noeudDest).findFirst().get().setDist(noeudInit.getDist() + cout);
+            listDijkstra.stream().filter(x -> x==noeudDest).findFirst().get().setParent(noeudInit); }
     }
 
     /**
@@ -385,6 +374,8 @@ public class Tour extends Observable {
         public void setColor(Integer color) {
             this.color = color;
         }
+
+
 
         public ObjectDijkstra(Intersection intersection, ObjectDijkstra parent, Double dist, Integer color) {
             this.intersection = intersection;

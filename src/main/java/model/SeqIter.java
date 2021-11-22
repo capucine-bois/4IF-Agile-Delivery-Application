@@ -20,7 +20,6 @@ public class SeqIter implements Iterator<Integer> {
         for (Integer s : unvisited){
             // if we found a delivery Address and the pick-up linked is in the unvisited nodes, we don't add the delivery address to the candidates
             if (g.isArc(currentVertex, s) && !(s%2==0 && unvisited.contains(s-1)))
-
                 candidates[nbCandidates++] = s;
         }
     }

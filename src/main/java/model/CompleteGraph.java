@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * The graphe used in TSP
  */
 public class CompleteGraph implements Graph {
-    ArrayList<Node> listNodesGraph = new ArrayList<>();
+    ArrayList<Node> listNodesGraph;
     int nbVertices;
     double[][] cost;
     private Tour tour;
