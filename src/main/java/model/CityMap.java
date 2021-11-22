@@ -4,6 +4,7 @@ import observer.Observable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,7 +18,7 @@ public class CityMap extends Observable {
     /**
      * Map linking intersections and segments they are part of.
      */
-    private Map<Intersection, ArrayList<Segment>> adjacenceMap;
+    private List<Intersection> intersections;
 
     /* CONSTRUCTORS */
 
@@ -25,7 +26,7 @@ public class CityMap extends Observable {
      * Constructor initializing adjacenceMap attribute as an empty HashMap.
      */
     public CityMap() {
-        this.adjacenceMap = new HashMap<>();
+        this.intersections = new ArrayList<>();
     }
 
     /* METHODS */
@@ -35,28 +36,19 @@ public class CityMap extends Observable {
      * @param i intersection to insert
      */
     public void addIntersection(Intersection i) {
-        adjacenceMap.put(i, new ArrayList<>());
-    }
-
-    /**
-     * Add a segment in adjacence map for an existing intersection.
-     * @param s the segment to insert
-     * @param i an existing intersection
-     */
-    public void addSegment(Segment s, Intersection i) {
-        adjacenceMap.get(i).add(s);
+        intersections.add(i);
     }
 
     /* GETTERS */
 
     /**
-     * Getter for adjacenceMap attribute
-     * @return adjacence map
+     * Getter for adjacentSegments attribute
+     *
+     * @return adjacentSegments attribute
      */
-    public Map<Intersection, ArrayList<Segment>> getAdjacenceMap() {
-        return adjacenceMap;
+    public List<Intersection> getIntersections() {
+        return intersections;
     }
-
     /* SETTERS */
 
 
