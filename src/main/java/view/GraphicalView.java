@@ -53,28 +53,30 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
      * @param adjacenceMap the map to display
      */
     public void displayCityMap(List<Intersection> intersections) {
-        Intersection firstIntersection = intersections.get(0);
-        double minLatitude = firstIntersection.getLatitude();
-        double maxLatitude = firstIntersection.getLatitude();
-        double minLongitude = firstIntersection.getLongitude();
-        double maxLongitude = firstIntersection.getLongitude();
+        if (!intersections.isEmpty()) {
+            Intersection firstIntersection = intersections.get(0);
+            double minLatitude = firstIntersection.getLatitude();
+            double maxLatitude = firstIntersection.getLatitude();
+            double minLongitude = firstIntersection.getLongitude();
+            double maxLongitude = firstIntersection.getLongitude();
 
-        for (Intersection intersection : intersections) {
-            double latitude = intersection.getLatitude();
-            double longitude = intersection.getLongitude();
-            if (latitude < minLatitude) {
-                minLatitude = latitude;
-            } else if (latitude > maxLatitude) {
-                maxLatitude = latitude;
+            for (Intersection intersection : intersections) {
+                double latitude = intersection.getLatitude();
+                double longitude = intersection.getLongitude();
+                if (latitude < minLatitude) {
+                    minLatitude = latitude;
+                } else if (latitude > maxLatitude) {
+                    maxLatitude = latitude;
+                }
+                if (longitude < minLongitude) {
+                    minLongitude = longitude;
+                } else if (longitude > maxLongitude) {
+                    maxLongitude = longitude;
+                }
             }
-            if (longitude < minLongitude) {
-                minLongitude = longitude;
-            } else if (longitude > maxLongitude) {
-                maxLongitude = longitude;
-            }
+
+            displayIntersectionsAndSegments(intersections, minLatitude, maxLatitude, minLongitude, maxLongitude);
         }
-
-        displayIntersectionsAndSegments(intersections, minLatitude, maxLatitude, minLongitude, maxLongitude);
     }
 
     /**
@@ -126,34 +128,28 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
             }
         }
 
-        for (Intersection origin : intersections) {
-            g.setColor(Constants.COLOR_7);
-            int originCoordinateX = getCoordinateX(origin, minLongitude, width, longitudeLength);
-            int originCoordinateY = getCoordinateY(origin, minLatitude, height, latitudeLength);
-            g.fillOval(originCoordinateX - scale/2, originCoordinateY - scale/2, scale, scale);
+        if (!tour.getPlanningRequests().isEmpty()) {
+            float[] hsv = new float[3];
+            Color initialColor = Color.red;
+            Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
+            double goldenRatioConjugate = 0.618033988749895;
+            for (Request request : tour.getPlanningRequests()) {
+                Intersection pickupAddress = request.getPickupAddress();
+                int pickupCoordinateX = getCoordinateX(pickupAddress, minLongitude, width, longitudeLength);
+                int pickupCoordinateY = getCoordinateY(pickupAddress, minLatitude, height, latitudeLength);
+                Intersection deliveryAddress = request.getDeliveryAddress();
+                int deliveryCoordinateX = getCoordinateX(deliveryAddress, minLongitude, width, longitudeLength);
+                int deliveryCoordinateY = getCoordinateY(deliveryAddress, minLatitude, height, latitudeLength);
+                Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
+                drawIcon(requestColor, pickupCoordinateX, pickupCoordinateY, "pickup-icon.png");
+                drawIcon(requestColor, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
+                hsv[0] += goldenRatioConjugate;
+                hsv[0] %= 1;
+            }
+            int depotCoordinateX = getCoordinateX(tour.getDepotAddress(), minLongitude, width, longitudeLength);
+            int depotCoordinateY = getCoordinateY(tour.getDepotAddress(), minLatitude, height, latitudeLength);
+            drawIcon(null, depotCoordinateX, depotCoordinateY, "depot-icon.png");
         }
-
-        Iterator<Request> iterator = tour.getPlanningRequests().iterator();
-        float[] hsv = new float[3];
-        Color initialColor = Color.red;
-        Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
-        double goldenRatioConjugate = 0.618033988749895;
-        while (iterator.hasNext()) {
-            Intersection pickupAddress = iterator.next().getPickupAddress();
-            int pickupCoordinateX = getCoordinateX(pickupAddress, minLongitude, width, longitudeLength);
-            int pickupCoordinateY = getCoordinateY(pickupAddress, minLatitude, height, latitudeLength);
-            Intersection deliveryAddress = iterator.next().getDeliveryAddress();
-            int deliveryCoordinateX = getCoordinateX(deliveryAddress, minLongitude, width, longitudeLength);
-            int deliveryCoordinateY = getCoordinateY(deliveryAddress, minLatitude, height, latitudeLength);
-            Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
-            drawIcon(requestColor, pickupCoordinateX, pickupCoordinateY, "pickup-icon.png");
-            drawIcon(requestColor, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
-            hsv[0] += goldenRatioConjugate;
-            hsv[0] %= 1;
-        }
-        int depotCoordinateX = getCoordinateX(tour.getDepotAddress(), minLongitude, width, longitudeLength);
-        int depotCoordinateY = getCoordinateY(tour.getDepotAddress(), minLatitude, height, latitudeLength);
-        drawIcon(null, depotCoordinateX, depotCoordinateY, "depot-icon.png");
     }
     
     private int getCoordinateX(Intersection intersection, double minLongitude, double width, double longitudeLength) {
@@ -163,7 +159,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
 
     private int getCoordinateY(Intersection intersection, double minLatitude, double height, double latitudeLength) {
         double coordinateLatitude = intersection.getLatitude() - minLatitude;
-        return (int) ((coordinateLatitude * height) / latitudeLength) + originX;
+        return (int) (height) - (int) ((coordinateLatitude * height) / latitudeLength) + originY;
     }
 
     /**
