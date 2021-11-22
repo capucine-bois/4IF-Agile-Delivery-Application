@@ -99,4 +99,22 @@ public class Intersection {
     public void addAdjacentSegment(Segment segment) {
         adjacentSegments.add(segment);
     }
+
+    /**
+     * Check if two intersections have the same attributes
+     * @param o the object to compare
+     * @return whether they have the same attributes or not
+     */
+    public boolean equals(Object o) {
+        boolean check;
+        if (o instanceof Intersection) {
+            Intersection i = (Intersection) o;
+            check = i.getLatitude() == this.getLatitude() &&
+                    i.getLongitude() == this.getLongitude() &&
+                    i.getId() == this.getId();
+        } else {
+            check = false;
+        }
+        return check;
+    }
 }

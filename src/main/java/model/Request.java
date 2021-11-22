@@ -124,4 +124,23 @@ public class Request {
      * @param visible new visibility (true or false)
      */
     public void setVisible(boolean visible) { this.visible = visible; }
+
+    /**
+     * Check if two requests have the same attributes
+     * @param o the object to compare
+     * @return whether they have the same attributes or not
+     */
+    public boolean equals(Object o) {
+        boolean check;
+        if (o instanceof Request) {
+            Request r = (Request) o;
+            check = r.getDeliveryAddress().equals(this.getDeliveryAddress()) &&
+                    r.getPickupAddress().equals(this.getPickupAddress()) &&
+                    r.getDeliveryDuration() == this.getDeliveryDuration() &&
+                    r.getPickupDuration() == this.getPickupDuration();
+        } else {
+            check = false;
+        }
+        return check;
+    }
 }
