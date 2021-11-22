@@ -169,7 +169,6 @@ public class Window extends JFrame implements ComponentListener {
         windowWidth = e.getComponent().getSize().width;
         windowHeight = e.getComponent().getSize().height;
         setWindowSize();
-        graphicalView.initCityMapView(cityMap.getAdjacenceMap());
         graphicalView.repaint();
     }
 

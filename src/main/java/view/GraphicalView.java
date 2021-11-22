@@ -20,9 +20,6 @@ import java.util.List;
  */
 public class GraphicalView extends JPanel implements Observer, MouseWheelListener {
 
-    private Map<Long, IntersectionView> intersectionViewMap;
-    private List<SegmentView> segmentViewList;
-    private List<Long> requestsIntersections;
     private Graphics g;
     private final int firstBorder = 10;
     private final int secondBorder = 2;
@@ -48,9 +45,6 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         tour.addObserver(this);
         this.cityMap = cityMap;
         this.tour = tour;
-        segmentViewList = new ArrayList<>();
-        intersectionViewMap = new HashMap<>();
-        requestsIntersections = new ArrayList<>();
         addMouseWheelListener(this);
     }
 
@@ -58,49 +52,41 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
      * Creates intersections and segments of a given map with coordinates X and Y
      * @param adjacenceMap the map to display
      */
-    public void initCityMapView(Map<Intersection, ArrayList<Segment>> adjacenceMap) {
-        intersectionViewMap.clear();
-        segmentViewList.clear();
+    public void displayCityMap(List<Intersection> intersections) {
+        Intersection firstIntersection = intersections.get(0);
+        double minLatitude = firstIntersection.getLatitude();
+        double maxLatitude = firstIntersection.getLatitude();
+        double minLongitude = firstIntersection.getLongitude();
+        double maxLongitude = firstIntersection.getLongitude();
 
-        Set<Intersection> intersections = adjacenceMap.keySet();
-        Optional<Intersection> optionalIntersection = intersections.stream().findFirst();
-        if (optionalIntersection.isPresent()) {
-            Intersection firstIntersection = optionalIntersection.get();
-            double minLatitude = firstIntersection.getLatitude();
-            double maxLatitude = firstIntersection.getLatitude();
-            double minLongitude = firstIntersection.getLongitude();
-            double maxLongitude = firstIntersection.getLongitude();
-
-            for (Intersection intersection : intersections) {
-                double latitude = intersection.getLatitude();
-                double longitude = intersection.getLongitude();
-                if (latitude < minLatitude) {
-                    minLatitude = latitude;
-                } else if (latitude > maxLatitude) {
-                    maxLatitude = latitude;
-                }
-                if (longitude < minLongitude) {
-                    minLongitude = longitude;
-                } else if (longitude > maxLongitude) {
-                    maxLongitude = longitude;
-                }
+        for (Intersection intersection : intersections) {
+            double latitude = intersection.getLatitude();
+            double longitude = intersection.getLongitude();
+            if (latitude < minLatitude) {
+                minLatitude = latitude;
+            } else if (latitude > maxLatitude) {
+                maxLatitude = latitude;
             }
-
-            initIntersectionViewList(adjacenceMap.keySet(), minLatitude, maxLatitude, minLongitude, maxLongitude);
-            initSegmentViewList(adjacenceMap.values());
+            if (longitude < minLongitude) {
+                minLongitude = longitude;
+            } else if (longitude > maxLongitude) {
+                maxLongitude = longitude;
+            }
         }
+
+        displayIntersectionsAndSegments(intersections, minLatitude, maxLatitude, minLongitude, maxLongitude);
     }
 
     /**
      * Initialize the list of intersections on the GUI.
      * Parse the list of intersections to instantiate all the intersections for the GUI (IntersectionView) with coordinates X and Y.
-     * @param listIntersections map containing an intersection as key and a list of segments where they are part of as value
+     * @param intersections map containing an intersection as key and a list of segments where they are part of as value
      * @param minLatitude minimal geographical latitude of all intersections
      * @param maxLatitude maximal geographical latitude of all intersections
      * @param minLongitude minimal geographical longitude of all intersections
      * @param maxLongitude maximal geographical longitude of all intersections
      */
-    private void initIntersectionViewList(Set<Intersection> listIntersections, double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
+    private void displayIntersectionsAndSegments(List<Intersection> intersections, double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
         double latitudeLength = maxLatitude - minLatitude;
         double longitudeLength = maxLongitude - minLongitude;
 
@@ -113,46 +99,71 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         if (originY > allBorders) originY = allBorders;
         if (originX + width - allBorders < viewWidth) originX = (int) (viewWidth - width + allBorders);
         if (originY + height - allBorders < viewHeight) originY = (int) (viewHeight - height + allBorders);
-        intersectionViewMap = new HashMap<>();
-        for (Intersection intersection : listIntersections) {
-            double coordinateLongitude = intersection.getLongitude() - minLongitude;
-            double coordinateLatitude = intersection.getLatitude() - minLatitude;
-            int coordinateX = (int) ((coordinateLongitude * width) / longitudeLength) + originX;
-            int coordinateY = (int) (height) - (int) ((coordinateLatitude * height) / latitudeLength) + originY;
-            IntersectionView intersectionView = new IntersectionView(coordinateX, coordinateY);
-            intersectionViewMap.put(intersection.getId(), intersectionView);
-        }
-    }
 
-    /**
-     * Initialize the list of segments on the GUI.
-     * Parse the list of segments to instantiate all the segments for the GUI (SegmentView).
-     * @param segmentsCollection all the segments
-     */
-    private void initSegmentViewList(Collection<ArrayList<Segment>> segmentsCollection) {
-        for (List<Segment> segments : segmentsCollection) {
-            for (Segment segment : segments) {
-                IntersectionView origin = intersectionViewMap.get(segment.getOrigin().getId());
-                IntersectionView destination = intersectionViewMap.get(segment.getDestination().getId());
-                SegmentView segmentView = new SegmentView(origin, destination);
-                segmentViewList.add(segmentView);
+        for (Intersection origin : intersections) {
+            int originCoordinateX = getCoordinateX(origin, minLongitude, width, longitudeLength);
+            int originCoordinateY = getCoordinateY(origin, minLatitude, height, latitudeLength);
+            for (Segment segment : origin.getAdjacentSegments()) {
+                int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
+                int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(Constants.COLOR_6);
+                g2.setStroke(new BasicStroke(scale + 2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
+                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
             }
         }
+
+        for (Intersection origin : intersections) {
+            int originCoordinateX = getCoordinateX(origin, minLongitude, width, longitudeLength);
+            int originCoordinateY = getCoordinateY(origin, minLatitude, height, latitudeLength);
+            for (Segment segment : origin.getAdjacentSegments()) {
+                int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
+                int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(Constants.COLOR_7);
+                g2.setStroke(new BasicStroke(scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+            }
+        }
+
+        for (Intersection origin : intersections) {
+            g.setColor(Constants.COLOR_7);
+            int originCoordinateX = getCoordinateX(origin, minLongitude, width, longitudeLength);
+            int originCoordinateY = getCoordinateY(origin, minLatitude, height, latitudeLength);
+            g.fillOval(originCoordinateX - scale/2, originCoordinateY - scale/2, scale, scale);
+        }
+
+        Iterator<Request> iterator = tour.getPlanningRequests().iterator();
+        float[] hsv = new float[3];
+        Color initialColor = Color.red;
+        Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
+        double goldenRatioConjugate = 0.618033988749895;
+        while (iterator.hasNext()) {
+            Intersection pickupAddress = iterator.next().getPickupAddress();
+            int pickupCoordinateX = getCoordinateX(pickupAddress, minLongitude, width, longitudeLength);
+            int pickupCoordinateY = getCoordinateY(pickupAddress, minLatitude, height, latitudeLength);
+            Intersection deliveryAddress = iterator.next().getDeliveryAddress();
+            int deliveryCoordinateX = getCoordinateX(deliveryAddress, minLongitude, width, longitudeLength);
+            int deliveryCoordinateY = getCoordinateY(deliveryAddress, minLatitude, height, latitudeLength);
+            Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
+            drawIcon(requestColor, pickupCoordinateX, pickupCoordinateY, "pickup-icon.png");
+            drawIcon(requestColor, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
+            hsv[0] += goldenRatioConjugate;
+            hsv[0] %= 1;
+        }
+        int depotCoordinateX = getCoordinateX(tour.getDepotAddress(), minLongitude, width, longitudeLength);
+        int depotCoordinateY = getCoordinateY(tour.getDepotAddress(), minLatitude, height, latitudeLength);
+        drawIcon(null, depotCoordinateX, depotCoordinateY, "depot-icon.png");
+    }
+    
+    private int getCoordinateX(Intersection intersection, double minLongitude, double width, double longitudeLength) {
+        double coordinateLongitude = intersection.getLongitude() - minLongitude;
+        return (int) ((coordinateLongitude * width) / longitudeLength) + originX;
     }
 
-    /**
-     * Associates depot, pickups and deliveries addresses with intersections having coordinates X and Y
-     * @param depotAddress depot address
-     * @param planningRequests list of all requests with for each a pickup address and a delivery address
-     */
-    private void initTourIntersectionsView(Intersection depotAddress, ArrayList<Request> planningRequests) {
-        requestsIntersections.clear();
-        requestsIntersections.add(depotAddress.getId());
-
-        for (Request request : planningRequests) {
-            requestsIntersections.add(request.getPickupAddress().getId());
-            requestsIntersections.add(request.getDeliveryAddress().getId());
-        }
+    private int getCoordinateY(Intersection intersection, double minLatitude, double height, double latitudeLength) {
+        double coordinateLatitude = intersection.getLatitude() - minLatitude;
+        return (int) ((coordinateLatitude * height) / latitudeLength) + originX;
     }
 
     /**
@@ -163,34 +174,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         this.g = g;
-        for (SegmentView segmentView : segmentViewList) {
-            segmentView.paintSegmentBorder(g, scale);
-        }
-        for (SegmentView segmentView : segmentViewList) {
-            segmentView.paintSegment(g, scale);
-        }
-        g.setColor(Constants.COLOR_7);
-        for (IntersectionView intersectionView : intersectionViewMap.values()) {
-            g.fillOval(intersectionView.getCoordinateX() - scale/2, intersectionView.getCoordinateY() - scale/2, scale, scale);
-        }
-        if (!requestsIntersections.isEmpty()) {
-            Iterator<Long> iterator = requestsIntersections.iterator();
-            IntersectionView depotAddress = intersectionViewMap.get(iterator.next());
-            float[] hsv = new float[3];
-            Color initialColor = Color.red;
-            Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
-            double goldenRatioConjugate = 0.618033988749895;
-            while (iterator.hasNext()) {
-                IntersectionView pickupAddress = intersectionViewMap.get(iterator.next());
-                IntersectionView deliveryAddress = intersectionViewMap.get(iterator.next());
-                Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
-                drawIcon(requestColor, pickupAddress, "pickup-icon.png");
-                drawIcon(requestColor, deliveryAddress, "delivery-icon.png");
-                hsv[0] += goldenRatioConjugate;
-                hsv[0] %= 1;
-            }
-            drawIcon(null, depotAddress, "depot-icon.png");
-        }
+        displayCityMap(cityMap.getIntersections());
     }
 
     /**
@@ -199,11 +183,11 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
      * @param address address with coordinates X and Y
      * @param iconFileName name of the icon file
      */
-    private void drawIcon(Color color, IntersectionView address, String iconFileName) {
+    private void drawIcon(Color color, int coordinateX, int coordinateY, String iconFileName) {
         try {
             BufferedImage image = Constants.getImage(iconFileName);
             if (color != null) fillColorInImage(image, color);
-            g.drawImage(image, address.getCoordinateX() - 20, address.getCoordinateY() - 40, 40, 40, this);
+            g.drawImage(image, coordinateX - 20, coordinateY - 40, 40, 40, this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -239,14 +223,6 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     public void update(Observable o, Object arg) {
         if (o.equals(cityMap)) {
             scale = 1;
-            requestsIntersections.clear();
-            initCityMapView(cityMap.getAdjacenceMap());
-        } else if (o.equals(tour)) {
-            initTourIntersectionsView(tour.getDepotAddress(), tour.getPlanningRequests());
-            if (!tour.getListShortestPaths().isEmpty()) {
-                System.out.println("GraphicalView: update tour");
-                // TODO: display tour
-            }
         }
         repaint();
     }
@@ -263,13 +239,11 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
                 scale *= zoomCoefficient;
                 originX -= (e.getX() - originX) * (zoomCoefficient - 1);
                 originY -= (e.getY() - originY) * (zoomCoefficient - 1);
-                initCityMapView(cityMap.getAdjacenceMap());
                 repaint();
             } else if (e.getWheelRotation() > 0 && scale > 1) {
                 scale /= zoomCoefficient;
                 originX += (e.getX() - originX) - (e.getX() - originX) / zoomCoefficient;
                 originY += (e.getY() - originY) - (e.getY() - originY) / zoomCoefficient;
-                initCityMapView(cityMap.getAdjacenceMap());
                 repaint();
             }
         }

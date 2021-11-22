@@ -49,7 +49,7 @@ public class RequestsLoadedState implements State {
      */
     @Override
     public void computeTour(CityMap cityMap, Tour tour) {
-        tour.computeTour(cityMap.getAdjacenceMap());
+        tour.computeTour(cityMap.getIntersections());
     }
 
 }
