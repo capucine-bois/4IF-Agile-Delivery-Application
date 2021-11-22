@@ -214,9 +214,16 @@ public class Tour extends Observable {
         }
 
         // print order
+        long intm;
         for (ShortestPath p: listShortestPaths) {
-            System.out.println(p.getStartAddress().getLatitude() + " " + p.getStartAddress().getLongitude() + " -> " +
-                    p.getEndAddress().getLatitude() + " " + p.getEndAddress().getLongitude());
+            intm = p.getStartAddress().getId();
+            System.out.print( intm );
+            for(Segment s : p.getListSegments()){
+                System.out.print(" -> " );
+                intm = s.getDestination().getId();
+                System.out.print( intm );
+            }
+            System.out.println();
         }
 
         notifyObservers();
