@@ -30,7 +30,6 @@ public class Window extends JFrame implements ComponentListener {
 
     // Listeners
     private ButtonListener buttonListener;
-    private MouseListener mouseListener;
     private KeyboardListener keyboardListener;
 
     // Window size
@@ -51,12 +50,10 @@ public class Window extends JFrame implements ComponentListener {
     public Window(CityMap cityMap, Tour tour, Controller controller) throws IOException, FontFormatException {
         createHeader(controller);
         graphicalView = new GraphicalView(cityMap, tour, this);
-        textualView = new TextualView(tour, this);
+        textualView = new TextualView(tour, this, controller);
         errorView = new ErrorView(this);
         this.cityMap = cityMap;
         this.tour = tour;
-        //TODO: Add mouse listener
-        //TODO: Add keyboard listener
         setMinimumSize(new Dimension(windowWidth, windowHeight));
         setWindowSize();
         setVisible(true);
