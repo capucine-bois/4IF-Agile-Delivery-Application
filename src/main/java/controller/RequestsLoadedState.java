@@ -22,7 +22,7 @@ public class RequestsLoadedState implements State {
             XMLDeserializer.load(cityMap);
             controller.setCurrentState(controller.mapLoadedState);
         } catch (Exception e) {
-            if(!e.getMessage().equals("Problem when opening file"))
+            if(!e.getMessage().equals("Cancel opening file"))
                 window.displayErrorMessage(e.getMessage());
         }
     }
@@ -39,7 +39,7 @@ public class RequestsLoadedState implements State {
             XMLDeserializer.load(tour, cityMap);
             controller.setCurrentState(controller.requestsLoadedState);
         } catch (Exception e) {
-            if(!e.getMessage().equals("Problem when opening file"))
+            if(!e.getMessage().equals("Cancel opening file"))
                 window.displayErrorMessage(e.getMessage());
         }
     }
@@ -49,8 +49,6 @@ public class RequestsLoadedState implements State {
      */
     @Override
     public void computeTour(CityMap cityMap, Tour tour) {
-        System.out.println("RequestsLoadedState.computeTour");
-
         tour.computeTour(cityMap.getAdjacenceMap());
     }
 

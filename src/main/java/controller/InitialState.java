@@ -27,7 +27,7 @@ public class InitialState implements State {
             XMLDeserializer.load(cityMap);
             controller.setCurrentState(controller.mapLoadedState);
         } catch (Exception e) {
-            if(!e.getMessage().equals("Problem when opening file"))
+            if(!e.getMessage().equals("Cancel opening file"))
                 window.displayErrorMessage(e.getMessage());
         }
     }

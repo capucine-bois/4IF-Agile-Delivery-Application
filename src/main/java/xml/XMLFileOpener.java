@@ -40,8 +40,11 @@ public class XMLFileOpener extends FileFilter {// Singleton
             returnVal = jFileChooserXML.showOpenDialog(null);
         else
             returnVal = jFileChooserXML.showSaveDialog(null);
-        if (returnVal != JFileChooser.APPROVE_OPTION)
+        if (returnVal == JFileChooser.ERROR_OPTION) {
             throw new ExceptionXML("Problem when opening file");
+        }else if(returnVal == JFileChooser.CANCEL_OPTION ) {
+            throw new ExceptionXML("Cancel opening file");
+        }
         return new File(jFileChooserXML.getSelectedFile().getAbsolutePath());
     }
 

@@ -2,6 +2,7 @@ package model;
 
 import observer.Observable;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +88,7 @@ public class Tour extends Observable {
     /**
      * Setter for tourLength attribute
      *
-     * @param tourLength wanted attribute for tourLength attribute
+     * @param tourLength wanted value for tourLength attribute
      */
     public void setTourLength(double tourLength) {
         this.tourLength = tourLength;
@@ -96,7 +97,7 @@ public class Tour extends Observable {
     /**
      * Setter for depotAddress attribute
      *
-     * @param depotAddress wanted attribute for depotAddress attribute
+     * @param depotAddress wanted value for depotAddress attribute
      */
     public void setDepotAddress(Intersection depotAddress) {
         this.depotAddress = depotAddress;
@@ -105,7 +106,7 @@ public class Tour extends Observable {
     /**
      * Setter for departureTime attribute
      *
-     * @param departureTime wanted attribute for departureTime attribute
+     * @param departureTime wanted value for departureTime attribute
      */
     public void setDepartureTime(String departureTime) {
         this.departureTime = departureTime;
@@ -114,7 +115,7 @@ public class Tour extends Observable {
     /**
      * Setter for planningRequests attribute
      *
-     * @param planningRequests wanted attribute for planningRequests attribute
+     * @param planningRequests wanted value for planningRequests attribute
      */
     public void setPlanningRequests(ArrayList<Request> planningRequests) {
         this.planningRequests = planningRequests;
@@ -123,11 +124,13 @@ public class Tour extends Observable {
     /**
      * Setter for listShortestPaths attribute
      *
-     * @param listShortestPaths wanted attribute for listShortestPaths attribute
+     * @param listShortestPaths wanted value for listShortestPaths attribute
      */
     public void setListShortestPaths(ArrayList<ShortestPath> listShortestPaths) {
         this.listShortestPaths = listShortestPaths;
     }
+
+    /* METHODS */
 
     /**
      * Adding a request in the planning requests.
@@ -142,8 +145,6 @@ public class Tour extends Observable {
      * @param adjacenceMap the map with all intersections and the segments starting from this intersections
      */
     public void  computeTour(Map<Intersection, ArrayList<Segment>> adjacenceMap) {
-
-        System.out.println("Tour.computeTour");
 
         Map<Intersection, ArrayList<ShortestPath>> dist = new HashMap<>();
         // get the points useful for the computing : pick-up address, delivery address, depot
@@ -176,8 +177,10 @@ public class Tour extends Observable {
                 listNodes.add(new Node(node,dist.get(node),iteratorNumber));
                 iteratorNumber++;
             }
-
         }
+
+        //listNodes.add(new Node(depotAddress,dist.get(depotAddress),iteratorNumber));
+
 
         // Run Tour
         TSP tsp = new TSP1();
@@ -186,11 +189,39 @@ public class Tour extends Observable {
         tsp.searchSolution(20000, g);
         System.out.print("Solution of cost "+tsp.getSolutionCost()+" found in "
                 +(System.currentTimeMillis() - startTime)+"ms : ");
-        for (int i=0; i<g.getNbVertices(); i++) System.out.print(tsp.getSolution(i)+" ");
-        System.out.println("0");
-        // TODO: store solution
-        // TODO: notify observer
 
+        Integer[] intersectionsOrder = tsp.getBestSol();
+        for (Integer i: intersectionsOrder) System.out.print(intersectionsOrder[i] + " ");
+        System.out.println("0");
+
+        Intersection previous = null;
+        for (Integer index: intersectionsOrder) {
+            Intersection currentIntersection;
+            if (index == 0)
+                currentIntersection = listUsefulPoints.get(listUsefulPoints.size()-1);
+            else
+                currentIntersection = listUsefulPoints.get(index-1);
+            if (previous != null) {
+                for (ShortestPath p: dist.get(previous)) {
+                    if (p.getEndAddress().equals(currentIntersection))
+                        listShortestPaths.add(p);
+                }
+            }
+            previous = currentIntersection;
+        }
+
+        for (ShortestPath p: dist.get(previous)) {
+            if (p.getEndAddress().equals(depotAddress))
+                listShortestPaths.add(p);
+        }
+
+        // print order
+        for (ShortestPath p: listShortestPaths) {
+            System.out.println(p.getStartAddress().getLatitude() + " " + p.getStartAddress().getLongitude() + " -> " +
+                    p.getEndAddress().getLatitude() + " " + p.getEndAddress().getLongitude());
+        }
+
+        notifyObservers();
     }
 
 
