@@ -22,6 +22,7 @@ public class Controller {
     protected final InitialState initialState = new InitialState();
     protected final MapLoadedState mapLoadedState = new MapLoadedState();
     protected final RequestsLoadedState requestsLoadedState = new RequestsLoadedState();
+    protected final ComputedTourState computedTourState = new ComputedTourState();
 
 
     /** Constructor taking already filled cityMap and tour structures
@@ -43,7 +44,7 @@ public class Controller {
         this.currentState = state;
         if (state == initialState) {
             window.setDefaultButtonStates(new boolean[]{true, false, false});
-        } else if (state == mapLoadedState){
+        } else if (state == mapLoadedState || state == computedTourState){
             window.setDefaultButtonStates(new boolean[]{true, true, false});
         } else {
             window.setDefaultButtonStates(new boolean[]{true, true, true});
@@ -58,7 +59,7 @@ public class Controller {
      * The behavior depends on the current state.
      */
     public void loadMap() {
-        currentState.loadMap(cityMap, window, this);
+        currentState.loadMap(cityMap, tour, window, this);
     }
 
     /**
@@ -66,13 +67,13 @@ public class Controller {
      * The behavior depends on the current state.
      */
     public void loadRequests() {
-        currentState.loadRequests(tour, cityMap, window, this);
+        currentState.loadRequests(cityMap, tour, window, this);
     }
 
     /**
      * Compute tour to accomplish all the requests as fast as possible (solving TSP problem).
      */
-    public void computeTour() { currentState.computeTour(cityMap, tour); }
+    public void computeTour() { currentState.computeTour(cityMap, tour, this); }
 
     public void leftClick(int indexRequest) {
         Request requestClicked = tour.getPlanningRequests().get(indexRequest);
