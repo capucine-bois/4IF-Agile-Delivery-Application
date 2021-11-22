@@ -18,13 +18,19 @@ public class ComputedTourState implements State {
      * @param controller application controller
      */
     @Override
-    public void loadMap(CityMap cityMap, Window window, Controller controller) {
+    public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
         try {
-            XMLDeserializer.load(cityMap);
+            XMLDeserializer.loadMap(cityMap);
             controller.setCurrentState(controller.mapLoadedState);
         } catch (Exception e) {
-            if(!e.getMessage().equals("Cancel opening file"))
+            if(!e.getMessage().equals("Cancel opening file")) {
+                cityMap.getIntersections().clear();
                 window.displayErrorMessage(e.getMessage());
+                controller.setCurrentState(controller.initialState);
+            }
+        } finally {
+            tour.clearLists();
+            tour.notifyObservers();
         }
     }
 
@@ -35,13 +41,18 @@ public class ComputedTourState implements State {
      * @param controller application controller
      */
     @Override
-    public void loadRequests(Tour tour, CityMap cityMap, Window window, Controller controller) {
+    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
         try {
-            XMLDeserializer.load(tour, cityMap);
+            XMLDeserializer.loadRequests(tour, cityMap);
             controller.setCurrentState(controller.requestsLoadedState);
         } catch (Exception e) {
-            if(!e.getMessage().equals("Cancel opening file"))
+            if(!e.getMessage().equals("Cancel opening file")) {
+                tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
+                controller.setCurrentState(controller.mapLoadedState);
+            }
+        } finally {
+            tour.notifyObservers();
         }
     }
 

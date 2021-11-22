@@ -22,13 +22,17 @@ public class InitialState implements State {
      * @param window the window where to show map and popup messages
      * @param controller application controller
      */
-    public void loadMap(CityMap cityMap, Window window, Controller controller) {
+    public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
         try {
-            XMLDeserializer.load(cityMap);
+            XMLDeserializer.loadMap(cityMap);
             controller.setCurrentState(controller.mapLoadedState);
         } catch (Exception e) {
-            if(!e.getMessage().equals("Cancel opening file"))
+            if(!e.getMessage().equals("Cancel opening file")) {
+                cityMap.getIntersections().clear();
                 window.displayErrorMessage(e.getMessage());
+            }
+        } finally {
+            cityMap.notifyObservers();
         }
     }
 

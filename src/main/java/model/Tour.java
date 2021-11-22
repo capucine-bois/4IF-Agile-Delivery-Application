@@ -20,7 +20,7 @@ public class Tour extends Observable {
     private double tourLength;
     private Intersection depotAddress;
     private String departureTime;
-    private ArrayList<Request> planningRequests = new ArrayList<>();
+    private ArrayList<Request> planningRequests;
     private ArrayList<ShortestPath> listShortestPaths;
 
     /* CONSTRUCTORS */
@@ -135,6 +135,14 @@ public class Tour extends Observable {
      */
     public void addRequest(Request request) {
         planningRequests.add(request);
+    }
+
+    /**
+     * Clear lists in tour
+     */
+    public void clearLists() {
+        planningRequests.clear();
+        listShortestPaths.clear();
     }
 
     /**

@@ -20,6 +20,8 @@ public class Constants {
     public static final Color COLOR_5 = new Color(244, 246, 247); // Graphical view background
     public static final Color COLOR_6 = new Color(220, 222, 226); // Segments stroke
     public static final Color COLOR_7 = new Color(255, 255, 255); // Segments background
+    public static final Color COLOR_8 = new Color(25, 103, 210); // Tour segments stroke
+    public static final Color COLOR_9 = new Color(102, 157, 246); // Tour segments background
 
     /**
      * Get Font instance for a given font name and a given font size

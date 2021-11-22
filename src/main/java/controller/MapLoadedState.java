@@ -2,13 +2,8 @@ package controller;
 
 import model.CityMap;
 import model.Tour;
-import org.xml.sax.SAXException;
 import view.Window;
-import xml.ExceptionXML;
 import xml.XMLDeserializer;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
 
 /**
  * Map loaded state. State of the application when map has been loaded.
@@ -23,13 +18,17 @@ public class MapLoadedState implements State {
      * @param controller application controller
      */
     @Override
-    public void loadMap(CityMap cityMap, Window window, Controller controller) {
+    public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
         try {
-            XMLDeserializer.load(cityMap);
-            controller.setCurrentState(controller.mapLoadedState);
+            XMLDeserializer.loadMap(cityMap);
         } catch (Exception e) {
-            if(!e.getMessage().equals("Cancel opening file"))
+            if(!e.getMessage().equals("Cancel opening file")) {
+                cityMap.getIntersections().clear();
                 window.displayErrorMessage(e.getMessage());
+                controller.setCurrentState(controller.initialState);
+            }
+        } finally {
+            cityMap.notifyObservers();
         }
     }
 
@@ -40,13 +39,17 @@ public class MapLoadedState implements State {
      * @param controller application controller
      */
     @Override
-    public void loadRequests(Tour tour, CityMap cityMap, Window window, Controller controller) {
+    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
         try {
-            XMLDeserializer.load(tour, cityMap);
+            XMLDeserializer.loadRequests(tour, cityMap);
             controller.setCurrentState(controller.requestsLoadedState);
         } catch (Exception e) {
-            if(!e.getMessage().equals("Cancel opening file"))
+            if(!e.getMessage().equals("Cancel opening file")) {
+                tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
+            }
+        } finally {
+            tour.notifyObservers();
         }
     }
 }

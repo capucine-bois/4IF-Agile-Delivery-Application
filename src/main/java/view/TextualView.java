@@ -20,6 +20,7 @@ public class TextualView extends JPanel implements Observer {
     private Tour tour;
     private final int gap = 20;
     private final int colorWidth = 10;
+    private final int border = 10;
     private MouseListener mouseListener;
     private List<JPanel> requestPanels;
 
@@ -30,7 +31,7 @@ public class TextualView extends JPanel implements Observer {
     public TextualView(Tour tour, Window w, Controller controller){
         setLayout(new BorderLayout());
         setBackground(Constants.COLOR_4);
-        setBorder(BorderFactory.createMatteBorder(10,10,10,0,Constants.COLOR_1));
+        setBorder(BorderFactory.createMatteBorder(border,border,border,0,Constants.COLOR_1));
         w.getContentPane().add(this, BorderLayout.LINE_START);
         tour.addObserver(this);
         this.tour = tour;
@@ -40,7 +41,9 @@ public class TextualView extends JPanel implements Observer {
 
     private void displayTextualRequests() {
         removeAll();
-        createScrollPane();
+        if (!tour.getPlanningRequests().isEmpty()) {
+            createScrollPane();
+        }
         revalidate();
     }
 
@@ -57,6 +60,7 @@ public class TextualView extends JPanel implements Observer {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(BorderFactory.createMatteBorder(gap,0,0,0,Constants.COLOR_4));
+        mainPanel.setBackground(Constants.COLOR_4);
         displayDepotInformation(mainPanel);
         displayRequestsInformation(mainPanel);
         return mainPanel;
