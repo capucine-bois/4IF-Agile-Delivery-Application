@@ -27,11 +27,10 @@ public class XMLDeserializer {
         Document document = extractDocument(file);
         Element racine = document.getDocumentElement();
         if (racine.getNodeName().equals("map")) {
-            cityMap.getAdjacenceMap().clear();
+            cityMap.getIntersections().clear();
             deserializeMap(cityMap, document);
             cityMap.notifyObservers();
         } else {
-            // TODO: manage cancel in file opener
             throw new ExceptionXML("Bad document");
         }
     }
@@ -53,7 +52,6 @@ public class XMLDeserializer {
             deserializeRequests(tour, cityMap, document);
             tour.notifyObservers();
         } else {
-            // TODO: manage cancel in file opener
             throw new ExceptionXML("Bad document");
         }
     }
@@ -119,10 +117,10 @@ public class XMLDeserializer {
             String name = nodeSegment.item(x).getAttributes().getNamedItem("name").getNodeValue();
             long originId = Long.parseLong(nodeSegment.item(x).getAttributes().getNamedItem("origin").getNodeValue());
             // find the origin and destination intersections
-            Intersection origin = cityMap.getAdjacenceMap().keySet().stream().filter(i -> i.getId() == originId).findFirst().get();
-            Intersection destination = cityMap.getAdjacenceMap().keySet().stream().filter(i -> i.getId() == destinationId).findFirst().get();
+            Intersection origin = cityMap.getIntersections().stream().filter(i->i.getId()==originId).findFirst().get();
+            Intersection destination = cityMap.getIntersections().stream().filter(i->i.getId()==destinationId).findFirst().get();
             // create the Segment object and add it to the city map
-            cityMap.addSegment(new Segment(length, name, destination, origin), origin);
+            origin.addAdjacentSegment(new Segment(length, name, destination, origin));
         }
     }
 
@@ -142,7 +140,8 @@ public class XMLDeserializer {
             NodeList nodeDepot = document.getElementsByTagName("depot");
             long address = Long.parseLong(nodeDepot.item(0).getAttributes().getNamedItem("address").getNodeValue());
             String departureTime = nodeDepot.item(0).getAttributes().getNamedItem("departureTime").getNodeValue();
-            Optional<Intersection> optionalDepotAddress = cityMap.getAdjacenceMap().keySet().stream().filter(i -> i.getId() == address).findFirst();
+            Optional<Intersection> optionalDepotAddress = cityMap.getIntersections().stream().filter(i->i.getId() == address).findFirst();
+
             if (optionalDepotAddress.isPresent()) {
                 Intersection depotAddress = optionalDepotAddress.get();
                 // set the Tour object
@@ -171,8 +170,8 @@ public class XMLDeserializer {
             int pickupDuration = Integer.parseInt(nodeRequest.item(x).getAttributes().getNamedItem("pickupDuration").getNodeValue());
             int deliveryDuration = Integer.parseInt(nodeRequest.item(x).getAttributes().getNamedItem("deliveryDuration").getNodeValue());
 
-            Optional<Intersection> pickupAddress = cityMap.getAdjacenceMap().keySet().stream().filter(i -> i.getId() == pickupAddressId).findFirst();
-            Optional<Intersection> deliveryAddress = cityMap.getAdjacenceMap().keySet().stream().filter(i -> i.getId() == deliveryAddressId).findFirst();
+            Optional<Intersection> pickupAddress = cityMap.getIntersections().stream().filter(i->i.getId() == pickupAddressId).findFirst();
+            Optional<Intersection> deliveryAddress = cityMap.getIntersections().stream().filter(i->i.getId() == deliveryAddressId).findFirst();
             if (pickupAddress.isPresent() && deliveryAddress.isPresent()) {
                 Request request = new Request(pickupDuration, deliveryDuration, pickupAddress.get(), deliveryAddress.get());
                 tour.addRequest(request);

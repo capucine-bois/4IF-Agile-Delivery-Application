@@ -29,6 +29,11 @@ public class Request {
      */
     private Intersection deliveryAddress;
 
+    /**
+     * The visibility of the request.
+     */
+    private boolean visible;
+
     /* CONSTRUCTORS */
 
     /**
@@ -43,6 +48,7 @@ public class Request {
         this.deliveryDuration = deliveryDuration;
         this.pickupAddress = pickupAddress;
         this.deliveryAddress = deliveryAddress;
+        this.visible=true;
     }
 
     /* GETTERS */
@@ -112,4 +118,10 @@ public class Request {
     public void setDeliveryAddress(Intersection deliveryAddress) {
         this.deliveryAddress = deliveryAddress;
     }
+
+    /**
+     * Setter for visible attribute
+     * @param visible new visibility (true or false)
+     */
+    public void setVisible(boolean visible) { this.visible = visible; }
 }

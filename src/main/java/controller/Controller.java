@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.*;
 
 import model.CityMap;
+import model.Request;
 import model.Tour;
 import view.Window;
 
@@ -70,12 +71,14 @@ public class Controller {
     }
 
     /**
-     * Close error popup.
-     */
-    public void closeError() { currentState.closeError(); }
-
-    /**
      * Compute tour to accomplish all the requests as fast as possible (solving TSP problem).
      */
     public void computeTour() { currentState.computeTour(cityMap, tour); }
+
+    public void setRequestsVisibility(Request request){
+        request.setVisible(true);
+        for (Request r : tour.getPlanningRequests()){
+            if(!(r==request)) r.setVisible(false);
+        }
+    }
 }
