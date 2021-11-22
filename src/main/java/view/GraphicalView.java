@@ -11,7 +11,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.*;
 import java.util.List;
 
 /**
@@ -133,16 +132,19 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
             Color initialColor = Color.red;
             Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
             double goldenRatioConjugate = 0.618033988749895;
+            boolean oneRequestSelected = tour.getPlanningRequests().stream().anyMatch(Request::isSelected);
             for (Request request : tour.getPlanningRequests()) {
-                Intersection pickupAddress = request.getPickupAddress();
-                int pickupCoordinateX = getCoordinateX(pickupAddress, minLongitude, width, longitudeLength);
-                int pickupCoordinateY = getCoordinateY(pickupAddress, minLatitude, height, latitudeLength);
-                Intersection deliveryAddress = request.getDeliveryAddress();
-                int deliveryCoordinateX = getCoordinateX(deliveryAddress, minLongitude, width, longitudeLength);
-                int deliveryCoordinateY = getCoordinateY(deliveryAddress, minLatitude, height, latitudeLength);
-                Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
-                drawIcon(requestColor, pickupCoordinateX, pickupCoordinateY, "pickup-icon.png");
-                drawIcon(requestColor, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
+                if (!oneRequestSelected || request.isSelected()) {
+                    Intersection pickupAddress = request.getPickupAddress();
+                    int pickupCoordinateX = getCoordinateX(pickupAddress, minLongitude, width, longitudeLength);
+                    int pickupCoordinateY = getCoordinateY(pickupAddress, minLatitude, height, latitudeLength);
+                    Intersection deliveryAddress = request.getDeliveryAddress();
+                    int deliveryCoordinateX = getCoordinateX(deliveryAddress, minLongitude, width, longitudeLength);
+                    int deliveryCoordinateY = getCoordinateY(deliveryAddress, minLatitude, height, latitudeLength);
+                    Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
+                    drawIcon(requestColor, pickupCoordinateX, pickupCoordinateY, "pickup-icon.png");
+                    drawIcon(requestColor, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
+                }
                 hsv[0] += goldenRatioConjugate;
                 hsv[0] %= 1;
             }
