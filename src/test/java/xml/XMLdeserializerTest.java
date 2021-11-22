@@ -51,6 +51,8 @@ public class XMLdeserializerTest {
 
     private void initializeMap(){
         this.listIntersection =  new ArrayList<>();
+        this.cityMap = new CityMap();
+        this.tour = new Tour();
         listIntersection.add(new Intersection(1,45.750404,4.8744674));
         listIntersection.add(new Intersection(2,45.75171,4.8718166));
         listIntersection.add(new Intersection(3,45.754265,4.886816));
@@ -104,6 +106,7 @@ public class XMLdeserializerTest {
         XMLDeserializer.parseXMLSegments(document,cityMap2);
         List<Intersection> listIntersection1 = this.cityMap.getIntersections();
         List<Intersection> listIntersection2 = cityMap2.getIntersections();
+        assertEquals(listIntersection1.size(),listIntersection2.size(), "Not the same intersections");
         for(int i = 0; i < listIntersection1.size(); i++) {
             List<Segment> listSegments = listIntersection1.get(i).getAdjacentSegments();
             List<Segment> listSegments2 = listIntersection2.get(i).getAdjacentSegments();
@@ -111,10 +114,7 @@ public class XMLdeserializerTest {
                 for (int j = 0; j < listSegments.size(); j++) {
                     Segment segmentA = listSegments.get(j);
                     Segment segmentB = listSegments2.get(j);
-                    assertEquals(segmentA.getLength(), segmentB.getLength(), "Length not equal");
-                    assertEquals(segmentA.getName(), segmentB.getName(), "Name not equal");
-                    assertEquals(segmentA.getDestination(), segmentB.getDestination(), "Destination not equal");
-                    assertEquals(segmentA.getOrigin(), segmentB.getOrigin(), "Origin not equal");
+                    assertEquals(segmentA, segmentB, "Segment aren't the same");
                 }
             }
         }
@@ -144,13 +144,10 @@ public class XMLdeserializerTest {
         List<Intersection> listIntersections2 = new ArrayList<>(cityMap.getIntersections());
         // Check if keys are all good
         for(int i = 0; i < this.listIntersection.size(); i++) {
-            assertTrue(containsIntersection(this.listIntersection, listIntersections2.get(i).getId()));
+            assertEquals(this.listIntersection.get(i), listIntersections2.get(i));
         }
     }
 
-    public boolean containsIntersection(final List<Intersection> list, final long id){
-        return list.stream().anyMatch(o -> o.getId() == id);
-    }
 
 
 
@@ -211,7 +208,7 @@ public class XMLdeserializerTest {
         Tour tour = new Tour();
         try{
             XMLDeserializer.deserializeRequests(this.tour,this.cityMap, document);
-            assertEquals(this.tour.getDepotAddress().getId(),this.listIntersection.get(5).getId(), "Bad depot adress");
+            assertEquals(this.tour.getDepotAddress(), this.listIntersection.get(5), "Bad depot adress");
             assertEquals(this.tour.getDepartureTime(),"8:0:0" ,"Bad departure adress");
         }catch(Exception exception) {
             fail("Exception find!");
@@ -241,10 +238,7 @@ public class XMLdeserializerTest {
             for (int j = 0; j < listRequestOutput.size(); j++) {
                 Request requestA = listRequestOutput.get(j);
                 Request requestB = listRequest.get(j);
-                assertEquals(requestA.getDeliveryAddress().getId(), requestB.getDeliveryAddress().getId(), "Delivery address not equal");
-                assertEquals(requestA.getDeliveryDuration(), requestB.getDeliveryDuration(), "Delivery duration not equal");
-                assertEquals(requestA.getPickupAddress().getId(), requestB.getPickupAddress().getId(), "Pickup address not equal");
-                assertEquals(requestA.getPickupDuration(), requestB.getPickupDuration(), "Pickup duration not equal");
+                assertEquals(requestA, requestB, "Request aren't the same");
             }
         }catch(Exception exception) {
             fail("Exception find!");
