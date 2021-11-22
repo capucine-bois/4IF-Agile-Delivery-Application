@@ -143,8 +143,12 @@ public class XMLdeserializerTest {
         List<Intersection> listIntersections2 = new ArrayList<>(cityMap.getAdjacenceMap().keySet());
         // Check if keys are all good
         for(int i = 0; i < this.listIntersection.size(); i++) {
-            assertTrue(this.listIntersection.contains(listIntersections2.get(i)));
+            assertTrue(containsIntersection(this.listIntersection, listIntersections2.get(i).getId()));
         }
+    }
+
+    public boolean containsIntersection(final List<Intersection> list, final long id){
+        return list.stream().anyMatch(o -> o.getId() == id);
     }
 
 
@@ -206,7 +210,7 @@ public class XMLdeserializerTest {
         Tour tour = new Tour();
         try{
             XMLDeserializer.deserializeRequests(this.tour,this.cityMap, document);
-            assertEquals(this.tour.getDepotAddress(), this.listIntersection.get(5), "Bad depot adress");
+            assertEquals(this.tour.getDepotAddress().getId(),this.listIntersection.get(5).getId(), "Bad depot adress");
             assertEquals(this.tour.getDepartureTime(),"8:0:0" ,"Bad departure adress");
         }catch(Exception exception) {
             fail("Exception find!");
@@ -229,10 +233,18 @@ public class XMLdeserializerTest {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(file);
-        Tour tour = new Tour();
         try{
             XMLDeserializer.parseXMLRequests(this.tour,this.cityMap, document);
-            ArrayList<Request> listRequestOutput = tour.getPlanningRequests();
+            ArrayList<Request> listRequestOutput = this.tour.getPlanningRequests();
+            assertEquals(listRequestOutput.size(),this.listRequest.size(),"Wrong number of requests");
+            for (int j = 0; j < listRequestOutput.size(); j++) {
+                Request requestA = listRequestOutput.get(j);
+                Request requestB = listRequest.get(j);
+                assertEquals(requestA.getDeliveryAddress().getId(), requestB.getDeliveryAddress().getId(), "Delivery address not equal");
+                assertEquals(requestA.getDeliveryDuration(), requestB.getDeliveryDuration(), "Delivery duration not equal");
+                assertEquals(requestA.getPickupAddress().getId(), requestB.getPickupAddress().getId(), "Pickup address not equal");
+                assertEquals(requestA.getPickupDuration(), requestB.getPickupDuration(), "Pickup duration not equal");
+            }
         }catch(Exception exception) {
             fail("Exception find!");
         }
