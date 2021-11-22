@@ -1,6 +1,7 @@
 package view;
 
 import java.awt.*;
+import java.awt.event.PaintEvent;
 
 /**
  * Segment on GraphicalView.
@@ -62,6 +63,13 @@ public class SegmentView {
 
     /* METHODS */
 
+    public void paintSegmentBorder(Graphics g, int scale) {
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setColor(Constants.COLOR_6);
+        g2.setStroke(new BasicStroke(scale + 2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
+        g2.drawLine(origin.getCoordinateX(), origin.getCoordinateY(), destination.getCoordinateX(), destination.getCoordinateY());
+    }
+
     /**
      * Paints a segment view with two strokes : one for background and one for border
      * @param g graphics of the graphical view
@@ -69,11 +77,8 @@ public class SegmentView {
      */
     public void paintSegment(Graphics g, int scale) {
         Graphics2D g2 = (Graphics2D) g;
-        g2.setColor(Constants.COLOR_6);
-        g2.setStroke(new BasicStroke(scale + 2));
-        g2.drawLine(origin.getCoordinateX(), origin.getCoordinateY(), destination.getCoordinateX(), destination.getCoordinateY());
         g2.setColor(Constants.COLOR_7);
-        g2.setStroke(new BasicStroke(scale));
+        g2.setStroke(new BasicStroke(scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g2.drawLine(origin.getCoordinateX(), origin.getCoordinateY(), destination.getCoordinateX(), destination.getCoordinateY());
     }
 }

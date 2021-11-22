@@ -50,7 +50,7 @@ public class Window extends JFrame implements ComponentListener {
     public Window(CityMap cityMap, Tour tour, Controller controller) throws IOException, FontFormatException {
         createHeader(controller);
         graphicalView = new GraphicalView(cityMap, tour, this);
-        textualView = new TextualView(this);
+        textualView = new TextualView(tour, this);
         errorView = new ErrorView(this);
         this.cityMap = cityMap;
         this.tour = tour;
