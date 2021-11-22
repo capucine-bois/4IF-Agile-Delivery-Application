@@ -2,11 +2,14 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
 import controller.Controller;
+import model.Intersection;
 import model.Request;
+import model.ShortestPath;
 import model.Tour;
 import observer.Observable;
 import observer.Observer;
@@ -23,12 +26,17 @@ public class TextualView extends JPanel implements Observer {
     private final int border = 10;
     private MouseListener mouseListener;
     private List<JPanel> requestPanels;
+    private CardLayout cardLayout;
+    private Window window;
+    private JButton requestsHeader;
+    private JButton tourHeader;
+    private JPanel cardLayoutPanel;
 
     /**
      * Create a textual view in window
      * @param w the GUI
      */
-    public TextualView(Tour tour, Window w, Controller controller){
+    public TextualView(Tour tour, Window w, Controller controller) throws IOException, FontFormatException {
         setLayout(new BorderLayout());
         setBackground(Constants.COLOR_4);
         setBorder(BorderFactory.createMatteBorder(border,border,border,0,Constants.COLOR_1));
@@ -37,33 +45,111 @@ public class TextualView extends JPanel implements Observer {
         this.tour = tour;
         requestPanels = new ArrayList<>();
         mouseListener = new MouseListener(controller, this);
+        this.window = w;
+        createHeader();
+        createCardLayout();
+    }
+
+    private void createHeader() throws IOException, FontFormatException {
+        JPanel header = new JPanel();
+        header.setLayout(new GridLayout(1, 2));
+
+        requestsHeader = new JButton("Requests");
+        window.setStyle(requestsHeader);
+        requestsHeader.setEnabled(false);
+        header.add(requestsHeader);
+
+        tourHeader = new JButton("Tour");
+        window.setStyle(tourHeader);
+        tourHeader.setEnabled(false);
+        header.add(tourHeader);
+
+        add(header, BorderLayout.PAGE_START);
+    }
+
+    private void createCardLayout() {
+        cardLayout = new CardLayout();
+        cardLayoutPanel = new JPanel();
+        cardLayoutPanel.setBackground(Constants.COLOR_4);
+        cardLayoutPanel.setLayout(cardLayout);
+        add(cardLayoutPanel);
     }
 
     private void displayTextualRequests() {
-        removeAll();
+        requestsHeader.setEnabled(false);
+        tourHeader.setEnabled(false);
+        cardLayoutPanel.removeAll();
         if (!tour.getPlanningRequests().isEmpty()) {
-            createScrollPane();
+            createRequestsScrollPane();
+            requestsHeader.setEnabled(true);
+            if (!tour.getListShortestPaths().isEmpty()) {
+                createTourScrollPane();
+                tourHeader.setEnabled(true);
+                cardLayout.next(cardLayoutPanel);
+            }
         }
         revalidate();
     }
 
-    private void createScrollPane() {
-        JPanel mainPanel = createMainPanel();
-        JScrollPane scrollPane = new JScrollPane(mainPanel);
+    private void createTourScrollPane() {
+        JPanel mainTourPanel = createTourMainPanel();
+        JScrollPane scrollPane = new JScrollPane(mainTourPanel);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(null);
-        add(scrollPane);
+        cardLayoutPanel.add(scrollPane);
     }
 
-    private JPanel createMainPanel() {
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBorder(BorderFactory.createMatteBorder(gap,0,0,0,Constants.COLOR_4));
-        mainPanel.setBackground(Constants.COLOR_4);
-        displayDepotInformation(mainPanel);
-        displayRequestsInformation(mainPanel);
-        return mainPanel;
+    private JPanel createTourMainPanel() {
+        JPanel tourMainPanel = new JPanel();
+        tourMainPanel.setLayout(new BoxLayout(tourMainPanel, BoxLayout.Y_AXIS));
+        tourMainPanel.setBorder(BorderFactory.createMatteBorder(gap,0,0,0,Constants.COLOR_4));
+        tourMainPanel.setBackground(Constants.COLOR_4);
+        displayShortestPaths(tourMainPanel);
+        return tourMainPanel;
+    }
+
+    private void displayShortestPaths(JPanel tourMainPanel) {
+        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+            Map<String, String> shortestPathInformation = new HashMap<>();
+            String startPath = findTypeIntersection(shortestPath.getStartAddress());
+            String endPath = findTypeIntersection(shortestPath.getEndAddress());
+            shortestPathInformation.put("Length", String.format("%.1f", shortestPath.getPathLength() / (double) 1000) + " km");
+            shortestPathInformation.put("From", startPath);
+            shortestPathInformation.put("To", endPath);
+            displayInformation(tourMainPanel, shortestPathInformation, Color.black, null);
+        }
+    }
+
+    private String findTypeIntersection(Intersection startAddress) {
+        String type;
+        if (startAddress == tour.getDepotAddress()) {
+            type = "Depot";
+        } else if (tour.getPlanningRequests().stream().anyMatch(x -> x.getPickupAddress() == startAddress)) {
+            type = "Pickup";
+        } else {
+            type = "Delivery";
+        }
+        return type;
+    }
+
+    private void createRequestsScrollPane() {
+        JPanel requestsMainPanel = createRequestsMainPanel();
+        JScrollPane scrollPane = new JScrollPane(requestsMainPanel);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBorder(null);
+        cardLayoutPanel.add(scrollPane);
+    }
+
+    private JPanel createRequestsMainPanel() {
+        JPanel requestsMainPanel = new JPanel();
+        requestsMainPanel.setLayout(new BoxLayout(requestsMainPanel, BoxLayout.Y_AXIS));
+        requestsMainPanel.setBorder(BorderFactory.createMatteBorder(gap,0,0,0,Constants.COLOR_4));
+        requestsMainPanel.setBackground(Constants.COLOR_4);
+        displayDepotInformation(requestsMainPanel);
+        displayRequestsInformation(requestsMainPanel);
+        return requestsMainPanel;
     }
 
     private void displayDepotInformation(JPanel mainPanel) {
