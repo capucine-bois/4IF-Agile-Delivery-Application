@@ -25,7 +25,7 @@ public class Intersection {
         this.id = id;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.adjacentSegments = new ArrayList<Segment>();
+        this.adjacentSegments = new ArrayList<>();
     }
 
     /**
@@ -94,7 +94,7 @@ public class Intersection {
     /**
      * Adder for adjacentSegments
      *
-     * @param Segment new segment that start from the intersection
+     * @param segment new segment that start from the intersection
      */
     public void addAdjacentSegment(Segment segment) {
         adjacentSegments.add(segment);
