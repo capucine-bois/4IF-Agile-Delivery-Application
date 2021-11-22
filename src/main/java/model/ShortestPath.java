@@ -99,4 +99,23 @@ public class ShortestPath {
     public void setEndAddress(Intersection endAddress) {
         this.endAddress = endAddress;
     }
+
+    /**
+     * Check if two shortest paths have the same attributes
+     * @param o the object to compare
+     * @return whether they have the same attributes or not
+     */
+    public boolean equals(Object o) {
+        boolean check;
+        if (o instanceof ShortestPath) {
+            ShortestPath s = (ShortestPath) o;
+            check = s.getEndAddress().equals(this.getEndAddress()) &&
+                    s.getStartAddress().equals(this.getStartAddress()) &&
+                    s.getPathLength() == this.getPathLength() &&
+                    s.getListSegments().equals(this.getListSegments());
+        } else {
+            check = false;
+        }
+        return check;
+    }
 }
