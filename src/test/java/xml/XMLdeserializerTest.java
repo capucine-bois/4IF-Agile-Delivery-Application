@@ -1,12 +1,7 @@
 package xml;
 
-import model.CityMap;
-import model.Intersection;
-import model.Segment;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import model.*;
+import org.junit.jupiter.api.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -26,8 +21,15 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("XMLdeserializerTest test case")
-class XMLdeserializerTest {
+public class XMLdeserializerTest {
 
+    private CityMap cityMap = new CityMap();
+    private Tour tour = new Tour();
+    private ArrayList<Intersection> listIntersection;
+    private ArrayList<Request> listRequest;
+    public XMLdeserializerTest(){
+        initializeMap();
+    }
     static Instant startedAt;
 
     @BeforeAll
@@ -42,9 +44,42 @@ class XMLdeserializerTest {
         System.out.println(MessageFormat.format("Test duration : {0} ms", duration));
     }
 
+    @BeforeEach
+    public void resetCityMap(){
+        initializeMap();
+    }
+
+    private void initializeMap(){
+        this.listIntersection =  new ArrayList<>();
+        listIntersection.add(new Intersection(1,45.750404,4.8744674));
+        listIntersection.add(new Intersection(2,45.75171,4.8718166));
+        listIntersection.add(new Intersection(3,45.754265,4.886816));
+        listIntersection.add(new Intersection(4,45.755234,4.8867016));
+        listIntersection.add(new Intersection(5,45.754894,4.8855863));
+        listIntersection.add(new Intersection(6,42.754894,4.1155863));
+        listIntersection.add(new Intersection(7,45.354894,4.4855863));
+        listIntersection.add(new Intersection(8,45.234244,4.5355862));
+        listIntersection.add(new Intersection(9,45.221244,4.9955862));
+        for (Intersection intersection : listIntersection) {
+            this.cityMap.addIntersection(intersection);
+        }
+        Segment s1 = new Segment(23.662397, "Rue Léon Blum", listIntersection.get(1), listIntersection.get(0));
+        Segment s2 = new Segment(28.430933, "Avenue Édouard Herriot", listIntersection.get(3),listIntersection.get(2));
+        Segment s3 = new Segment(233.383, "Avenue Edouard", listIntersection.get(5), listIntersection.get(4));
+        Segment s4 = new Segment(202.5549, "Rue des coquelicots", listIntersection.get(7), listIntersection.get(6));
+        this.cityMap.addSegment(s1,listIntersection.get(0));
+        this.cityMap.addSegment(s2,listIntersection.get(2));
+        this.cityMap.addSegment(s3,listIntersection.get(4));
+        this.cityMap.addSegment(s4,listIntersection.get(6));
+
+        this.listRequest =  new ArrayList<>();
+        this.listRequest.add(new Request(0,600,listIntersection.get(0),listIntersection.get(1)));
+        this.listRequest.add(new Request(600,120,listIntersection.get(3),listIntersection.get(6)));
+    }
 
 
-    /*
+
+    /**
      * Method to test:
      * parseXMLSegments()
      *
@@ -54,42 +89,22 @@ class XMLdeserializerTest {
     @Test
     @DisplayName("Test on parseXMLSegments")
     void parseXMLSegmentsTest() throws ParserConfigurationException, IOException, SAXException {
-        // Create cityMap to compare to
-        CityMap cityMap = new CityMap();
         // Create input of parseXMLSegments
         CityMap cityMap2 = new CityMap();
         File file = new File("src/test/resources/testMap.xml");
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(file);
-        ArrayList<Intersection> listIntersection =  new ArrayList<Intersection>();
-        listIntersection.add(new Intersection(1,45.750404,4.8744674));
-        listIntersection.add(new Intersection(2,45.75171,4.8718166));
-        listIntersection.add(new Intersection(3,45.754265,4.886816));
-        listIntersection.add(new Intersection(4,45.755234,4.8867016));
-        listIntersection.add(new Intersection(5,45.754894,4.8855863));
-        listIntersection.add(new Intersection(6,42.754894,4.1155863));
-        listIntersection.add(new Intersection(7,45.354894,4.4855863));
-        listIntersection.add(new Intersection(8,45.234244,4.5355862));
-        for(int i = 0 ; i < listIntersection.size(); i++) {
-            cityMap.addIntersection(listIntersection.get(i));
-            cityMap2.addIntersection(listIntersection.get(i));
-        }
-        Segment s1 = new Segment(23.662397, "Rue Léon Blum", listIntersection.get(1), listIntersection.get(0));
-        Segment s2 = new Segment(28.430933, "Avenue Édouard Herriot", listIntersection.get(3),listIntersection.get(2));
-        Segment s3 = new Segment(233.383, "Avenue Edouard", listIntersection.get(5), listIntersection.get(4));
-        Segment s4 = new Segment(202.5549, "Rue des coquelicots", listIntersection.get(7), listIntersection.get(6));
-        cityMap.addSegment(s1,listIntersection.get(0));
-        cityMap.addSegment(s2,listIntersection.get(2));
-        cityMap.addSegment(s3,listIntersection.get(4));
-        cityMap.addSegment(s4,listIntersection.get(6));
 
+        for (Intersection intersection : this.listIntersection) {
+            cityMap2.addIntersection(intersection);
+        }
 
         // Function test
         XMLDeserializer.parseXMLSegments(document,cityMap2);
 
-        for(int i = 0; i < cityMap.getAdjacenceMap().size(); i++) {
-            ArrayList<Segment> listSegments = cityMap.getAdjacenceMap().get(i);
+        for(int i = 0; i < this.cityMap.getAdjacenceMap().size(); i++) {
+            ArrayList<Segment> listSegments = this.cityMap.getAdjacenceMap().get(i);
             ArrayList<Segment> listSegments2 = cityMap2.getAdjacenceMap().get(i);
             if(listSegments != null ) {
                 for (int j = 0; j < listSegments.size(); j++) {
@@ -101,14 +116,10 @@ class XMLdeserializerTest {
                     assertEquals(segmentA.getOrigin(), segmentA.getOrigin(), "Origin not equal");
                 }
             }
-
-
         }
-
-
     }
 
-    /*
+    /**
      * Method to test:
      * parseXMLIntersections()
      *
@@ -123,31 +134,121 @@ class XMLdeserializerTest {
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(file);
         CityMap cityMap = new CityMap();
-        ArrayList<Intersection> listIntersections = new ArrayList<>();
-        listIntersections.add(new Intersection(1,45.750404,4.8744674));
-        listIntersections.add(new Intersection(2,45.75171,4.8718166));
-        listIntersections.add(new Intersection(3,45.754265,4.886816));
-        listIntersections.add(new Intersection(4,45.755234,4.8867016));
-        listIntersections.add(new Intersection(5,45.754894,4.8855863));
-        listIntersections.add(new Intersection(6,42.754894,4.1155863));
-        listIntersections.add(new Intersection(7,45.354894,4.4855863));
-        listIntersections.add(new Intersection(8,45.234244,4.5355862));
-        listIntersections.add(new Intersection(9,45.221244,4.9955862));
 
         // Function test
         XMLDeserializer.parseXMLIntersections(document,cityMap);
         // Same length
-        assertEquals(cityMap.getAdjacenceMap().size(), listIntersections.size(), "Wrong number of segments");
+        assertEquals(cityMap.getAdjacenceMap().size(), this.listIntersection.size(), "Wrong number of segments");
         // Take all keys
         List<Intersection> listIntersections2 = new ArrayList<>(cityMap.getAdjacenceMap().keySet());
         // Check if keys are all good
-        for(int i = 0; i < listIntersections.size(); i++) {
-            listIntersections.contains(listIntersections2.get(i));
+        for(int i = 0; i < this.listIntersection.size(); i++) {
+            assertTrue(containsIntersection(this.listIntersection, listIntersections2.get(i).getId()));
         }
+    }
 
+    public boolean containsIntersection(final List<Intersection> list, final long id){
+        return list.stream().anyMatch(o -> o.getId() == id);
+    }
+
+
+
+    /**
+     * Method to test:
+     * load()
+     *
+     * What it does:
+     * Load an XML map file
+     *
+     */
+    @Test
+    @DisplayName("Test on load() map")
+    void load() {
 
     }
 
+
+    /**
+     * Method to test:
+     * deserializeRequests()
+     *
+     * What it does:
+     * Check wether a request can be added or not
+     *
+     */
+    @Test
+    @DisplayName("Test on deserializeRequests - fail wanted")
+    void deserializeRequestsFail() throws ParserConfigurationException, IOException, SAXException {
+        File file = new File("src/test/resources/requestTest.xml");
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document document = db.parse(file);
+        CityMap citymap = new CityMap();
+        Tour tour = new Tour();
+        try{
+            XMLDeserializer.deserializeRequests(tour,citymap, document);
+        }catch(Exception exception) {
+            assertTrue(exception.getMessage().contains("One of the pickup or delivery address is not an intersection of the city map."), "Request is out of the map");
+        }
+    }
+
+    /**
+     * Method to test:
+     * deserializeRequests()
+     *
+     * What it does:
+     * Check if request XML is eligible
+     *
+     */
+    @Test
+    @DisplayName("Test on deserializeRequests()")
+    void deserializeRequests() throws ParserConfigurationException, IOException, SAXException {
+        File file = new File("src/test/resources/requestTestValid.xml");
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document document = db.parse(file);
+        Tour tour = new Tour();
+        try{
+            XMLDeserializer.deserializeRequests(this.tour,this.cityMap, document);
+            assertEquals(this.tour.getDepotAddress().getId(),this.listIntersection.get(5).getId(), "Bad depot adress");
+            assertEquals(this.tour.getDepartureTime(),"8:0:0" ,"Bad departure adress");
+        }catch(Exception exception) {
+            fail("Exception find!");
+        }
+    }
+
+
+    /**
+     * Method to test:
+     * parseXMLRequests()
+     *
+     * What it does:
+     * Check if request are well parsed
+     *
+     */
+    @Test
+    @DisplayName("Test on parseXMLRequests()")
+    void parseXMLRequests() throws ParserConfigurationException, IOException, SAXException {
+        File file = new File("src/test/resources/requestTestValid.xml");
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document document = db.parse(file);
+        try{
+            XMLDeserializer.parseXMLRequests(this.tour,this.cityMap, document);
+            ArrayList<Request> listRequestOutput = this.tour.getPlanningRequests();
+            assertEquals(listRequestOutput.size(),this.listRequest.size(),"Wrong number of requests");
+            for (int j = 0; j < listRequestOutput.size(); j++) {
+                Request requestA = listRequestOutput.get(j);
+                Request requestB = listRequest.get(j);
+                assertEquals(requestA.getDeliveryAddress().getId(), requestB.getDeliveryAddress().getId(), "Delivery address not equal");
+                assertEquals(requestA.getDeliveryDuration(), requestB.getDeliveryDuration(), "Delivery duration not equal");
+                assertEquals(requestA.getPickupAddress().getId(), requestB.getPickupAddress().getId(), "Pickup address not equal");
+                assertEquals(requestA.getPickupDuration(), requestB.getPickupDuration(), "Pickup duration not equal");
+            }
+        }catch(Exception exception) {
+            fail("Exception find!");
+        }
+    }
 
 
 

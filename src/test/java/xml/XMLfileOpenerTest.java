@@ -31,7 +31,7 @@ class XMLfileOpenerTest {
 
 
 
-    /*
+    /**
      * Method to test:
      * accept()
      *
