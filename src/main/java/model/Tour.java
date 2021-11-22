@@ -179,6 +179,13 @@ public class Tour extends Observable {
             } else {
                 listNodes.add(0,new Node(depotAddress,shortestPathsFromStartPoint,0));
             }
+            System.out.println("###id " + startPoint.getId());
+            for(ShortestPath sp : shortestPathsFromStartPoint){
+                for(Segment s : sp.getListSegments()){
+                    System.out.print(s.getDestination().getId() + "    " + s.getName() + "    ");
+                }
+                System.out.println("----------------------------");
+            }
         }
 
 
@@ -201,7 +208,7 @@ public class Tour extends Observable {
         }
         System.out.println("0");
 
-/*
+
         Intersection previous = null;
         for (Integer index: intersectionsOrder) {
             Intersection currentIntersection;
@@ -226,12 +233,19 @@ public class Tour extends Observable {
         }
 
         // print order
+        long intm;
         for (ShortestPath p: listShortestPaths) {
-            System.out.println(p.getStartAddress().getId() + " -> " +
-                    p.getEndAddress().getId());
+            intm = p.getStartAddress().getId();
+            System.out.print( intm );
+            for(Segment s : p.getListSegments()){
+                System.out.print(" -> " );
+                intm = s.getDestination().getId();
+                System.out.print( intm );
+            }
+            System.out.println();
         }
 
-*/
+
         notifyObservers();
     }
 
