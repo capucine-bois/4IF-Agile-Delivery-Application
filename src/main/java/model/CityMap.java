@@ -49,7 +49,22 @@ public class CityMap extends Observable {
     public List<Intersection> getIntersections() {
         return intersections;
     }
-    /* SETTERS */
+
+    /**
+     * Check if two citymaps have the same attributes
+     * @param o the object to compare
+     * @return whether they have the same attributes or not
+     */
+    public boolean equals(Object o) {
+        boolean check;
+        if (o instanceof CityMap) {
+            CityMap c = (CityMap) o;
+            check = c.getIntersections().equals(this.getIntersections());
+        } else {
+            check = false;
+        }
+        return check;
+    }
 
 
 }

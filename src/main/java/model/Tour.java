@@ -395,4 +395,24 @@ public class Tour extends Observable {
 
 
     }
+
+    /**
+     * Check if two tours have the same attributes
+     * @param o the object to compare
+     * @return whether they have the same attributes or not
+     */
+    public boolean equals(Object o) {
+        boolean check;
+        if (o instanceof Tour) {
+            Tour t = (Tour) o;
+            check = t.getDepotAddress().equals(this.getDepotAddress()) &&
+                    t.getTourLength() == this.getTourLength() &&
+                    t.getDepartureTime() == this.getDepartureTime() &&
+                    t.getPlanningRequests().equals(this.getPlanningRequests()) &&
+                    t.getListShortestPaths().equals(this.getListShortestPaths());
+        } else {
+            check = false;
+        }
+        return check;
+    }
 }

@@ -93,4 +93,23 @@ public class Segment {
     public void setOrigin(Intersection origin) {
         this.origin = origin;
     }
+
+    /**
+     * Check if two segments have the same attributes
+     * @param o the object to compare
+     * @return whether they have the same attributes or not
+     */
+    public boolean equals(Object o) {
+        boolean check;
+        if (o instanceof Segment) {
+            Segment s = (Segment) o;
+            check = s.getDestination().equals(this.getDestination()) &&
+                    s.getOrigin().equals(this.getOrigin()) &&
+                    s.getLength() == this.getLength() &&
+                    s.getName().equals(this.getName());
+        } else {
+            check = false;
+        }
+        return check;
+    }
 }
