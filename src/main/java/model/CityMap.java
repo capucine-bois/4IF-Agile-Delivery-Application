@@ -16,7 +16,7 @@ public class CityMap extends Observable {
     /* ATTRIBUTES */
 
     /**
-     * Map linking intersections and segments they are part of.
+     * List of all intersections.
      */
     private List<Intersection> intersections;
 
