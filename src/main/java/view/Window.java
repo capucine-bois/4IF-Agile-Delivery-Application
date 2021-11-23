@@ -24,7 +24,7 @@ public class Window extends JFrame implements ComponentListener {
     private JPanel header;
     private GraphicalView graphicalView;
     private TextualView textualView;
-    private ErrorView errorView;
+    private PopUpView popUpView;
     private CityMap cityMap;
     private Tour tour;
 
@@ -48,12 +48,12 @@ public class Window extends JFrame implements ComponentListener {
      * @throws FontFormatException raised if text font can't be loaded
      */
     public Window(CityMap cityMap, Tour tour, Controller controller) throws IOException, FontFormatException {
-        createHeader(controller);
         graphicalView = new GraphicalView(cityMap, tour, this);
         textualView = new TextualView(tour, this, controller);
-        errorView = new ErrorView(this);
+        popUpView = new PopUpView(this);
         this.cityMap = cityMap;
         this.tour = tour;
+        createHeader(controller);
         setMinimumSize(new Dimension(windowWidth, windowHeight));
         setWindowSize();
         setVisible(true);
@@ -73,7 +73,7 @@ public class Window extends JFrame implements ComponentListener {
         header.setLayout(headerLayout);
         header.setBackground(Constants.COLOR_1);
         addAppName();
-        buttonListener = new ButtonListener(controller);
+        buttonListener = new ButtonListener(controller, this);
         buttons = new ArrayList<>();
         for (String text : buttonTexts){
             JButton button = new JButton(text);
@@ -83,7 +83,7 @@ public class Window extends JFrame implements ComponentListener {
             header.add(button);
         }
         getContentPane().add(header, BorderLayout.PAGE_START);
-        resetDefaultButtonStates();
+        resetComponentsState();
     }
 
     /**
@@ -134,27 +134,31 @@ public class Window extends JFrame implements ComponentListener {
      * @param message error message
      */
     public void displayErrorMessage(String message) {
-        setButtonsState(false);
-        errorView.showError(message);
+        disableElements();
+        popUpView.showError(message);
     }
 
     /**
      * Reset buttons state corresponding to current state.
      */
-    public void resetDefaultButtonStates() {
+    public void resetComponentsState() {
+        // buttons
         for (int i=0; i<defaultButtonStates.length; i++) {
             buttons.get(i).setEnabled(defaultButtonStates[i]);
         }
+        // city map zoom
+        graphicalView.setCanZoom(true);
     }
 
     /**
-     * Set state (enable or disable) to all the buttons.
-     * @param state new state of the buttons
+     * Disable buttons and graphical view
      */
-    public void setButtonsState(boolean state) {
+    public void disableElements() {
+        // disable buttons
         for (JButton b : buttons) {
-            b.setEnabled(state);
+            b.setEnabled(false);
         }
+        graphicalView.setCanZoom(false);
     }
 
     /**
@@ -203,4 +207,15 @@ public class Window extends JFrame implements ComponentListener {
     public void setDefaultButtonStates(boolean[] defaultButtonStates) {
         this.defaultButtonStates = defaultButtonStates;
     }
+
+    public void showLoader() {
+        this.disableElements();
+        this.popUpView.showLoader();
+    }
+
+    public void hideLoader() {
+        this.resetComponentsState();
+        this.popUpView.hideLoader();
+    }
+
 }

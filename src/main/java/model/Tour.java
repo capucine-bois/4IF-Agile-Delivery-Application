@@ -180,20 +180,9 @@ public class Tour extends Observable {
             } else {
                 listNodes.add(0,new Node(depotAddress,shortestPathsFromStartPoint,0));
             }
-            /*System.out.println("###id " + startPoint.getId());
-            for(ShortestPath sp : shortestPathsFromStartPoint){
-                for(Segment s : sp.getListSegments()){
-                    System.out.print(s.getDestination().getId() + "    " + s.getName() + "    ");
-                }
-                System.out.println("----------------------------");
-            }*/
         }
 
 
-
-        for(Node noeuuud : listNodes) {
-            System.out.println(noeuuud.getIntersection().getId() + "    " + noeuuud.getNumber());
-        }
 
         // Run Tour
         TSP tsp = new TSP1();
@@ -208,7 +197,6 @@ public class Tour extends Observable {
             System.out.print(intersectionsOrder[i] + "  ");
         }
         System.out.println("0");
-
 
         Intersection previous = null;
         for (Integer index: intersectionsOrder) {
@@ -233,9 +221,13 @@ public class Tour extends Observable {
                 listShortestPaths.add(p);
         }
 
+
+        /*
         // print order
         long intm;
         for (ShortestPath p: listShortestPaths) {
+            System.out.println(p.getStartAddress().getId() + " -> " +
+                    p.getEndAddress().getId());
             intm = p.getStartAddress().getId();
             System.out.print( intm );
             for(Segment s : p.getListSegments()){
@@ -245,8 +237,7 @@ public class Tour extends Observable {
             }
             System.out.println();
         }
-
-
+        */
         notifyObservers();
     }
 
