@@ -5,9 +5,27 @@ package model;
  * It has a length in meters, and a name (for example, “Rue de l’Arc-en-Ciel").
  */
 public class Segment {
+
+    /* ATTRIBUTES */
+
+    /**
+     * The length of the segment
+     */
     private double length;
+
+    /**
+     * The segment's name
+     */
     private String name;
+
+    /**
+     * The intersection where the segment ends
+     */
     private Intersection destination;
+
+    /**
+     * The intersection where the segment starts
+     */
     private Intersection origin;
 
     /* CONSTRUCTORS */
@@ -28,68 +46,36 @@ public class Segment {
 
     /* GETTERS */
 
-    /**
-     * Getter for length attribute
-     * @return length
-     */
     public double getLength() {
         return length;
     }
 
-    /**
-     * Getter for name attribute
-     * @return name
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * Getter for destination attribute
-     * @return destination
-     */
     public Intersection getDestination() {
         return destination;
     }
 
-    /**
-     * Getter for origin attribute
-     * @return origin
-     */
     public Intersection getOrigin() {
         return origin;
     }
 
     /* SETTERS */
 
-    /**
-     * Setter for length attribute
-     * @param length new value wanted to length attribute
-     */
     public void setLength(double length) {
         this.length = length;
     }
 
-    /**
-     * Setter for name attribute
-     * @param name new value wanted for name attribute
-     */
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * Setter for destination attribute
-     * @param destination new value wanted for destination attribute
-     */
     public void setDestination(Intersection destination) {
         this.destination = destination;
     }
 
-    /**
-     * Setter for origin attribute
-     * @param origin new value wanted for origin attribute
-     */
     public void setOrigin(Intersection origin) {
         this.origin = origin;
     }

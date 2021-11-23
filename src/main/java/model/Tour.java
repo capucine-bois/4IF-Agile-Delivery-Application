@@ -16,10 +16,29 @@ public class Tour extends Observable {
 
     /* ATTRIBUTES */
 
+    /**
+     * The total length of the tour
+     */
     private double tourLength;
+
+    /**
+     * The intersection corresponding to the depot
+     */
     private Intersection depotAddress;
+
+    /**
+     * The time of starting for the tour
+     */
     private String departureTime;
+
+    /**
+     * All requests the tour need to cover
+     */
     private ArrayList<Request> planningRequests;
+
+    /**
+     * A list of shortest path which is used to print the best path
+     */
     private ArrayList<ShortestPath> listShortestPaths;
 
     /* CONSTRUCTORS */

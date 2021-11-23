@@ -11,9 +11,24 @@ public class ShortestPath {
 
     /* ATTRIBUTES */
 
+    /**
+     * The length of the shortes path
+     */
     private double pathLength;
+
+    /**
+     * The list of all segments needed by this path
+     */
     private ArrayList<Segment> listSegments;
+
+    /**
+     * The start intersection
+     */
     private Intersection startAddress;
+
+    /**
+     * The end intersection
+     */
     private Intersection endAddress;
 
     /* CONSTRUCTORS */
@@ -34,68 +49,36 @@ public class ShortestPath {
 
     /* GETTERS */
 
-    /**
-     * Getter for pathLength attribute
-     * @return path length
-     */
     public double getPathLength() {
         return pathLength;
     }
 
-    /**
-     * Getter for listSegments attribute
-     * @return list of segments
-     */
     public ArrayList<Segment> getListSegments() {
         return listSegments;
     }
 
-    /**
-     * Getter for startAddress attribute
-     * @return start address
-     */
     public Intersection getStartAddress() {
         return startAddress;
     }
 
-    /**
-     * Getter for endAddress attribute
-     * @return end address
-     */
     public Intersection getEndAddress() {
         return endAddress;
     }
 
     /* SETTERS */
 
-    /**
-     * Setter for pathLength attribute
-     * @param pathLength wanted value for pathLength attribute
-     */
     public void setPathLength(double pathLength) {
         this.pathLength = pathLength;
     }
 
-    /**
-     * Setter for listSegments attribute
-     * @param listSegments wanted value for listSegments attribute
-     */
     public void setListSegments(ArrayList<Segment> listSegments) {
         this.listSegments = listSegments;
     }
 
-    /**
-     * Setter for startAddress attribute
-     * @param startAddress wanted value for startAddress attribute
-     */
     public void setStartAddress(Intersection startAddress) {
         this.startAddress = startAddress;
     }
 
-    /**
-     * Setter for endAddress attribute
-     * @param endAddress wanted value for endAddress attribute
-     */
     public void setEndAddress(Intersection endAddress) {
         this.endAddress = endAddress;
     }
