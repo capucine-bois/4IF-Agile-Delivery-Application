@@ -83,9 +83,11 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         if (!tour.getPlanningRequests().isEmpty()) {
             createRequestsScrollPane();
             requestsHeader.setEnabled(true);
+            changeButton(tourHeader, requestsHeader);
             if (!tour.getListShortestPaths().isEmpty()) {
                 createTourScrollPane();
                 tourHeader.setEnabled(true);
+                changeButton(requestsHeader, tourHeader);
                 cardLayout.next(cardLayoutPanel);
             }
         }
@@ -296,10 +298,19 @@ public class TextualView extends JPanel implements Observer, ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == requestsHeader) {
+        if (e.getSource() == requestsHeader && requestsHeader.getBorder() == BorderFactory.createEmptyBorder()) {
+            changeButton(tourHeader, requestsHeader);
             cardLayout.previous(cardLayoutPanel);
-        } else if (e.getSource() == tourHeader) {
+        } else if (e.getSource() == tourHeader && tourHeader.getBorder() == BorderFactory.createEmptyBorder()) {
+            changeButton(requestsHeader, tourHeader);
             cardLayout.next(cardLayoutPanel);
         }
+    }
+
+    private void changeButton(JButton previousButton, JButton nextButton) {
+        nextButton.setBorder(BorderFactory.createMatteBorder(0,0,5,0,Constants.COLOR_3));
+        nextButton.setBackground(Constants.COLOR_4);
+        previousButton.setBorder(BorderFactory.createEmptyBorder());
+        previousButton.setBackground(Constants.COLOR_2);
     }
 }
