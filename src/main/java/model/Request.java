@@ -30,9 +30,9 @@ public class Request {
     private Intersection deliveryAddress;
 
     /**
-     * The visibility of the request.
+     * The selected state of the request.
      */
-    private boolean visible;
+    private boolean selected;
 
     /* CONSTRUCTORS */
 
@@ -48,7 +48,7 @@ public class Request {
         this.deliveryDuration = deliveryDuration;
         this.pickupAddress = pickupAddress;
         this.deliveryAddress = deliveryAddress;
-        this.visible=true;
+        this.selected = false;
     }
 
     /* GETTERS */
@@ -83,6 +83,14 @@ public class Request {
      */
     public Intersection getDeliveryAddress() {
         return deliveryAddress;
+    }
+
+    /**
+     * Getter for selection attribute
+     * @return selected state
+     */
+    public boolean isSelected() {
+        return selected;
     }
 
     /* SETTERS */
@@ -120,10 +128,10 @@ public class Request {
     }
 
     /**
-     * Setter for visible attribute
-     * @param visible new visibility (true or false)
+     * Setter for selection attribute
+     * @param selected new selected state (true or false)
      */
-    public void setVisible(boolean visible) { this.visible = visible; }
+    public void setSelected(boolean selected) { this.selected = selected; }
 
     /**
      * Check if two requests have the same attributes

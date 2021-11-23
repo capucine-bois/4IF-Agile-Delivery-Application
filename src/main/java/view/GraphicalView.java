@@ -11,7 +11,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.*;
 import java.util.List;
 
 /**
@@ -30,6 +29,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     private int originY = allBorders;
     private CityMap cityMap;
     private Tour tour;
+    private boolean canZoom = true;
 
     /**
      * Create the graphical view
@@ -110,7 +110,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
                 int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setColor(Constants.COLOR_6);
-                g2.setStroke(new BasicStroke(scale + 2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
+                g2.setStroke(new BasicStroke(scale + 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                 g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
             }
         }
@@ -128,21 +128,50 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
             }
         }
 
+        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+            for (Segment segment : shortestPath.getListSegments()) {
+                int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
+                int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
+                int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
+                int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(Constants.COLOR_8);
+                g2.setStroke(new BasicStroke(scale + 4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+            }
+        }
+
+        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+            for (Segment segment : shortestPath.getListSegments()) {
+                int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
+                int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
+                int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
+                int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(Constants.COLOR_9);
+                g2.setStroke(new BasicStroke(scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+            }
+        }
+
         if (!tour.getPlanningRequests().isEmpty()) {
             float[] hsv = new float[3];
             Color initialColor = Color.red;
             Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
             double goldenRatioConjugate = 0.618033988749895;
+            boolean oneRequestSelected = tour.getPlanningRequests().stream().anyMatch(Request::isSelected);
             for (Request request : tour.getPlanningRequests()) {
-                Intersection pickupAddress = request.getPickupAddress();
-                int pickupCoordinateX = getCoordinateX(pickupAddress, minLongitude, width, longitudeLength);
-                int pickupCoordinateY = getCoordinateY(pickupAddress, minLatitude, height, latitudeLength);
-                Intersection deliveryAddress = request.getDeliveryAddress();
-                int deliveryCoordinateX = getCoordinateX(deliveryAddress, minLongitude, width, longitudeLength);
-                int deliveryCoordinateY = getCoordinateY(deliveryAddress, minLatitude, height, latitudeLength);
-                Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
-                drawIcon(requestColor, pickupCoordinateX, pickupCoordinateY, "pickup-icon.png");
-                drawIcon(requestColor, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
+                if (!oneRequestSelected || request.isSelected()) {
+                    Intersection pickupAddress = request.getPickupAddress();
+                    int pickupCoordinateX = getCoordinateX(pickupAddress, minLongitude, width, longitudeLength);
+                    int pickupCoordinateY = getCoordinateY(pickupAddress, minLatitude, height, latitudeLength);
+                    Intersection deliveryAddress = request.getDeliveryAddress();
+                    int deliveryCoordinateX = getCoordinateX(deliveryAddress, minLongitude, width, longitudeLength);
+                    int deliveryCoordinateY = getCoordinateY(deliveryAddress, minLatitude, height, latitudeLength);
+                    Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
+                    drawIcon(requestColor, pickupCoordinateX, pickupCoordinateY, "pickup-icon.png");
+                    drawIcon(requestColor, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
+                }
                 hsv[0] += goldenRatioConjugate;
                 hsv[0] %= 1;
             }
@@ -228,20 +257,26 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
      */
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        int zoomCoefficient = 2;
-        int zoomBorders = allBorders - fakeBorder;
-        if (e.getX() > zoomBorders && e.getX() < g.getClipBounds().width - zoomBorders && e.getY() > zoomBorders && e.getY() < g.getClipBounds().height - zoomBorders) {
-            if ((e.getWheelRotation() < 0) && scale < 20) {
-                scale *= zoomCoefficient;
-                originX -= (e.getX() - originX) * (zoomCoefficient - 1);
-                originY -= (e.getY() - originY) * (zoomCoefficient - 1);
-                repaint();
-            } else if (e.getWheelRotation() > 0 && scale > 1) {
-                scale /= zoomCoefficient;
-                originX += (e.getX() - originX) - (e.getX() - originX) / zoomCoefficient;
-                originY += (e.getY() - originY) - (e.getY() - originY) / zoomCoefficient;
-                repaint();
+        if (canZoom) {
+            int zoomCoefficient = 2;
+            int zoomBorders = allBorders - fakeBorder;
+            if (e.getX() > zoomBorders && e.getX() < g.getClipBounds().width - zoomBorders && e.getY() > zoomBorders && e.getY() < g.getClipBounds().height - zoomBorders) {
+                if ((e.getWheelRotation() < 0) && scale < 20) {
+                    scale *= zoomCoefficient;
+                    originX -= (e.getX() - originX) * (zoomCoefficient - 1);
+                    originY -= (e.getY() - originY) * (zoomCoefficient - 1);
+                    repaint();
+                } else if (e.getWheelRotation() > 0 && scale > 1) {
+                    scale /= zoomCoefficient;
+                    originX += (e.getX() - originX) - (e.getX() - originX) / zoomCoefficient;
+                    originY += (e.getY() - originY) - (e.getY() - originY) / zoomCoefficient;
+                    repaint();
+                }
             }
         }
+    }
+
+    public void setCanZoom(boolean canZoom) {
+        this.canZoom = canZoom;
     }
 }

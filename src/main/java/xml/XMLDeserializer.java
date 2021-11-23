@@ -22,14 +22,13 @@ public class XMLDeserializer {
      * @param cityMap structure to fill
      * @throws Exception raised if file can't be loaded
      */
-    public static void load(CityMap cityMap) throws Exception {
+    public static void loadMap(CityMap cityMap) throws Exception {
         File file = XMLFileOpener.getInstance().open(true);
         Document document = extractDocument(file);
         Element racine = document.getDocumentElement();
         if (racine.getNodeName().equals("map")) {
             cityMap.getIntersections().clear();
             deserializeMap(cityMap, document);
-            cityMap.notifyObservers();
         } else {
             throw new ExceptionXML("Bad document");
         }
@@ -43,14 +42,13 @@ public class XMLDeserializer {
      * @param cityMap city map where the tour takes place
      * @throws Exception raised if file can't be loaded or if incoherence is caught
      */
-    public static void load(Tour tour, CityMap cityMap) throws Exception {
+    public static void loadRequests(Tour tour, CityMap cityMap) throws Exception {
         File file = XMLFileOpener.getInstance().open(true);
         Document document = extractDocument(file);
         Element racine = document.getDocumentElement();
         if (racine.getNodeName().equals("planningRequest")) {
-            tour.getPlanningRequests().clear();
+            tour.clearLists();
             deserializeRequests(tour, cityMap, document);
-            tour.notifyObservers();
         } else {
             throw new ExceptionXML("Bad document");
         }

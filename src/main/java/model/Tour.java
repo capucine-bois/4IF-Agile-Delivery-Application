@@ -138,6 +138,14 @@ public class Tour extends Observable {
     }
 
     /**
+     * Clear lists in tour
+     */
+    public void clearLists() {
+        planningRequests.clear();
+        listShortestPaths.clear();
+    }
+
+    /**
      * Method which calls dijkstra and then the TSP method
      * @param adjacenceMap the map with all intersections and the segments starting from this intersections
      */
@@ -174,10 +182,6 @@ public class Tour extends Observable {
         }
 
 
-
-        for(Node noeuuud : listNodes) {
-            System.out.println(noeuuud.getIntersection().getId() + "    " + noeuuud.getNumber());
-        }
 
         // Run Tour
         TSP tsp = new TSP1();
@@ -218,9 +222,18 @@ public class Tour extends Observable {
         }
 
         // print order
+        long intm;
         for (ShortestPath p: listShortestPaths) {
             System.out.println(p.getStartAddress().getId() + " -> " +
                     p.getEndAddress().getId());
+            intm = p.getStartAddress().getId();
+            System.out.print( intm );
+            for(Segment s : p.getListSegments()){
+                System.out.print(" -> " );
+                intm = s.getDestination().getId();
+                System.out.print( intm );
+            }
+            System.out.println();
         }
 
 */
