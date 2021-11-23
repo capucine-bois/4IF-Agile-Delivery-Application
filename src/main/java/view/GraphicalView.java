@@ -7,17 +7,17 @@ import observer.Observer;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
+import java.awt.event.*;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.util.List;
 
 /**
  * Graphical element on the GUI.
  * Used to display map and tour (with their segments).
  */
-public class GraphicalView extends JPanel implements Observer, MouseWheelListener {
+public class GraphicalView extends JPanel implements Observer, MouseWheelListener, MouseListener, MouseMotionListener {
 
     private Graphics g;
     private final int firstBorder = 10;
@@ -30,6 +30,8 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     private CityMap cityMap;
     private Tour tour;
     private boolean canZoom = true;
+    private int previousMouseX;
+    private int previousMouseY;
 
     /**
      * Create the graphical view
@@ -46,6 +48,8 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         this.cityMap = cityMap;
         this.tour = tour;
         addMouseWheelListener(this);
+        addMouseListener(this);
+        addMouseMotionListener(this);
     }
 
     /**
@@ -277,5 +281,45 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
 
     public void setCanZoom(boolean canZoom) {
         this.canZoom = canZoom;
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        previousMouseX = e.getX();
+        previousMouseY = e.getY();
+        setCursor(new Cursor(Cursor.MOVE_CURSOR));
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        originX += e.getX() - previousMouseX;
+        originY += e.getY() - previousMouseY;
+        previousMouseX = e.getX();
+        previousMouseY = e.getY();
+        repaint();
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
     }
 }
