@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<map>
+<intersection id="1" latitude="45.75406" longitude="4.857418"/>
+<intersection id="2" latitude="45.750404" longitude="4.8744674"/>
+<intersection id="3" latitude="45.75871" longitude="4.8704023"/>
+<intersection id="4" latitude="45.75171" longitude="4.871819"/>
+<intersection id="5" latitude="45.750896" longitude="4.859119"/>
+<intersection id="6" latitude="45.75159" longitude="4.8700043"/>
+<segment destination="1" length="75" name="Rue du Dauphiné" origin="6"/>
+<segment destination="6" length="75" name="Rue du Dauphiné" origin="1"/>
+<segment destination="6" length="77" name="Rue du Dauphiné" origin="2"/>
+<segment destination="2" length="77" name="Rue du Dauphiné" origin="6"/>
+<segment destination="4" length="68" name="Rue de Domrémy" origin="6"/>
+<segment destination="6" length="68" name="Rue de Domrémy" origin="4"/>
+<segment destination="5" length="9" name="Rue de Domrémy" origin="6"/>
+<segment destination="6" length="9" name="Rue de Domrémy" origin="5"/>
+<segment destination="4" length="16" name="Cours Albert Thomas" origin="2"/>
+<segment destination="2" length="16" name="Cours Albert Thomas" origin="4"/>
+<segment destination="5" length="118" name="Boulevard Vivier-Merle" origin="3"/>
+<segment destination="3" length="118" name="Boulevard Vivier-Merle" origin="5"/>
+</map>
