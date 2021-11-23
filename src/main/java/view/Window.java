@@ -48,12 +48,12 @@ public class Window extends JFrame implements ComponentListener {
      * @throws FontFormatException raised if text font can't be loaded
      */
     public Window(CityMap cityMap, Tour tour, Controller controller) throws IOException, FontFormatException {
-        createHeader(controller);
         graphicalView = new GraphicalView(cityMap, tour, this);
         textualView = new TextualView(tour, this, controller);
         errorView = new ErrorView(this);
         this.cityMap = cityMap;
         this.tour = tour;
+        createHeader(controller);
         setMinimumSize(new Dimension(windowWidth, windowHeight));
         setWindowSize();
         setVisible(true);
@@ -134,7 +134,7 @@ public class Window extends JFrame implements ComponentListener {
      * @param message error message
      */
     public void displayErrorMessage(String message) {
-        setButtonsState(false);
+        disableElements();
         errorView.showError(message);
     }
 
@@ -142,19 +142,23 @@ public class Window extends JFrame implements ComponentListener {
      * Reset buttons state corresponding to current state.
      */
     public void resetDefaultButtonStates() {
+        // buttons
         for (int i=0; i<defaultButtonStates.length; i++) {
             buttons.get(i).setEnabled(defaultButtonStates[i]);
         }
+        // city map zoom
+        graphicalView.setCanZoom(true);
     }
 
     /**
-     * Set state (enable or disable) to all the buttons.
-     * @param state new state of the buttons
+     * Disable buttons and graphical view
      */
-    public void setButtonsState(boolean state) {
+    public void disableElements() {
+        // disable buttons
         for (JButton b : buttons) {
-            b.setEnabled(state);
+            b.setEnabled(false);
         }
+        graphicalView.setCanZoom(false);
     }
 
     /**

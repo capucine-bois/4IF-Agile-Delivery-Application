@@ -29,6 +29,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     private int originY = allBorders;
     private CityMap cityMap;
     private Tour tour;
+    private boolean canZoom = true;
 
     /**
      * Create the graphical view
@@ -256,20 +257,26 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
      */
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        int zoomCoefficient = 2;
-        int zoomBorders = allBorders - fakeBorder;
-        if (e.getX() > zoomBorders && e.getX() < g.getClipBounds().width - zoomBorders && e.getY() > zoomBorders && e.getY() < g.getClipBounds().height - zoomBorders) {
-            if ((e.getWheelRotation() < 0) && scale < 20) {
-                scale *= zoomCoefficient;
-                originX -= (e.getX() - originX) * (zoomCoefficient - 1);
-                originY -= (e.getY() - originY) * (zoomCoefficient - 1);
-                repaint();
-            } else if (e.getWheelRotation() > 0 && scale > 1) {
-                scale /= zoomCoefficient;
-                originX += (e.getX() - originX) - (e.getX() - originX) / zoomCoefficient;
-                originY += (e.getY() - originY) - (e.getY() - originY) / zoomCoefficient;
-                repaint();
+        if (canZoom) {
+            int zoomCoefficient = 2;
+            int zoomBorders = allBorders - fakeBorder;
+            if (e.getX() > zoomBorders && e.getX() < g.getClipBounds().width - zoomBorders && e.getY() > zoomBorders && e.getY() < g.getClipBounds().height - zoomBorders) {
+                if ((e.getWheelRotation() < 0) && scale < 20) {
+                    scale *= zoomCoefficient;
+                    originX -= (e.getX() - originX) * (zoomCoefficient - 1);
+                    originY -= (e.getY() - originY) * (zoomCoefficient - 1);
+                    repaint();
+                } else if (e.getWheelRotation() > 0 && scale > 1) {
+                    scale /= zoomCoefficient;
+                    originX += (e.getX() - originX) - (e.getX() - originX) / zoomCoefficient;
+                    originY += (e.getY() - originY) - (e.getY() - originY) / zoomCoefficient;
+                    repaint();
+                }
             }
         }
+    }
+
+    public void setCanZoom(boolean canZoom) {
+        this.canZoom = canZoom;
     }
 }
