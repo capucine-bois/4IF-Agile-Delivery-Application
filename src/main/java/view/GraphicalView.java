@@ -154,10 +154,6 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         }
 
         if (!tour.getPlanningRequests().isEmpty()) {
-            float[] hsv = new float[3];
-            Color initialColor = Color.red;
-            Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
-            double goldenRatioConjugate = 0.618033988749895;
             boolean oneRequestSelected = tour.getPlanningRequests().stream().anyMatch(Request::isSelected);
             for (Request request : tour.getPlanningRequests()) {
                 if (!oneRequestSelected || request.isSelected()) {
@@ -167,12 +163,9 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
                     Intersection deliveryAddress = request.getDeliveryAddress();
                     int deliveryCoordinateX = getCoordinateX(deliveryAddress, minLongitude, width, longitudeLength);
                     int deliveryCoordinateY = getCoordinateY(deliveryAddress, minLatitude, height, latitudeLength);
-                    Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
-                    drawIcon(requestColor, pickupCoordinateX, pickupCoordinateY, "pickup-icon.png");
-                    drawIcon(requestColor, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
+                    drawIcon(request.getColor(), pickupCoordinateX, pickupCoordinateY, "pickup-icon.png");
+                    drawIcon(request.getColor(), deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
                 }
-                hsv[0] += goldenRatioConjugate;
-                hsv[0] %= 1;
             }
             int depotCoordinateX = getCoordinateX(tour.getDepotAddress(), minLongitude, width, longitudeLength);
             int depotCoordinateY = getCoordinateY(tour.getDepotAddress(), minLatitude, height, latitudeLength);

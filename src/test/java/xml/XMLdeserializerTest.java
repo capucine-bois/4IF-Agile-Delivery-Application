@@ -9,6 +9,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -75,8 +76,8 @@ public class XMLdeserializerTest {
             this.cityMap.addIntersection(intersection);
         }
         this.listRequest =  new ArrayList<>();
-        this.listRequest.add(new Request(0,600,listIntersection.get(0),listIntersection.get(1)));
-        this.listRequest.add(new Request(600,120,listIntersection.get(3),listIntersection.get(6)));
+        this.listRequest.add(new Request(0,600,listIntersection.get(0),listIntersection.get(1), Color.blue));
+        this.listRequest.add(new Request(600,120,listIntersection.get(3),listIntersection.get(6), Color.red));
     }
 
 

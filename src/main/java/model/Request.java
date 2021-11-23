@@ -1,5 +1,7 @@
 package model;
 
+import java.awt.*;
+
 /**
  * A request represents pickup and delivery (both at the same time).
  * A request has a pickup address (where to get the package), and a delivery address (where to deliver the package).
@@ -34,6 +36,11 @@ public class Request {
      */
     private boolean selected;
 
+    /**
+     * The color of the request.
+     */
+    private Color color;
+
     /* CONSTRUCTORS */
 
     /**
@@ -42,13 +49,15 @@ public class Request {
      * @param deliveryDuration duration for delivery action
      * @param pickupAddress address of pickup point
      * @param deliveryAddress address of delivery point
+     * @param color color of the request
      */
-    public Request(int pickupDuration, int deliveryDuration, Intersection pickupAddress, Intersection deliveryAddress) {
+    public Request(int pickupDuration, int deliveryDuration, Intersection pickupAddress, Intersection deliveryAddress, Color color) {
         this.pickupDuration = pickupDuration;
         this.deliveryDuration = deliveryDuration;
         this.pickupAddress = pickupAddress;
         this.deliveryAddress = deliveryAddress;
         this.selected = false;
+        this.color = color;
     }
 
     /* GETTERS */
@@ -93,6 +102,14 @@ public class Request {
         return selected;
     }
 
+    /**
+     * Getter for color attribute
+     * @return color
+     */
+    public Color getColor() {
+        return color;
+    }
+
     /* SETTERS */
 
     /**
@@ -132,6 +149,14 @@ public class Request {
      * @param selected new selected state (true or false)
      */
     public void setSelected(boolean selected) { this.selected = selected; }
+
+    /**
+     * Setter for color attribute
+     * @param color new color
+     */
+    public void setColor(Color color) {
+        this.color = color;
+    }
 
     /**
      * Check if two requests have the same attributes
