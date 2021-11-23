@@ -249,7 +249,7 @@ public class Tour extends Observable {
      * @param origin the intersection from we search the shortest paths
      * @return listShortestPathFromOrigin, the list of shortest paths from the origin
      */
-    private ArrayList<ShortestPath> dijkstra(List<Intersection> listIntersections, ArrayList<Intersection> listUsefulEndPoints, Intersection origin) {
+    ArrayList<ShortestPath> dijkstra(List<Intersection> listIntersections, ArrayList<Intersection> listUsefulEndPoints, Intersection origin) {
         System.out.println("ORIGIN : " + origin.getId());
         System.out.println("listIntersections");
         for(Intersection i : listIntersections){
