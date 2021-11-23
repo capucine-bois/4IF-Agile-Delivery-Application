@@ -130,6 +130,7 @@ public class TextualView extends JPanel implements Observer, ActionListener {
             displaySegments(tourMainPanel, optionalShortestPath.get().getListSegments());
         } else {
             addLine(tourMainPanel, "Total length", String.format("%.1f", tour.getTourLength() / (double) 1000) + " km", null, 14);
+            tourMainPanel.getComponent(0).setMaximumSize(new Dimension(getPreferredSize().width, 29));
             for (ShortestPath shortestPath : tour.getListShortestPaths()) {
                 displayShortestPath(tourMainPanel, shortestPath, true);
             }
@@ -165,8 +166,8 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         shortestPastHeader.add(backToTour, BorderLayout.LINE_START);
 
         displayShortestPath(shortestPastHeader, shortestPath, false);
-        shortestPastHeader.setMaximumSize(new Dimension(getPreferredSize().width, 78));
-        shortestPastHeader.setBorder(BorderFactory.createMatteBorder(0,0,10,0,Constants.COLOR_4));
+        shortestPastHeader.setMaximumSize(new Dimension(getPreferredSize().width, 78 + gap));
+        shortestPastHeader.setBorder(BorderFactory.createMatteBorder(0,0,gap,0,Constants.COLOR_4));
         shortestPastHeader.setBackground(Constants.COLOR_2);
         tourMainPanel.add(shortestPastHeader);
     }
@@ -185,6 +186,7 @@ public class TextualView extends JPanel implements Observer, ActionListener {
             segmentPanel.setBorder(new CompoundBorder(BorderFactory.createMatteBorder(0,20,0,20, Constants.COLOR_4), BorderFactory.createMatteBorder(1,0,0,0, Constants.COLOR_2)));
             addLine(segmentPanel, "", name, null, 12);
             addLine(segmentPanel, "", (int) length + " m", null, 12);
+            segmentPanel.setMaximumSize(new Dimension(getPreferredSize().width, 53));
             tourMainPanel.add(segmentPanel);
         }
     }
