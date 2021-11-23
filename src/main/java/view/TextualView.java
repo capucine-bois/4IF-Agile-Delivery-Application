@@ -33,6 +33,7 @@ public class TextualView extends JPanel implements Observer, ActionListener {
     private JButton tourHeader;
     private JLabel backToTour;
     private JPanel cardLayoutPanel;
+    private boolean segmentWasSelected = false;
 
     /**
      * Create a textual view in window
@@ -82,24 +83,31 @@ public class TextualView extends JPanel implements Observer, ActionListener {
 
     private void displayTextualView() {
         cardLayoutPanel.removeAll();
+        System.out.println(Arrays.toString(cardLayoutPanel.getComponents()));
         if (!tour.getPlanningRequests().isEmpty()) {
             createRequestsScrollPane();
             requestsHeader.setEnabled(true);
             changeButton(tourHeader, requestsHeader);
             if (!tour.getListShortestPaths().isEmpty()) {
                 createTourScrollPane();
-                if (!tourHeader.isEnabled() || tour.getListShortestPaths().stream().anyMatch(ShortestPath::isSelected)) {
+                boolean segmentIsSelected = tour.getListShortestPaths().stream().anyMatch(ShortestPath::isSelected);
+                if (!tourHeader.isEnabled() || segmentIsSelected || segmentWasSelected) {
                     changeButton(requestsHeader, tourHeader);
                     cardLayout.next(cardLayoutPanel);
                     tourHeader.setEnabled(true);
+                    segmentWasSelected = segmentIsSelected;
                 }
             } else {
                 tourHeader.setEnabled(false);
+                segmentWasSelected = false;
             }
         } else {
             requestsHeader.setEnabled(false);
+            tourHeader.setEnabled(false);
+            segmentWasSelected = false;
         }
         revalidate();
+        repaint();
     }
 
     private void createTourScrollPane() {
