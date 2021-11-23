@@ -25,6 +25,7 @@ public class Window extends JFrame implements ComponentListener {
     private GraphicalView graphicalView;
     private TextualView textualView;
     private ErrorView errorView;
+    private LoaderView loaderView;
     private CityMap cityMap;
     private Tour tour;
 
@@ -51,6 +52,7 @@ public class Window extends JFrame implements ComponentListener {
         graphicalView = new GraphicalView(cityMap, tour, this);
         textualView = new TextualView(tour, this, controller);
         errorView = new ErrorView(this);
+        loaderView = new LoaderView(this);
         this.cityMap = cityMap;
         this.tour = tour;
         createHeader(controller);
@@ -73,7 +75,7 @@ public class Window extends JFrame implements ComponentListener {
         header.setLayout(headerLayout);
         header.setBackground(Constants.COLOR_1);
         addAppName();
-        buttonListener = new ButtonListener(controller);
+        buttonListener = new ButtonListener(controller, this);
         buttons = new ArrayList<>();
         for (String text : buttonTexts){
             JButton button = new JButton(text);
@@ -83,7 +85,7 @@ public class Window extends JFrame implements ComponentListener {
             header.add(button);
         }
         getContentPane().add(header, BorderLayout.PAGE_START);
-        resetDefaultButtonStates();
+        resetComponentsState();
     }
 
     /**
@@ -141,7 +143,7 @@ public class Window extends JFrame implements ComponentListener {
     /**
      * Reset buttons state corresponding to current state.
      */
-    public void resetDefaultButtonStates() {
+    public void resetComponentsState() {
         // buttons
         for (int i=0; i<defaultButtonStates.length; i++) {
             buttons.get(i).setEnabled(defaultButtonStates[i]);
@@ -207,4 +209,15 @@ public class Window extends JFrame implements ComponentListener {
     public void setDefaultButtonStates(boolean[] defaultButtonStates) {
         this.defaultButtonStates = defaultButtonStates;
     }
+
+    public void showLoader() {
+        this.disableElements();
+        this.loaderView.setVisibility(true);
+    }
+
+    public void hideLoader() {
+        this.resetComponentsState();
+        this.loaderView.setVisibility(false);
+    }
+
 }

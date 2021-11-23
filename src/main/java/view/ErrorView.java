@@ -64,7 +64,7 @@ public class ErrorView implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == button) {
-            window.resetDefaultButtonStates();
+            window.resetComponentsState();
             errorPanel.setVisible(false);
         }
     }
