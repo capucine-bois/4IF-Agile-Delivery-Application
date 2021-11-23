@@ -16,14 +16,15 @@ public class ComputedTourState implements State {
         try {
             XMLDeserializer.loadMap(cityMap);
             controller.setCurrentState(controller.mapLoadedState);
+            tour.clearLists();
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
                 cityMap.getIntersections().clear();
+                tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
                 controller.setCurrentState(controller.initialState);
             }
         } finally {
-            tour.clearLists();
             tour.notifyObservers();
         }
     }
