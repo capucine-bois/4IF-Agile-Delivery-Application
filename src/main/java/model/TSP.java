@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * The implemeentation of TSP
+ */
 public interface TSP {
     /**
      * Search for a shortest cost hamiltonian circuit in <code>g</code> within <code>timeLimit</code> milliseconds

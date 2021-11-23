@@ -4,11 +4,34 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+/**
+ * The computing of TSP
+ */
 public abstract class TemplateTSP implements TSP {
+
+    /**
+     * A table containing the order of vertex of the best solution
+     */
     private Integer[] bestSol;
+
+    /**
+     * The graph studied
+     */
     protected Graph g;
+
+    /**
+     * The length of the solution
+     */
     private double bestSolCost;
+
+    /**
+     * The time limit before which we want a solution
+     */
     private int timeLimit;
+
+    /**
+     * The start time of computing
+     */
     private long startTime;
 
     public void searchSolution(int timeLimit, Graph g){
