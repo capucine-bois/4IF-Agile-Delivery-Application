@@ -15,6 +15,7 @@ public class ShortestPath {
     private ArrayList<Segment> listSegments;
     private Intersection startAddress;
     private Intersection endAddress;
+    private boolean selected;
 
     /* CONSTRUCTORS */
 
@@ -66,6 +67,13 @@ public class ShortestPath {
         return endAddress;
     }
 
+    /**
+     * Getter for selection attribute
+     * @return selected state
+     */
+    public boolean isSelected() {
+        return selected;
+    }
     /* SETTERS */
 
     /**
@@ -98,6 +106,14 @@ public class ShortestPath {
      */
     public void setEndAddress(Intersection endAddress) {
         this.endAddress = endAddress;
+    }
+
+    /**
+     * Setter for selection attribute
+     * @param selected wanted value for selected state
+     */
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     /**

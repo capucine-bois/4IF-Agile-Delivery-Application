@@ -1,6 +1,7 @@
 package view;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,10 +26,12 @@ public class TextualView extends JPanel implements Observer, ActionListener {
     private final int border = 10;
     private MouseListener mouseListener;
     private List<JPanel> requestPanels;
+    private List<JPanel> shortestPathsPanels;
     private CardLayout cardLayout;
     private Window window;
     private JButton requestsHeader;
     private JButton tourHeader;
+    private JLabel backToTour;
     private JPanel cardLayoutPanel;
 
     /**
@@ -43,6 +46,7 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         tour.addObserver(this);
         this.tour = tour;
         requestPanels = new ArrayList<>();
+        shortestPathsPanels = new ArrayList<>();
         mouseListener = new MouseListener(controller, this);
         this.window = w;
         createHeader();
@@ -84,7 +88,7 @@ public class TextualView extends JPanel implements Observer, ActionListener {
             changeButton(tourHeader, requestsHeader);
             if (!tour.getListShortestPaths().isEmpty()) {
                 createTourScrollPane();
-                if (!tourHeader.isEnabled()) {
+                if (!tourHeader.isEnabled() || tour.getListShortestPaths().stream().anyMatch(ShortestPath::isSelected)) {
                     changeButton(requestsHeader, tourHeader);
                     cardLayout.next(cardLayoutPanel);
                     tourHeader.setEnabled(true);
@@ -112,22 +116,62 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         tourMainPanel.setLayout(new BoxLayout(tourMainPanel, BoxLayout.Y_AXIS));
         tourMainPanel.setBorder(BorderFactory.createMatteBorder(gap,0,gap,0,Constants.COLOR_4));
         tourMainPanel.setBackground(Constants.COLOR_4);
-        displayShortestPaths(tourMainPanel);
+        shortestPathsPanels.clear();
+        Optional<ShortestPath> optionalShortestPath = tour.getListShortestPaths().stream().filter(ShortestPath::isSelected).findFirst();
+        if (optionalShortestPath.isPresent()) {
+            displayShortestPathHeader(tourMainPanel, optionalShortestPath.get());
+            displaySegments(tourMainPanel, optionalShortestPath.get().getListSegments());
+        } else {
+            addLine(tourMainPanel, "Total length", String.format("%.1f", tour.getTourLength() / (double) 1000) + " km", null, 14);
+            for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+                displayShortestPath(tourMainPanel, shortestPath, true);
+            }
+        }
         return tourMainPanel;
     }
 
-    private void displayShortestPaths(JPanel tourMainPanel) {
-        addLine(tourMainPanel, "Total length", String.format("%.1f", tour.getTourLength() / (double) 1000) + " km", null, 14);
-        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            Map<String, String> shortestPathInformation = new HashMap<>();
-            String startPath = findTypeIntersection(shortestPath.getStartAddress());
-            String endPath = findTypeIntersection(shortestPath.getEndAddress());
-            shortestPathInformation.put("Length", String.format("%.1f", shortestPath.getPathLength() / (double) 1000) + " km");
-            shortestPathInformation.put("From", startPath);
-            shortestPathInformation.put("To", endPath);
-            Color startColor = findColor(shortestPath.getStartAddress());
-            Color endColor = findColor(shortestPath.getEndAddress());
-            displayPathInformation(tourMainPanel, shortestPathInformation, startColor, endColor, shortestPath.getListSegments());
+    private void displayShortestPath(JPanel parentPanel, ShortestPath shortestPath, boolean addMouseEvent) {
+        Map<String, String> shortestPathInformation = new HashMap<>();
+        String startPath = findTypeIntersection(shortestPath.getStartAddress());
+        String endPath = findTypeIntersection(shortestPath.getEndAddress());
+        shortestPathInformation.put("Length", String.format("%.1f", shortestPath.getPathLength() / (double) 1000) + " km");
+        shortestPathInformation.put("From", startPath);
+        shortestPathInformation.put("To", endPath);
+        Color startColor = findColor(shortestPath.getStartAddress());
+        Color endColor = findColor(shortestPath.getEndAddress());
+        displayPathInformation(parentPanel, shortestPathInformation, startColor, endColor, addMouseEvent);
+    }
+
+    private void displayShortestPathHeader(JPanel tourMainPanel, ShortestPath shortestPath) {
+        JPanel shortestPastHeader = new JPanel();
+        shortestPastHeader.setLayout(new BorderLayout());
+
+        backToTour = new JLabel("Back");
+        backToTour.setForeground(Constants.COLOR_3);
+        try {
+            backToTour.setFont(Constants.getFont("DMSans-Bold.ttf", 12));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        backToTour.setBorder(new CompoundBorder(BorderFactory.createMatteBorder(20, 10, 20, 10, Constants.COLOR_4), BorderFactory.createMatteBorder(0,10,0,10,Constants.COLOR_2)));
+        backToTour.addMouseListener(mouseListener);
+        shortestPastHeader.add(backToTour, BorderLayout.LINE_START);
+
+        displayShortestPath(shortestPastHeader, shortestPath, false);
+        shortestPastHeader.setMaximumSize(new Dimension(getPreferredSize().width, 78));
+        shortestPastHeader.setBorder(BorderFactory.createMatteBorder(0,0,10,0,Constants.COLOR_4));
+        shortestPastHeader.setBackground(Constants.COLOR_2);
+        tourMainPanel.add(shortestPastHeader);
+    }
+
+    private void displaySegments(JPanel tourMainPanel, ArrayList<Segment> segments) {
+        for (Segment segment : segments) {
+            JPanel segmentPanel = new JPanel();
+            segmentPanel.setLayout(new BoxLayout(segmentPanel, BoxLayout.Y_AXIS));
+            segmentPanel.setBorder(new CompoundBorder(BorderFactory.createMatteBorder(0,20,0,20, Constants.COLOR_4), BorderFactory.createMatteBorder(1,0,0,0, Constants.COLOR_2)));
+            addLine(segmentPanel, "", segment.getName(), null, 12);
+            addLine(segmentPanel, "", (int) segment.getLength() + " m", null, 12);
+            tourMainPanel.add(segmentPanel);
         }
     }
 
@@ -154,7 +198,7 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         return color;
     }
 
-    private void displayPathInformation(JPanel tourMainPanel, Map<String, String> shortestPathInformation, Color startColor, Color endColor, List<Segment> segments) {
+    private void displayPathInformation(JPanel parentPanel, Map<String, String> shortestPathInformation, Color startColor, Color endColor, boolean addMouseEVent) {
         JPanel pathInformationPanel = new JPanel();
         pathInformationPanel.setLayout(new BoxLayout(pathInformationPanel, BoxLayout.Y_AXIS));
 
@@ -178,10 +222,16 @@ public class TextualView extends JPanel implements Observer, ActionListener {
             pathInformationPanel.add(contentPanel);
         }
 
-        pathInformationPanel.setBorder(BorderFactory.createMatteBorder(gap,0,0,0,Constants.COLOR_4));
         int maxLineHeight = 26;
         pathInformationPanel.setMaximumSize(new Dimension(getPreferredSize().width - colorWidth, shortestPathInformation.size()*maxLineHeight + gap));
-        tourMainPanel.add(pathInformationPanel);
+        parentPanel.add(pathInformationPanel);
+
+        if (addMouseEVent) {
+            pathInformationPanel.setBorder(BorderFactory.createMatteBorder(gap,0,0,0,Constants.COLOR_4));
+            pathInformationPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            shortestPathsPanels.add(pathInformationPanel);
+            pathInformationPanel.addMouseListener(mouseListener);
+        }
     }
 
     private void createRequestsScrollPane() {
@@ -260,7 +310,8 @@ public class TextualView extends JPanel implements Observer, ActionListener {
     private void addLine(JPanel information, String fieldName, String fieldContent, Request request, int fontSize) {
         JPanel line = new JPanel();
         line.setLayout(new FlowLayout(FlowLayout.LEFT));
-        JLabel fieldNameLabel = new JLabel(fieldName + " : ");
+        String finalFieldName = fieldName.equals("") ? "" : fieldName + " : ";
+        JLabel fieldNameLabel = new JLabel(finalFieldName);
         setLabelStyle(fieldNameLabel, "DMSans-Bold.ttf", fontSize);
         line.add(fieldNameLabel);
         JLabel fieldContentLabel = new JLabel(fieldContent);
@@ -288,6 +339,14 @@ public class TextualView extends JPanel implements Observer, ActionListener {
 
     public List<JPanel> getRequestPanels() {
         return requestPanels;
+    }
+
+    public List<JPanel> getShortestPathsPanels() {
+        return shortestPathsPanels;
+    }
+
+    public JLabel getBackToTour() {
+        return backToTour;
     }
 
     /**

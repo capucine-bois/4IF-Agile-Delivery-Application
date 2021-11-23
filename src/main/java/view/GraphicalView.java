@@ -127,29 +127,35 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
             }
         }
 
+        boolean oneShortestPathSelected = tour.getListShortestPaths().stream().anyMatch(ShortestPath::isSelected);
+
         for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            for (Segment segment : shortestPath.getListSegments()) {
-                int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
-                int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
-                int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
-                int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(Constants.COLOR_8);
-                g2.setStroke(new BasicStroke(scale + 4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+            if (!oneShortestPathSelected || shortestPath.isSelected()) {
+                for (Segment segment : shortestPath.getListSegments()) {
+                    int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
+                    int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
+                    int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
+                    int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
+                    Graphics2D g2 = (Graphics2D) g;
+                    g2.setColor(Constants.COLOR_8);
+                    g2.setStroke(new BasicStroke(scale + 4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+                }
             }
         }
 
         for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            for (Segment segment : shortestPath.getListSegments()) {
-                int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
-                int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
-                int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
-                int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(Constants.COLOR_9);
-                g2.setStroke(new BasicStroke(scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+            if (!oneShortestPathSelected || shortestPath.isSelected()) {
+                for (Segment segment : shortestPath.getListSegments()) {
+                    int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
+                    int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
+                    int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
+                    int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
+                    Graphics2D g2 = (Graphics2D) g;
+                    g2.setColor(Constants.COLOR_9);
+                    g2.setStroke(new BasicStroke(scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+                }
             }
         }
 
