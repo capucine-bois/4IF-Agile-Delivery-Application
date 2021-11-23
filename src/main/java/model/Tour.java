@@ -197,7 +197,6 @@ public class Tour extends Observable {
         }
         System.out.println("0");
 
-/*
         Intersection previous = null;
         for (Integer index: intersectionsOrder) {
             Intersection currentIntersection;
@@ -221,6 +220,8 @@ public class Tour extends Observable {
                 listShortestPaths.add(p);
         }
 
+
+        /*
         // print order
         long intm;
         for (ShortestPath p: listShortestPaths) {
@@ -235,8 +236,7 @@ public class Tour extends Observable {
             }
             System.out.println();
         }
-
-*/
+        */
         notifyObservers();
     }
 
