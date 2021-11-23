@@ -33,6 +33,7 @@ public class TextualView extends JPanel implements Observer, ActionListener {
     private JButton tourHeader;
     private JLabel backToTour;
     private JPanel cardLayoutPanel;
+    private boolean segmentWasSelected = false;
 
     /**
      * Create a textual view in window
@@ -88,18 +89,24 @@ public class TextualView extends JPanel implements Observer, ActionListener {
             changeButton(tourHeader, requestsHeader);
             if (!tour.getListShortestPaths().isEmpty()) {
                 createTourScrollPane();
-                if (!tourHeader.isEnabled() || tour.getListShortestPaths().stream().anyMatch(ShortestPath::isSelected)) {
+                boolean segmentIsSelected = tour.getListShortestPaths().stream().anyMatch(ShortestPath::isSelected);
+                if (!tourHeader.isEnabled() || segmentIsSelected || segmentWasSelected) {
                     changeButton(requestsHeader, tourHeader);
                     cardLayout.next(cardLayoutPanel);
                     tourHeader.setEnabled(true);
+                    segmentWasSelected = segmentIsSelected;
                 }
             } else {
                 tourHeader.setEnabled(false);
+                segmentWasSelected = false;
             }
         } else {
             requestsHeader.setEnabled(false);
+            tourHeader.setEnabled(false);
+            segmentWasSelected = false;
         }
         revalidate();
+        repaint();
     }
 
     private void createTourScrollPane() {
@@ -123,6 +130,7 @@ public class TextualView extends JPanel implements Observer, ActionListener {
             displaySegments(tourMainPanel, optionalShortestPath.get().getListSegments());
         } else {
             addLine(tourMainPanel, "Total length", String.format("%.1f", tour.getTourLength() / (double) 1000) + " km", null, 14);
+            tourMainPanel.getComponent(0).setMaximumSize(new Dimension(getPreferredSize().width, 29));
             for (ShortestPath shortestPath : tour.getListShortestPaths()) {
                 displayShortestPath(tourMainPanel, shortestPath, true);
             }
@@ -158,19 +166,27 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         shortestPastHeader.add(backToTour, BorderLayout.LINE_START);
 
         displayShortestPath(shortestPastHeader, shortestPath, false);
-        shortestPastHeader.setMaximumSize(new Dimension(getPreferredSize().width, 78));
-        shortestPastHeader.setBorder(BorderFactory.createMatteBorder(0,0,10,0,Constants.COLOR_4));
+        shortestPastHeader.setMaximumSize(new Dimension(getPreferredSize().width, 78 + gap));
+        shortestPastHeader.setBorder(BorderFactory.createMatteBorder(0,0,gap,0,Constants.COLOR_4));
         shortestPastHeader.setBackground(Constants.COLOR_2);
         tourMainPanel.add(shortestPastHeader);
     }
 
     private void displaySegments(JPanel tourMainPanel, ArrayList<Segment> segments) {
-        for (Segment segment : segments) {
+        for (int i = 0; i < segments.size() - 1; i++) {
+            Segment segment = segments.get(i);
+            String name = segment.getName();
+            double length = segment.getLength();
+            while (i < segments.size() - 1 && segments.get(i+1).getName().equals(name)) {
+                length += segments.get(i+1).getLength();
+                i++;
+            }
             JPanel segmentPanel = new JPanel();
             segmentPanel.setLayout(new BoxLayout(segmentPanel, BoxLayout.Y_AXIS));
             segmentPanel.setBorder(new CompoundBorder(BorderFactory.createMatteBorder(0,20,0,20, Constants.COLOR_4), BorderFactory.createMatteBorder(1,0,0,0, Constants.COLOR_2)));
-            addLine(segmentPanel, "", segment.getName(), null, 12);
-            addLine(segmentPanel, "", (int) segment.getLength() + " m", null, 12);
+            addLine(segmentPanel, "", name, null, 12);
+            addLine(segmentPanel, "", (int) length + " m", null, 12);
+            segmentPanel.setMaximumSize(new Dimension(getPreferredSize().width, 53));
             tourMainPanel.add(segmentPanel);
         }
     }
