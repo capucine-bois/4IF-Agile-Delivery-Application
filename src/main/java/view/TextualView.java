@@ -33,7 +33,8 @@ public class TextualView extends JPanel implements Observer, ActionListener {
     private JButton tourHeader;
     private JLabel backToTour;
     private JPanel cardLayoutPanel;
-    private boolean segmentWasSelected = false;
+    private JPanel requestsMainPanel;
+    private JPanel tourMainPanel;
 
     /**
      * Create a textual view in window
@@ -52,6 +53,8 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         this.window = w;
         createHeader();
         createCardLayout();
+        createRequestsPanel();
+        createTourPanel();
     }
 
     private void createHeader() throws IOException, FontFormatException {
@@ -82,44 +85,41 @@ public class TextualView extends JPanel implements Observer, ActionListener {
     }
 
     private void displayTextualView() {
-        cardLayoutPanel.removeAll();
+        requestsMainPanel.removeAll();
+        tourMainPanel.removeAll();
         if (!tour.getPlanningRequests().isEmpty()) {
-            createRequestsScrollPane();
             requestsHeader.setEnabled(true);
-            changeButton(tourHeader, requestsHeader);
+            addRequests();
             if (!tour.getListShortestPaths().isEmpty()) {
-                createTourScrollPane();
-                boolean segmentIsSelected = tour.getListShortestPaths().stream().anyMatch(ShortestPath::isSelected);
-                if (!tourHeader.isEnabled() || segmentIsSelected || segmentWasSelected) {
+                if (!tourHeader.isEnabled()) {
                     changeButton(requestsHeader, tourHeader);
-                    cardLayout.next(cardLayoutPanel);
+                    cardLayout.show(cardLayoutPanel, "tour");
                     tourHeader.setEnabled(true);
-                    segmentWasSelected = segmentIsSelected;
                 }
+                addShortestPaths();
             } else {
+                changeButton(tourHeader, requestsHeader);
+                cardLayout.show(cardLayoutPanel, "requests");
                 tourHeader.setEnabled(false);
-                segmentWasSelected = false;
             }
         } else {
             requestsHeader.setEnabled(false);
             tourHeader.setEnabled(false);
-            segmentWasSelected = false;
         }
         revalidate();
         repaint();
     }
 
-    private void createTourScrollPane() {
-        JPanel mainTourPanel = createTourMainPanel();
-        JScrollPane scrollPane = new JScrollPane(mainTourPanel);
+    private void createTourPanel() {
+        tourMainPanel = new JPanel();
+        JScrollPane scrollPane = new JScrollPane(tourMainPanel);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(null);
-        cardLayoutPanel.add(scrollPane);
+        cardLayoutPanel.add("tour", scrollPane);
     }
 
-    private JPanel createTourMainPanel() {
-        JPanel tourMainPanel = new JPanel();
+    private void addShortestPaths() {
         tourMainPanel.setLayout(new BoxLayout(tourMainPanel, BoxLayout.Y_AXIS));
         tourMainPanel.setBorder(BorderFactory.createMatteBorder(gap,0,gap,0,Constants.COLOR_4));
         tourMainPanel.setBackground(Constants.COLOR_4);
@@ -135,7 +135,6 @@ public class TextualView extends JPanel implements Observer, ActionListener {
                 displayShortestPath(tourMainPanel, shortestPath, true);
             }
         }
-        return tourMainPanel;
     }
 
     private void displayShortestPath(JPanel parentPanel, ShortestPath shortestPath, boolean addMouseEvent) {
@@ -250,23 +249,21 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         }
     }
 
-    private void createRequestsScrollPane() {
-        JPanel requestsMainPanel = createRequestsMainPanel();
+    private void createRequestsPanel() {
+        requestsMainPanel = new JPanel();
         JScrollPane scrollPane = new JScrollPane(requestsMainPanel);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(null);
-        cardLayoutPanel.add(scrollPane);
+        cardLayoutPanel.add("requests", scrollPane);
     }
 
-    private JPanel createRequestsMainPanel() {
-        JPanel requestsMainPanel = new JPanel();
+    private void addRequests() {
         requestsMainPanel.setLayout(new BoxLayout(requestsMainPanel, BoxLayout.Y_AXIS));
         requestsMainPanel.setBorder(BorderFactory.createMatteBorder(gap,0,0,0,Constants.COLOR_4));
         requestsMainPanel.setBackground(Constants.COLOR_4);
         displayDepotInformation(requestsMainPanel);
         displayRequestsInformation(requestsMainPanel);
-        return requestsMainPanel;
     }
 
     private void displayDepotInformation(JPanel mainPanel) {
@@ -381,10 +378,10 @@ public class TextualView extends JPanel implements Observer, ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == requestsHeader && requestsHeader.getBorder() == BorderFactory.createEmptyBorder()) {
             changeButton(tourHeader, requestsHeader);
-            cardLayout.previous(cardLayoutPanel);
+            cardLayout.show(cardLayoutPanel, "requests");
         } else if (e.getSource() == tourHeader && tourHeader.getBorder() == BorderFactory.createEmptyBorder()) {
             changeButton(requestsHeader, tourHeader);
-            cardLayout.next(cardLayoutPanel);
+            cardLayout.show(cardLayoutPanel, "tour");
         }
     }
 
