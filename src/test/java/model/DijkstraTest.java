@@ -100,6 +100,7 @@ public class DijkstraTest {
         //number of segments in each shortest paths
         assertEquals(2,sp1.get(0).getListSegments().size(), "Wrong number of segments in first SP for Intersection 1");
         assertEquals(2,sp1.get(1).getListSegments().size(), "Wrong number of segments in second SP for Intersection 1");
+
         //Intersection of each list of segment for first shortest path
         //first list of segments
         assertEquals(1,sp1.get(0).getListSegments().get(0).getOrigin().getId(), "Wrong id for Intersection1/SP1/SL1/EL1/ORIGIN");
@@ -130,6 +131,7 @@ public class DijkstraTest {
         assertEquals(1,sp2.get(0).getListSegments().size(), "Wrong number of segments in first SP for Intersection 2");
         assertEquals(2,sp2.get(1).getListSegments().size(), "Wrong number of segments in second SP for Intersection 2");
         assertEquals(3,sp2.get(2).getListSegments().size(), "Wrong number of segments in third SP for Intersection 2");
+
         //Intersection of each list of segment for first shortest path
         //first list of segments
         assertEquals(2,sp2.get(0).getListSegments().get(0).getOrigin().getId(), "Wrong id for Intersection2/SP1/SL1/EL1/ORIGIN");
@@ -150,6 +152,46 @@ public class DijkstraTest {
 
         //Intersection 3
         Intersection origin3 = cityMap.getIntersections().get(2);
+        ArrayList<Intersection> listUsefulEndPoints3 = new ArrayList<>();
+        for (Intersection endPoint : listUsefulPoints) {
+            if (tour.isPossiblePath(origin3, endPoint)) {
+                listUsefulEndPoints3.add(endPoint);
+            }
+        }
+
+        //original method to test
+        ArrayList<ShortestPath> sp3 = tour.dijkstra(listIntersectionsDijkstra, listUsefulEndPoints3, origin3);
+        //number of shortest paths
+        assertEquals(3,sp3.size(), "Wrong number of shortest paths for Intersection 3");
+        //number of segments in each shortest paths
+        assertEquals(1,sp3.get(0).getListSegments().size(), "Wrong number of segments in first SP for Intersection 2");
+        assertEquals(3,sp3.get(1).getListSegments().size(), "Wrong number of segments in second SP for Intersection 2");
+        assertEquals(3,sp3.get(2).getListSegments().size(), "Wrong number of segments in third SP for Intersection 2");
+
+        //Intersection of each list of segment for first shortest path
+        //first list of segments
+        assertEquals(3,sp3.get(0).getListSegments().get(0).getOrigin().getId(), "Wrong id for Intersection3/SP1/SL1/EL1/ORIGIN");
+        assertEquals(5,sp3.get(0).getListSegments().get(0).getDestination().getId(), "Wrong id for Intersection3/SP1/SL1/EL1/DESTINATION");
+        //second list of segments
+        assertEquals(3,sp3.get(1).getListSegments().get(0).getOrigin().getId(), "Wrong id for Intersection3/SP1/SL2/EL1/ORIGIN");
+        assertEquals(5,sp3.get(1).getListSegments().get(0).getDestination().getId(), "Wrong id for Intersection3/SP1/SL2/EL1/DESTINATION");
+        assertEquals(5,sp3.get(1).getListSegments().get(1).getOrigin().getId(), "Wrong id for Intersection3/SP1/SL2/EL2/ORIGIN");
+        assertEquals(6,sp3.get(1).getListSegments().get(1).getDestination().getId(), "Wrong id for Intersection3/SP1/SL2/EL2/DESTINATION");
+        assertEquals(6,sp3.get(1).getListSegments().get(2).getOrigin().getId(), "Wrong id for Intersection3/SP1/SL2/EL3/ORIGIN");
+        assertEquals(4,sp3.get(1).getListSegments().get(2).getDestination().getId(), "Wrong id for Intersection3/SP1/SL2/EL3/DESTINATION");
+        //third list of segments
+        assertEquals(3,sp3.get(2).getListSegments().get(0).getOrigin().getId(), "Wrong id for Intersection3/SP1/SL3/EL1/ORIGIN");
+        assertEquals(5,sp3.get(2).getListSegments().get(0).getDestination().getId(), "Wrong id for Intersection3/SP1/SL3/EL1/DESTINATION");
+        assertEquals(5,sp3.get(2).getListSegments().get(1).getOrigin().getId(), "Wrong id for Intersection3/SP1/SL3/EL2/ORIGIN");
+        assertEquals(6,sp3.get(2).getListSegments().get(1).getDestination().getId(), "Wrong id for Intersection3/SP1/SL3/EL2/DESTINATION");
+        assertEquals(6,sp3.get(2).getListSegments().get(2).getOrigin().getId(), "Wrong id for Intersection3/SP1/SL3/EL3/ORIGIN");
+        assertEquals(1,sp3.get(2).getListSegments().get(2).getDestination().getId(), "Wrong id for Intersection3/SP1/SL3/EL3/DESTINATION");
+
+        /*
+        3,5
+        3,5,6,4
+        3,5,6,1
+        */
 
 
         //Intersection 4
