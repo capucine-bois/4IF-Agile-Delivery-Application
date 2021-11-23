@@ -33,7 +33,7 @@ public class XMLFileOpener extends FileFilter {// Singleton
      */
     public File open(boolean read) throws ExceptionXML{
         int returnVal;
-        JFileChooser jFileChooserXML = new JFileChooser();
+        JFileChooser jFileChooserXML = new JFileChooser("src/main/resources/fichiersXML2020");
         jFileChooserXML.setFileFilter(this);
         jFileChooserXML.setFileSelectionMode(JFileChooser.FILES_ONLY);
         if (read)
