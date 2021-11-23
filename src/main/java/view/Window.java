@@ -24,8 +24,7 @@ public class Window extends JFrame implements ComponentListener {
     private JPanel header;
     private GraphicalView graphicalView;
     private TextualView textualView;
-    private ErrorView errorView;
-    private LoaderView loaderView;
+    private PopUpView popUpView;
     private CityMap cityMap;
     private Tour tour;
 
@@ -51,8 +50,7 @@ public class Window extends JFrame implements ComponentListener {
     public Window(CityMap cityMap, Tour tour, Controller controller) throws IOException, FontFormatException {
         graphicalView = new GraphicalView(cityMap, tour, this);
         textualView = new TextualView(tour, this, controller);
-        errorView = new ErrorView(this);
-        loaderView = new LoaderView(this);
+        popUpView = new PopUpView(this);
         this.cityMap = cityMap;
         this.tour = tour;
         createHeader(controller);
@@ -137,7 +135,7 @@ public class Window extends JFrame implements ComponentListener {
      */
     public void displayErrorMessage(String message) {
         disableElements();
-        errorView.showError(message);
+        popUpView.showError(message);
     }
 
     /**
@@ -212,12 +210,12 @@ public class Window extends JFrame implements ComponentListener {
 
     public void showLoader() {
         this.disableElements();
-        this.loaderView.setVisibility(true);
+        this.popUpView.showLoader();
     }
 
     public void hideLoader() {
         this.resetComponentsState();
-        this.loaderView.setVisibility(false);
+        this.popUpView.hideLoader();
     }
 
 }

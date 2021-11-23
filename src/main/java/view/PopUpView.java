@@ -9,8 +9,8 @@ import java.io.IOException;
 /**
  * Error message on the GUI
  */
-public class ErrorView implements ActionListener {
-    private final JPanel errorPanel;
+public class PopUpView implements ActionListener {
+    private final JPanel popUpPanel;
     private final JLabel message;
     private final JButton button;
     private final Window window;
@@ -21,20 +21,20 @@ public class ErrorView implements ActionListener {
      * @throws IOException raised if font file can't be found
      * @throws FontFormatException raised if font can't be loaded
      */
-    public ErrorView(Window window) throws IOException, FontFormatException {
-        errorPanel = (JPanel) window.getGlassPane();
-        errorPanel.setLayout(new BorderLayout());
+    public PopUpView(Window window) throws IOException, FontFormatException {
+        popUpPanel = (JPanel) window.getGlassPane();
+        popUpPanel.setLayout(new BorderLayout());
 
-        JPanel backgroundError = new JPanel();
-        backgroundError.setLayout(new GridBagLayout());
-        backgroundError.setBackground(new Color(0,0,0,115));
-        errorPanel.add(backgroundError);
+        JPanel backgroundPopUp = new JPanel();
+        backgroundPopUp.setLayout(new GridBagLayout());
+        backgroundPopUp.setBackground(new Color(0,0,0,115));
+        popUpPanel.add(backgroundPopUp);
 
-        JPanel error = new JPanel();
-        error.setLayout(new BorderLayout());
-        error.setPreferredSize(new Dimension(360, 180));
-        error.setBackground(Constants.COLOR_1);
-        backgroundError.add(error, new GridBagConstraints());
+        JPanel popUp = new JPanel();
+        popUp.setLayout(new BorderLayout());
+        popUp.setPreferredSize(new Dimension(360, 180));
+        popUp.setBackground(Constants.COLOR_1);
+        backgroundPopUp.add(popUp, new GridBagConstraints());
 
         JPanel messagePanel = new JPanel();
         messagePanel.setLayout(new GridBagLayout());
@@ -43,7 +43,7 @@ public class ErrorView implements ActionListener {
         message.setFont(Constants.getFont("DMSans-Medium.ttf", 14));
         message.setForeground(Constants.COLOR_3);
         messagePanel.add(message, new GridBagConstraints());
-        error.add(messagePanel, BorderLayout.CENTER);
+        popUp.add(messagePanel, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
@@ -52,30 +52,48 @@ public class ErrorView implements ActionListener {
         window.setStyle(button);
         buttonPanel.add(button, new GridBagConstraints());
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
-        error.add(buttonPanel, BorderLayout.PAGE_END);
+        popUp.add(buttonPanel, BorderLayout.PAGE_END);
 
         this.window = window;
     }
 
     /**
-     * Hides error panel when button is pressed.
+     * Hides error when button is pressed.
      * @param e event information
      */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == button) {
             window.resetComponentsState();
-            errorPanel.setVisible(false);
+            popUpPanel.setVisible(false);
         }
     }
 
     /**
-     * Shows error panel
+     * Shows error
      * @param messageContent error message to display
      */
     public void showError(String messageContent) {
+        button.setVisible(true);
         message.setText("<html><p style='text-align: center;'>" + messageContent + "</p></html>");
         message.setHorizontalAlignment(SwingConstants.CENTER);
-        errorPanel.setVisible(true);
+        popUpPanel.setVisible(true);
+    }
+
+    /**
+     * Shows loader
+     */
+    public void showLoader() {
+        message.setText("<html><p style='text-align: center;'>Loading...</p></html>");
+        message.setHorizontalAlignment(SwingConstants.CENTER);
+        button.setVisible(false);
+        popUpPanel.setVisible(true);
+    }
+
+    /**
+     * Hides loader
+     */
+    public void hideLoader() {
+        popUpPanel.setVisible(false);
     }
 }
