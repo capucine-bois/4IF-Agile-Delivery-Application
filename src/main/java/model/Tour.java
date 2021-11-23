@@ -222,12 +222,10 @@ public class Tour extends Observable {
         }
 
 
-        /*
+
         // print order
         long intm;
         for (ShortestPath p: listShortestPaths) {
-            System.out.println(p.getStartAddress().getId() + " -> " +
-                    p.getEndAddress().getId());
             intm = p.getStartAddress().getId();
             System.out.print( intm );
             for(Segment s : p.getListSegments()){
@@ -237,7 +235,7 @@ public class Tour extends Observable {
             }
             System.out.println();
         }
-        */
+
         notifyObservers();
     }
 
@@ -250,18 +248,6 @@ public class Tour extends Observable {
      * @return listShortestPathFromOrigin, the list of shortest paths from the origin
      */
     ArrayList<ShortestPath> dijkstra(List<Intersection> listIntersections, ArrayList<Intersection> listUsefulEndPoints, Intersection origin) {
-        System.out.println("ORIGIN : " + origin.getId());
-        System.out.println("listIntersections");
-        for(Intersection i : listIntersections){
-            System.out.print(i.getId() + "  |  ");
-        }
-        System.out.println();
-        System.out.println("listUsefulEndPoints");
-        for(Intersection i : listUsefulEndPoints){
-            System.out.print(i.getId() + "  |  ");
-        }
-        System.out.println();
-
         ArrayList<ObjectDijkstra> listDijkstra = new ArrayList<>();
         ArrayList<ShortestPath> listShortestPathFromOrigin = new ArrayList<>();
         for (Intersection noeud : listIntersections) {
@@ -300,9 +286,6 @@ public class Tour extends Observable {
                     tempoIntersection = tmpParent;
                 }
                 ShortestPath shortestPath = new ShortestPath(noeudGrisAvecDistMin.getDist(),listSegments,origin,noeudGrisAvecDistMin.getIntersection());
-                System.out.println("start adress : "+ shortestPath.getStartAddress().getId());
-                System.out.println("end adress : "+ shortestPath.getEndAddress().getId());
-
 
                 listShortestPathFromOrigin.add((shortestPath));
                 if(listShortestPathFromOrigin.size()==listUsefulEndPoints.size())
