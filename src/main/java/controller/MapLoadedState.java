@@ -43,13 +43,12 @@ public class MapLoadedState implements State {
         try {
             XMLDeserializer.loadRequests(tour, cityMap);
             controller.setCurrentState(controller.requestsLoadedState);
+            tour.notifyObservers();
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
                 tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
             }
-        } finally {
-            tour.notifyObservers();
         }
     }
 }
