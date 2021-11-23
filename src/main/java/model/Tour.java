@@ -3,6 +3,7 @@ package model;
 import observer.Observable;
 
 import java.lang.reflect.Array;
+import java.sql.SQLOutput;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -179,13 +180,13 @@ public class Tour extends Observable {
             } else {
                 listNodes.add(0,new Node(depotAddress,shortestPathsFromStartPoint,0));
             }
-            System.out.println("###id " + startPoint.getId());
+            /*System.out.println("###id " + startPoint.getId());
             for(ShortestPath sp : shortestPathsFromStartPoint){
                 for(Segment s : sp.getListSegments()){
                     System.out.print(s.getDestination().getId() + "    " + s.getName() + "    ");
                 }
                 System.out.println("----------------------------");
-            }
+            }*/
         }
 
 
@@ -258,6 +259,18 @@ public class Tour extends Observable {
      * @return listShortestPathFromOrigin, the list of shortest paths from the origin
      */
     private ArrayList<ShortestPath> dijkstra(List<Intersection> listIntersections, ArrayList<Intersection> listUsefulEndPoints, Intersection origin) {
+        System.out.println("ORIGIN : " + origin.getId());
+        System.out.println("listIntersections");
+        for(Intersection i : listIntersections){
+            System.out.print(i.getId() + "  |  ");
+        }
+        System.out.println();
+        System.out.println("listUsefulEndPoints");
+        for(Intersection i : listUsefulEndPoints){
+            System.out.print(i.getId() + "  |  ");
+        }
+        System.out.println();
+
         ArrayList<ObjectDijkstra> listDijkstra = new ArrayList<>();
         ArrayList<ShortestPath> listShortestPathFromOrigin = new ArrayList<>();
         for (Intersection noeud : listIntersections) {
@@ -296,6 +309,10 @@ public class Tour extends Observable {
                     tempoIntersection = tmpParent;
                 }
                 ShortestPath shortestPath = new ShortestPath(noeudGrisAvecDistMin.getDist(),listSegments,origin,noeudGrisAvecDistMin.getIntersection());
+                System.out.println("start adress : "+ shortestPath.getStartAddress().getId());
+                System.out.println("end adress : "+ shortestPath.getEndAddress().getId());
+
+
                 listShortestPathFromOrigin.add((shortestPath));
                 if(listShortestPathFromOrigin.size()==listUsefulEndPoints.size())
                     break;
