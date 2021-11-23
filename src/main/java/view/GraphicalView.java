@@ -128,37 +128,39 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
             }
         }
 
+        boolean oneShortestPathSelected = tour.getListShortestPaths().stream().anyMatch(ShortestPath::isSelected);
+
         for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            for (Segment segment : shortestPath.getListSegments()) {
-                int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
-                int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
-                int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
-                int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(Constants.COLOR_8);
-                g2.setStroke(new BasicStroke(scale + 4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+            if (!oneShortestPathSelected || shortestPath.isSelected()) {
+                for (Segment segment : shortestPath.getListSegments()) {
+                    int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
+                    int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
+                    int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
+                    int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
+                    Graphics2D g2 = (Graphics2D) g;
+                    g2.setColor(Constants.COLOR_8);
+                    g2.setStroke(new BasicStroke(scale + 4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+                }
             }
         }
 
         for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            for (Segment segment : shortestPath.getListSegments()) {
-                int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
-                int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
-                int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
-                int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(Constants.COLOR_9);
-                g2.setStroke(new BasicStroke(scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+            if (!oneShortestPathSelected || shortestPath.isSelected()) {
+                for (Segment segment : shortestPath.getListSegments()) {
+                    int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
+                    int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
+                    int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
+                    int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
+                    Graphics2D g2 = (Graphics2D) g;
+                    g2.setColor(Constants.COLOR_9);
+                    g2.setStroke(new BasicStroke(scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+                }
             }
         }
 
         if (!tour.getPlanningRequests().isEmpty()) {
-            float[] hsv = new float[3];
-            Color initialColor = Color.red;
-            Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
-            double goldenRatioConjugate = 0.618033988749895;
             boolean oneRequestSelected = tour.getPlanningRequests().stream().anyMatch(Request::isSelected);
             for (Request request : tour.getPlanningRequests()) {
                 if (!oneRequestSelected || request.isSelected()) {
@@ -168,12 +170,9 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
                     Intersection deliveryAddress = request.getDeliveryAddress();
                     int deliveryCoordinateX = getCoordinateX(deliveryAddress, minLongitude, width, longitudeLength);
                     int deliveryCoordinateY = getCoordinateY(deliveryAddress, minLatitude, height, latitudeLength);
-                    Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
-                    drawIcon(requestColor, pickupCoordinateX, pickupCoordinateY, "pickup-icon.png");
-                    drawIcon(requestColor, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
+                    drawIcon(request.getColor(), pickupCoordinateX, pickupCoordinateY, "pickup-icon.png");
+                    drawIcon(request.getColor(), deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
                 }
-                hsv[0] += goldenRatioConjugate;
-                hsv[0] %= 1;
             }
             int depotCoordinateX = getCoordinateX(tour.getDepotAddress(), minLongitude, width, longitudeLength);
             int depotCoordinateY = getCoordinateY(tour.getDepotAddress(), minLatitude, height, latitudeLength);

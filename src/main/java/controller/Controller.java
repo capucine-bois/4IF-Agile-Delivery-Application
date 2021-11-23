@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import model.CityMap;
 import model.Request;
+import model.ShortestPath;
 import model.Tour;
 import view.Window;
 
@@ -75,7 +76,7 @@ public class Controller {
      */
     public void computeTour() { currentState.computeTour(cityMap, tour, this); }
 
-    public void leftClick(int indexRequest) {
+    public void leftClickOnRequest(int indexRequest) {
         Request requestClicked = tour.getPlanningRequests().get(indexRequest);
         if (requestClicked.isSelected()) {
             requestClicked.setSelected(false);
@@ -84,6 +85,19 @@ public class Controller {
             for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
                 if (i != indexRequest) tour.getPlanningRequests().get(i).setSelected(false);
             }
+        }
+        tour.notifyObservers();
+    }
+
+    public void leftClickOnShortestPath(int indexShortestPath) {
+        ShortestPath shortestPath = tour.getListShortestPaths().get(indexShortestPath);
+        shortestPath.setSelected(true);
+        tour.notifyObservers();
+    }
+
+    public void goBackToTour() {
+        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+            shortestPath.setSelected(false);
         }
         tour.notifyObservers();
     }
