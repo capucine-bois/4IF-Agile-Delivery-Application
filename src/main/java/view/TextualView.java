@@ -76,9 +76,7 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         add(cardLayoutPanel);
     }
 
-    private void displayTextualRequests() {
-        requestsHeader.setEnabled(false);
-        tourHeader.setEnabled(false);
+    private void displayTextualView() {
         cardLayoutPanel.removeAll();
         if (!tour.getPlanningRequests().isEmpty()) {
             createRequestsScrollPane();
@@ -86,10 +84,16 @@ public class TextualView extends JPanel implements Observer, ActionListener {
             changeButton(tourHeader, requestsHeader);
             if (!tour.getListShortestPaths().isEmpty()) {
                 createTourScrollPane();
-                tourHeader.setEnabled(true);
-                changeButton(requestsHeader, tourHeader);
-                cardLayout.next(cardLayoutPanel);
+                if (!tourHeader.isEnabled()) {
+                    changeButton(requestsHeader, tourHeader);
+                    cardLayout.next(cardLayoutPanel);
+                    tourHeader.setEnabled(true);
+                }
+            } else {
+                tourHeader.setEnabled(false);
             }
+        } else {
+            requestsHeader.setEnabled(false);
         }
         revalidate();
     }
@@ -106,13 +110,14 @@ public class TextualView extends JPanel implements Observer, ActionListener {
     private JPanel createTourMainPanel() {
         JPanel tourMainPanel = new JPanel();
         tourMainPanel.setLayout(new BoxLayout(tourMainPanel, BoxLayout.Y_AXIS));
-        tourMainPanel.setBorder(BorderFactory.createMatteBorder(gap,0,0,0,Constants.COLOR_4));
+        tourMainPanel.setBorder(BorderFactory.createMatteBorder(gap,0,gap,0,Constants.COLOR_4));
         tourMainPanel.setBackground(Constants.COLOR_4);
         displayShortestPaths(tourMainPanel);
         return tourMainPanel;
     }
 
     private void displayShortestPaths(JPanel tourMainPanel) {
+        addLine(tourMainPanel, "Total length", String.format("%.1f", tour.getTourLength() / (double) 1000) + " km", null, 14);
         for (ShortestPath shortestPath : tour.getListShortestPaths()) {
             Map<String, String> shortestPathInformation = new HashMap<>();
             String startPath = findTypeIntersection(shortestPath.getStartAddress());
@@ -166,14 +171,14 @@ public class TextualView extends JPanel implements Observer, ActionListener {
                 colorInformation.setBackground(Constants.COLOR_4);
             }
             colorInformation.setOpaque(true);
-            colorInformation.setPreferredSize(new Dimension(colorWidth, pathInformationPanel.getPreferredSize().height));
+            colorInformation.setPreferredSize(new Dimension(colorWidth, contentPanel.getPreferredSize().height));
             contentPanel.add(colorInformation, BorderLayout.LINE_START);
 
-            addLine(contentPanel, information.getKey(), information.getValue(), null);
+            addLine(contentPanel, information.getKey(), information.getValue(), null, 12);
             pathInformationPanel.add(contentPanel);
         }
 
-        pathInformationPanel.setBorder(BorderFactory.createMatteBorder(0,0,gap,0,Constants.COLOR_4));
+        pathInformationPanel.setBorder(BorderFactory.createMatteBorder(gap,0,0,0,Constants.COLOR_4));
         int maxLineHeight = 26;
         pathInformationPanel.setMaximumSize(new Dimension(getPreferredSize().width - colorWidth, shortestPathInformation.size()*maxLineHeight + gap));
         tourMainPanel.add(pathInformationPanel);
@@ -237,9 +242,10 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         for(Map.Entry<String, String> information : informations.entrySet()) {
-            addLine(contentPanel, information.getKey(), information.getValue(), request);
+            addLine(contentPanel, information.getKey(), information.getValue(), request, 12);
         }
         if (request != null) {
+            contentPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             requestPanels.add(contentPanel);
             contentPanel.addMouseListener(mouseListener);
         }
@@ -251,14 +257,14 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         mainPanel.add(informationPanel);
     }
 
-    private void addLine(JPanel information, String fieldName, String fieldContent, Request request) {
+    private void addLine(JPanel information, String fieldName, String fieldContent, Request request, int fontSize) {
         JPanel line = new JPanel();
         line.setLayout(new FlowLayout(FlowLayout.LEFT));
         JLabel fieldNameLabel = new JLabel(fieldName + " : ");
-        setLabelStyle(fieldNameLabel, "DMSans-Bold.ttf");
+        setLabelStyle(fieldNameLabel, "DMSans-Bold.ttf", fontSize);
         line.add(fieldNameLabel);
         JLabel fieldContentLabel = new JLabel(fieldContent);
-        setLabelStyle(fieldContentLabel, "DMSans-Regular.ttf");
+        setLabelStyle(fieldContentLabel, "DMSans-Regular.ttf", fontSize);
         line.add(fieldContentLabel);
         line.setPreferredSize(new Dimension(information.getPreferredSize().width, line.getPreferredSize().height));
         if (request == null || !request.isSelected()) {
@@ -271,9 +277,9 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         information.add(line);
     }
 
-    private void setLabelStyle(JLabel label, String fontName) {
+    private void setLabelStyle(JLabel label, String fontName, int fontSize) {
         try {
-            label.setFont(Constants.getFont(fontName, 12));
+            label.setFont(Constants.getFont(fontName, fontSize));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -292,7 +298,7 @@ public class TextualView extends JPanel implements Observer, ActionListener {
     @Override
     public void update(Observable o, Object arg) {
         if (o.equals(tour)) {
-            displayTextualRequests();
+            displayTextualView();
         }
     }
 
