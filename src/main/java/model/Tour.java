@@ -2,25 +2,43 @@ package model;
 
 import observer.Observable;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * A tour is composed of many (shortest) paths, all connected between them, to accomplish every request that must
+ * A tour is composed of a list of shortest paths. This list corresponds to all path which need to accomplish every request that must
  * be made during the same trip. It has access to these requests.
- * A tour also has a depot address where the delivery man starts and ends its travel, and a tour length in meters,
- * which is the sum of the length of its paths.
+ * A tour also has a depot address where the delivery man starts and ends its travel, a tour length in meters,
+ * which is the sum of the length of its paths and a departure's time.
  * As it extends Observable, an instance can notify observer when their attributes change.
  */
 public class Tour extends Observable {
 
     /* ATTRIBUTES */
 
+    /**
+     * The total length of the tour
+     */
     private double tourLength;
+
+    /**
+     * The intersection corresponding to the depot
+     */
     private Intersection depotAddress;
+
+    /**
+     * The time of starting for the tour
+     */
     private String departureTime;
+
+    /**
+     * All requests the tour need to cover
+     */
     private ArrayList<Request> planningRequests;
+
+    /**
+     * A list of shortest path which is used to print the best path
+     */
     private ArrayList<ShortestPath> listShortestPaths;
 
     /* CONSTRUCTORS */
@@ -34,95 +52,45 @@ public class Tour extends Observable {
     }
 
     /* GETTERS */
-
-    /**
-     * Getter for tour tourLength attribute
-     *
-     * @return tour length
-     */
     public double getTourLength() {
         return tourLength;
     }
 
-    /**
-     * Getter for depotAddress attribute
-     *
-     * @return depot address
-     */
     public Intersection getDepotAddress() {
         return depotAddress;
     }
 
-    /**
-     * Getter for departureTime attribute
-     *
-     * @return departure time
-     */
     public String getDepartureTime() {
         return departureTime;
     }
 
-    /**
-     * Getter for planningRequests attribute
-     *
-     * @return planning of requests
-     */
     public ArrayList<Request> getPlanningRequests() {
         return planningRequests;
     }
 
-    /**
-     * Getter for listShortestPaths attribute
-     *
-     * @return list of shortest paths
-     */
     public ArrayList<ShortestPath> getListShortestPaths() {
         return listShortestPaths;
     }
 
     /* SETTERS */
 
-    /**
-     * Setter for tourLength attribute
-     *
-     * @param tourLength wanted value for tourLength attribute
-     */
     public void setTourLength(double tourLength) {
         this.tourLength = tourLength;
     }
 
-    /**
-     * Setter for depotAddress attribute
-     *
-     * @param depotAddress wanted value for depotAddress attribute
-     */
     public void setDepotAddress(Intersection depotAddress) {
         this.depotAddress = depotAddress;
     }
 
-    /**
-     * Setter for departureTime attribute
-     *
-     * @param departureTime wanted value for departureTime attribute
-     */
     public void setDepartureTime(String departureTime) {
         this.departureTime = departureTime;
     }
 
-    /**
-     * Setter for planningRequests attribute
-     *
-     * @param planningRequests wanted value for planningRequests attribute
-     */
     public void setPlanningRequests(ArrayList<Request> planningRequests) {
         this.planningRequests = planningRequests;
     }
 
-    /**
-     * Setter for listShortestPaths attribute
-     *
-     * @param listShortestPaths wanted value for listShortestPaths attribute
-     */
+
     public void setListShortestPaths(ArrayList<ShortestPath> listShortestPaths) {
         this.listShortestPaths = listShortestPaths;
     }
@@ -146,10 +114,10 @@ public class Tour extends Observable {
     }
 
     /**
-     * Method which calls dijkstra and then the TSP method
-     * @param adjacenceMap the map with all intersections and the segments starting from this intersections
+     * Method which calls dijkstra method, creates a graphe according to the result of dijkstra and then calls the TSP method
+     * @param allIntersectionsList the list with all intersections of the map
      */
-    public void  computeTour(List<Intersection> adjacenceMap) {
+    public void  computeTour(List<Intersection> allIntersectionsList) {
 
         ArrayList<Node> listNodes = new ArrayList<>();
         // get the points useful for the computing : pick-up address, delivery address, depot
@@ -170,7 +138,7 @@ public class Tour extends Observable {
                     listUsefulEndPoints.add(endPoint);
                 }
             }
-            ArrayList<ShortestPath> shortestPathsFromStartPoint = dijkstra(adjacenceMap,listUsefulEndPoints, startPoint);
+            ArrayList<ShortestPath> shortestPathsFromStartPoint = dijkstra(allIntersectionsList,listUsefulEndPoints, startPoint);
             Node nodeToAdd = null;
             if(startPoint!=depotAddress) {
                 nodeToAdd = new Node(startPoint,shortestPathsFromStartPoint,iteratorNumber);
@@ -188,14 +156,19 @@ public class Tour extends Observable {
         Graph g = new CompleteGraph(listNodes, this);
         long startTime = System.currentTimeMillis();
         tsp.searchSolution(20000, g);
-        System.out.print("Solution of cost "+tsp.getSolutionCost()+" found in "
+        this.setTourLength(tsp.getSolutionCost());
+
+        // print the cost of the solution
+        System.out.print("Solution of cost "+this.tourLength+" found in "
                 +(System.currentTimeMillis() - startTime)+"ms : ");
 
+        // print the solution with number which correspond to the order in the planning request
         Integer[] intersectionsOrder = tsp.getBestSol();
         for(int i = 0; i<intersectionsOrder.length; i++) {
             System.out.print(intersectionsOrder[i] + "  ");
         }
         System.out.println("0");
+
 
         Intersection previous = null;
         for (Integer index: intersectionsOrder) {
@@ -220,6 +193,7 @@ public class Tour extends Observable {
                 listShortestPaths.add(p);
         }
 
+        /*
 
         /*
         // print order
@@ -235,18 +209,19 @@ public class Tour extends Observable {
                 System.out.print( intm );
             }
             System.out.println();
-        }
-        */
+        }*/
+
+
         notifyObservers();
     }
 
 
     /**
      * Algorithm dijkstra : compute all shortest paths between a point and the points in the list "listUsefulEndPoints"
-     * @param listIntersections the map with all intersections and the segments starting from this intersections
-     * @param listUsefulEndPoints the intersections which can be reached by the origin Intersection
-     * @param origin the intersection from we search the shortest paths
-     * @return listShortestPathFromOrigin, the list of shortest paths from the origin
+     * @param listIntersections the list with all intersections
+     * @param listUsefulEndPoints the intersections which can be reached by the origin Intersection (for example a delivery address cannot reach his pick-up address)
+     * @param origin the intersection from which we search the shortest paths
+     * @return listShortestPathFromOrigin, the list of shortest paths from the origin to the intersection in the list of useful end points
      */
     private ArrayList<ShortestPath> dijkstra(List<Intersection> listIntersections, ArrayList<Intersection> listUsefulEndPoints, Intersection origin) {
         ArrayList<ObjectDijkstra> listDijkstra = new ArrayList<>();
@@ -323,22 +298,22 @@ public class Tour extends Observable {
 
     /**
      * Check if the path is shorter
-     * @param noeudInit the intersection where the segment begins
-     * @param noeudDest the intersections where the segment ends
-     * @param cout the cost of the segment
-     * @param listDijkstra the list of Intersection with its infos (cost, parent and color)
+     * @param noeudInit the node which contains the intersection where the segment begins
+     * @param noeudDest the node which contains the intersection where the segment ends
+     * @param cost the cost of the segment
+     * @param listDijkstra the list of all dijkstra objects with their infos (the Intersection with its cost, parent and color)
      */
-    private void relax(ObjectDijkstra noeudInit, ObjectDijkstra noeudDest, double cout, ArrayList<ObjectDijkstra> listDijkstra) {
-        if(noeudDest.getDist() > noeudInit.getDist() + cout) {
-            listDijkstra.stream().filter(x -> x==noeudDest).findFirst().get().setDist(noeudInit.getDist() + cout);
+    private void relax(ObjectDijkstra noeudInit, ObjectDijkstra noeudDest, double cost, ArrayList<ObjectDijkstra> listDijkstra) {
+        if(noeudDest.getDist() > noeudInit.getDist() + cost) {
+            listDijkstra.stream().filter(x -> x==noeudDest).findFirst().get().setDist(noeudInit.getDist() + cost);
             listDijkstra.stream().filter(x -> x==noeudDest).findFirst().get().setParent(noeudInit); }
     }
 
     /**
      * Return the parent of the intersection of the dijkstra object in parameter
-     * @param intersectionToFind
+     * @param intersectionToFind the dijkstra object which contains the intersection we want to get the parent of
      * @param listDijkstra the list of all ObjectDijkstra
-     * @return
+     * @return the parent of the intersection
      */
     public ObjectDijkstra findParent(ObjectDijkstra intersectionToFind, ArrayList<ObjectDijkstra> listDijkstra) {
         for(ObjectDijkstra obj : listDijkstra) {
@@ -350,7 +325,7 @@ public class Tour extends Observable {
     }
 
     /**
-     * This inner class groups an intersection its his parent (and his its parent distance and color and his parent itself), its distance to the origin and its color
+     * This inner class groups an intersection and its distance to the origin, its color and its parent (which is a dijkstra object so we also get the parent's distance and color and its parent itself)
      */
     class ObjectDijkstra {
         private Intersection intersection;
@@ -391,7 +366,13 @@ public class Tour extends Observable {
         }
 
 
-
+        /**
+         * Constructor initialize all parameter of the dijkstra object
+         * @param intersection
+         * @param parent
+         * @param dist
+         * @param color
+         */
         public ObjectDijkstra(Intersection intersection, ObjectDijkstra parent, Double dist, Integer color) {
             this.intersection = intersection;
             this.parent = parent;

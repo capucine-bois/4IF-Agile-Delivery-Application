@@ -7,8 +7,22 @@ import java.util.ArrayList;
  * It also has a number, useful to make the graphe of TSP
  */
 public class Node {
+
+    /* ATTRIBUTES */
+
+    /**
+     * A number used in the graph. We put the number in the same order as the planning request
+     */
     private int number;
+
+    /**
+     * The list of shortest path from the intersection to the other intersections in the planning
+     */
     private ArrayList<ShortestPath> listArcs;
+
+    /**
+     * The intersection
+     */
     private Intersection intersection;
 
     /**

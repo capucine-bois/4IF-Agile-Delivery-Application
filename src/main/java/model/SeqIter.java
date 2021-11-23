@@ -3,16 +3,29 @@ package model;
 import java.util.Collection;
 import java.util.Iterator;
 
+/**
+ * The iterator use for the TSP
+ */
 public class SeqIter implements Iterator<Integer> {
+
+    /* ATTRIBUTES */
+
+    /**
+     * The vertex a vertex can reach
+     */
     private Integer[] candidates;
+
+    /**
+     * The number of vertex to visit remaining
+     */
     private int nbCandidates;
 
     /**
      * Create an iterator to traverse the set of vertices in <code>unvisited</code>
      * which are successors of <code>currentVertex</code> in <code>g</code>
      * Vertices are traversed in the same order as in <code>unvisited</code>
-     * @param unvisited
-     * @param currentVertex
+     * @param unvisited the unvisited vertex
+     * @param currentVertex the current vertex
      * @param g
      */
     public SeqIter(Collection<Integer> unvisited, int currentVertex, Graph g){

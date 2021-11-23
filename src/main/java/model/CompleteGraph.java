@@ -6,14 +6,33 @@ import java.util.ArrayList;
  * The graphe used in TSP
  */
 public class CompleteGraph implements Graph {
+
+    /* ATTRIBUTES */
+
+    /**
+     * A list of nodes
+     */
     ArrayList<Node> listNodesGraph;
+
+    /**
+     * The number of address in the planning request
+     */
     int nbVertices;
+
+    /**
+     * The cost of a travel between two nodes in each sense. -1 if the travel isn't possible
+     */
     double[][] cost;
+
+    /**
+     * The tour object to verify if the path are posible
+     */
     private Tour tour;
 
     /**
-     * Create a complete directed graph such that each edge has a weight within [MIN_COST,MAX_COST]
-     * @param listNodes
+     * Create a complete directed graph such that each edge has a weight according to the cost of each arc
+     * @param tour the tour
+     * @param listNodes the list of nodes
      */
     public CompleteGraph(ArrayList<Node> listNodes, Tour tour){
         this.listNodesGraph=listNodes;
@@ -32,6 +51,8 @@ public class CompleteGraph implements Graph {
 
     /**
      * Get the distance between two Intersection
+     * @param i one intersection
+     * @param j the other intersection
      */
     private double getCostArc(int i, int j) {
         Node startNode = listNodesGraph.get(i);
@@ -57,6 +78,7 @@ public class CompleteGraph implements Graph {
             return -1;
         return cost[i][j];
     }
+
 
     @Override
     public boolean isArc(int i, int j) {

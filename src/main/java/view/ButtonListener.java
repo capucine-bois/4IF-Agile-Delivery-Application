@@ -12,7 +12,17 @@ import javax.swing.*;
  * Specify actions when buttons are pressed.
  */
 public class ButtonListener implements ActionListener {
+
+    /* ATTRIBUTES */
+
+    /**
+     * The application controller
+     */
     private  Controller controller;
+
+    /**
+     * The window
+     */
     private Window window;
 
     /**
@@ -40,6 +50,9 @@ public class ButtonListener implements ActionListener {
         }
     }
 
+    /**
+     * Launch the tour computing
+     */
     private void computeTour() {
         SwingWorker sw = new SwingWorker() {
             @Override

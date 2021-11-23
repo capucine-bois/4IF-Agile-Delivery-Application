@@ -30,6 +30,9 @@ public interface State {
 
     /**
      * Compute tour to accomplish all the requests as fast as possible (solving TSP problem).
+     * @param cityMap the city map which contains the list of intersections of the map file
+     * @param tour the tour which contains all the requests
+     * @param controller the controller of our application
      */
     public default void computeTour(CityMap cityMap, Tour tour, Controller controller) {};
 
