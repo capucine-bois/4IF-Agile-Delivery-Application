@@ -83,7 +83,6 @@ public class TextualView extends JPanel implements Observer, ActionListener {
 
     private void displayTextualView() {
         cardLayoutPanel.removeAll();
-        System.out.println(Arrays.toString(cardLayoutPanel.getComponents()));
         if (!tour.getPlanningRequests().isEmpty()) {
             createRequestsScrollPane();
             requestsHeader.setEnabled(true);
@@ -173,12 +172,19 @@ public class TextualView extends JPanel implements Observer, ActionListener {
     }
 
     private void displaySegments(JPanel tourMainPanel, ArrayList<Segment> segments) {
-        for (Segment segment : segments) {
+        for (int i = 0; i < segments.size() - 1; i++) {
+            Segment segment = segments.get(i);
+            String name = segment.getName();
+            double length = segment.getLength();
+            while (i < segments.size() - 1 && segments.get(i+1).getName().equals(name)) {
+                length += segments.get(i+1).getLength();
+                i++;
+            }
             JPanel segmentPanel = new JPanel();
             segmentPanel.setLayout(new BoxLayout(segmentPanel, BoxLayout.Y_AXIS));
             segmentPanel.setBorder(new CompoundBorder(BorderFactory.createMatteBorder(0,20,0,20, Constants.COLOR_4), BorderFactory.createMatteBorder(1,0,0,0, Constants.COLOR_2)));
-            addLine(segmentPanel, "", segment.getName(), null, 12);
-            addLine(segmentPanel, "", (int) segment.getLength() + " m", null, 12);
+            addLine(segmentPanel, "", name, null, 12);
+            addLine(segmentPanel, "", (int) length + " m", null, 12);
             tourMainPanel.add(segmentPanel);
         }
     }
