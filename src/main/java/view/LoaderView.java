@@ -45,7 +45,7 @@ public class LoaderView {
         messagePanel.add(message, new GridBagConstraints());
         loader.add(messagePanel, BorderLayout.CENTER);
 
-        message.setText("<html><p style='text-align: center;'>" + "Chargement en cours..." + "</p></html>");
+        message.setText("<html><p style='text-align: center;'>" + "Loading..." + "</p></html>");
         message.setHorizontalAlignment(SwingConstants.CENTER);
 
         this.window = window;
