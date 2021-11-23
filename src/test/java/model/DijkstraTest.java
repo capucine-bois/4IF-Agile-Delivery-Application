@@ -50,6 +50,10 @@ public class DijkstraTest {
     }
 
     private void initializeMapAndTour() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
+        tour = new Tour();
+        cityMap = new CityMap();
+        ArrayList<Intersection> listIntersection = new ArrayList<>();
+        ArrayList<Request> listRequest = new ArrayList<>();
         File fileMap = new File("./src/test/resources/mapTestDijkstra.xml");
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
@@ -73,10 +77,10 @@ public class DijkstraTest {
     void dijkstraTest(){
         List<Intersection> listIntersectionsDijkstra = cityMap.getIntersections();
         ArrayList<Intersection> listUsefulPoints = new ArrayList<>();
-        listUsefulPoints.add(cityMap.getIntersections().get(1));
-        listUsefulPoints.add(cityMap.getIntersections().get(2));
-        listUsefulPoints.add(cityMap.getIntersections().get(3));
-        listUsefulPoints.add(cityMap.getIntersections().get(4));
+        for(Request req : tour.getPlanningRequests()) {
+            listUsefulPoints.add(req.getPickupAddress());
+            listUsefulPoints.add(req.getDeliveryAddress());
+        }
         listUsefulPoints.add(cityMap.getIntersections().get(0));
 
 
