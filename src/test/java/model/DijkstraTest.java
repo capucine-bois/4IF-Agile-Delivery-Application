@@ -10,6 +10,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -18,14 +19,16 @@ import java.util.List;
 
 import static xml.XMLDeserializer.deserializeMap;
 import static xml.XMLDeserializer.deserializeRequests;
+import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("DijkstraTest test case")
 public class DijkstraTest {
     private Tour tour = new Tour();
     private CityMap cityMap = new CityMap();
     private ArrayList<Intersection> listIntersection;
     private ArrayList<Request> listRequest;
     public DijkstraTest() throws ParserConfigurationException, ExceptionXML, SAXException, IOException {
-        initializeMap();
+        initializeMapAndTour();
     }
     static Instant startedAt;
 
@@ -43,16 +46,19 @@ public class DijkstraTest {
 
     @BeforeEach
     public void resetCityMap() throws IOException, SAXException, ParserConfigurationException, ExceptionXML {
-        initializeMap();
+        initializeMapAndTour();
     }
 
-    private void initializeMap() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
-        File file = new File("./src/test/resources/mapTestDijkstra.xml");
+    private void initializeMapAndTour() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
+        File fileMap = new File("./src/test/resources/mapTestDijkstra.xml");
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
-        Document docParsed = db.parse(file);
-        deserializeMap(cityMap, docParsed);
-        deserializeRequests(tour, cityMap, docParsed);
+        Document docParsedMap = db.parse(fileMap);
+        deserializeMap(cityMap, docParsedMap);
+
+        File fileReq = new File("./src/test/resources/requestsTestDijkstra.xml");
+        Document docParsedReq = db.parse(fileReq);
+        deserializeRequests(tour, cityMap, docParsedReq);
     }
 
     /**
@@ -64,44 +70,54 @@ public class DijkstraTest {
      */
     @Test
     @DisplayName("Test on dijkstra")
-    private void dijkstraTest(){
+    void dijkstraTest(){
         List<Intersection> listIntersectionsDijkstra = cityMap.getIntersections();
+        ArrayList<Intersection> listUsefulPoints = new ArrayList<>();
+        listUsefulPoints.add(cityMap.getIntersections().get(1));
+        listUsefulPoints.add(cityMap.getIntersections().get(2));
+        listUsefulPoints.add(cityMap.getIntersections().get(3));
+        listUsefulPoints.add(cityMap.getIntersections().get(4));
+        listUsefulPoints.add(cityMap.getIntersections().get(0));
+
 
         // Intersection 1
         Intersection origin1 = cityMap.getIntersections().get(0);
-        ArrayList<Intersection> listUsefulEndPointsDijkstra1 = new ArrayList<>();
-        listUsefulEndPointsDijkstra1.add(listIntersectionsDijkstra.get(1));
-        listUsefulEndPointsDijkstra1.add(listIntersectionsDijkstra.get(3));
+        ArrayList<Intersection> listUsefulEndPoints1 = new ArrayList<>();
+        for (Intersection endPoint : listUsefulPoints) {
+            if (tour.isPossiblePath(origin1, endPoint)) {
+                listUsefulEndPoints1.add(endPoint);
+            }
+        }
 
+        //original method to test
+        ArrayList<ShortestPath> sp1 = tour.dijkstra(listIntersectionsDijkstra, listUsefulEndPoints1, origin1);
+
+        //number of shortest paths
+        assertEquals(2,sp1.size(), "Wrong number of shortest paths for Intersection 1");
+        //number of segments in each shortest paths
+        assertEquals(2,sp1.get(0).getListSegments().size(), "Wrong number of segments in first SP for Intersection 1");
+        assertEquals(2,sp1.get(1).getListSegments().size(), "Wrong number of segments in second SP for Intersection 1");
+        //Intersection of each list of segment for first shortest path
+        assertEquals(1,sp1.get(0).getListSegments().get(0).getOrigin(), "Wrong origin for Intersection1/SP1/SL1/EL1/ORIGIN");
+        assertEquals(6,sp1.get(0).getListSegments().get(0).getDestination(), "Wrong origin for Intersection1/SP1/SL1/EL1/DESTINATION");
+        assertEquals(6,sp1.get(0).getListSegments().get(1).getOrigin(), "Wrong origin for Intersection1/SP1/SL1/EL2/ORIGIN");
+        assertEquals(4,sp1.get(0).getListSegments().get(1).getDestination(), "Wrong origin for Intersection1/SP1/SL1/EL2/DESTINATION");
 
 
         //Intersection 2
         Intersection origin2 = cityMap.getIntersections().get(1);
-        ArrayList<Intersection> listUsefulEndPointsDijkstra2 = new ArrayList<>();
-        listUsefulEndPointsDijkstra1.add(listIntersectionsDijkstra.get(2));
-        listUsefulEndPointsDijkstra1.add(listIntersectionsDijkstra.get(3));
-        listUsefulEndPointsDijkstra1.add(listIntersectionsDijkstra.get(4));
+
 
         //Intersection 3
         Intersection origin3 = cityMap.getIntersections().get(2);
-        ArrayList<Intersection> listUsefulEndPointsDijkstra3 = new ArrayList<>();
-        listUsefulEndPointsDijkstra1.add(listIntersectionsDijkstra.get(3));
-        listUsefulEndPointsDijkstra1.add(listIntersectionsDijkstra.get(4));
-        listUsefulEndPointsDijkstra1.add(listIntersectionsDijkstra.get(0));
+
 
         //Intersection 4
         Intersection origin4 = cityMap.getIntersections().get(3);
-        ArrayList<Intersection> listUsefulEndPointsDijkstra4 = new ArrayList<>();
-        listUsefulEndPointsDijkstra1.add(listIntersectionsDijkstra.get(1));
-        listUsefulEndPointsDijkstra1.add(listIntersectionsDijkstra.get(4));
-        listUsefulEndPointsDijkstra1.add(listIntersectionsDijkstra.get(2));
+
 
         //Intersection 5
         Intersection origin5 = cityMap.getIntersections().get(4);
-        ArrayList<Intersection> listUsefulEndPointsDijkstra5 = new ArrayList<>();
-        listUsefulEndPointsDijkstra1.add(listIntersectionsDijkstra.get(2));
-        listUsefulEndPointsDijkstra1.add(listIntersectionsDijkstra.get(1));
-        listUsefulEndPointsDijkstra1.add(listIntersectionsDijkstra.get(0));
 
     }
 
