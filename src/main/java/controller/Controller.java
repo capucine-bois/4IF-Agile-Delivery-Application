@@ -75,6 +75,10 @@ public class Controller {
      */
     public void computeTour() { currentState.computeTour(cityMap, tour, this); }
 
+    /**
+     * Handle the click on a request
+     * @param indexRequest
+     */
     public void leftClick(int indexRequest) {
         Request requestClicked = tour.getPlanningRequests().get(indexRequest);
         if (requestClicked.isSelected()) {
