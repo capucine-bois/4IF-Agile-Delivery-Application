@@ -181,6 +181,7 @@ public class Tour extends Observable {
         }
 
 
+
         // Run Tour
         TSP tsp = new TSP1();
         Graph g = new CompleteGraph(listNodes, this);
@@ -201,7 +202,7 @@ public class Tour extends Observable {
 
 
         Intersection previous = null;
-        for (int index=0; index<intersectionsOrder.length; index++) {
+        for (Integer index: intersectionsOrder) {
             Intersection currentIntersection;
             if (index == 0)
                 currentIntersection = listUsefulPoints.get(listUsefulPoints.size()-1);
@@ -223,6 +224,7 @@ public class Tour extends Observable {
                 listShortestPaths.add(p);
         }
 
+        /*
         // print order
         long intm;
         for (ShortestPath p: listShortestPaths) {
@@ -236,7 +238,9 @@ public class Tour extends Observable {
                 System.out.print( intm );
             }
             System.out.println();
-        }
+        }*/
+
+
         notifyObservers();
     }
 
