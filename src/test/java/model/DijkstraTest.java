@@ -102,10 +102,10 @@ public class DijkstraTest {
         assertEquals(2,sp1.get(0).getListSegments().size(), "Wrong number of segments in first SP for Intersection 1");
         assertEquals(2,sp1.get(1).getListSegments().size(), "Wrong number of segments in second SP for Intersection 1");
         //Intersection of each list of segment for first shortest path
-        assertEquals(1,sp1.get(0).getListSegments().get(0).getOrigin(), "Wrong origin for Intersection1/SP1/SL1/EL1/ORIGIN");
-        assertEquals(6,sp1.get(0).getListSegments().get(0).getDestination(), "Wrong origin for Intersection1/SP1/SL1/EL1/DESTINATION");
-        assertEquals(6,sp1.get(0).getListSegments().get(1).getOrigin(), "Wrong origin for Intersection1/SP1/SL1/EL2/ORIGIN");
-        assertEquals(4,sp1.get(0).getListSegments().get(1).getDestination(), "Wrong origin for Intersection1/SP1/SL1/EL2/DESTINATION");
+        assertEquals(1,sp1.get(0).getListSegments().get(0).getOrigin().getId(), "Wrong origin for Intersection1/SP1/SL1/EL1/ORIGIN");
+        assertEquals(6,sp1.get(0).getListSegments().get(0).getDestination().getId(), "Wrong origin for Intersection1/SP1/SL1/EL1/DESTINATION");
+        assertEquals(6,sp1.get(0).getListSegments().get(1).getOrigin().getId(), "Wrong origin for Intersection1/SP1/SL1/EL2/ORIGIN");
+        assertEquals(4,sp1.get(0).getListSegments().get(1).getDestination().getId(), "Wrong origin for Intersection1/SP1/SL1/EL2/DESTINATION");
 
 
         //Intersection 2
