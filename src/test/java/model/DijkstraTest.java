@@ -8,6 +8,7 @@ import xml.ExceptionXML;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -52,8 +53,8 @@ public class DijkstraTest {
     private void initializeMapAndTour() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
         tour = new Tour();
         cityMap = new CityMap();
-        ArrayList<Intersection> listIntersection = new ArrayList<>();
-        ArrayList<Request> listRequest = new ArrayList<>();
+        listIntersection = new ArrayList<>();
+        listRequest = new ArrayList<>();
         File fileMap = new File("./src/test/resources/mapTestDijkstra.xml");
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
@@ -265,6 +266,45 @@ public class DijkstraTest {
          */
     }
 
+    /**
+     * Method to test:
+     * dijkstra()
+     *
+     * What it does:
+     * Expect dijkstra to handle impossible graph
+     */
+    @Test
+    @DisplayName("Test on dijkstra - Unreachable intersection")
+    void impossiblePathDijkstraTest(){
+        // Add request alone impossible to access by any segment
+        Intersection aloneIntersec = new Intersection(10,45.3112,33.2245);
+        Intersection aloneIntersec2 = new Intersection(11,45.5112,33.2245);
+        Request request =  new Request(100,120, aloneIntersec,aloneIntersec2,new Color(65, 65, 65));
+        listRequest = tour.getPlanningRequests();
+        listRequest.add(request);
 
+
+        List<Intersection> listIntersectionsDijkstra = cityMap.getIntersections();
+        listIntersectionsDijkstra.add(aloneIntersec);
+        listIntersectionsDijkstra.add(aloneIntersec2);
+
+        ArrayList<Intersection> listUsefulPoints = new ArrayList<>();
+        for(Request req : listRequest) {
+            listUsefulPoints.add(req.getPickupAddress());
+            listUsefulPoints.add(req.getDeliveryAddress());
+        }
+        listUsefulPoints.add(cityMap.getIntersections().get(0));
+        Intersection origin1 = cityMap.getIntersections().get(0);
+
+
+        ArrayList<Intersection> listUsefulEndPoints1 = new ArrayList<>();
+        for (Intersection endPoint : listUsefulPoints) {
+            if (tour.isPossiblePath(origin1, endPoint)) {
+                listUsefulEndPoints1.add(endPoint);
+            }
+        }
+
+        ArrayList<ShortestPath> sp1 = tour.dijkstra(listIntersectionsDijkstra, listUsefulEndPoints1, origin1);
+    }
 
 }
