@@ -18,13 +18,15 @@ import observer.Observer;
  * Textual element on the GUI.
  * Used to display requests.
  */
-public class TextualView extends JPanel implements Observer, ActionListener {
+public class TextualView extends JPanel implements Observer {
 
+    // Titles of textual view buttons
+    protected final static String REQUESTS_HEADER = "Requests";
+    protected static final String TOUR_HEADER = "Tour";
     private Tour tour;
     private final int gap = 20;
     private final int colorWidth = 10;
     private final int border = 10;
-    private MouseListener mouseListener;
     private List<JPanel> requestPanels;
     private List<JPanel> shortestPathsPanels;
     private CardLayout cardLayout;
@@ -36,11 +38,15 @@ public class TextualView extends JPanel implements Observer, ActionListener {
     private JPanel requestsMainPanel;
     private JPanel tourMainPanel;
 
+    // Listeners
+    private MouseListener mouseListener;
+    private ButtonListener buttonListener;
+
     /**
      * Create a textual view in window
      * @param w the GUI
      */
-    public TextualView(Tour tour, Window w, Controller controller) throws IOException, FontFormatException {
+    public TextualView(Tour tour, Window w, MouseListener mouseListener, ButtonListener buttonListener) throws IOException, FontFormatException {
         setLayout(new BorderLayout());
         setBackground(Constants.COLOR_4);
         setBorder(BorderFactory.createMatteBorder(border,border,border,0,Constants.COLOR_1));
@@ -49,7 +55,8 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         this.tour = tour;
         requestPanels = new ArrayList<>();
         shortestPathsPanels = new ArrayList<>();
-        mouseListener = new MouseListener(controller, this);
+        this.mouseListener = mouseListener;
+        this.buttonListener = buttonListener;
         this.window = w;
         createHeader();
         createCardLayout();
@@ -64,13 +71,13 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         requestsHeader = new JButton("Requests");
         window.setStyle(requestsHeader);
         requestsHeader.setEnabled(false);
-        requestsHeader.addActionListener(this);
+        requestsHeader.addActionListener(buttonListener);
         header.add(requestsHeader);
 
         tourHeader = new JButton("Tour");
         window.setStyle(tourHeader);
         tourHeader.setEnabled(false);
-        tourHeader.addActionListener(this);
+        tourHeader.addActionListener(buttonListener);
         header.add(tourHeader);
 
         add(header, BorderLayout.PAGE_START);
@@ -361,17 +368,6 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == requestsHeader && requestsHeader.getBorder() == BorderFactory.createEmptyBorder()) {
-            changeButton(tourHeader, requestsHeader);
-            cardLayout.show(cardLayoutPanel, "requests");
-        } else if (e.getSource() == tourHeader && tourHeader.getBorder() == BorderFactory.createEmptyBorder()) {
-            changeButton(requestsHeader, tourHeader);
-            cardLayout.show(cardLayoutPanel, "tour");
-        }
-    }
-
     private void changeButton(JButton previousButton, JButton nextButton) {
         nextButton.setBorder(BorderFactory.createMatteBorder(0,0,5,0,Constants.COLOR_3));
         nextButton.setBackground(Constants.COLOR_4);
@@ -379,35 +375,36 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         previousButton.setBackground(Constants.COLOR_2);
     }
 
-    public void showTourPanel() {
+    public void showRequestsPanel() {
         changeButton(tourHeader, requestsHeader);
         cardLayout.show(cardLayoutPanel, "requests");
     }
 
-    public void showRequestsPanel() {
+    public void showTourPanel() {
         changeButton(requestsHeader, tourHeader);
         cardLayout.show(cardLayoutPanel, "tour");
     }
 
-    public void showTour() {
-        changeButton(requestsHeader, tourHeader);
-        cardLayout.show(cardLayoutPanel, "tour");
+    public void setEnabledRequests(boolean enabled) {
+        requestsHeader.setEnabled(enabled);
+        if(!enabled) {
+            try {
+                window.setStyle(requestsHeader);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    public void disableRequests() {
-        requestsHeader.setEnabled(false);
-    }
-
-    public void enableRequests() {
-        requestsHeader.setEnabled(true);
-    }
-
-    public void disableTour() {
-        tourHeader.setEnabled(false);
-    }
-
-    public void enableTour() {
-        tourHeader.setEnabled(true);
+    public void setEnabledTour(boolean enabled) {
+        tourHeader.setEnabled(enabled);
+        if(!enabled) {
+            try {
+                window.setStyle(tourHeader);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

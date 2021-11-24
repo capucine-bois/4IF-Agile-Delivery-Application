@@ -13,10 +13,14 @@ public class MouseListener extends MouseAdapter {
 
     private Controller controller;
     private TextualView textualView;
+    private GraphicalView graphicalView;
+    private Window window;
 
-    public MouseListener(Controller controller, TextualView textualView) {
+    public MouseListener(Controller controller, TextualView textualView, GraphicalView graphicalView, Window window) {
         this.controller = controller;
         this.textualView = textualView;
+        this.graphicalView = graphicalView;
+        this.window = window;
     }
 
     @Override

@@ -74,7 +74,11 @@ public class Controller {
     /**
      * Compute tour to accomplish all the requests as fast as possible (solving TSP problem).
      */
-    public void computeTour() { currentState.computeTour(cityMap, tour, this); }
+    public void computeTour() { currentState.computeTour(cityMap, tour, window, this); }
+
+    public void showRequestsPanel() { currentState.showRequestsPanel(window); }
+
+    public void showTourPanel() { currentState.showTourPanel(window); }
 
     public void leftClickOnRequest(int indexRequest) {
         currentState.leftClickOnRequest(indexRequest, tour);

@@ -34,7 +34,11 @@ public interface State {
      * @param tour the tour which contains all the requests
      * @param controller the controller of our application
      */
-    public default void computeTour(CityMap cityMap, Tour tour, Controller controller) {};
+    public default void computeTour(CityMap cityMap, Tour tour, Window window, Controller controller) {};
+
+    public default void showRequestsPanel(Window window) {};
+
+    public default void showTourPanel(Window window) {};
 
     public default void leftClickOnRequest(int indexRequest, Tour tour) {};
 
