@@ -42,34 +42,33 @@ public class MouseListener extends MouseAdapter {
         }
     }
 
-
     /**
      * Method called each time the mouse wheel is moved
      */
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        if (e.getSource() instanceof GraphicalView) {
+        if (e.getSource().equals(graphicalView)) {
             graphicalView.zoom(e.getX(), e.getY(), e.getWheelRotation());
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (e.getSource() instanceof GraphicalView) {
+        if (e.getSource().equals(graphicalView)) {
             graphicalView.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (e.getSource() instanceof GraphicalView) {
+        if (e.getSource().equals(graphicalView)) {
             graphicalView.moveMap(e.getX(), e.getY());
         }
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (e.getSource() instanceof GraphicalView) {
+        if (e.getSource().equals(graphicalView)) {
             graphicalView.updatePrevious(e.getX(), e.getY());
             graphicalView.setCursor(new Cursor(Cursor.MOVE_CURSOR));
         }
