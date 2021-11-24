@@ -33,6 +33,7 @@ public class GraphicalView extends JPanel implements Observer {
     private int previousMouseX;
     private int previousMouseY;
     private Font roadFont;
+    private Font roadShortestPathFont;
 
     // listeners
     private MouseListener mouseListener;
@@ -58,6 +59,7 @@ public class GraphicalView extends JPanel implements Observer {
         addMouseMotionListener(mouseListener);
         try {
             roadFont = Constants.getFont("DMSans-Medium.ttf", 12);
+            roadShortestPathFont = Constants.getFont("DMSans-Bold.ttf", 12);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -139,29 +141,27 @@ public class GraphicalView extends JPanel implements Observer {
                 g2.setColor(Constants.COLOR_7);
                 g2.setStroke(new BasicStroke((float) scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                 g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
-                displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY);
+                displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY, false);
             }
         }
 
         boolean oneShortestPathSelected = tour.getListShortestPaths().stream().anyMatch(ShortestPath::isSelected);
 
         for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            if (!oneShortestPathSelected || shortestPath.isSelected()) {
-                for (Segment segment : shortestPath.getListSegments()) {
-                    int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
-                    int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
-                    int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
-                    int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
-                    Graphics2D g2 = (Graphics2D) g;
-                    g2.setColor(Constants.COLOR_8);
-                    g2.setStroke(new BasicStroke((float) (scale + 4), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                    g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
-                }
+            for (Segment segment : shortestPath.getListSegments()) {
+                int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
+                int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
+                int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
+                int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(Constants.COLOR_8);
+                g2.setStroke(new BasicStroke((float) (scale + 4), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
             }
         }
 
         for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            if (!oneShortestPathSelected || shortestPath.isSelected()) {
+            if (!shortestPath.isSelected()) {
                 for (Segment segment : shortestPath.getListSegments()) {
                     int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
                     int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
@@ -171,6 +171,23 @@ public class GraphicalView extends JPanel implements Observer {
                     g2.setColor(Constants.COLOR_9);
                     g2.setStroke(new BasicStroke((float) scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                     g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+                    displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY, true);
+                }
+            }
+        }
+
+        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+            if (shortestPath.isSelected()) {
+                for (Segment segment : shortestPath.getListSegments()) {
+                    int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
+                    int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
+                    int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
+                    int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
+                    Graphics2D g2 = (Graphics2D) g;
+                    g2.setColor(Constants.COLOR_3);
+                    g2.setStroke(new BasicStroke((float) (scale + 4), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+                    displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY, true);
                 }
             }
         }
@@ -178,15 +195,19 @@ public class GraphicalView extends JPanel implements Observer {
         if (!tour.getPlanningRequests().isEmpty()) {
             boolean oneRequestSelected = tour.getPlanningRequests().stream().anyMatch(Request::isSelected);
             for (Request request : tour.getPlanningRequests()) {
+
+                Intersection pickupAddress = request.getPickupAddress();
+                int pickupCoordinateX = getCoordinateX(pickupAddress, minLongitude, width, longitudeLength);
+                int pickupCoordinateY = getCoordinateY(pickupAddress, minLatitude, height, latitudeLength);
+                Intersection deliveryAddress = request.getDeliveryAddress();
+                int deliveryCoordinateX = getCoordinateX(deliveryAddress, minLongitude, width, longitudeLength);
+                int deliveryCoordinateY = getCoordinateY(deliveryAddress, minLatitude, height, latitudeLength);
                 if (!oneRequestSelected || request.isSelected()) {
-                    Intersection pickupAddress = request.getPickupAddress();
-                    int pickupCoordinateX = getCoordinateX(pickupAddress, minLongitude, width, longitudeLength);
-                    int pickupCoordinateY = getCoordinateY(pickupAddress, minLatitude, height, latitudeLength);
-                    Intersection deliveryAddress = request.getDeliveryAddress();
-                    int deliveryCoordinateX = getCoordinateX(deliveryAddress, minLongitude, width, longitudeLength);
-                    int deliveryCoordinateY = getCoordinateY(deliveryAddress, minLatitude, height, latitudeLength);
                     drawIcon(request.getColor(), pickupCoordinateX, pickupCoordinateY, "pickup-icon.png");
                     drawIcon(request.getColor(), deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
+                } else {
+                    drawIcon(Constants.COLOR_4, pickupCoordinateX, pickupCoordinateY, "pickup-icon.png");
+                    drawIcon(Constants.COLOR_4, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
                 }
             }
             int depotCoordinateX = getCoordinateX(tour.getDepotAddress(), minLongitude, width, longitudeLength);
@@ -195,7 +216,7 @@ public class GraphicalView extends JPanel implements Observer {
         }
     }
 
-    private void displayRoadName(Graphics2D g2, String name, int originX, int destinationX, int originY, int destinationY) {
+    private void displayRoadName(Graphics2D g2, String name, int originX, int destinationX, int originY, int destinationY, boolean shortestPath) {
         double oppositeSide = destinationY - originY;
         double adjacentSide = destinationX - originX;
         double angle = Math.atan(oppositeSide/adjacentSide);
@@ -208,8 +229,13 @@ public class GraphicalView extends JPanel implements Observer {
         if (scale > 5 && name.length() * 10 < hypotenuseSize
                 && !(((originX < 0 && destinationX < 0) || (originX > g.getClipBounds().width && destinationX > g.getClipBounds().width))
                 || ((originY < 0 && destinationY < 0) || (originY > g.getClipBounds().height && destinationY > g.getClipBounds().height)))) {
-            g2.setColor(Constants.COLOR_10);
-            g2.setFont(roadFont);
+            if (shortestPath) {
+                g2.setColor(Constants.COLOR_7);
+                g2.setFont(roadShortestPathFont);
+            } else {
+                g2.setColor(Constants.COLOR_10);
+                g2.setFont(roadFont);
+            }
             g2.translate(textCoordinateX, textCoordinateY);
             g2.rotate(angle);
             g2.drawString(name, (float) (hypotenuseSize / 2 - name.length() * 3), 4);
