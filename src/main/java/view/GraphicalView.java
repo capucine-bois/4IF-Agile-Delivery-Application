@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
@@ -23,7 +24,7 @@ public class GraphicalView extends JPanel implements Observer {
     private final int secondBorder = 2;
     private final int fakeBorder = 10;
     private final int allBorders = firstBorder + secondBorder + fakeBorder;
-    private int scale = 1;
+    private double scale = 1;
     private int originX = allBorders;
     private int originY = allBorders;
     private CityMap cityMap;
@@ -31,6 +32,7 @@ public class GraphicalView extends JPanel implements Observer {
     private boolean canZoom = true;
     private int previousMouseX;
     private int previousMouseY;
+    private Font roadFont;
 
     // listeners
     private MouseListener mouseListener;
@@ -54,11 +56,15 @@ public class GraphicalView extends JPanel implements Observer {
         addMouseWheelListener(mouseListener);
         addMouseListener(mouseListener);
         addMouseMotionListener(mouseListener);
+        try {
+            roadFont = Constants.getFont("DMSans-Medium.ttf", 12);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * Creates intersections and segments of a given map with coordinates X and Y
-     * @param adjacenceMap the map to display
      */
     public void displayCityMap(List<Intersection> intersections) {
         if (!intersections.isEmpty()) {
@@ -118,7 +124,7 @@ public class GraphicalView extends JPanel implements Observer {
                 int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setColor(Constants.COLOR_6);
-                g2.setStroke(new BasicStroke(scale + 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.setStroke(new BasicStroke((float) (scale + 2), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                 g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
             }
         }
@@ -131,8 +137,9 @@ public class GraphicalView extends JPanel implements Observer {
                 int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setColor(Constants.COLOR_7);
-                g2.setStroke(new BasicStroke(scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.setStroke(new BasicStroke((float) scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                 g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+                displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY);
             }
         }
 
@@ -147,7 +154,7 @@ public class GraphicalView extends JPanel implements Observer {
                     int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
                     Graphics2D g2 = (Graphics2D) g;
                     g2.setColor(Constants.COLOR_8);
-                    g2.setStroke(new BasicStroke(scale + 4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g2.setStroke(new BasicStroke((float) (scale + 4), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                     g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
                 }
             }
@@ -162,7 +169,7 @@ public class GraphicalView extends JPanel implements Observer {
                     int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
                     Graphics2D g2 = (Graphics2D) g;
                     g2.setColor(Constants.COLOR_9);
-                    g2.setStroke(new BasicStroke(scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g2.setStroke(new BasicStroke((float) scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                     g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
                 }
             }
@@ -187,7 +194,30 @@ public class GraphicalView extends JPanel implements Observer {
             drawIcon(null, depotCoordinateX, depotCoordinateY, "depot-icon.png");
         }
     }
-    
+
+    private void displayRoadName(Graphics2D g2, String name, int originX, int destinationX, int originY, int destinationY) {
+        double oppositeSide = destinationY - originY;
+        double adjacentSide = destinationX - originX;
+        double angle = Math.atan(oppositeSide/adjacentSide);
+        int textCoordinateX;
+        int textCoordinateY;
+        textCoordinateX = Math.min(originX, destinationX);
+        if (textCoordinateX == originX) textCoordinateY = originY;
+        else textCoordinateY = destinationY;
+        double hypotenuseSize = Math.sqrt(oppositeSide * oppositeSide + adjacentSide * adjacentSide);
+        if (scale > 5 && name.length() * 10 < hypotenuseSize
+                && !(((originX < 0 && destinationX < 0) || (originX > g.getClipBounds().width && destinationX > g.getClipBounds().width))
+                || ((originY < 0 && destinationY < 0) || (originY > g.getClipBounds().height && destinationY > g.getClipBounds().height)))) {
+            g2.setColor(Constants.COLOR_10);
+            g2.setFont(roadFont);
+            g2.translate(textCoordinateX, textCoordinateY);
+            g2.rotate(angle);
+            g2.drawString(name, (float) (hypotenuseSize / 2 - name.length() * 3), 4);
+            g2.rotate(-angle);
+            g2.translate(-textCoordinateX, -textCoordinateY);
+        }
+    }
+
     private int getCoordinateX(Intersection intersection, double minLongitude, double width, double longitudeLength) {
         double coordinateLongitude = intersection.getLongitude() - minLongitude;
         return (int) ((coordinateLongitude * width) / longitudeLength) + originX;
@@ -212,7 +242,6 @@ public class GraphicalView extends JPanel implements Observer {
     /**
      * Draw the icon for a depot, pickup or delivery address
      * @param color color of the icon
-     * @param address address with coordinates X and Y
      * @param iconFileName name of the icon file
      */
     private void drawIcon(Color color, int coordinateX, int coordinateY, String iconFileName) {
@@ -266,7 +295,7 @@ public class GraphicalView extends JPanel implements Observer {
     public void zoom(int x, int y, double rotation) {
 
         if (canZoom) {
-            int zoomCoefficient = 2;
+            double zoomCoefficient = 1.2;
             int zoomBorders = allBorders - fakeBorder;
             if (x > zoomBorders && x < g.getClipBounds().width - zoomBorders && y > zoomBorders && y < g.getClipBounds().height - zoomBorders) {
                 if ((rotation < 0) && scale < 20) {
@@ -276,7 +305,7 @@ public class GraphicalView extends JPanel implements Observer {
                     repaint();
                 } else if (rotation > 0 && scale > 1) {
                     scale /= zoomCoefficient;
-                    originX += (x - originX) - (y - originX) / zoomCoefficient;
+                    originX += (x - originX) - (x - originX) / zoomCoefficient;
                     originY += (y - originY) - (y - originY) / zoomCoefficient;
                     repaint();
                 }
