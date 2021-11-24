@@ -7,8 +7,6 @@ import observer.Observer;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
@@ -34,6 +32,14 @@ public class GraphicalView extends JPanel implements Observer {
     private int previousMouseY;
     private Font roadFont;
     private Font roadShortestPathFont;
+    private double minLatitude;
+    private double maxLatitude;
+    private double minLongitude;
+    private double maxLongitude;
+    private double latitudeLength;
+    private double longitudeLength;
+    private double width;
+    private double height;
 
     // listeners
     private MouseListener mouseListener;
@@ -71,10 +77,10 @@ public class GraphicalView extends JPanel implements Observer {
     public void displayCityMap(List<Intersection> intersections) {
         if (!intersections.isEmpty()) {
             Intersection firstIntersection = intersections.get(0);
-            double minLatitude = firstIntersection.getLatitude();
-            double maxLatitude = firstIntersection.getLatitude();
-            double minLongitude = firstIntersection.getLongitude();
-            double maxLongitude = firstIntersection.getLongitude();
+            minLatitude = firstIntersection.getLatitude();
+            maxLatitude = firstIntersection.getLatitude();
+            minLongitude = firstIntersection.getLongitude();
+            maxLongitude = firstIntersection.getLongitude();
 
             for (Intersection intersection : intersections) {
                 double latitude = intersection.getLatitude();
@@ -91,7 +97,7 @@ public class GraphicalView extends JPanel implements Observer {
                 }
             }
 
-            displayIntersectionsAndSegments(intersections, minLatitude, maxLatitude, minLongitude, maxLongitude);
+            displayIntersectionsAndSegments(intersections);
         }
     }
 
@@ -99,97 +105,32 @@ public class GraphicalView extends JPanel implements Observer {
      * Initialize the list of intersections on the GUI.
      * Parse the list of intersections to instantiate all the intersections for the GUI (IntersectionView) with coordinates X and Y.
      * @param intersections map containing an intersection as key and a list of segments where they are part of as value
-     * @param minLatitude minimal geographical latitude of all intersections
-     * @param maxLatitude maximal geographical latitude of all intersections
-     * @param minLongitude minimal geographical longitude of all intersections
-     * @param maxLongitude maximal geographical longitude of all intersections
      */
-    private void displayIntersectionsAndSegments(List<Intersection> intersections, double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
-        double latitudeLength = maxLatitude - minLatitude;
-        double longitudeLength = maxLongitude - minLongitude;
+    private void displayIntersectionsAndSegments(List<Intersection> intersections) {
+        latitudeLength = maxLatitude - minLatitude;
+        longitudeLength = maxLongitude - minLongitude;
 
         double viewWidth = g.getClipBounds().width - allBorders * 2;
-        double width = viewWidth * scale;
+        width = viewWidth * scale;
         double viewHeight = g.getClipBounds().height - allBorders * 2;
-        double height = viewHeight * scale;
+        height = viewHeight * scale;
 
         if (originX > allBorders) originX = allBorders;
         if (originY > allBorders) originY = allBorders;
         if (originX + width - allBorders < viewWidth) originX = (int) (viewWidth - width + allBorders);
         if (originY + height - allBorders < viewHeight) originY = (int) (viewHeight - height + allBorders);
 
-        for (Intersection origin : intersections) {
-            int originCoordinateX = getCoordinateX(origin, minLongitude, width, longitudeLength);
-            int originCoordinateY = getCoordinateY(origin, minLatitude, height, latitudeLength);
-            for (Segment segment : origin.getAdjacentSegments()) {
-                int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
-                int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(Constants.COLOR_6);
-                g2.setStroke(new BasicStroke((float) (scale + 2), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
-            }
-        }
-
-        for (Intersection origin : intersections) {
-            int originCoordinateX = getCoordinateX(origin, minLongitude, width, longitudeLength);
-            int originCoordinateY = getCoordinateY(origin, minLatitude, height, latitudeLength);
-            for (Segment segment : origin.getAdjacentSegments()) {
-                int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
-                int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(Constants.COLOR_7);
-                g2.setStroke(new BasicStroke((float) scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
-                displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY, false);
-            }
-        }
-
-        boolean oneShortestPathSelected = tour.getListShortestPaths().stream().anyMatch(ShortestPath::isSelected);
+        displaySegmentsForEachOrigin(intersections, Constants.COLOR_6, (float) (scale + 2), false);
+        displaySegmentsForEachOrigin(intersections, Constants.COLOR_7, (float) scale, true);
 
         for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            for (Segment segment : shortestPath.getListSegments()) {
-                int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
-                int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
-                int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
-                int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(Constants.COLOR_8);
-                g2.setStroke(new BasicStroke((float) (scale + 4), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
-            }
+            displayShortestPaths(shortestPath, true, Constants.COLOR_8, (float) (scale + 4), false);
         }
-
         for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            if (!shortestPath.isSelected()) {
-                for (Segment segment : shortestPath.getListSegments()) {
-                    int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
-                    int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
-                    int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
-                    int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
-                    Graphics2D g2 = (Graphics2D) g;
-                    g2.setColor(Constants.COLOR_9);
-                    g2.setStroke(new BasicStroke((float) scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                    g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
-                    displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY, true);
-                }
-            }
+            displayShortestPaths(shortestPath, !shortestPath.isSelected(), Constants.COLOR_9, (float) scale, true);
         }
-
         for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            if (shortestPath.isSelected()) {
-                for (Segment segment : shortestPath.getListSegments()) {
-                    int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
-                    int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
-                    int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
-                    int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
-                    Graphics2D g2 = (Graphics2D) g;
-                    g2.setColor(Constants.COLOR_3);
-                    g2.setStroke(new BasicStroke((float) (scale + 4), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                    g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
-                    displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY, true);
-                }
-            }
+            displayShortestPaths(shortestPath, shortestPath.isSelected(), Constants.COLOR_3, (float) (scale + 4), true);
         }
 
         if (!tour.getPlanningRequests().isEmpty()) {
@@ -197,11 +138,11 @@ public class GraphicalView extends JPanel implements Observer {
             for (Request request : tour.getPlanningRequests()) {
 
                 Intersection pickupAddress = request.getPickupAddress();
-                int pickupCoordinateX = getCoordinateX(pickupAddress, minLongitude, width, longitudeLength);
-                int pickupCoordinateY = getCoordinateY(pickupAddress, minLatitude, height, latitudeLength);
+                int pickupCoordinateX = getCoordinateX(pickupAddress);
+                int pickupCoordinateY = getCoordinateY(pickupAddress);
                 Intersection deliveryAddress = request.getDeliveryAddress();
-                int deliveryCoordinateX = getCoordinateX(deliveryAddress, minLongitude, width, longitudeLength);
-                int deliveryCoordinateY = getCoordinateY(deliveryAddress, minLatitude, height, latitudeLength);
+                int deliveryCoordinateX = getCoordinateX(deliveryAddress);
+                int deliveryCoordinateY = getCoordinateY(deliveryAddress);
                 if (!oneRequestSelected || request.isSelected()) {
                     drawIcon(request.getColor(), pickupCoordinateX, pickupCoordinateY, "pickup-icon.png");
                     drawIcon(request.getColor(), deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
@@ -210,9 +151,45 @@ public class GraphicalView extends JPanel implements Observer {
                     drawIcon(Constants.COLOR_4, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
                 }
             }
-            int depotCoordinateX = getCoordinateX(tour.getDepotAddress(), minLongitude, width, longitudeLength);
-            int depotCoordinateY = getCoordinateY(tour.getDepotAddress(), minLatitude, height, latitudeLength);
+            int depotCoordinateX = getCoordinateX(tour.getDepotAddress());
+            int depotCoordinateY = getCoordinateY(tour.getDepotAddress());
             drawIcon(null, depotCoordinateX, depotCoordinateY, "depot-icon.png");
+        }
+    }
+
+    private void displaySegmentsForEachOrigin(List<Intersection> intersections, Color color, float strokeSize, boolean displayRoadNames) {
+        for (Intersection origin : intersections) {
+            int originCoordinateX = getCoordinateX(origin);
+            int originCoordinateY = getCoordinateY(origin);
+            for (Segment segment : origin.getAdjacentSegments()) {
+                int destinationCoordinateX = getCoordinateX(segment.getDestination());
+                int destinationCoordinateY = getCoordinateY(segment.getDestination());
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(color);
+                g2.setStroke(new BasicStroke(strokeSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+                if (displayRoadNames) {
+                    displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY, false);
+                }
+            }
+        }
+    }
+
+    private void displayShortestPaths(ShortestPath shortestPath, boolean conditionToDisplay, Color color, float strokeSize, boolean displayRoadNames) {
+        if (conditionToDisplay) {
+            for (Segment segment : shortestPath.getListSegments()) {
+                int originCoordinateX = getCoordinateX(segment.getOrigin());
+                int originCoordinateY = getCoordinateY(segment.getOrigin());
+                int destinationCoordinateX = getCoordinateX(segment.getDestination());
+                int destinationCoordinateY = getCoordinateY(segment.getDestination());
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(color);
+                g2.setStroke(new BasicStroke(strokeSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+                if (displayRoadNames) {
+                    displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY, true);
+                }
+            }
         }
     }
 
@@ -244,12 +221,12 @@ public class GraphicalView extends JPanel implements Observer {
         }
     }
 
-    private int getCoordinateX(Intersection intersection, double minLongitude, double width, double longitudeLength) {
+    private int getCoordinateX(Intersection intersection) {
         double coordinateLongitude = intersection.getLongitude() - minLongitude;
         return (int) ((coordinateLongitude * width) / longitudeLength) + originX;
     }
 
-    private int getCoordinateY(Intersection intersection, double minLatitude, double height, double latitudeLength) {
+    private int getCoordinateY(Intersection intersection) {
         double coordinateLatitude = intersection.getLatitude() - minLatitude;
         return (int) (height) - (int) ((coordinateLatitude * height) / latitudeLength) + originY;
     }
