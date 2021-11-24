@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
@@ -31,6 +32,7 @@ public class GraphicalView extends JPanel implements Observer {
     private boolean canZoom = true;
     private int previousMouseX;
     private int previousMouseY;
+    private Font roadFont;
 
     // listeners
     private MouseListener mouseListener;
@@ -54,6 +56,11 @@ public class GraphicalView extends JPanel implements Observer {
         addMouseWheelListener(mouseListener);
         addMouseListener(mouseListener);
         addMouseMotionListener(mouseListener);
+        try {
+            roadFont = Constants.getFont("DMSans-Medium.ttf", 12);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -133,6 +140,7 @@ public class GraphicalView extends JPanel implements Observer {
                 g2.setColor(Constants.COLOR_7);
                 g2.setStroke(new BasicStroke(scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                 g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+                displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY);
             }
         }
 
@@ -187,7 +195,27 @@ public class GraphicalView extends JPanel implements Observer {
             drawIcon(null, depotCoordinateX, depotCoordinateY, "depot-icon.png");
         }
     }
-    
+
+    private void displayRoadName(Graphics2D g2, String name, int originCoordinateX, int destinationCoordinateX, int originCoordinateY, int destinationCoordinateY) {
+        double oppositeSide = destinationCoordinateY - originCoordinateY;
+        double adjacentSide = destinationCoordinateX - originCoordinateX;
+        double angle = Math.atan(oppositeSide/adjacentSide);
+        int textCoordinateX;
+        int textCoordinateY;
+        textCoordinateX = Math.min(originCoordinateX, destinationCoordinateX);
+        if (textCoordinateX == originCoordinateX) textCoordinateY = originCoordinateY;
+        else textCoordinateY = destinationCoordinateY;
+        if (scale > 10 && textCoordinateX > 0 && textCoordinateX < g.getClipBounds().width && textCoordinateY > 0 && textCoordinateY < g.getClipBounds().height) {
+            g2.setColor(Constants.COLOR_10);
+            g2.setFont(roadFont);
+            g2.translate(textCoordinateX, textCoordinateY);
+            g2.rotate(angle);
+            g2.drawString(name, 0, 0);
+            g2.rotate(-angle);
+            g2.translate(-textCoordinateX, -textCoordinateY);
+        }
+    }
+
     private int getCoordinateX(Intersection intersection, double minLongitude, double width, double longitudeLength) {
         double coordinateLongitude = intersection.getLongitude() - minLongitude;
         return (int) ((coordinateLongitude * width) / longitudeLength) + originX;
