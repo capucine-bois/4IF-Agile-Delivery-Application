@@ -8,7 +8,6 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
@@ -17,7 +16,7 @@ import java.util.List;
  * Graphical element on the GUI.
  * Used to display map and tour (with their segments).
  */
-public class GraphicalView extends JPanel implements Observer, MouseWheelListener, MouseListener, MouseMotionListener {
+public class GraphicalView extends JPanel implements Observer {
 
     private Graphics g;
     private final int firstBorder = 10;
@@ -33,13 +32,16 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     private int previousMouseX;
     private int previousMouseY;
 
+    // listeners
+    private MouseListener mouseListener;
+
     /**
      * Create the graphical view
      * @param cityMap the city map
      * @param tour the tour
      * @param w the window
      */
-    public GraphicalView(CityMap cityMap, Tour tour, Window w) {
+    public GraphicalView(CityMap cityMap, Tour tour, Window w, MouseListener mouseListener) {
         setBackground(Constants.COLOR_5);
         setBorder(new CompoundBorder(BorderFactory.createLineBorder(Constants.COLOR_1, firstBorder),BorderFactory.createLineBorder(Constants.COLOR_4, secondBorder)));
         w.getContentPane().add(this, BorderLayout.CENTER);
@@ -47,9 +49,10 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         tour.addObserver(this);
         this.cityMap = cityMap;
         this.tour = tour;
-        addMouseWheelListener(this);
-        addMouseListener(this);
-        addMouseMotionListener(this);
+        this.mouseListener = mouseListener;
+        addMouseWheelListener(mouseListener);
+        addMouseListener(mouseListener);
+        addMouseMotionListener(mouseListener);
     }
 
     /**
@@ -255,71 +258,30 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         repaint();
     }
 
-    /**
-     * Method called each time the mouse wheel is moved
-     */
-    @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        if (canZoom) {
-            int zoomCoefficient = 2;
-            int zoomBorders = allBorders - fakeBorder;
-            if (e.getX() > zoomBorders && e.getX() < g.getClipBounds().width - zoomBorders && e.getY() > zoomBorders && e.getY() < g.getClipBounds().height - zoomBorders) {
-                if ((e.getWheelRotation() < 0) && scale < 20) {
-                    scale *= zoomCoefficient;
-                    originX -= (e.getX() - originX) * (zoomCoefficient - 1);
-                    originY -= (e.getY() - originY) * (zoomCoefficient - 1);
-                    repaint();
-                } else if (e.getWheelRotation() > 0 && scale > 1) {
-                    scale /= zoomCoefficient;
-                    originX += (e.getX() - originX) - (e.getX() - originX) / zoomCoefficient;
-                    originY += (e.getY() - originY) - (e.getY() - originY) / zoomCoefficient;
-                    repaint();
-                }
-            }
-        }
-    }
-
     public void setCanZoom(boolean canZoom) {
         this.canZoom = canZoom;
     }
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
+    public void zoom(int x, int y, double rotation) {
+
+        if (canZoom) {
+            int zoomCoefficient = 2;
+            int zoomBorders = allBorders - fakeBorder;
+            if (x > zoomBorders && x < g.getClipBounds().width - zoomBorders && y > zoomBorders && y < g.getClipBounds().height - zoomBorders) {
+                if ((rotation < 0) && scale < 20) {
+                    scale *= zoomCoefficient;
+                    originX -= (x - originX) * (zoomCoefficient - 1);
+                    originY -= (y - originY) * (zoomCoefficient - 1);
+                    repaint();
+                } else if (rotation > 0 && scale > 1) {
+                    scale /= zoomCoefficient;
+                    originX += (x - originX) - (y - originX) / zoomCoefficient;
+                    originY += (y - originY) - (y - originY) / zoomCoefficient;
+                    repaint();
+                }
+            }
+        }
 
     }
 
-    @Override
-    public void mousePressed(MouseEvent e) {
-        previousMouseX = e.getX();
-        previousMouseY = e.getY();
-        setCursor(new Cursor(Cursor.MOVE_CURSOR));
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        originX += e.getX() - previousMouseX;
-        originY += e.getY() - previousMouseY;
-        previousMouseX = e.getX();
-        previousMouseY = e.getY();
-        repaint();
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
-    }
 }

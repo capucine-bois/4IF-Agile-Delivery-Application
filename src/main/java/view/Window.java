@@ -31,6 +31,7 @@ public class Window extends JFrame implements ComponentListener {
     // Listeners
     private ButtonListener buttonListener;
     private KeyboardListener keyboardListener;
+    private MouseListener mouseListener;
 
     // Window size
     private int windowWidth = 800;
@@ -48,8 +49,10 @@ public class Window extends JFrame implements ComponentListener {
      * @throws FontFormatException raised if text font can't be loaded
      */
     public Window(CityMap cityMap, Tour tour, Controller controller) throws IOException, FontFormatException {
-        graphicalView = new GraphicalView(cityMap, tour, this);
+
         textualView = new TextualView(tour, this, controller);
+        mouseListener = new MouseListener(controller, textualView, this);
+        graphicalView = new GraphicalView(cityMap, tour, this, mouseListener);
         popUpView = new PopUpView(this);
         this.cityMap = cityMap;
         this.tour = tour;
@@ -216,6 +219,10 @@ public class Window extends JFrame implements ComponentListener {
     public void hideLoader() {
         this.resetComponentsState();
         this.popUpView.hideLoader();
+    }
+
+    public void zoomGraphicalView(int x, int y, double rotation) {
+        this.graphicalView.zoom(x, y, rotation);
     }
 
 }

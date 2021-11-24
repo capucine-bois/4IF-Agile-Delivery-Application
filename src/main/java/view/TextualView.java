@@ -49,7 +49,7 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         this.tour = tour;
         requestPanels = new ArrayList<>();
         shortestPathsPanels = new ArrayList<>();
-        mouseListener = new MouseListener(controller, this);
+        mouseListener = new MouseListener(controller, this, window);
         this.window = w;
         createHeader();
         createCardLayout();
