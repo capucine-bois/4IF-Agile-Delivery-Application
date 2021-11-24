@@ -47,6 +47,7 @@ public class ButtonListener implements ActionListener {
             case Window.COMPUTE_TOUR -> this.computeTour();
             case TextualView.REQUESTS_HEADER -> controller.showRequestsPanel();
             case TextualView.TOUR_HEADER -> controller.showTourPanel();
+            case TextualView.GO_BACK_TO_TOUR -> controller.goBackToTour();
         }
     }
 

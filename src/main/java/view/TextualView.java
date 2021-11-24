@@ -23,6 +23,7 @@ public class TextualView extends JPanel implements Observer {
     // Titles of textual view buttons
     protected final static String REQUESTS_HEADER = "Requests";
     protected static final String TOUR_HEADER = "Tour";
+    protected static final String GO_BACK_TO_TOUR = "Back";
     private Tour tour;
     private final int gap = 20;
     private final int colorWidth = 10;
@@ -33,7 +34,7 @@ public class TextualView extends JPanel implements Observer {
     private Window window;
     private JButton requestsHeader;
     private JButton tourHeader;
-    private JLabel backToTour;
+    private JButton backToTour;
     private JPanel cardLayoutPanel;
     private JPanel requestsMainPanel;
     private JPanel tourMainPanel;
@@ -148,15 +149,14 @@ public class TextualView extends JPanel implements Observer {
         JPanel shortestPastHeader = new JPanel();
         shortestPastHeader.setLayout(new BorderLayout());
 
-        backToTour = new JLabel("Back");
-        backToTour.setForeground(Constants.COLOR_3);
+        backToTour = new JButton("Back");
         try {
-            backToTour.setFont(Constants.getFont("DMSans-Bold.ttf", 12));
+            window.setStyle(backToTour);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        backToTour.setBorder(new CompoundBorder(BorderFactory.createMatteBorder(20, 10, 20, 10, Constants.COLOR_4), BorderFactory.createMatteBorder(0,10,0,10,Constants.COLOR_2)));
-        backToTour.addMouseListener(mouseListener);
+        backToTour.setBorder(new CompoundBorder(BorderFactory.createMatteBorder(20, 5, 20, 5, Constants.COLOR_4), BorderFactory.createMatteBorder(0,10,0,10,Constants.COLOR_2)));
+        backToTour.addActionListener(buttonListener);
         shortestPastHeader.add(backToTour, BorderLayout.LINE_START);
 
         displayShortestPath(shortestPastHeader, shortestPath, false);
@@ -351,10 +351,6 @@ public class TextualView extends JPanel implements Observer {
 
     public List<JPanel> getShortestPathsPanels() {
         return shortestPathsPanels;
-    }
-
-    public JLabel getBackToTour() {
-        return backToTour;
     }
 
     /**
