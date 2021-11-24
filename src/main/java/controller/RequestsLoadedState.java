@@ -51,4 +51,18 @@ public class RequestsLoadedState implements State {
         controller.setCurrentState(controller.computedTourState);
     }
 
+    @Override
+    public void leftClickOnRequest(int indexRequest, Tour tour, Window window) {
+        Request requestClicked = tour.getPlanningRequests().get(indexRequest);
+        if (requestClicked.isSelected()) {
+            requestClicked.setSelected(false);
+        } else {
+            requestClicked.setSelected(true);
+            for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
+                if (i != indexRequest) tour.getPlanningRequests().get(i).setSelected(false);
+            }
+        }
+        window.showRequestsPanel();
+        tour.notifyObservers();
+    }
 }

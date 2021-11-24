@@ -218,4 +218,8 @@ public class Window extends JFrame implements ComponentListener {
         this.popUpView.hideLoader();
     }
 
+    public void showRequestsPanel() {
+        textualView.showRequestsPanel();
+    }
+
 }

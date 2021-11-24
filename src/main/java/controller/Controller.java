@@ -77,22 +77,11 @@ public class Controller {
     public void computeTour() { currentState.computeTour(cityMap, tour, this); }
 
     public void leftClickOnRequest(int indexRequest) {
-        Request requestClicked = tour.getPlanningRequests().get(indexRequest);
-        if (requestClicked.isSelected()) {
-            requestClicked.setSelected(false);
-        } else {
-            requestClicked.setSelected(true);
-            for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
-                if (i != indexRequest) tour.getPlanningRequests().get(i).setSelected(false);
-            }
-        }
-        tour.notifyObservers();
+        currentState.leftClickOnRequest(indexRequest, tour, window);
     }
 
     public void leftClickOnShortestPath(int indexShortestPath) {
-        ShortestPath shortestPath = tour.getListShortestPaths().get(indexShortestPath);
-        shortestPath.setSelected(true);
-        tour.notifyObservers();
+        currentState.leftClickOnShortestPath(indexShortestPath, tour, window);
     }
 
     public void goBackToTour() {

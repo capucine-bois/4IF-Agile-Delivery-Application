@@ -45,4 +45,9 @@ public class ComputedTourState implements State {
         }
     }
 
+
+    @Override
+    public void leftClickOnShortestPath(int indexShortestPath, Tour tour, Window window) {
+
+    }
 }

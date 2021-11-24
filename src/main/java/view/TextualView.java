@@ -88,23 +88,10 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         requestsMainPanel.removeAll();
         tourMainPanel.removeAll();
         if (!tour.getPlanningRequests().isEmpty()) {
-            requestsHeader.setEnabled(true);
             addRequests();
             if (!tour.getListShortestPaths().isEmpty()) {
-                if (!tourHeader.isEnabled()) {
-                    changeButton(requestsHeader, tourHeader);
-                    cardLayout.show(cardLayoutPanel, "tour");
-                    tourHeader.setEnabled(true);
-                }
                 addShortestPaths();
-            } else {
-                changeButton(tourHeader, requestsHeader);
-                cardLayout.show(cardLayoutPanel, "requests");
-                tourHeader.setEnabled(false);
             }
-        } else {
-            requestsHeader.setEnabled(false);
-            tourHeader.setEnabled(false);
         }
         revalidate();
         repaint();
@@ -391,4 +378,36 @@ public class TextualView extends JPanel implements Observer, ActionListener {
         previousButton.setBorder(BorderFactory.createEmptyBorder());
         previousButton.setBackground(Constants.COLOR_2);
     }
+
+    public void showTourPanel() {
+        changeButton(tourHeader, requestsHeader);
+        cardLayout.show(cardLayoutPanel, "requests");
+    }
+
+    public void showRequestsPanel() {
+        changeButton(requestsHeader, tourHeader);
+        cardLayout.show(cardLayoutPanel, "tour");
+    }
+
+    public void showTour() {
+        changeButton(requestsHeader, tourHeader);
+        cardLayout.show(cardLayoutPanel, "tour");
+    }
+
+    public void disableRequests() {
+        requestsHeader.setEnabled(false);
+    }
+
+    public void enableRequests() {
+        requestsHeader.setEnabled(true);
+    }
+
+    public void disableTour() {
+        tourHeader.setEnabled(false);
+    }
+
+    public void enableTour() {
+        tourHeader.setEnabled(true);
+    }
+
 }
