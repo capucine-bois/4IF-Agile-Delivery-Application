@@ -1,6 +1,7 @@
 package controller;
 
 import model.CityMap;
+import model.Request;
 import model.ShortestPath;
 import model.Tour;
 import view.Window;
@@ -39,17 +40,17 @@ public class ComputedTourState implements State {
             XMLDeserializer.loadRequests(tour, cityMap);
             controller.setCurrentState(controller.requestsLoadedState);
             window.showRequestsPanel();
-            window.setEnabledTour(false);
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
                 tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
                 controller.setCurrentState(controller.mapLoadedState);
                 window.showRequestsPanel();
-                window.setEnabledTour(false);
+                window.setEnabledRequests(false);
             }
         } finally {
             tour.notifyObservers();
+            window.setEnabledTour(false);
         }
     }
 
@@ -61,6 +62,20 @@ public class ComputedTourState implements State {
     @Override
     public void showTourPanel(Window window) {
         window.showTourPanel();
+    }
+
+    @Override
+    public void leftClickOnRequest(int indexRequest, Tour tour) {
+        Request requestClicked = tour.getPlanningRequests().get(indexRequest);
+        if (requestClicked.isSelected()) {
+            requestClicked.setSelected(false);
+        } else {
+            requestClicked.setSelected(true);
+            for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
+                if (i != indexRequest) tour.getPlanningRequests().get(i).setSelected(false);
+            }
+        }
+        tour.notifyObservers();
     }
 
     @Override

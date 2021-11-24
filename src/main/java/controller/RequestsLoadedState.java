@@ -41,7 +41,7 @@ public class RequestsLoadedState implements State {
                 tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
                 controller.setCurrentState(controller.mapLoadedState);
-                window.setEnabledTour(false);
+                window.setEnabledRequests(false);
             }
         } finally {
             tour.notifyObservers();
