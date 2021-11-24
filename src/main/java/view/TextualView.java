@@ -55,6 +55,7 @@ public class TextualView extends JPanel implements Observer {
         this.tour = tour;
         requestPanels = new ArrayList<>();
         shortestPathsPanels = new ArrayList<>();
+        mouseListener.setTextualView(this);
         this.mouseListener = mouseListener;
         this.buttonListener = buttonListener;
         this.window = w;
@@ -68,13 +69,13 @@ public class TextualView extends JPanel implements Observer {
         JPanel header = new JPanel();
         header.setLayout(new GridLayout(1, 2));
 
-        requestsHeader = new JButton("Requests");
+        requestsHeader = new JButton(REQUESTS_HEADER);
         window.setStyle(requestsHeader);
         requestsHeader.setEnabled(false);
         requestsHeader.addActionListener(buttonListener);
         header.add(requestsHeader);
 
-        tourHeader = new JButton("Tour");
+        tourHeader = new JButton(TOUR_HEADER);
         window.setStyle(tourHeader);
         tourHeader.setEnabled(false);
         tourHeader.addActionListener(buttonListener);

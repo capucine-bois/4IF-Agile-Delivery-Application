@@ -49,11 +49,11 @@ public class Window extends JFrame implements ComponentListener {
      * @throws FontFormatException raised if text font can't be loaded
      */
     public Window(CityMap cityMap, Tour tour, Controller controller) throws IOException, FontFormatException {
+        mouseListener = new MouseListener(controller, this);
+        buttonListener = new ButtonListener(controller, this);
         graphicalView = new GraphicalView(cityMap, tour, this);
         textualView = new TextualView(tour, this, mouseListener, buttonListener);
         popUpView = new PopUpView(this);
-        mouseListener = new MouseListener(controller, textualView, graphicalView, this);
-        buttonListener = new ButtonListener(controller, this);
         this.cityMap = cityMap;
         this.tour = tour;
         createHeader();
