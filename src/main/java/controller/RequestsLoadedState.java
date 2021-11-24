@@ -4,6 +4,8 @@ import model.*;
 import view.Window;
 import xml.XMLDeserializer;
 
+import javax.swing.*;
+
 /**
  * Request loaded state. State when the application has successfully loaded requests.
  */
@@ -25,6 +27,7 @@ public class RequestsLoadedState implements State {
             }
         } finally {
             tour.notifyObservers();
+            window.setEnabledRequests(false);
         }
     }
 
@@ -38,6 +41,7 @@ public class RequestsLoadedState implements State {
                 tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
                 controller.setCurrentState(controller.mapLoadedState);
+                window.setEnabledRequests(false);
             }
         } finally {
             tour.notifyObservers();
@@ -46,9 +50,24 @@ public class RequestsLoadedState implements State {
 
 
     @Override
-    public void computeTour(CityMap cityMap, Tour tour, Controller controller) {
+    public void computeTour(CityMap cityMap, Tour tour, Window window, Controller controller) {
         tour.computeTour(cityMap.getIntersections());
         controller.setCurrentState(controller.computedTourState);
+        window.showTourPanel();
+        window.setEnabledTour(true);
     }
 
+    @Override
+    public void leftClickOnRequest(int indexRequest, Tour tour) {
+        Request requestClicked = tour.getPlanningRequests().get(indexRequest);
+        if (requestClicked.isSelected()) {
+            requestClicked.setSelected(false);
+        } else {
+            requestClicked.setSelected(true);
+            for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
+                if (i != indexRequest) tour.getPlanningRequests().get(i).setSelected(false);
+            }
+        }
+        tour.notifyObservers();
+    }
 }

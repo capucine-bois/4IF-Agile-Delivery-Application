@@ -30,8 +30,8 @@ public class Window extends JFrame implements ComponentListener {
 
     // Listeners
     private ButtonListener buttonListener;
-    private KeyboardListener keyboardListener;
     private MouseListener mouseListener;
+    private KeyboardListener keyboardListener;
 
     // Window size
     private int windowWidth = 800;
@@ -49,14 +49,14 @@ public class Window extends JFrame implements ComponentListener {
      * @throws FontFormatException raised if text font can't be loaded
      */
     public Window(CityMap cityMap, Tour tour, Controller controller) throws IOException, FontFormatException {
-
-        textualView = new TextualView(tour, this, controller);
-        mouseListener = new MouseListener(controller, textualView, this);
+        mouseListener = new MouseListener(controller, this);
+        buttonListener = new ButtonListener(controller, this);
         graphicalView = new GraphicalView(cityMap, tour, this, mouseListener);
+        textualView = new TextualView(tour, this, mouseListener, buttonListener);
         popUpView = new PopUpView(this);
         this.cityMap = cityMap;
         this.tour = tour;
-        createHeader(controller);
+        createHeader();
         setMinimumSize(new Dimension(windowWidth, windowHeight));
         setWindowSize();
         setVisible(true);
@@ -66,17 +66,15 @@ public class Window extends JFrame implements ComponentListener {
 
     /**
      * Create header in GUI window with buttons for map loading, request loading, and computing tour.
-     * @param controller application controller
      * @throws IOException raised if font file can't be found
      * @throws FontFormatException raised if font can't be loaded
      */
-    private void createHeader(Controller controller) throws IOException, FontFormatException {
+    private void createHeader() throws IOException, FontFormatException {
         header = new JPanel();
         FlowLayout headerLayout = new FlowLayout(FlowLayout.LEFT);
         header.setLayout(headerLayout);
         header.setBackground(Constants.COLOR_1);
         addAppName();
-        buttonListener = new ButtonListener(controller, this);
         buttons = new ArrayList<>();
         for (String text : buttonTexts){
             JButton button = new JButton(text);
@@ -221,8 +219,23 @@ public class Window extends JFrame implements ComponentListener {
         this.popUpView.hideLoader();
     }
 
+    public void showRequestsPanel() {
+        textualView.showRequestsPanel();
+    }
+
+    public void showTourPanel() {
+        textualView.showTourPanel();
+    }
+
+    public void setEnabledRequests(boolean enabled) {
+        textualView.setEnabledRequests(enabled);
+    }
+
+    public void setEnabledTour(boolean enabled) {
+        textualView.setEnabledTour(enabled);
+    }
+
     public void zoomGraphicalView(int x, int y, double rotation) {
         this.graphicalView.zoom(x, y, rotation);
     }
-
 }

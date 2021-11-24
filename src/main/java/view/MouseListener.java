@@ -3,10 +3,8 @@ package view;
 import controller.Controller;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 
 /**
  * Listener for mouse events.
@@ -17,10 +15,13 @@ public class MouseListener extends MouseAdapter {
     private TextualView textualView;
     private Window window;
 
-    public MouseListener(Controller controller, TextualView textualView, Window window) {
+    public MouseListener(Controller controller, Window window) {
         this.controller = controller;
-        this.textualView = textualView;
         this.window = window;
+    }
+
+    public void setTextualView(TextualView textualView) {
+        this.textualView = textualView;
     }
 
     @Override
@@ -33,50 +34,6 @@ public class MouseListener extends MouseAdapter {
             } else if (e.getSource() instanceof JLabel && textualView.getBackToTour() == e.getSource()) {
                 controller.goBackToTour();
             }
-        }
-    }
-
-    /**
-     * Method called each time the mouse wheel is moved
-     */
-    @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        if (e.getSource() instanceof GraphicalView) {
-            double rotation = e.getWheelRotation();
-            int x = e.getX();
-            int y = e.getY();
-            window.zoomGraphicalView(x, y, rotation);
-        } 
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        if (e.getSource() instanceof GraphicalView) {
-            // setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        }
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        if (e.getSource() instanceof GraphicalView) {
-            /*
-            originX += e.getX() - previousMouseX;
-            originY += e.getY() - previousMouseY;
-            previousMouseX = e.getX();
-            previousMouseY = e.getY();
-            repaint();
-             */
-        }
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        if (e.getSource() instanceof GraphicalView) {
-            /*
-            previousMouseX = e.getX();
-            previousMouseY = e.getY();
-            setCursor(new Cursor(Cursor.MOVE_CURSOR));
-             */
         }
     }
 }
