@@ -122,9 +122,17 @@ public class Tour extends Observable {
         ArrayList<Node> listNodes = new ArrayList<>();
         // get the points useful for the computing : pick-up address, delivery address, depot
         ArrayList<Intersection> listUsefulPoints = new ArrayList<>();
+        ArrayList<Intersection> listDobleInPlanning = new ArrayList<>();
         for(Request req : planningRequests) {
+
+            if(listUsefulPoints.contains(req.getPickupAddress()))
+                listDobleInPlanning.add(req.getPickupAddress());
+            if(listUsefulPoints.contains(req.getDeliveryAddress()))
+                listDobleInPlanning.add(req.getDeliveryAddress());
+
             listUsefulPoints.add(req.getPickupAddress());
             listUsefulPoints.add(req.getDeliveryAddress());
+
         }
         listUsefulPoints.add(depotAddress);
 
@@ -134,7 +142,7 @@ public class Tour extends Observable {
             ArrayList<Intersection> listUsefulEndPoints = new ArrayList<>();
             for(Intersection endPoint : listUsefulPoints) {
                 //if(endPoint!=startPoint && isPossiblePath(startPoint,endPoint) && !(isPickUp(startPoint) && endPoint==depotAddress) && !(startPoint==depotAddress && isDelivery(endPoint))) {
-                if(isPossiblePath(startPoint,endPoint)) {
+                if(isPossiblePath(startPoint,endPoint) || (listDobleInPlanning.contains(endPoint) && startPoint.equals(endPoint))) {
                     listUsefulEndPoints.add(endPoint);
                 }
             }
@@ -244,7 +252,13 @@ public class Tour extends Observable {
 
                 int colorNoeudAdj = noeudAdj.getColor();
                 if (colorNoeudAdj == 0 || colorNoeudAdj == 1 ) {
-                    double length = noeudGrisAvecDistMin.getIntersection().getAdjacentSegments().stream().filter(x -> x.getDestination() == noeudAdj.getIntersection()).findFirst().get().getLength();
+                    double length;
+                    if(noeudGrisAvecDistMin.equals(noeudAdj)) {
+                        length = 0;
+                    } else {
+                        length = noeudGrisAvecDistMin.getIntersection().getAdjacentSegments().stream().filter(x -> x.getDestination() == noeudAdj.getIntersection()).findFirst().get().getLength();
+                    }
+
                     relax(noeudGrisAvecDistMin, noeudAdj, length,listDijkstra);
                     if (colorNoeudAdj == 0) {
                         noeudAdj.setColor(1);
