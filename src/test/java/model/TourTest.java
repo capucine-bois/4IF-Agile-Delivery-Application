@@ -93,10 +93,10 @@ class TourTest {
      * computeTour()
      *
      * What it does:
-     * Compute shortest path for a wrong tour
+     * Compute shortest path for a wrong tour (one way road, no other road)
      */
     @Test
-    @DisplayName("Test on computeTour - Impossible tour")
+    @DisplayName("Test on computeTour - Impossible tour (one way road)")
     void computeTourImpossible() {
         listIntersection = (ArrayList<Intersection>) cityMap.getIntersections();
 
@@ -107,10 +107,76 @@ class TourTest {
         listRequest = tour.getPlanningRequests();
         listRequest.add(request);
 
+        // Add segment to access new points (one way)
         Segment segmentOneWay = new Segment(140,"Rue sens unique",aloneIntersec, listIntersection.get(1));
         Segment segmentOneWay2 = new Segment(10,"Rue sens unique 2",aloneIntersec2,aloneIntersec);
         listIntersection.get(1).addAdjacentSegment(segmentOneWay);
         aloneIntersec.addAdjacentSegment(segmentOneWay2);
+
+
+        // Method to test
+        tour.computeTour(listIntersection);
+
+        // Result
+        ArrayList<ShortestPath> listShortestPaths = tour.getListShortestPaths();
+        double tourLength = tour.getTourLength();
+
+
+        // Check answer
+
+    }
+
+    /**
+     * Method to test:
+     * computeTour()
+     *
+     * What it does:
+     * Compute shortest path for a wrong tour
+     */
+    @Test
+    @DisplayName("Test on computeTour - Empty tour")
+    void computeEmptyTour() {
+
+        // Add one request only
+        Intersection aloneIntersec = new Intersection(1,45.3112,33.2245);
+        listIntersection.add(aloneIntersec);
+
+
+        // Method to test
+        tour.computeTour(listIntersection);
+
+        // Result
+        ArrayList<ShortestPath> listShortestPaths = tour.getListShortestPaths();
+        double tourLength = tour.getTourLength();
+
+
+        // Check answer
+    }
+
+    /**
+     * Method to test:
+     * computeTour()
+     *
+     * What it does:
+     * Compute shortest path for a wrong tour (delivery unreachable)
+     */
+    @Test
+    @DisplayName("Test on computeTour - Impossible tour (no segment to access intersection)")
+    void computeTourImpossibleNoRoad() {
+        listIntersection = (ArrayList<Intersection>) cityMap.getIntersections();
+
+        // Add request
+        Intersection aloneIntersec = new Intersection(10,45.3112,33.2245);
+        Intersection aloneIntersec2 = new Intersection(11,45.5112,33.2245);
+        Request request =  new Request(100,120, aloneIntersec,aloneIntersec2,new Color(65, 65, 65));
+        listRequest = tour.getPlanningRequests();
+        listRequest.add(request);
+
+        // Add segment to access pick-up point (but not the delivery point)
+        Segment segment = new Segment(140,"Rue Richard",aloneIntersec, listIntersection.get(1));
+        Segment segment2 = new Segment(140,"Rue Richard",listIntersection.get(1), aloneIntersec);
+        listIntersection.get(1).addAdjacentSegment(segment);
+        aloneIntersec.addAdjacentSegment(segment2);
 
 
         // Method to test

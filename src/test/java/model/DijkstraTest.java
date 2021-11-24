@@ -305,6 +305,12 @@ public class DijkstraTest {
         }
 
         ArrayList<ShortestPath> sp1 = tour.dijkstra(listIntersectionsDijkstra, listUsefulEndPoints1, origin1);
+
+
+        // Verify answer
+        // TODO: Add answer and check that dijkstra hasn't added cost to the unreachable intersection
+        // TODO: Notify user that some intersections can't be access
+        fail();
     }
 
 }
