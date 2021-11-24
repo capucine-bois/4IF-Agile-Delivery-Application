@@ -285,4 +285,17 @@ public class GraphicalView extends JPanel implements Observer {
 
     }
 
+    public void moveMap(int x, int y) {
+        originX += x - previousMouseX;
+        originY += y - previousMouseY;
+        previousMouseX = x;
+        previousMouseY = y;
+        repaint();
+    }
+
+    public void updatePrevious(int x, int y) {
+        previousMouseX = x;
+        previousMouseY = y;
+    }
+
 }

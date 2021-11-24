@@ -235,7 +235,4 @@ public class Window extends JFrame implements ComponentListener {
         textualView.setEnabledTour(enabled);
     }
 
-    public void zoomGraphicalView(int x, int y, double rotation) {
-        this.graphicalView.zoom(x, y, rotation);
-    }
 }
