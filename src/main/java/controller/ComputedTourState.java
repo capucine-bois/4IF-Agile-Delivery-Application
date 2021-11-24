@@ -1,6 +1,7 @@
 package controller;
 
 import model.CityMap;
+import model.ShortestPath;
 import model.Tour;
 import view.Window;
 import xml.XMLDeserializer;
@@ -45,9 +46,18 @@ public class ComputedTourState implements State {
         }
     }
 
+    @Override
+    public void leftClickOnShortestPath(int indexShortestPath, Tour tour) {
+        ShortestPath shortestPath = tour.getListShortestPaths().get(indexShortestPath);
+        shortestPath.setSelected(true);
+        tour.notifyObservers();
+    }
 
     @Override
-    public void leftClickOnShortestPath(int indexShortestPath, Tour tour, Window window) {
-
+    public void goBackToTour(Tour tour) {
+        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+            shortestPath.setSelected(false);
+        }
+        tour.notifyObservers();
     }
 }

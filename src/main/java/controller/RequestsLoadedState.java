@@ -52,7 +52,7 @@ public class RequestsLoadedState implements State {
     }
 
     @Override
-    public void leftClickOnRequest(int indexRequest, Tour tour, Window window) {
+    public void leftClickOnRequest(int indexRequest, Tour tour) {
         Request requestClicked = tour.getPlanningRequests().get(indexRequest);
         if (requestClicked.isSelected()) {
             requestClicked.setSelected(false);
@@ -62,7 +62,6 @@ public class RequestsLoadedState implements State {
                 if (i != indexRequest) tour.getPlanningRequests().get(i).setSelected(false);
             }
         }
-        window.showRequestsPanel();
         tour.notifyObservers();
     }
 }

@@ -36,9 +36,9 @@ public interface State {
      */
     public default void computeTour(CityMap cityMap, Tour tour, Controller controller) {};
 
-    public default void leftClickOnRequest(int indexRequest, Tour tour, Window window) {};
+    public default void leftClickOnRequest(int indexRequest, Tour tour) {};
 
-    public default void leftClickOnShortestPath(int indexShortestPath, Tour tour, Window window) {};
+    public default void leftClickOnShortestPath(int indexShortestPath, Tour tour) {};
 
-    public default void goBackToTour() {};
+    public default void goBackToTour(Tour tour) {};
 }
