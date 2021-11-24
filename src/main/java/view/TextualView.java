@@ -18,7 +18,7 @@ import observer.Observer;
  * Textual element on the GUI.
  * Used to display requests.
  */
-public class TextualView extends JPanel implements Observer, ActionListener {
+public class TextualView extends JPanel implements Observer {
 
     // Titles of textual view buttons
     protected final static String REQUESTS_HEADER = "Requests";

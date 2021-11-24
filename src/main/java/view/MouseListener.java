@@ -13,6 +13,7 @@ public class MouseListener extends MouseAdapter {
 
     private Controller controller;
     private TextualView textualView;
+    private GraphicalView graphicalView;
     private Window window;
 
     public MouseListener(Controller controller, Window window) {
@@ -22,6 +23,10 @@ public class MouseListener extends MouseAdapter {
 
     public void setTextualView(TextualView textualView) {
         this.textualView = textualView;
+    }
+
+    public void setGraphicalView(GraphicalView graphicalView) {
+        this.graphicalView = graphicalView;
     }
 
     @Override

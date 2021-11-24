@@ -49,6 +49,7 @@ public class GraphicalView extends JPanel implements Observer {
         tour.addObserver(this);
         this.cityMap = cityMap;
         this.tour = tour;
+        mouseListener.setGraphicalView(this);
         this.mouseListener = mouseListener;
         addMouseWheelListener(mouseListener);
         addMouseListener(mouseListener);
