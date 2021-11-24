@@ -23,6 +23,8 @@ public class Constants {
     public static final Color COLOR_8 = new Color(25, 103, 210); // Tour segments stroke
     public static final Color COLOR_9 = new Color(102, 157, 246); // Tour segments background
     public static final Color COLOR_10 = new Color(103, 114, 119); // Roads name on segments
+    public static final Color COLOR_11 = new Color(146, 148, 151); // Tour unselected segments stroke
+    public static final Color COLOR_12 = new Color(187, 189, 191); // Tour unselected segments background
 
     /**
      * Get Font instance for a given font name and a given font size

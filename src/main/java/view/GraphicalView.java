@@ -123,14 +123,18 @@ public class GraphicalView extends JPanel implements Observer {
         displaySegmentsForEachOrigin(intersections, Constants.COLOR_6, (float) (scale + 2), false);
         displaySegmentsForEachOrigin(intersections, Constants.COLOR_7, (float) scale, true);
 
+        boolean oneShortestPathSelected = tour.getListShortestPaths().stream().anyMatch(ShortestPath::isSelected);
         for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            displayShortestPaths(shortestPath, true, Constants.COLOR_8, (float) (scale + 4), false);
+            displayShortestPaths(shortestPath, oneShortestPathSelected && !shortestPath.isSelected(), Constants.COLOR_11, (float) (scale + 4), false);
         }
         for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            displayShortestPaths(shortestPath, !shortestPath.isSelected(), Constants.COLOR_9, (float) scale, true);
+            displayShortestPaths(shortestPath, oneShortestPathSelected && !shortestPath.isSelected(), Constants.COLOR_12, (float) scale, true);
         }
         for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            displayShortestPaths(shortestPath, shortestPath.isSelected(), Constants.COLOR_3, (float) (scale + 4), true);
+            displayShortestPaths(shortestPath, !oneShortestPathSelected || shortestPath.isSelected(), Constants.COLOR_8, (float) (scale + 4), false);
+        }
+        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+            displayShortestPaths(shortestPath, !oneShortestPathSelected || shortestPath.isSelected(), Constants.COLOR_9, (float) (scale), true);
         }
 
         if (!tour.getPlanningRequests().isEmpty()) {
