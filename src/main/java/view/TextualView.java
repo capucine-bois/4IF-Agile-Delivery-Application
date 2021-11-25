@@ -39,6 +39,8 @@ public class TextualView extends JPanel implements Observer {
     private JPanel requestsMainPanel;
     private JPanel tourMainPanel;
 
+    private double offsetTime;
+
     // Listeners
     private MouseListener mouseListener;
     private ButtonListener buttonListener;
@@ -99,7 +101,8 @@ public class TextualView extends JPanel implements Observer {
         if (!tour.getPlanningRequests().isEmpty()) {
             addRequests();
             if (!tour.getListShortestPaths().isEmpty()) {
-                addShortestPaths();
+                // addShortestPaths();
+                addPoints();
             }
         }
         revalidate();
@@ -115,7 +118,27 @@ public class TextualView extends JPanel implements Observer {
         cardLayoutPanel.add("tour", scrollPane);
     }
 
+    private void addPoints() {
+        offsetTime = 0;
+        tourMainPanel.setLayout(new BoxLayout(tourMainPanel, BoxLayout.Y_AXIS));
+        tourMainPanel.setBorder(BorderFactory.createMatteBorder(gap,0,gap,0,Constants.COLOR_4));
+        tourMainPanel.setBackground(Constants.COLOR_4);
+        shortestPathsPanels.clear();
+        Optional<ShortestPath> optionalShortestPath = tour.getListShortestPaths().stream().filter(ShortestPath::isSelected).findFirst();
+        if (optionalShortestPath.isPresent()) {
+            displayShortestPathHeader(tourMainPanel, optionalShortestPath.get());
+            displaySegments(tourMainPanel, optionalShortestPath.get().getListSegments());
+        } else {
+            addLine(tourMainPanel, "Total length", String.format("%.1f", tour.getTourLength() / (double) 1000) + " km", null, 14);
+            tourMainPanel.getComponent(0).setMaximumSize(new Dimension(getPreferredSize().width, 29));
+            for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+                displayPoint(tourMainPanel, shortestPath, true);
+            }
+        }
+    }
+
     private void addShortestPaths() {
+
         tourMainPanel.setLayout(new BoxLayout(tourMainPanel, BoxLayout.Y_AXIS));
         tourMainPanel.setBorder(BorderFactory.createMatteBorder(gap,0,gap,0,Constants.COLOR_4));
         tourMainPanel.setBackground(Constants.COLOR_4);
@@ -130,6 +153,51 @@ public class TextualView extends JPanel implements Observer {
             for (ShortestPath shortestPath : tour.getListShortestPaths()) {
                 displayShortestPath(tourMainPanel, shortestPath, true);
             }
+        }
+
+    }
+
+    private void displayPoint(JPanel parentPanel, ShortestPath shortestPath, boolean addMouseEvent) {
+        Map<String, String> pointsInformation = new HashMap<>();
+        String type = findTypeIntersection(shortestPath.getEndAddress());
+        if (!type.equals("Depot")) {
+            pointsInformation.put("Type", type);
+
+            // TODO: convert path length in time
+            offsetTime += shortestPath.getPathLength();
+            pointsInformation.put("Time", tour.getDepartureTime() + " + " + offsetTime);
+            Color color = findColor(shortestPath.getEndAddress());
+            displayPointInformation(parentPanel, pointsInformation, color, addMouseEvent);
+        }
+    }
+
+    private void displayPointInformation(JPanel parentPanel, Map<String, String> pointsInformation, Color color, boolean addMouseEVent) {
+        JPanel pathInformationPanel = new JPanel();
+        pathInformationPanel.setLayout(new BoxLayout(pathInformationPanel, BoxLayout.Y_AXIS));
+
+        for (Map.Entry<String, String> information : pointsInformation.entrySet()) {
+            JPanel contentPanel = new JPanel();
+            contentPanel.setLayout(new BorderLayout());
+
+            JLabel colorInformation = new JLabel();
+            colorInformation.setBackground(color);
+            colorInformation.setOpaque(true);
+            colorInformation.setPreferredSize(new Dimension(colorWidth, contentPanel.getPreferredSize().height));
+            contentPanel.add(colorInformation, BorderLayout.LINE_START);
+
+            addLine(contentPanel, information.getKey(), information.getValue(), null, 12);
+            pathInformationPanel.add(contentPanel);
+        }
+
+        int maxLineHeight = 26;
+        pathInformationPanel.setMaximumSize(new Dimension(getPreferredSize().width - colorWidth, pointsInformation.size()*maxLineHeight + gap));
+        parentPanel.add(pathInformationPanel);
+
+        if (addMouseEVent) {
+            pathInformationPanel.setBorder(BorderFactory.createMatteBorder(gap,0,0,0,Constants.COLOR_4));
+            pathInformationPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            shortestPathsPanels.add(pathInformationPanel);
+            pathInformationPanel.addMouseListener(mouseListener);
         }
     }
 
