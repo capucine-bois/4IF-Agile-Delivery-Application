@@ -39,7 +39,7 @@ public class TextualView extends JPanel implements Observer {
     private JPanel requestsMainPanel;
     private JPanel tourMainPanel;
 
-    private double offsetTime;
+    private Calendar arrivals;
 
     // Listeners
     private MouseListener mouseListener;
@@ -119,7 +119,7 @@ public class TextualView extends JPanel implements Observer {
     }
 
     private void addPoints() {
-        offsetTime = 0;
+        arrivals = (Calendar) tour.getCal().clone();
         tourMainPanel.setLayout(new BoxLayout(tourMainPanel, BoxLayout.Y_AXIS));
         tourMainPanel.setBorder(BorderFactory.createMatteBorder(gap,0,gap,0,Constants.COLOR_4));
         tourMainPanel.setBackground(Constants.COLOR_4);
@@ -130,9 +130,22 @@ public class TextualView extends JPanel implements Observer {
             displaySegments(tourMainPanel, optionalShortestPath.get().getListSegments());
         } else {
             addLine(tourMainPanel, "Total length", String.format("%.1f", tour.getTourLength() / (double) 1000) + " km", null, 14);
+
+            double totalDuration = tour.metersToSeconds(tour.getTourLength());
+            for (Request r: tour.getPlanningRequests())
+                totalDuration += r.getPickupDuration() + r.getDeliveryDuration();
+            addLine(tourMainPanel, "Starting at ",
+                    tour.getParser().format(arrivals.getTime()), null, 14);
+
+            arrivals.add(Calendar.SECOND, (int) totalDuration);
+            addLine(tourMainPanel, "Ending at ",
+                    tour.getParser().format(arrivals.getTime()), null, 14);
+
             tourMainPanel.getComponent(0).setMaximumSize(new Dimension(getPreferredSize().width, 29));
-            for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-                displayPoint(tourMainPanel, shortestPath, true);
+            arrivals = (Calendar) tour.getCal().clone();
+            //for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+            for (int i=0; i<tour.getListShortestPaths().size(); i++) {
+                displayPoint(tourMainPanel, tour.getListShortestPaths().get(i), i, true);
             }
         }
     }
@@ -157,15 +170,30 @@ public class TextualView extends JPanel implements Observer {
 
     }
 
-    private void displayPoint(JPanel parentPanel, ShortestPath shortestPath, boolean addMouseEvent) {
+    private void displayPoint(JPanel parentPanel, ShortestPath shortestPath, int index, boolean addMouseEvent) {
         Map<String, String> pointsInformation = new HashMap<>();
         String type = findTypeIntersection(shortestPath.getEndAddress());
         if (!type.equals("Depot")) {
             pointsInformation.put("Type", type);
 
-            // TODO: convert path length in time
-            offsetTime += shortestPath.getPathLength();
-            pointsInformation.put("Time", tour.getDepartureTime() + " + " + offsetTime);
+            int processTime = 0;
+            //int requestIndex = index % 2 == 0 ? index/2: (index+1)/2;
+            int requestIndex = index / 2;
+            Request request = tour.getPlanningRequests().get(requestIndex);
+
+            if (type.equals("Pickup")) {
+                processTime += request.getPickupDuration();
+            } else if (type.equals("Delivery")) {
+                processTime += request.getDeliveryDuration();
+            }
+
+            arrivals.add(Calendar.SECOND, (int) tour.metersToSeconds(shortestPath.getPathLength()));
+            pointsInformation.put("Arrival time", tour.getParser().format(arrivals.getTime()));
+            pointsInformation.put("Process time", processTime/60 + " min");
+
+            arrivals.add(Calendar.SECOND, processTime);
+            pointsInformation.put("Departure time", tour.getParser().format(arrivals.getTime()));
+
             Color color = findColor(shortestPath.getEndAddress());
             displayPointInformation(parentPanel, pointsInformation, color, addMouseEvent);
         }

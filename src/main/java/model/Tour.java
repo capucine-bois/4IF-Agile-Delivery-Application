@@ -2,6 +2,7 @@ package model;
 
 import observer.Observable;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,9 @@ import java.util.stream.Collectors;
 public class Tour extends Observable {
 
     /* ATTRIBUTES */
+
+    // km/h
+    private final double speed = 15;
 
     /**
      * The total length of the tour
@@ -30,6 +34,11 @@ public class Tour extends Observable {
      * The time of starting for the tour
      */
     private String departureTime;
+
+    private SimpleDateFormat parser = new SimpleDateFormat("HH:mm:ss");
+
+    private Calendar cal;
+
 
     /**
      * All requests the tour need to cover
@@ -72,6 +81,14 @@ public class Tour extends Observable {
         return listShortestPaths;
     }
 
+    public SimpleDateFormat getParser() {
+        return parser;
+    }
+
+    public Calendar getCal() {
+        return cal;
+    }
+
     /* SETTERS */
 
     public void setTourLength(double tourLength) {
@@ -84,6 +101,12 @@ public class Tour extends Observable {
 
     public void setDepartureTime(String departureTime) {
         this.departureTime = departureTime;
+        this.cal = Calendar.getInstance();
+        try {
+            this.cal.setTime(parser.parse(departureTime));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void setPlanningRequests(ArrayList<Request> planningRequests) {
@@ -93,6 +116,14 @@ public class Tour extends Observable {
 
     public void setListShortestPaths(ArrayList<ShortestPath> listShortestPaths) {
         this.listShortestPaths = listShortestPaths;
+    }
+
+    public void setParser(SimpleDateFormat parser) {
+        this.parser = parser;
+    }
+
+    public void setCal(Calendar cal) {
+        this.cal = cal;
     }
 
     /* METHODS */
@@ -401,5 +432,9 @@ public class Tour extends Observable {
             check = false;
         }
         return check;
+    }
+
+    public double metersToSeconds(double meters) {
+        return (meters/(speed*1000))*60*60;
     }
 }
