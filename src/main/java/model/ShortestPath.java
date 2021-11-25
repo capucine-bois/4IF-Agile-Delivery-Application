@@ -48,6 +48,10 @@ public class ShortestPath {
         this.endAddress = endAddress;
     }
 
+    public ShortestPath() {
+
+    }
+
     /* GETTERS */
 
     public double getPathLength() {

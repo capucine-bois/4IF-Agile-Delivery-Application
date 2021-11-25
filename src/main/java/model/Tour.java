@@ -86,14 +86,6 @@ public class Tour extends Observable {
         this.departureTime = departureTime;
     }
 
-    public void setPlanningRequests(ArrayList<Request> planningRequests) {
-        this.planningRequests = planningRequests;
-    }
-
-
-    public void setListShortestPaths(ArrayList<ShortestPath> listShortestPaths) {
-        this.listShortestPaths = listShortestPaths;
-    }
 
     /* METHODS */
 
@@ -122,41 +114,44 @@ public class Tour extends Observable {
         ArrayList<Node> listNodes = new ArrayList<>();
         // get the points useful for the computing : pick-up address, delivery address, depot
         ArrayList<Intersection> listUsefulPoints = new ArrayList<>();
-        ArrayList<Intersection> listDobleInPlanning = new ArrayList<>();
-        for(Request req : planningRequests) {
+        ArrayList<Intersection> listUsefulEndPointsForDepot = new ArrayList<>();
 
-            if(listUsefulPoints.contains(req.getPickupAddress()))
-                listDobleInPlanning.add(req.getPickupAddress());
-            if(listUsefulPoints.contains(req.getDeliveryAddress()))
-                listDobleInPlanning.add(req.getDeliveryAddress());
-
-            listUsefulPoints.add(req.getPickupAddress());
-            listUsefulPoints.add(req.getDeliveryAddress());
-
-        }
         listUsefulPoints.add(depotAddress);
 
-        int iteratorNumber = 1;
-        for(Intersection startPoint : listUsefulPoints) {
+        for(int i=0;i<planningRequests.size();i++) {
+            Intersection pickupReq1 = planningRequests.get(i).getPickupAddress();
+            listUsefulPoints.add(pickupReq1);
+            Intersection deliveryReq1 = planningRequests.get(i).getDeliveryAddress();
+            listUsefulPoints.add(deliveryReq1);
             // gets the ends points useful for the computing according to the start point
-            ArrayList<Intersection> listUsefulEndPoints = new ArrayList<>();
-            for(Intersection endPoint : listUsefulPoints) {
-                //if(endPoint!=startPoint && isPossiblePath(startPoint,endPoint) && !(isPickUp(startPoint) && endPoint==depotAddress) && !(startPoint==depotAddress && isDelivery(endPoint))) {
-                if(isPossiblePath(startPoint,endPoint) || (listDobleInPlanning.contains(endPoint) && startPoint.equals(endPoint))) {
-                    listUsefulEndPoints.add(endPoint);
+            ArrayList<Intersection> listUsefulEndPointsPickUp = new ArrayList<>();
+            ArrayList<Intersection> listUsefulEndPointsDelivery = new ArrayList<>();
+
+            listUsefulEndPointsPickUp.add(deliveryReq1);
+            listUsefulEndPointsDelivery.add(depotAddress);
+            // addingpickUp to the endPoints of depot
+            listUsefulEndPointsForDepot.add(pickupReq1);
+
+            for(int j=0;j<planningRequests.size();j++) {
+                Intersection pickupReq2 = planningRequests.get(j).getPickupAddress();
+                Intersection deliveryReq2 = planningRequests.get(j).getDeliveryAddress();
+                if(i!=j) {
+                    listUsefulEndPointsPickUp.add(pickupReq2);
+                    listUsefulEndPointsPickUp.add(deliveryReq2);
+                    listUsefulEndPointsDelivery.add(pickupReq2);
+                    listUsefulEndPointsDelivery.add(deliveryReq2);
                 }
             }
-            ArrayList<ShortestPath> shortestPathsFromStartPoint = dijkstra(allIntersectionsList,listUsefulEndPoints, startPoint);
-            Node nodeToAdd = null;
-            if(startPoint!=depotAddress) {
-                nodeToAdd = new Node(startPoint,shortestPathsFromStartPoint,iteratorNumber);
-                listNodes.add(nodeToAdd);
-                iteratorNumber++;
-            } else {
-                listNodes.add(0,new Node(depotAddress,shortestPathsFromStartPoint,0));
-            }
+            ArrayList<ShortestPath> shortestPathsFromPickUp = dijkstra(allIntersectionsList,listUsefulEndPointsPickUp, pickupReq1);
+            ArrayList<ShortestPath> shortestPathsFromDelivery = dijkstra(allIntersectionsList,listUsefulEndPointsDelivery, deliveryReq1);
+
+            listNodes.add(new Node(pickupReq1,shortestPathsFromPickUp,i+1));
+            listNodes.add(new Node(deliveryReq1,shortestPathsFromDelivery,i+2));
+
+
         }
 
+        listNodes.add(0,new Node(depotAddress,dijkstra(allIntersectionsList,listUsefulEndPointsForDepot,depotAddress),0));
 
 
         // Run Tour
@@ -177,47 +172,16 @@ public class Tour extends Observable {
         }
         System.out.println("0");
 
-
-        Intersection previous = null;
-        for (Integer index: intersectionsOrder) {
-            Intersection currentIntersection;
-            if (index == 0)
-                currentIntersection = listUsefulPoints.get(listUsefulPoints.size()-1);
-            else
-                currentIntersection = listUsefulPoints.get(index-1);
-            if (previous != null) {
-                Intersection finalPrevious = previous;
-                for (ShortestPath p: listNodes.stream().filter(x -> x.getIntersection() == finalPrevious).findFirst().get().getListArcs()) {
-                    if (p.getEndAddress().equals(currentIntersection))
-                        listShortestPaths.add(p);
-                }
+        for(int i=0; i< intersectionsOrder.length-1; i++) {
+            Intersection end  = listNodes.get(intersectionsOrder[i+1]).getIntersection();
+            ShortestPath shortestPathToAdd = listNodes.get(intersectionsOrder[i]).getListArcs().stream().filter(x -> x.getEndAddress()==end).findFirst().get();
+            listShortestPaths.add(shortestPathToAdd);
+            if(i==intersectionsOrder.length-2) {
+                shortestPathToAdd = listNodes.get(intersectionsOrder[i+1]).getListArcs().stream().filter(x -> x.getEndAddress()==depotAddress).findFirst().get();
+                listShortestPaths.add(shortestPathToAdd);
             }
-            previous = currentIntersection;
         }
 
-        Intersection finalPrevious1 = previous;
-        for (ShortestPath p: listNodes.stream().filter(x -> x.getIntersection() == finalPrevious1).findFirst().get().getListArcs()) {
-            if (p.getEndAddress().equals(depotAddress))
-                listShortestPaths.add(p);
-        }
-
-        /*
-
-        /*
-        // print order
-        long intm;
-        for (ShortestPath p: listShortestPaths) {
-            System.out.println(p.getStartAddress().getId() + " -> " +
-                    p.getEndAddress().getId());
-            intm = p.getStartAddress().getId();
-            System.out.print( intm );
-            for(Segment s : p.getListSegments()){
-                System.out.print(" -> " );
-                intm = s.getDestination().getId();
-                System.out.print( intm );
-            }
-            System.out.println();
-        }*/
 
 
         notifyObservers();
@@ -269,45 +233,25 @@ public class Tour extends Observable {
             if(listUsefulEndPoints.contains(noeudGrisAvecDistMin.getIntersection())) {
                 ObjectDijkstra tempoIntersection = noeudGrisAvecDistMin;
                 ArrayList<Segment> listSegments = new ArrayList<>();
-                while(findParent(tempoIntersection,listDijkstra)!=null) {
-                    ObjectDijkstra finalTempoIntersection1 = tempoIntersection;
-                    ObjectDijkstra tmpParent = finalTempoIntersection1.getParent();
-                    listSegments.add(0,tmpParent.getIntersection().getAdjacentSegments().stream().filter(x -> x.getDestination() == finalTempoIntersection1.getIntersection()).findFirst().get());
-                    tempoIntersection = tmpParent;
+                ShortestPath shortestPath = new ShortestPath();
+                if(origin.equals(noeudGrisAvecDistMin.getIntersection())) {
+                    Segment segmentZero = new Segment(0.0, "segment", noeudGrisAvecDistMin.getIntersection(),origin);
+                    listSegments.add(segmentZero);
+                    shortestPath = new ShortestPath(0.0,listSegments,origin,noeudGrisAvecDistMin.getIntersection());
+                } else {
+                    while(findParent(tempoIntersection,listDijkstra)!=null) {
+                        ObjectDijkstra finalTempoIntersection1 = tempoIntersection;
+                        ObjectDijkstra tmpParent = finalTempoIntersection1.getParent();
+                        listSegments.add(0,tmpParent.getIntersection().getAdjacentSegments().stream().filter(x -> x.getDestination() == finalTempoIntersection1.getIntersection()).findFirst().get());
+                        tempoIntersection = tmpParent;
+                    }
+                     shortestPath = new ShortestPath(noeudGrisAvecDistMin.getDist(),listSegments,origin,noeudGrisAvecDistMin.getIntersection());
                 }
-                ShortestPath shortestPath = new ShortestPath(noeudGrisAvecDistMin.getDist(),listSegments,origin,noeudGrisAvecDistMin.getIntersection());
+
                 listShortestPathFromOrigin.add((shortestPath));
-                if(listShortestPathFromOrigin.size()==listUsefulEndPoints.size())
-                    break;
             }
         }
         return listShortestPathFromOrigin;
-    }
-
-
-
-
-    /**
-     * Return true if the two intersections in parameters make a possible path
-     * @param startPoint the beginning of the segment
-     * @param endPoint the end of a segment begin by startPoint
-     * @return true if the path is possible, false otherwise
-     */
-    public boolean isPossiblePath(Intersection startPoint, Intersection endPoint) {
-        boolean retour = true;
-        for(Request req: planningRequests) {
-            // case where the path is not possible : the start and the end are the same, the start is a pick-up address and the end
-            // is the depot, the start is the depot and the end a delivery address, the start is a delivery address and the end is the
-            // pick-up links to this delivery address
-            if((req.getDeliveryAddress() == startPoint && req.getPickupAddress()==endPoint)
-                    || (startPoint==depotAddress && req.getDeliveryAddress()==endPoint)
-                    || (req.getPickupAddress()==startPoint && endPoint==depotAddress)
-                    || startPoint==endPoint) {
-                retour = false;
-                break;
-            }
-        }
-        return retour;
     }
 
     /**

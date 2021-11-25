@@ -41,7 +41,7 @@ public class CompleteGraph implements Graph {
         cost = new double[nbVertices][nbVertices];
         for (int i=0; i<nbVertices; i++){
             for (int j=0; j<nbVertices; j++){
-                if (i == j || !tour.isPossiblePath(listNodesGraph.get(i).getIntersection(),listNodesGraph.get(j).getIntersection())) cost[i][j] = -1;
+                if (i == j || (i%2==0 && i==j+1) || (i==0 && j%2==0) || (j==0 && i%2==1)) cost[i][j] = -1;
                 else {
                     cost[i][j] = getCostArc(i,j);
                 }
@@ -82,9 +82,7 @@ public class CompleteGraph implements Graph {
 
     @Override
     public boolean isArc(int i, int j) {
-        if (i<0 || i>=nbVertices || j<0 || j>=nbVertices || !tour.isPossiblePath(listNodesGraph.get(i).getIntersection(),listNodesGraph.get(j).getIntersection()))
-            return false;
-        return i != j;
+        return !(i<0 || i>=nbVertices || j<0 || j>=nbVertices || cost[i][j]==-1);
     }
 
 
