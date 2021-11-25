@@ -195,6 +195,7 @@ public class TextualView extends JPanel implements Observer {
     private void displaySegments(JPanel parentPanel, ArrayList<Segment> segments) {
         JPanel segmentsPanel = new JPanel();
         segmentsPanel.setLayout(new BoxLayout(segmentsPanel, BoxLayout.Y_AXIS));
+        segmentsPanel.setBackground(Constants.COLOR_4);
         for (int i = 0; i < segments.size() - 1; i++) {
             Segment segment = segments.get(i);
             String name = segment.getName();
