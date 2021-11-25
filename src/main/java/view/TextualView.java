@@ -130,15 +130,15 @@ public class TextualView extends JPanel implements Observer {
             displaySegments(tourMainPanel, optionalShortestPath.get().getListSegments());
         } else {
             addLine(tourMainPanel, "Total length", String.format("%.1f", tour.getTourLength() / (double) 1000) + " km", null, 14);
-
+            addLine(tourMainPanel, "Speed", String.format("%.1f", tour.getSpeed()) + " km/h", null, 14);
             double totalDuration = tour.metersToSeconds(tour.getTourLength());
             for (Request r: tour.getPlanningRequests())
                 totalDuration += r.getPickupDuration() + r.getDeliveryDuration();
-            addLine(tourMainPanel, "Starting at ",
+            addLine(tourMainPanel, "Starting at",
                     tour.getParser().format(arrivals.getTime()), null, 14);
 
             arrivals.add(Calendar.SECOND, (int) totalDuration);
-            addLine(tourMainPanel, "Ending at ",
+            addLine(tourMainPanel, "Ending at",
                     tour.getParser().format(arrivals.getTime()), null, 14);
 
             tourMainPanel.getComponent(0).setMaximumSize(new Dimension(getPreferredSize().width, 29));

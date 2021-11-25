@@ -89,6 +89,10 @@ public class Tour extends Observable {
         return cal;
     }
 
+    public double getSpeed() {
+        return speed;
+    }
+
     /* SETTERS */
 
     public void setTourLength(double tourLength) {
