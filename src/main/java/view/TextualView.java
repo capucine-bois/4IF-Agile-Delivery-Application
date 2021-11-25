@@ -99,7 +99,7 @@ public class TextualView extends JPanel implements Observer {
             addRequests();
             if (!tour.getListShortestPaths().isEmpty()) {
                 // addShortestPaths();
-                addPoints();
+                addTourIntersections();
             }
         }
         revalidate();
@@ -115,21 +115,36 @@ public class TextualView extends JPanel implements Observer {
         cardLayoutPanel.add("tour", scrollPane);
     }
 
-    private void addPoints() {
+    private void addTourIntersections() {
         arrivals = (Calendar) tour.getCal().clone();
-        tourMainPanel.setLayout(new BoxLayout(tourMainPanel, BoxLayout.Y_AXIS));
-        tourMainPanel.setBorder(BorderFactory.createMatteBorder(gap,0,gap,0,Constants.COLOR_4));
         tourMainPanel.setBackground(Constants.COLOR_4);
         shortestPathsPanels.clear();
         Optional<ShortestPath> optionalShortestPath = tour.getListShortestPaths().stream().filter(ShortestPath::isSelected).findFirst();
         if (optionalShortestPath.isPresent()) {
+            tourMainPanel.setLayout(new BorderLayout());
+            tourMainPanel.setBorder(BorderFactory.createMatteBorder(0,0,gap,0,Constants.COLOR_4));
+            displaySegmentsHeader(tourMainPanel);
             displaySegments(tourMainPanel, optionalShortestPath.get().getListSegments());
         } else {
+            tourMainPanel.setLayout(new BoxLayout(tourMainPanel, BoxLayout.Y_AXIS));
+            tourMainPanel.setBorder(BorderFactory.createMatteBorder(gap,0,gap,0,Constants.COLOR_4));
             displayTourGlobalInformation();
             for (int i=0; i<tour.getListShortestPaths().size(); i++) {
                 displayPoint(tourMainPanel, tour.getListShortestPaths().get(i), i);
             }
         }
+    }
+
+    private void displaySegmentsHeader(JPanel parentPanel) {
+        backToTour = new JButton(GO_BACK_TO_TOUR);
+        try {
+            window.setStyle(backToTour);
+            backToTour.setBackground(Constants.COLOR_12);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        backToTour.addActionListener(buttonListener);
+        parentPanel.add(backToTour, BorderLayout.PAGE_START);
     }
 
     private void displayTourGlobalInformation() {
@@ -177,7 +192,9 @@ public class TextualView extends JPanel implements Observer {
         }
     }
 
-    private void displaySegments(JPanel tourMainPanel, ArrayList<Segment> segments) {
+    private void displaySegments(JPanel parentPanel, ArrayList<Segment> segments) {
+        JPanel segmentsPanel = new JPanel();
+        segmentsPanel.setLayout(new BoxLayout(segmentsPanel, BoxLayout.Y_AXIS));
         for (int i = 0; i < segments.size() - 1; i++) {
             Segment segment = segments.get(i);
             String name = segment.getName();
@@ -192,8 +209,9 @@ public class TextualView extends JPanel implements Observer {
             addLine(segmentPanel, "", name, false, 12);
             addLine(segmentPanel, "", (int) length + " m", false, 12);
             segmentPanel.setMaximumSize(new Dimension(getPreferredSize().width, 53));
-            tourMainPanel.add(segmentPanel);
+            segmentsPanel.add(segmentPanel);
         }
+        parentPanel.add(segmentsPanel);
     }
 
     private String findTypeIntersection(Intersection startAddress) {
