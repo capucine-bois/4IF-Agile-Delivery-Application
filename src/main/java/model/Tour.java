@@ -35,10 +35,14 @@ public class Tour extends Observable {
      */
     private String departureTime;
 
+    /**
+     * The time of ending for the tour
+     */
+    private String arrivalTime;
+
     private SimpleDateFormat parser = new SimpleDateFormat("HH:mm:ss");
 
-    private Calendar cal;
-
+    private Calendar calendar;
 
     /**
      * All requests the tour need to cover
@@ -73,6 +77,10 @@ public class Tour extends Observable {
         return departureTime;
     }
 
+    public String getArrivalTime() {
+        return arrivalTime;
+    }
+
     public ArrayList<Request> getPlanningRequests() {
         return planningRequests;
     }
@@ -83,10 +91,6 @@ public class Tour extends Observable {
 
     public SimpleDateFormat getParser() {
         return parser;
-    }
-
-    public Calendar getCal() {
-        return cal;
     }
 
     public double getSpeed() {
@@ -104,22 +108,13 @@ public class Tour extends Observable {
     }
 
     public void setDepartureTime(String departureTime) {
-        this.departureTime = departureTime;
-        this.cal = Calendar.getInstance();
+        this.calendar = Calendar.getInstance();
         try {
-            this.cal.setTime(parser.parse(departureTime));
+            this.calendar.setTime(parser.parse(departureTime));
+            this.departureTime = parser.format(calendar.getTime());
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-
-    public void setParser(SimpleDateFormat parser) {
-        this.parser = parser;
-    }
-
-    public void setCal(Calendar cal) {
-        this.cal = cal;
     }
 
     /* METHODS */
@@ -210,14 +205,30 @@ public class Tour extends Observable {
         for(int i=0; i< intersectionsOrder.length-1; i++) {
             Intersection end  = listNodes.get(intersectionsOrder[i+1]).getIntersection();
             ShortestPath shortestPathToAdd = listNodes.get(intersectionsOrder[i]).getListArcs().stream().filter(x -> x.getEndAddress()==end).findFirst().get();
+            shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i]);
+            shortestPathToAdd.setEndNodeNumber(intersectionsOrder[i+1]);
             listShortestPaths.add(shortestPathToAdd);
+            calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
+            int indexRequest = intersectionsOrder[i+1]%2 == 0 ? intersectionsOrder[i+1]/2 - 1 : intersectionsOrder[i+1]/2;
+            Request requestEndPath = planningRequests.get(indexRequest);
+            if (intersectionsOrder[i+1]%2 == 1) {
+                requestEndPath.setPickupArrivalTime(parser.format(calendar.getTime()));
+                calendar.add(Calendar.SECOND, requestEndPath.getPickupDuration());
+                requestEndPath.setPickupDepartureTime(parser.format(calendar.getTime()));
+            } else {
+                requestEndPath.setDeliveryArrivalTime(parser.format(calendar.getTime()));
+                calendar.add(Calendar.SECOND, requestEndPath.getDeliveryDuration());
+                requestEndPath.setDeliveryDepartureTime(parser.format(calendar.getTime()));
+            }
             if(i==intersectionsOrder.length-2) {
                 shortestPathToAdd = listNodes.get(intersectionsOrder[i+1]).getListArcs().stream().filter(x -> x.getEndAddress()==depotAddress).findFirst().get();
+                shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i+1]);
+                shortestPathToAdd.setEndNodeNumber(0);
                 listShortestPaths.add(shortestPathToAdd);
+                calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
+                arrivalTime = parser.format(calendar.getTime());
             }
         }
-
-
 
         notifyObservers();
     }
@@ -268,7 +279,7 @@ public class Tour extends Observable {
             if(listUsefulEndPoints.contains(noeudGrisAvecDistMin.getIntersection())) {
                 ObjectDijkstra tempoIntersection = noeudGrisAvecDistMin;
                 ArrayList<Segment> listSegments = new ArrayList<>();
-                ShortestPath shortestPath = new ShortestPath();
+                ShortestPath shortestPath;
                 if(origin.equals(noeudGrisAvecDistMin.getIntersection())) {
                     Segment segmentZero = new Segment(0.0, "segment", noeudGrisAvecDistMin.getIntersection(),origin);
                     listSegments.add(segmentZero);
@@ -280,7 +291,7 @@ public class Tour extends Observable {
                         listSegments.add(0,tmpParent.getIntersection().getAdjacentSegments().stream().filter(x -> x.getDestination() == finalTempoIntersection1.getIntersection()).findFirst().get());
                         tempoIntersection = tmpParent;
                     }
-                     shortestPath = new ShortestPath(noeudGrisAvecDistMin.getDist(),listSegments,origin,noeudGrisAvecDistMin.getIntersection());
+                    shortestPath = new ShortestPath(noeudGrisAvecDistMin.getDist(),listSegments,origin,noeudGrisAvecDistMin.getIntersection());
                 }
 
                 listShortestPathFromOrigin.add((shortestPath));
@@ -315,6 +326,10 @@ public class Tour extends Observable {
             }
         }
         return null;
+    }
+
+    public double metersToSeconds(double meters) {
+        return (meters/(speed*1000))*60*60;
     }
 
     /**
@@ -394,9 +409,5 @@ public class Tour extends Observable {
             check = false;
         }
         return check;
-    }
-
-    public double metersToSeconds(double meters) {
-        return (meters/(speed*1000))*60*60;
     }
 }

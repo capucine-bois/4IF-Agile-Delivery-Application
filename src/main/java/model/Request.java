@@ -1,6 +1,7 @@
 package model;
 
 import java.awt.*;
+import java.util.Calendar;
 
 /**
  * A request represents pickup and delivery (both at the same time).
@@ -30,6 +31,26 @@ public class Request {
      * The address of the delivery point.
      */
     private Intersection deliveryAddress;
+
+    /**
+     * The arrival time at the pickup point.
+     */
+    private String pickupArrivalTime;
+
+    /**
+     * The arrival time at the delivery point.
+     */
+    private String deliveryArrivalTime;
+
+    /**
+     * The departure time at the pickup point.
+     */
+    private String pickupDepartureTime;
+
+    /**
+     * The departure time at the delivery point.
+     */
+    private String deliveryDepartureTime;
 
     /**
      * The selected state of the request.
@@ -78,14 +99,26 @@ public class Request {
         return deliveryAddress;
     }
 
+    public String getPickupArrivalTime() {
+        return pickupArrivalTime;
+    }
+
+    public String getDeliveryArrivalTime() {
+        return deliveryArrivalTime;
+    }
+
+    public String getPickupDepartureTime() {
+        return pickupDepartureTime;
+    }
+
+    public String getDeliveryDepartureTime() {
+        return deliveryDepartureTime;
+    }
+
     public boolean isSelected() {
         return selected;
     }
 
-    /**
-     * Getter for color attribute
-     * @return color
-     */
     public Color getColor() {
         return color;
     }
@@ -108,12 +141,24 @@ public class Request {
         this.deliveryAddress = deliveryAddress;
     }
 
+    public void setPickupArrivalTime(String pickupArrivalTime) {
+        this.pickupArrivalTime = pickupArrivalTime;
+    }
+
+    public void setDeliveryArrivalTime(String deliveryArrivalTime) {
+        this.deliveryArrivalTime = deliveryArrivalTime;
+    }
+
+    public void setPickupDepartureTime(String pickupDepartureTime) {
+        this.pickupDepartureTime = pickupDepartureTime;
+    }
+
+    public void setDeliveryDepartureTime(String deliveryDepartureTime) {
+        this.deliveryDepartureTime = deliveryDepartureTime;
+    }
+
     public void setSelected(boolean selected) { this.selected = selected; }
 
-    /**
-     * Setter for color attribute
-     * @param color new color
-     */
     public void setColor(Color color) {
         this.color = color;
     }

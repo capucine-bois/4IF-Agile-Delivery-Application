@@ -36,8 +36,6 @@ public class TextualView extends JPanel implements Observer {
     private JPanel requestsMainPanel;
     private JPanel tourMainPanel;
 
-    private Calendar arrivals;
-
     // Listeners
     private MouseListener mouseListener;
     private ButtonListener buttonListener;
@@ -116,7 +114,6 @@ public class TextualView extends JPanel implements Observer {
     }
 
     private void addTourIntersections() {
-        arrivals = (Calendar) tour.getCal().clone();
         tourMainPanel.setBackground(Constants.COLOR_4);
         shortestPathsPanels.clear();
         Optional<ShortestPath> optionalShortestPath = tour.getListShortestPaths().stream().filter(ShortestPath::isSelected).findFirst();
@@ -130,7 +127,7 @@ public class TextualView extends JPanel implements Observer {
             tourMainPanel.setBorder(BorderFactory.createMatteBorder(gap,0,gap,0,Constants.COLOR_4));
             displayTourGlobalInformation();
             for (int i=0; i<tour.getListShortestPaths().size(); i++) {
-                displayPoint(tourMainPanel, tour.getListShortestPaths().get(i), i);
+                displayPoint(tourMainPanel, tour.getListShortestPaths().get(i));
             }
         }
     }
@@ -152,43 +149,31 @@ public class TextualView extends JPanel implements Observer {
         tourFirstPanel.setLayout(new BoxLayout(tourFirstPanel, BoxLayout.Y_AXIS));
         addLine(tourFirstPanel, "Total length", String.format("%.1f", tour.getTourLength() / (double) 1000) + " km", false, 14);
         addLine(tourFirstPanel, "Speed", String.format("%.1f", tour.getSpeed()) + " km/h", false, 14);
-        double totalDuration = tour.metersToSeconds(tour.getTourLength());
-        for (Request r: tour.getPlanningRequests())
-            totalDuration += r.getPickupDuration() + r.getDeliveryDuration();
-        addLine(tourFirstPanel, "Starting at", tour.getParser().format(arrivals.getTime()), false, 14);
-        arrivals.add(Calendar.SECOND, (int) totalDuration);
-        addLine(tourFirstPanel, "Ending at", tour.getParser().format(arrivals.getTime()), false, 14);
-        arrivals = (Calendar) tour.getCal().clone();
+        addLine(tourFirstPanel, "Starting at", tour.getDepartureTime(), false, 14);
+        addLine(tourFirstPanel, "Ending at", tour.getArrivalTime(), false, 14);
         tourFirstPanel.setBorder(BorderFactory.createMatteBorder(0, 0, gap, 0, Constants.COLOR_4));
         tourFirstPanel.setMaximumSize(new Dimension(getPreferredSize().width, 116 + gap));
         tourMainPanel.add(tourFirstPanel);
     }
 
-    private void displayPoint(JPanel parentPanel, ShortestPath shortestPath, int index) {
+    private void displayPoint(JPanel parentPanel, ShortestPath shortestPath) {
         Map<String, String> pointsInformation = new HashMap<>();
-        String type = findTypeIntersection(shortestPath.getEndAddress());
-        if (!type.equals("Depot")) {
-            pointsInformation.put("Type", type);
+        if (shortestPath.getEndNodeNumber() != 0) {
+            boolean endAddressIsPickup = shortestPath.getEndNodeNumber()%2 == 1;
+            pointsInformation.put("Type", endAddressIsPickup ? "Pickup" : "Delivery");
 
-            int processTime = 0;
-            int requestIndex = index / 2;
+            int requestIndex = endAddressIsPickup ? shortestPath.getEndNodeNumber()/2 : shortestPath.getEndNodeNumber()/2 - 1;
             Request request = tour.getPlanningRequests().get(requestIndex);
-
-            if (type.equals("Pickup")) {
-                processTime += request.getPickupDuration();
-            } else if (type.equals("Delivery")) {
-                processTime += request.getDeliveryDuration();
+            if (endAddressIsPickup) {
+                pointsInformation.put("Arrival time", request.getPickupArrivalTime());
+                pointsInformation.put("Process time", request.getPickupDuration()/60 + " min");
+                pointsInformation.put("Departure time", request.getPickupDepartureTime());
+            } else {
+                pointsInformation.put("Arrival time", request.getDeliveryArrivalTime());
+                pointsInformation.put("Process time", request.getDeliveryDuration()/60 + " min");
+                pointsInformation.put("Departure time", request.getDeliveryDepartureTime());
             }
-
-            arrivals.add(Calendar.SECOND, (int) tour.metersToSeconds(shortestPath.getPathLength()));
-            pointsInformation.put("Arrival time", tour.getParser().format(arrivals.getTime()));
-            pointsInformation.put("Process time", processTime/60 + " min");
-
-            arrivals.add(Calendar.SECOND, processTime);
-            pointsInformation.put("Departure time", tour.getParser().format(arrivals.getTime()));
-
-            Color color = findColor(shortestPath.getEndAddress());
-            displayInformation(parentPanel, pointsInformation, color, shortestPathsPanels, false);
+            displayInformation(parentPanel, pointsInformation, request.getColor(), shortestPathsPanels, false);
         }
     }
 
@@ -213,29 +198,6 @@ public class TextualView extends JPanel implements Observer {
             segmentsPanel.add(segmentPanel);
         }
         parentPanel.add(segmentsPanel);
-    }
-
-    private String findTypeIntersection(Intersection startAddress) {
-        String type;
-        if (startAddress == tour.getDepotAddress()) {
-            type = "Depot";
-        } else if (tour.getPlanningRequests().stream().anyMatch(x -> x.getPickupAddress() == startAddress)) {
-            type = "Pickup";
-        } else {
-            type = "Delivery";
-        }
-        return type;
-    }
-
-    private Color findColor(Intersection intersection) {
-        Color color;
-        Optional<Request> optionalRequest = tour.getPlanningRequests().stream().filter(x -> x.getPickupAddress() == intersection || x.getDeliveryAddress() == intersection).findFirst();
-        if (optionalRequest.isPresent()) {
-            color = optionalRequest.get().getColor();
-        } else {
-            color = Color.black;
-        }
-        return color;
     }
 
     private void createRequestsPanel() {

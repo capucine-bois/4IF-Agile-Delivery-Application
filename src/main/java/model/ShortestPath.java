@@ -30,6 +30,17 @@ public class ShortestPath {
      * The end intersection
      */
     private Intersection endAddress;
+
+    /**
+     * The number of the start node used in TSP
+     */
+    private int startNodeNumber;
+
+    /**
+     * The number of the end node used in TSP
+     */
+    private int endNodeNumber;
+
     private boolean selected;
 
     /* CONSTRUCTORS */
@@ -48,10 +59,6 @@ public class ShortestPath {
         this.endAddress = endAddress;
     }
 
-    public ShortestPath() {
-
-    }
-
     /* GETTERS */
 
     public double getPathLength() {
@@ -68,6 +75,14 @@ public class ShortestPath {
 
     public Intersection getEndAddress() {
         return endAddress;
+    }
+
+    public int getStartNodeNumber() {
+        return startNodeNumber;
+    }
+
+    public int getEndNodeNumber() {
+        return endNodeNumber;
     }
 
     /**
@@ -93,6 +108,14 @@ public class ShortestPath {
 
     public void setEndAddress(Intersection endAddress) {
         this.endAddress = endAddress;
+    }
+
+    public void setStartNodeNumber(int startNodeNumber) {
+        this.startNodeNumber = startNodeNumber;
+    }
+
+    public void setEndNodeNumber(int endNodeNumber) {
+        this.endNodeNumber = endNodeNumber;
     }
 
     /**
