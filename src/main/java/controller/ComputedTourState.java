@@ -19,18 +19,21 @@ public class ComputedTourState implements State {
             XMLDeserializer.loadMap(cityMap);
             controller.setCurrentState(controller.mapLoadedState);
             tour.clearLists();
+            window.showRequestsPanel();
+            window.setEnabledRequests(false);
+            window.setEnabledTour(false);
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
                 cityMap.getIntersections().clear();
                 tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
                 controller.setCurrentState(controller.initialState);
+                window.showRequestsPanel();
+                window.setEnabledRequests(false);
+                window.setEnabledTour(false);
             }
         } finally {
             tour.notifyObservers();
-            window.showRequestsPanel();
-            window.setEnabledRequests(false);
-            window.setEnabledTour(false);
         }
     }
 
@@ -40,6 +43,7 @@ public class ComputedTourState implements State {
             XMLDeserializer.loadRequests(tour, cityMap);
             controller.setCurrentState(controller.requestsLoadedState);
             window.showRequestsPanel();
+            window.setEnabledTour(false);
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
                 tour.clearLists();
@@ -47,10 +51,10 @@ public class ComputedTourState implements State {
                 controller.setCurrentState(controller.mapLoadedState);
                 window.showRequestsPanel();
                 window.setEnabledRequests(false);
+                window.setEnabledTour(false);
             }
         } finally {
             tour.notifyObservers();
-            window.setEnabledTour(false);
         }
     }
 
