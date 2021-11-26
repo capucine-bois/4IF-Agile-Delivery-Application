@@ -295,6 +295,8 @@ public class Tour extends Observable {
                 }
 
                 listShortestPathFromOrigin.add((shortestPath));
+                if(listShortestPathFromOrigin.size()==listUsefulEndPoints.size())
+                    break;
             }
         }
         return listShortestPathFromOrigin;
