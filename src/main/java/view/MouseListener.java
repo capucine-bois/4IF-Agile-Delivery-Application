@@ -15,6 +15,7 @@ public class MouseListener extends MouseAdapter {
 
     private Controller controller;
     private GraphicalView graphicalView;
+    private TextualView textualView;
 
     public MouseListener(Controller controller) {
         this.controller = controller;
@@ -22,6 +23,10 @@ public class MouseListener extends MouseAdapter {
 
     public void setGraphicalView(GraphicalView graphicalView) {
         this.graphicalView = graphicalView;
+    }
+
+    public void setTextualView(TextualView textualView) {
+        this.textualView = textualView;
     }
 
     @Override
@@ -32,6 +37,24 @@ public class MouseListener extends MouseAdapter {
             } else if (TextualView.tourIntersectionsPanels.contains((JPanel) e.getSource())) {
                 controller.leftClickOnTourIntersection(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
             }
+        }
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        if (TextualView.requestPanels.contains((JPanel) e.getSource())) {
+            textualView.setRequestPanelMouseEntered(TextualView.requestPanels.indexOf((JPanel) e.getSource()));
+        } else if (TextualView.tourIntersectionsPanels.contains((JPanel) e.getSource())) {
+           textualView.setTourIntersectionPanelMouseEntered(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
+        }
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        if (TextualView.requestPanels.contains((JPanel) e.getSource())) {
+            textualView.setRequestPanelMouseExited(TextualView.requestPanels.indexOf((JPanel) e.getSource()));
+        } else if (TextualView.tourIntersectionsPanels.contains((JPanel) e.getSource())) {
+            textualView.setTourIntersectionPanelMouseExited(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
         }
     }
 

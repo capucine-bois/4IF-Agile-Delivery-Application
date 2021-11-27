@@ -56,6 +56,7 @@ public class TextualView extends JPanel implements Observer {
         requestPanels = new ArrayList<>();
         tourIntersectionsPanels = new ArrayList<>();
         pathDetailsButtons = new ArrayList<>();
+        mouseListener.setTextualView(this);
         this.mouseListener = mouseListener;
         this.buttonListener = buttonListener;
         this.window = w;
@@ -181,16 +182,20 @@ public class TextualView extends JPanel implements Observer {
 
             int requestIndex = endAddressIsPickup ? shortestPath.getEndNodeNumber()/2 : shortestPath.getEndNodeNumber()/2 - 1;
             Request request = tour.getPlanningRequests().get(requestIndex);
+            boolean pointSelected;
             if (endAddressIsPickup) {
                 pointsInformation.put("Arrival time", request.getPickupArrivalTime());
                 pointsInformation.put("Process time", request.getPickupDuration()/60 + " min");
                 pointsInformation.put("Departure time", request.getPickupDepartureTime());
+                pointSelected = request.isPickupSelected();
             } else {
                 pointsInformation.put("Arrival time", request.getDeliveryArrivalTime());
                 pointsInformation.put("Process time", request.getDeliveryDuration()/60 + " min");
                 pointsInformation.put("Departure time", request.getDeliveryDepartureTime());
+                pointSelected = request.isDeliverySelected();
             }
-            displayInformation(parentPanel, pointsInformation, request.getColor(), tourIntersectionsPanels, false);
+            System.out.println(shortestPath.isSelected());
+            displayInformation(parentPanel, pointsInformation, request.getColor(), tourIntersectionsPanels, pointSelected);
         }
     }
 
@@ -349,10 +354,6 @@ public class TextualView extends JPanel implements Observer {
         label.setForeground(Constants.COLOR_3);
     }
 
-    public List<JPanel> getRequestPanels() {
-        return requestPanels;
-    }
-
     /**
      * Method called by observable instances when the textual view must be updated.
      * @param o observable instance which send the notification
@@ -404,4 +405,47 @@ public class TextualView extends JPanel implements Observer {
         }
     }
 
+    public void setRequestPanelMouseEntered(int indexPanel) {
+        for (Component childComponent : requestPanels.get(indexPanel).getComponents()) {
+            JPanel childPanel = (JPanel) childComponent;
+            childPanel.setBackground(Constants.COLOR_2);
+            childPanel.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, Constants.COLOR_2));
+        }
+    }
+
+    public void setTourIntersectionPanelMouseEntered(int indexPanel) {
+        for (Component childComponent : tourIntersectionsPanels.get(indexPanel).getComponents()) {
+            JPanel childPanel = (JPanel) childComponent;
+            childPanel.setBackground(Constants.COLOR_2);
+            childPanel.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, Constants.COLOR_2));
+        }
+    }
+
+    public void setRequestPanelMouseExited(int indexPanel) {
+        Request request = tour.getPlanningRequests().get(indexPanel);
+        if (!request.isDeliverySelected() || !request.isPickupSelected()) {
+            for (Component childComponent : requestPanels.get(indexPanel).getComponents()) {
+                JPanel childPanel = (JPanel) childComponent;
+                childPanel.setBackground(Constants.COLOR_4);
+                childPanel.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, Constants.COLOR_4));
+            }
+        }
+    }
+
+    public void setTourIntersectionPanelMouseExited(int indexPanel) {
+        ShortestPath shortestPath = tour.getListShortestPaths().get(indexPanel);
+        boolean tourIntersectionSelected;
+        if (shortestPath.getEndNodeNumber() % 2 == 1) {
+            tourIntersectionSelected = tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2).isPickupSelected();
+        } else {
+            tourIntersectionSelected = tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2 - 1).isDeliverySelected();
+        }
+        if (!tourIntersectionSelected) {
+            for (Component childComponent : tourIntersectionsPanels.get(indexPanel).getComponents()) {
+                JPanel childPanel = (JPanel) childComponent;
+                childPanel.setBackground(Constants.COLOR_4);
+                childPanel.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, Constants.COLOR_4));
+            }
+        }
+    }
 }
