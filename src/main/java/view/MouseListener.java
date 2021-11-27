@@ -29,6 +29,8 @@ public class MouseListener extends MouseAdapter {
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (TextualView.requestPanels.contains((JPanel) e.getSource())) {
                 controller.leftClickOnRequest(TextualView.requestPanels.indexOf((JPanel) e.getSource()));
+            } else if (TextualView.tourIntersectionsPanels.contains((JPanel) e.getSource())) {
+                controller.leftClickOnTourIntersection(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
             }
         }
     }

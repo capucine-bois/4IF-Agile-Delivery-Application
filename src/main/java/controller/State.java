@@ -42,6 +42,8 @@ public interface State {
 
     public default void leftClickOnRequest(int indexRequest, Tour tour) {};
 
+    public default void leftClickOnTourIntersection(int indexShortestPath, Tour tour) {};
+
     public default void leftClickOnShortestPath(int indexShortestPath, Tour tour) {};
 
     public default void goBackToTour(Tour tour) {};

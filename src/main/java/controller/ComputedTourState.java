@@ -101,7 +101,36 @@ public class ComputedTourState implements State {
     }
 
     @Override
+    public void leftClickOnTourIntersection(int indexShortestPath, Tour tour) {
+        ShortestPath shortestPath = tour.getListShortestPaths().get(indexShortestPath);
+        Request requestClicked;
+        boolean pickupWasSelected = false;
+        boolean deliveryWasSelected = false;
+        if (shortestPath.getEndNodeNumber() % 2 == 1) {
+            requestClicked = tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2);
+            pickupWasSelected = requestClicked.isPickupSelected();
+        } else {
+            requestClicked = tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2 - 1);
+            deliveryWasSelected = requestClicked.isDeliverySelected();
+        }
+        for (Request request : tour.getPlanningRequests()) {
+            request.setPickupSelected(false);
+            request.setDeliverySelected(false);
+        }
+        if (!pickupWasSelected && shortestPath.getEndNodeNumber() % 2 == 1)  {
+            requestClicked.setPickupSelected(true);
+        } else if (!deliveryWasSelected && shortestPath.getEndNodeNumber() % 2 == 0) {
+            requestClicked.setDeliverySelected(true);
+        }
+        tour.notifyObservers();
+    }
+
+    @Override
     public void leftClickOnShortestPath(int indexShortestPath, Tour tour) {
+        for (Request request : tour.getPlanningRequests()) {
+            request.setPickupSelected(false);
+            request.setDeliverySelected(false);
+        }
         ShortestPath shortestPath = tour.getListShortestPaths().get(indexShortestPath);
         shortestPath.setSelected(true);
         if (shortestPath.getStartNodeNumber() != 0) {

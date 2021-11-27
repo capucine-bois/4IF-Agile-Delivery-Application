@@ -23,6 +23,7 @@ public class TextualView extends JPanel implements Observer {
     protected static final String GO_BACK_TO_TOUR = "Back to tour";
     protected static final String PATH_DETAILS = "Show path";
     protected static List<JPanel> requestPanels;
+    protected static List<JPanel> tourIntersectionsPanels;
     protected static List<JButton> pathDetailsButtons;
     private Tour tour;
     private final int gap = 20;
@@ -53,6 +54,7 @@ public class TextualView extends JPanel implements Observer {
         tour.addObserver(this);
         this.tour = tour;
         requestPanels = new ArrayList<>();
+        tourIntersectionsPanels = new ArrayList<>();
         pathDetailsButtons = new ArrayList<>();
         this.mouseListener = mouseListener;
         this.buttonListener = buttonListener;
@@ -116,6 +118,7 @@ public class TextualView extends JPanel implements Observer {
     private void addTourIntersections() {
         tourMainPanel.setBackground(Constants.COLOR_4);
         pathDetailsButtons.clear();
+        tourIntersectionsPanels.clear();
         Optional<ShortestPath> optionalShortestPath = tour.getListShortestPaths().stream().filter(ShortestPath::isSelected).findFirst();
         if (optionalShortestPath.isPresent()) {
             tourMainPanel.setLayout(new BorderLayout());
@@ -187,7 +190,7 @@ public class TextualView extends JPanel implements Observer {
                 pointsInformation.put("Process time", request.getDeliveryDuration()/60 + " min");
                 pointsInformation.put("Departure time", request.getDeliveryDepartureTime());
             }
-            displayInformation(parentPanel, pointsInformation, request.getColor(), null, false);
+            displayInformation(parentPanel, pointsInformation, request.getColor(), tourIntersectionsPanels, false);
         }
     }
 
