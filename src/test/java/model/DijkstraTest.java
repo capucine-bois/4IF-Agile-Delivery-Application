@@ -98,7 +98,8 @@ public class DijkstraTest {
         tour.setDepotAddress(i1);
         listRequest.add(r1);
         listRequest.add(r2);
-        tour.setPlanningRequests(listRequest);
+        tour.addRequest(r1);
+        tour.addRequest(r2);
 
         // Setup Dijkstra input
         listUsefulPoints.add(i2);

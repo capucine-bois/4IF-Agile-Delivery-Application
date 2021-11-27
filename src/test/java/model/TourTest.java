@@ -40,7 +40,7 @@ class TourTest {
     }
 
     @BeforeEach
-    public void resetCityMap() throws IOException, SAXException, ParserConfigurationException, ExceptionXML {
+    public void resetCityMap() {
         initializeMapAndTour();
     }
 
@@ -96,7 +96,8 @@ class TourTest {
         tour.setDepotAddress(i1);
         listRequest.add(r1);
         listRequest.add(r2);
-        tour.setPlanningRequests(listRequest);
+        tour.addRequest(r1);
+        tour.addRequest(r2);
     }
 
 
