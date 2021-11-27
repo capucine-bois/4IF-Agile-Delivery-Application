@@ -48,6 +48,7 @@ public class ButtonListener implements ActionListener {
             case TextualView.REQUESTS_HEADER -> controller.showRequestsPanel();
             case TextualView.TOUR_HEADER -> controller.showTourPanel();
             case TextualView.GO_BACK_TO_TOUR -> controller.goBackToTour();
+            case TextualView.PATH_DETAILS -> controller.leftClickOnShortestPath(TextualView.pathDetailsButtons.indexOf((JButton) e.getSource()));
         }
     }
 

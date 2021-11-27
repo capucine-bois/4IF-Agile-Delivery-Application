@@ -14,17 +14,10 @@ import java.awt.event.MouseWheelEvent;
 public class MouseListener extends MouseAdapter {
 
     private Controller controller;
-    private TextualView textualView;
     private GraphicalView graphicalView;
-    private Window window;
 
-    public MouseListener(Controller controller, Window window) {
+    public MouseListener(Controller controller) {
         this.controller = controller;
-        this.window = window;
-    }
-
-    public void setTextualView(TextualView textualView) {
-        this.textualView = textualView;
     }
 
     public void setGraphicalView(GraphicalView graphicalView) {
@@ -34,10 +27,8 @@ public class MouseListener extends MouseAdapter {
     @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
-            if (textualView.getRequestPanels().contains((JPanel) e.getSource())) {
-                controller.leftClickOnRequest(textualView.getRequestPanels().indexOf((JPanel) e.getSource()));
-            } else if (textualView.getShortestPathsPanels().contains((JPanel) e.getSource())) {
-                controller.leftClickOnShortestPath(textualView.getShortestPathsPanels().indexOf((JPanel) e.getSource()));
+            if (TextualView.requestPanels.contains((JPanel) e.getSource())) {
+                controller.leftClickOnRequest(TextualView.requestPanels.indexOf((JPanel) e.getSource()));
             }
         }
     }
