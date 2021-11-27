@@ -36,9 +36,9 @@ public interface State {
      */
     public default void computeTour(CityMap cityMap, Tour tour, Window window, Controller controller) {};
 
-    public default void showRequestsPanel(Window window) {};
+    public default void showRequestsPanel(Tour tour, Window window) {};
 
-    public default void showTourPanel(Window window) {};
+    public default void showTourPanel(Tour tour, Window window) {};
 
     public default void leftClickOnRequest(int indexRequest, Tour tour) {};
 
