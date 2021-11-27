@@ -194,6 +194,8 @@ public class TextualView extends JPanel implements Observer {
     private void displayShortestPath(JPanel parentPanel, ShortestPath shortestPath) {
         JPanel pathPanel = new JPanel();
         pathPanel.setLayout(new BorderLayout());
+        pathPanel.setBorder(BorderFactory.createMatteBorder(0,0,0,10, Constants.COLOR_4));
+
         JLabel arrowDown = new JLabel();
         try {
             arrowDown.setIcon(new ImageIcon(Constants.getImage("arrow-down").getScaledInstance(30, 30, Image.SCALE_DEFAULT)));
@@ -210,6 +212,7 @@ public class TextualView extends JPanel implements Observer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        pathDetail.setPreferredSize(new Dimension(pathDetail.getPreferredSize().width, 30));
         pathDetailsButtons.add(pathDetail);
         pathDetail.addActionListener(buttonListener);
         pathPanel.add(pathDetail, BorderLayout.LINE_END);
