@@ -44,7 +44,7 @@ public class Window extends JFrame {
      * @throws FontFormatException raised if text font can't be loaded
      */
     public Window(CityMap cityMap, Tour tour, Controller controller) throws IOException, FontFormatException {
-        mouseListener = new MouseListener(controller, this);
+        mouseListener = new MouseListener(controller);
         buttonListener = new ButtonListener(controller, this);
         componentListener = new ComponentListener(this, graphicalView);
         graphicalView = new GraphicalView(cityMap, tour, this, mouseListener);

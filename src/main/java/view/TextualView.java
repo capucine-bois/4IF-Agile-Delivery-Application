@@ -22,12 +22,12 @@ public class TextualView extends JPanel implements Observer {
     protected static final String TOUR_HEADER = "Tour";
     protected static final String GO_BACK_TO_TOUR = "Back to tour";
     protected static final String PATH_DETAILS = "Show path";
+    protected static List<JPanel> requestPanels;
+    protected static List<JButton> pathDetailsButtons;
     private Tour tour;
     private final int gap = 20;
     private final int colorWidth = 10;
     private final int border = 10;
-    private List<JPanel> requestPanels;
-    protected static List<JButton> pathDetailsButtons;
     private CardLayout cardLayout;
     private Window window;
     private JButton requestsHeader;
@@ -54,7 +54,6 @@ public class TextualView extends JPanel implements Observer {
         this.tour = tour;
         requestPanels = new ArrayList<>();
         pathDetailsButtons = new ArrayList<>();
-        mouseListener.setTextualView(this);
         this.mouseListener = mouseListener;
         this.buttonListener = buttonListener;
         this.window = w;
