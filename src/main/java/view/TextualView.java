@@ -194,7 +194,6 @@ public class TextualView extends JPanel implements Observer {
                 pointsInformation.put("Departure time", request.getDeliveryDepartureTime());
                 pointSelected = request.isDeliverySelected();
             }
-            System.out.println(shortestPath.isSelected());
             displayInformation(parentPanel, pointsInformation, request.getColor(), tourIntersectionsPanels, pointSelected);
         }
     }
