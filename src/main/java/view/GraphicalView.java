@@ -148,16 +148,16 @@ public class GraphicalView extends JPanel implements Observer {
                 int deliveryCoordinateX = getCoordinateX(deliveryAddress);
                 int deliveryCoordinateY = getCoordinateY(deliveryAddress);
                 if (!oneRequestSelected || request.isSelected()) {
-                    drawIcon(request.getColor(), pickupCoordinateX, pickupCoordinateY, "pickup-icon.png");
-                    drawIcon(request.getColor(), deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
+                    drawIcon(request.getColor(), pickupCoordinateX, pickupCoordinateY, "pickup-icon");
+                    drawIcon(request.getColor(), deliveryCoordinateX, deliveryCoordinateY, "delivery-icon");
                 } else {
-                    drawIcon(Constants.COLOR_4, pickupCoordinateX, pickupCoordinateY, "pickup-icon.png");
-                    drawIcon(Constants.COLOR_4, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
+                    drawIcon(Constants.COLOR_4, pickupCoordinateX, pickupCoordinateY, "pickup-icon");
+                    drawIcon(Constants.COLOR_4, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon");
                 }
             }
             int depotCoordinateX = getCoordinateX(tour.getDepotAddress());
             int depotCoordinateY = getCoordinateY(tour.getDepotAddress());
-            drawIcon(null, depotCoordinateX, depotCoordinateY, "depot-icon.png");
+            drawIcon(null, depotCoordinateX, depotCoordinateY, "depot-icon");
         }
     }
 
@@ -249,11 +249,11 @@ public class GraphicalView extends JPanel implements Observer {
     /**
      * Draw the icon for a depot, pickup or delivery address
      * @param color color of the icon
-     * @param iconFileName name of the icon file
+     * @param iconName name of the icon file
      */
-    private void drawIcon(Color color, int coordinateX, int coordinateY, String iconFileName) {
+    private void drawIcon(Color color, int coordinateX, int coordinateY, String iconName) {
         try {
-            BufferedImage image = Constants.getImage(iconFileName);
+            BufferedImage image = Constants.getImage(iconName);
             if (color != null) fillColorInImage(image, color);
             g.drawImage(image, coordinateX - 20, coordinateY - 40, 40, 40, this);
         } catch (IOException e) {

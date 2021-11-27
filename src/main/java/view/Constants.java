@@ -40,11 +40,18 @@ public class Constants {
 
     /**
      * Get image for a given image name
-     * @param filename name of the image file
+     * @param iconName name of the icon in the image file
      * @return buffered image linked to the image
      * @throws IOException raised if the file can not be read
      */
-    public static BufferedImage getImage(String filename) throws IOException {
-        return ImageIO.read(new File("src/main/resources/img/" + filename));
+    public static BufferedImage getImage(String iconName) throws IOException {
+        int screenSize = Toolkit.getDefaultToolkit().getScreenSize().width;
+        String iconSize = "-";
+        if (screenSize > 1800) {
+            iconSize += "large";
+        } else {
+            iconSize += "medium";
+        }
+        return ImageIO.read(new File("src/main/resources/img/" + iconName + iconSize + ".png"));
     }
 }

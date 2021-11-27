@@ -36,8 +36,6 @@ public class MouseListener extends MouseAdapter {
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (textualView.getRequestPanels().contains((JPanel) e.getSource())) {
                 controller.leftClickOnRequest(textualView.getRequestPanels().indexOf((JPanel) e.getSource()));
-            } else if (textualView.getShortestPathsPanels().contains((JPanel) e.getSource())) {
-                controller.leftClickOnShortestPath(textualView.getShortestPathsPanels().indexOf((JPanel) e.getSource()));
             }
         }
     }
