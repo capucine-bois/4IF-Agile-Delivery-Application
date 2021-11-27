@@ -144,8 +144,8 @@ public class DijkstraTest {
             //number of shortest paths
             assertEquals(6,sp1.size(), "Wrong number of shortest paths for Intersection 1");
             //number of segments in each shortest paths
-            assertEquals(1,sp1.get(1).getListSegments().size(), "Wrong number of segments in first SP for Intersection 1");
-            assertEquals(2,sp1.get(2).getListSegments().size(), "Wrong number of segments in second SP for Intersection 1");
+            assertEquals(2,sp1.get(3).getListSegments().size(), "Wrong number of segments in first SP for Intersection 1 to Intersection 4");
+            assertEquals(2,sp1.get(1).getListSegments().size(), "Wrong number of segments in second SP for Intersection 1 to Intersection 2");
 
             //Intersection of each list of segment (each shortest path)
             //first interesting shortest path
