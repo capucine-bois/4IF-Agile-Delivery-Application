@@ -53,9 +53,14 @@ public class Request {
     private String deliveryDepartureTime;
 
     /**
-     * The selected state of the request.
+     * The selected state of the pickup.
      */
-    private boolean selected;
+    private boolean pickupSelected;
+
+    /**
+     * The selected state of the delivery.
+     */
+    private boolean deliverySelected;
 
     /**
      * The color of the request.
@@ -77,7 +82,8 @@ public class Request {
         this.deliveryDuration = deliveryDuration;
         this.pickupAddress = pickupAddress;
         this.deliveryAddress = deliveryAddress;
-        this.selected = false;
+        this.pickupSelected = false;
+        this.deliverySelected = false;
         this.color = color;
     }
 
@@ -115,8 +121,12 @@ public class Request {
         return deliveryDepartureTime;
     }
 
-    public boolean isSelected() {
-        return selected;
+    public boolean isPickupSelected() {
+        return pickupSelected;
+    }
+
+    public boolean isDeliverySelected() {
+        return deliverySelected;
     }
 
     public Color getColor() {
@@ -157,7 +167,13 @@ public class Request {
         this.deliveryDepartureTime = deliveryDepartureTime;
     }
 
-    public void setSelected(boolean selected) { this.selected = selected; }
+    public void setPickupSelected(boolean pickupSelected) {
+        this.pickupSelected = pickupSelected;
+    }
+
+    public void setDeliverySelected(boolean deliverySelected) {
+        this.deliverySelected = deliverySelected;
+    }
 
     public void setColor(Color color) {
         this.color = color;

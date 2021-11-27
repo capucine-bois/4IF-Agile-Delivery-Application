@@ -70,13 +70,13 @@ public class ComputedTourState implements State {
 
     @Override
     public void leftClickOnRequest(int indexRequest, Tour tour) {
-        Request requestClicked = tour.getPlanningRequests().get(indexRequest);
-        if (requestClicked.isSelected()) {
-            requestClicked.setSelected(false);
-        } else {
-            requestClicked.setSelected(true);
-            for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
-                if (i != indexRequest) tour.getPlanningRequests().get(i).setSelected(false);
+        for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
+            if (i != indexRequest) {
+                tour.getPlanningRequests().get(i).setPickupSelected(false);
+                tour.getPlanningRequests().get(i).setDeliverySelected(false);
+            } else {
+                tour.getPlanningRequests().get(i).setPickupSelected(true);
+                tour.getPlanningRequests().get(i).setDeliverySelected(true);
             }
         }
         tour.notifyObservers();
@@ -84,13 +84,35 @@ public class ComputedTourState implements State {
 
     @Override
     public void leftClickOnShortestPath(int indexShortestPath, Tour tour) {
+        for (Request request : tour.getPlanningRequests()) {
+            request.setPickupSelected(false);
+            request.setPickupSelected(false);
+        }
         ShortestPath shortestPath = tour.getListShortestPaths().get(indexShortestPath);
         shortestPath.setSelected(true);
+        if (shortestPath.getStartNodeNumber() != 0) {
+            if (shortestPath.getStartNodeNumber() % 2 == 1) {
+                tour.getPlanningRequests().get(shortestPath.getStartNodeNumber() / 2).setPickupSelected(false);
+            } else {
+                tour.getPlanningRequests().get(shortestPath.getStartNodeNumber() / 2 - 1).setDeliverySelected(false);
+            }
+        }
+        if (shortestPath.getEndNodeNumber() != 0) {
+            if (shortestPath.getEndNodeNumber() % 2 == 1) {
+                tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2).setPickupSelected(false);
+            } else {
+                tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2 - 1).setDeliverySelected(false);
+            }
+        }
         tour.notifyObservers();
     }
 
     @Override
     public void goBackToTour(Tour tour) {
+        for (Request request : tour.getPlanningRequests()) {
+            request.setPickupSelected(false);
+            request.setPickupSelected(false);
+        }
         for (ShortestPath shortestPath : tour.getListShortestPaths()) {
             shortestPath.setSelected(false);
         }

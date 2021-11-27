@@ -285,7 +285,7 @@ public class TextualView extends JPanel implements Observer {
             requestInformation.put("Pickup duration", pickupDuration);
             requestInformation.put("Delivery address", deliveryCoordinates);
             requestInformation.put("Delivery duration", deliveryDuration);
-            displayInformation(parentPanel, requestInformation, request.getColor(), requestPanels, request.isSelected());
+            displayInformation(parentPanel, requestInformation, request.getColor(), requestPanels, request.isPickupSelected() && request.isDeliverySelected());
             parentPanel.add(Box.createRigidArea(new Dimension(0, gap)));
         }
     }

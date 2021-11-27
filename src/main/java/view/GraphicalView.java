@@ -138,7 +138,7 @@ public class GraphicalView extends JPanel implements Observer {
         }
 
         if (!tour.getPlanningRequests().isEmpty()) {
-            boolean oneRequestSelected = tour.getPlanningRequests().stream().anyMatch(Request::isSelected);
+            boolean oneRequestPointSelected = tour.getPlanningRequests().stream().anyMatch(req -> req.isDeliverySelected() || req.isPickupSelected());
             for (Request request : tour.getPlanningRequests()) {
 
                 Intersection pickupAddress = request.getPickupAddress();
@@ -147,11 +147,14 @@ public class GraphicalView extends JPanel implements Observer {
                 Intersection deliveryAddress = request.getDeliveryAddress();
                 int deliveryCoordinateX = getCoordinateX(deliveryAddress);
                 int deliveryCoordinateY = getCoordinateY(deliveryAddress);
-                if (!oneRequestSelected || request.isSelected()) {
+                if (!oneRequestPointSelected || request.isPickupSelected()) {
                     drawIcon(request.getColor(), pickupCoordinateX, pickupCoordinateY, "pickup-icon");
-                    drawIcon(request.getColor(), deliveryCoordinateX, deliveryCoordinateY, "delivery-icon");
                 } else {
                     drawIcon(Constants.COLOR_4, pickupCoordinateX, pickupCoordinateY, "pickup-icon");
+                }
+                if (!oneRequestPointSelected || request.isDeliverySelected()) {
+                    drawIcon(request.getColor(), deliveryCoordinateX, deliveryCoordinateY, "delivery-icon");
+                } else {
                     drawIcon(Constants.COLOR_4, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon");
                 }
             }
