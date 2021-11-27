@@ -44,17 +44,59 @@ class TourTest {
         initializeMapAndTour();
     }
 
-    private void initializeMapAndTour() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
-        listIntersection = new ArrayList<>();
+    private void initializeMapAndTour() {
+        tour = new Tour();
         cityMap = new CityMap();
-        File fileMap = new File("./src/test/resources/mapTestDijkstra.xml");
-        File fileReq = new File("./src/test/resources/requestsTestDijkstra.xml");
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document docParsedMap = db.parse(fileMap);
-        Document docParsedReq = db.parse(fileReq);
-        deserializeMap(cityMap, docParsedMap);
-        deserializeRequests(tour, cityMap, docParsedReq);
+        listIntersection = new ArrayList<>();
+        listRequest = new ArrayList<>();
+        // Setup intersection
+        Intersection i1 = new Intersection(1,45.75406,4.857418);
+        Intersection i2 = new Intersection(2,45.750404,4.8744674);
+        Intersection i3 = new Intersection(3,45.75871,4.8704023);
+        Intersection i4 = new Intersection(4,45.75171,4.871819);
+        Intersection i5 = new Intersection(5,45.750896,4.859119);
+        Intersection i6 = new Intersection(6,45.75159,4.8700043);
+        // Setup segment
+        Segment s1 = new Segment(75,"Rue du Dauphiné",i1,i6);
+        Segment s2 = new Segment(75,"Rue du Pardo",i6,i1);
+        Segment s3 = new Segment(77,"Rue du Brager",i6,i2);
+        Segment s4 = new Segment(77,"Rue de l'avenir",i2,i6);
+        Segment s5 = new Segment(68,"Rue d'Esteban",i4,i6);
+        Segment s6 = new Segment(68,"Rue de Fabien",i6,i4);
+        Segment s7 = new Segment(9,"Rue de la Republique",i5,i6);
+        Segment s8 = new Segment(9,"Rue de Domrémy",i6,i5);
+        Segment s9 = new Segment(16,"Cours Albert Thomas",i4,i2);
+        Segment s10 = new Segment(16,"Cours Thomas",i2,i4);
+        Segment s11 = new Segment(118,"Boulevard Vivier-Merle",i5,i3);
+        Segment s12 = new Segment(118,"oulevard Vivier-Pat",i3,i5);
+        // Setup request
+        Request r1 = new Request(180,240,i2,i3,Color.BLACK);
+        Request r2 = new Request(90,185,i4,i5,Color.BLACK);
+        i1.addAdjacentSegment(s2);
+        i2.addAdjacentSegment(s3);
+        i2.addAdjacentSegment(s9);
+        i3.addAdjacentSegment(s11);
+        i4.addAdjacentSegment(s6);
+        i4.addAdjacentSegment(s10);
+        i5.addAdjacentSegment(s8);
+        i5.addAdjacentSegment(s12);
+        i6.addAdjacentSegment(s1);
+        i6.addAdjacentSegment(s4);
+        i6.addAdjacentSegment(s5);
+        i6.addAdjacentSegment(s7);
+        // Setup CityMap
+        cityMap.addIntersection(i1);
+        cityMap.addIntersection(i2);
+        cityMap.addIntersection(i3);
+        cityMap.addIntersection(i4);
+        cityMap.addIntersection(i5);
+        cityMap.addIntersection(i6);
+        // Setup tour
+        tour.setDepartureTime("8:0:0");
+        tour.setDepotAddress(i1);
+        listRequest.add(r1);
+        listRequest.add(r2);
+        tour.setPlanningRequests(listRequest);
     }
 
 
