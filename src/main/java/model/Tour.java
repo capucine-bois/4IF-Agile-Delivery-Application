@@ -116,6 +116,8 @@ public class Tour extends Observable {
             e.printStackTrace();
         }
     }
+    public void setPlanningRequests(ArrayList<Request> listRequest) {
+    }
 
     /* METHODS */
 
@@ -182,6 +184,11 @@ public class Tour extends Observable {
         }
 
         listNodes.add(0,new Node(depotAddress,dijkstra(allIntersectionsList,listUsefulEndPointsForDepot,depotAddress),0));
+
+
+        // check if the intersection in the planning request are in the same component of the graph
+
+
 
 
         // Run Tour
@@ -334,6 +341,8 @@ public class Tour extends Observable {
         return (meters/(speed*1000))*60*60;
     }
 
+
+
     /**
      * This inner class groups an intersection and its distance to the origin, its color and its parent (which is a dijkstra object so we also get the parent's distance and color and its parent itself)
      */
@@ -391,6 +400,59 @@ public class Tour extends Observable {
         }
 
 
+    }
+
+    /**
+     * Check if the two intersections in parameter are in the same strongly connected part
+     * @param firstIntersection
+     * @param secondIntersection
+     * @param listIntersection the list of all intersections
+     * @return true if there are in the same strongly connected part, false otherwise
+     */
+    public boolean sameStronglyConnected(Intersection firstIntersection, Intersection secondIntersection, ArrayList<Intersection> listIntersection) {
+        ArrayList<ObjectDijkstra> listObjectDijkstra = foretDFS(listIntersection);
+        ObjectDijkstra objFirst = listObjectDijkstra.stream().filter(x -> x.getIntersection()==firstIntersection).findFirst().get();
+        ObjectDijkstra objSecond = listObjectDijkstra.stream().filter(x -> x.getIntersection()==secondIntersection).findFirst().get();
+        while(objFirst.getParent()!=null)
+            objFirst = objFirst.getParent();
+        while(objSecond.getParent()!=null) {
+            objSecond = objSecond.getParent();
+        }
+        return objFirst.equals(objSecond);
+    }
+
+    /**
+     * Return an array with a predecessor for each intersection
+     * @param listIntersections list of all intersections
+     * @return a list of dijkstra object (thus each will have his parent)
+     */
+    public ArrayList<ObjectDijkstra> foretDFS(ArrayList<Intersection> listIntersections) {
+        ArrayList<ObjectDijkstra> listObjectDijkstra = new ArrayList<>();
+        for(Intersection intersection : listIntersections) {
+            listObjectDijkstra.add(new ObjectDijkstra(intersection, null, 0.0, 0));
+        }
+        for(ObjectDijkstra objectDijkstra : listObjectDijkstra) {
+            if(objectDijkstra.getColor()==0)
+                DFSrec(listObjectDijkstra,objectDijkstra);
+        }
+        return listObjectDijkstra;
+    }
+
+    /**
+     * Depth first search to put a parent for each intersection
+     * @param listObjectDijsktra list of all dijkstra object
+     * @param origin the vertex which we look the successor
+     */
+    public void DFSrec(ArrayList<ObjectDijkstra> listObjectDijsktra, ObjectDijkstra origin) {
+        origin.setColor(1);
+        for(Segment successor : origin.getIntersection().getAdjacentSegments()) {
+            ObjectDijkstra objTmp = listObjectDijsktra.stream().filter(x -> x.getIntersection().equals(successor.getDestination())).findFirst().get();
+            if(objTmp.getColor()==0) {
+                objTmp.setParent(origin);
+                DFSrec(listObjectDijsktra, objTmp);
+            }
+        }
+        origin.setColor(2);
     }
 
     /**
