@@ -52,6 +52,10 @@ public class RequestsLoadedState implements State {
     @Override
     public void computeTour(CityMap cityMap, Tour tour, Window window, Controller controller) {
         tour.computeTour(cityMap.getIntersections());
+        for (Request request : tour.getPlanningRequests()) {
+            request.setPickupSelected(false);
+            request.setDeliverySelected(false);
+        }
         controller.setCurrentState(controller.computedTourState);
         window.showTourPanel();
         window.setEnabledTour(true);
@@ -70,5 +74,11 @@ public class RequestsLoadedState implements State {
             }
         }
         tour.notifyObservers();
+    }
+
+    @Override
+    public void leftClickOnIcon(int indexIcon, Tour tour) {
+        int indexRequest = indexIcon%2 == 0 ? indexIcon/2 - 1 : indexIcon/2;
+        leftClickOnRequest(indexRequest, tour);
     }
 }

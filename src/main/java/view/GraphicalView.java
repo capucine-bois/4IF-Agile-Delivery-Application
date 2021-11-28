@@ -368,4 +368,45 @@ public class GraphicalView extends JPanel implements Observer {
         previousMouseY = y;
     }
 
+    public int findIcon(int x, int y) {
+        int indexIcon = -1;
+        for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
+            Intersection pickupAddress = tour.getPlanningRequests().get(i).getPickupAddress();
+            int pickupCoordinateX = getCoordinateX(pickupAddress);
+            int pickupCoordinateY = getCoordinateY(pickupAddress);
+            if (x >= pickupCoordinateX - 20  && x <= pickupCoordinateX + 20 && y >= pickupCoordinateY - 40 && y <= pickupCoordinateY) {
+                if (checkCursorOnIcon(x - (pickupCoordinateX - 20), y - (pickupCoordinateY - 40), "depot-icon")) {
+                    indexIcon = i * 2 + 1;
+                }
+            }
+            Intersection deliveryAddress = tour.getPlanningRequests().get(i).getDeliveryAddress();
+            int deliveryCoordinateX = getCoordinateX(deliveryAddress);
+            int deliveryCoordinateY = getCoordinateY(deliveryAddress);
+            if (x >= deliveryCoordinateX - 20  && x <= deliveryCoordinateX + 20 && y >= deliveryCoordinateY - 40 && y <= deliveryCoordinateY) {
+                if (checkCursorOnIcon(x - (deliveryCoordinateX - 20), y - (deliveryCoordinateY - 40), "depot-icon")) {
+                    indexIcon = i * 2 + 2;
+                }
+            }
+        }
+        return indexIcon;
+    }
+
+    private boolean checkCursorOnIcon(int x, int y, String iconName) {
+        boolean cursorOnIcon = true;
+        BufferedImage image = null;
+        try {
+            image = Constants.getImage(iconName);
+            x = (x * (image.getWidth())) / 40;
+            y = (y * (image.getHeight())) / 40;
+            if (x == image.getWidth()) x -= 1;
+            if (y == image.getHeight()) y -= 1;
+            Color color = new Color(image.getRGB(x, y), true);
+            if (color.getAlpha() == 0) {
+                cursorOnIcon = false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return cursorOnIcon;
+    }
 }

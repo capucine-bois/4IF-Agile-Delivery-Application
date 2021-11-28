@@ -36,6 +36,9 @@ public class MouseListener extends MouseAdapter {
                 controller.leftClickOnRequest(TextualView.requestPanels.indexOf((JPanel) e.getSource()));
             } else if (TextualView.tourIntersectionsPanels.contains((JPanel) e.getSource())) {
                 controller.leftClickOnTourIntersection(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
+            } else if (graphicalView.contains(e.getX(), e.getY())) {
+               int indexIcon = graphicalView.findIcon(e.getX(), e.getY());
+               if (indexIcon != -1) controller.leftClickonIcon(indexIcon);
             }
         }
     }
@@ -55,6 +58,15 @@ public class MouseListener extends MouseAdapter {
             textualView.setRequestPanelMouseExited(TextualView.requestPanels.indexOf((JPanel) e.getSource()));
         } else if (TextualView.tourIntersectionsPanels.contains((JPanel) e.getSource())) {
             textualView.setTourIntersectionPanelMouseExited(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
+        }
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        graphicalView.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        if (graphicalView.contains(e.getX(), e.getY())) {
+            int indexIcon = graphicalView.findIcon(e.getX(), e.getY());
+            if (indexIcon != -1) graphicalView.setCursor(new Cursor(Cursor.HAND_CURSOR));
         }
     }
 

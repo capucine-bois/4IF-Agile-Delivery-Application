@@ -161,4 +161,10 @@ public class ComputedTourState implements State {
         }
         tour.notifyObservers();
     }
+
+    @Override
+    public void leftClickOnIcon(int indexIcon, Tour tour) {
+        ShortestPath shortestPath = tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexIcon).findFirst().get();
+        leftClickOnTourIntersection(tour.getListShortestPaths().indexOf(shortestPath), tour);
+    }
 }

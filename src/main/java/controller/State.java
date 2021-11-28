@@ -47,4 +47,6 @@ public interface State {
     public default void leftClickOnShortestPath(int indexShortestPath, Tour tour) {};
 
     public default void goBackToTour(Tour tour) {};
+
+    public default void leftClickOnIcon(int indexIcon, Tour tour) {};
 }

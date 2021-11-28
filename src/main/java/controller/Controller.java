@@ -96,4 +96,8 @@ public class Controller {
     public void goBackToTour() {
         currentState.goBackToTour(tour);
     }
+
+    public void leftClickonIcon(int indexIcon) {
+        currentState.leftClickOnIcon(indexIcon, tour);
+    }
 }
