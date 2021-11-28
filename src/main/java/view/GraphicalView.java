@@ -193,10 +193,41 @@ public class GraphicalView extends JPanel implements Observer {
                 g2.setColor(color);
                 g2.setStroke(new BasicStroke(strokeSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                 g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+                displayArrow(g2, originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
                 if (displayRoadNames) {
                     displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY, true);
                 }
             }
+        }
+    }
+
+    private void displayArrow(Graphics2D g2, int originX, int originY, int destinationX, int destinationY) {
+        double oppositeSide = destinationY - originY;
+        double adjacentSide = destinationX - originX;
+        double hypotenuseSize = Math.sqrt(oppositeSide * oppositeSide + adjacentSide * adjacentSide);
+        if (hypotenuseSize > 80) {
+            double angle = Math.atan(oppositeSide / adjacentSide);
+            int middleX;
+            int middleY;
+            if (originX > destinationX) {
+                middleX = (int) (originX - Math.abs(adjacentSide) / 2);
+                angle -= Math.PI;
+            } else {
+                middleX = (int) (originX + Math.abs(adjacentSide) / 2);
+            }
+            if (originY > destinationY) {
+                middleY = (int) (originY - Math.abs(oppositeSide) / 2);
+            } else {
+                middleY = (int) (originY + Math.abs(oppositeSide) / 2);
+            }
+            g2.translate(middleX, middleY);
+            BasicStroke stroke = (BasicStroke) g2.getStroke();
+            g2.setStroke(new BasicStroke(stroke.getLineWidth()/2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g2.rotate(angle + 3 * Math.PI / 4);
+            g2.drawLine(0, 0, (int) (2 * scale), 0);
+            g2.drawLine(0, 0, 0, (int) (2 * scale));
+            g2.rotate(-(angle + 3 * Math.PI / 4));
+            g2.translate(-middleX, -middleY);
         }
     }
 
