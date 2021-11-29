@@ -37,7 +37,7 @@ public class Tour extends Observable {
     private ArrayList<Request> planningRequests;
 
     /**
-     * A list of shortest path which is used to print the best path
+     * A list of shortest path which is used to print the best path. Sorted ascending for optimization.
      */
     private ArrayList<ShortestPath> listShortestPaths;
 
@@ -139,6 +139,10 @@ public class Tour extends Observable {
                 }
             }
             ArrayList<ShortestPath> shortestPathsFromStartPoint = dijkstra(allIntersectionsList,listUsefulEndPoints, startPoint);
+
+            //sorting the shortestPaths in ascending order for optimization
+            Collections.sort(shortestPathsFromStartPoint);
+
             Node nodeToAdd = null;
             if(startPoint!=depotAddress) {
                 nodeToAdd = new Node(startPoint,shortestPathsFromStartPoint,iteratorNumber);
