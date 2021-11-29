@@ -24,6 +24,8 @@ public class Controller {
     protected final TourComputedState tourComputedState = new TourComputedState();
     protected final RequestsComputedState requestsComputedState = new RequestsComputedState();
     protected final PathDetailsComputedState pathDetailsComputedState = new PathDetailsComputedState();
+    protected final SelectedIntersectionState selectedIntersectionState = new SelectedIntersectionState();
+    protected final SelectedRequestState selectedRequestState = new SelectedRequestState();
 
 
     /** Constructor taking already filled cityMap and tour structures
@@ -42,11 +44,13 @@ public class Controller {
      * @param state the new current state
      */
     public void setCurrentState(State state) {
+        System.out.println("state = " + state);
         this.currentState = state;
         if (state == initialState) {
             window.setDefaultButtonStates(new boolean[]{true, false, false});
         } else if (state == mapLoadedState || state == tourComputedState ||
-                state == pathDetailsComputedState || state == requestsComputedState){
+                state == pathDetailsComputedState || state == requestsComputedState ||
+                state == selectedIntersectionState || state == selectedRequestState){
             window.setDefaultButtonStates(new boolean[]{true, true, false});
         } else {
             window.setDefaultButtonStates(new boolean[]{true, true, true});
@@ -82,11 +86,11 @@ public class Controller {
     public void showTourPanel() { currentState.showTourPanel(tour, window, this); }
 
     public void leftClickOnRequest(int indexRequest) {
-        currentState.leftClickOnRequest(indexRequest, tour);
+        currentState.leftClickOnRequest(indexRequest, tour, this);
     }
 
     public void leftClickOnTourIntersection(int indexShortestPath) {
-        currentState.leftClickOnTourIntersection(indexShortestPath, tour);
+        currentState.leftClickOnTourIntersection(indexShortestPath, tour, this);
     }
 
 
@@ -99,6 +103,6 @@ public class Controller {
     }
 
     public void leftClickonIcon(int indexIcon) {
-        currentState.leftClickOnIcon(indexIcon, tour);
+        currentState.leftClickOnIcon(indexIcon, tour, this);
     }
 }

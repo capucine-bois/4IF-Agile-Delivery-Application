@@ -68,7 +68,7 @@ public class RequestsComputedState implements State{
     }
 
     @Override
-    public void leftClickOnRequest(int indexRequest, Tour tour) {
+    public void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {
         for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
             Request request = tour.getPlanningRequests().get(i);
             if (i != indexRequest || (request.isPickupSelected() && request.isDeliverySelected())) {
@@ -80,11 +80,13 @@ public class RequestsComputedState implements State{
             }
         }
         tour.notifyObservers();
+        controller.setCurrentState(controller.selectedRequestState);
     }
 
     @Override
-    public void leftClickOnIcon(int indexIcon, Tour tour) {
+    public void leftClickOnIcon(int indexIcon, Tour tour, Controller controller) {
         ShortestPath shortestPath = tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexIcon).findFirst().get();
-        leftClickOnTourIntersection(tour.getListShortestPaths().indexOf(shortestPath), tour);
+        leftClickOnTourIntersection(tour.getListShortestPaths().indexOf(shortestPath), tour, controller);
+        controller.setCurrentState(controller.selectedIntersectionState);
     }
 }

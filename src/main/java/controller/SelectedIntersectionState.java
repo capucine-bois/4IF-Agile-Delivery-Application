@@ -7,53 +7,37 @@ import model.Tour;
 import view.Window;
 import xml.XMLDeserializer;
 
-import java.util.Optional;
-
-/**
- * Computed tour state. State of the application when a tour has been computed.
- */
-public class TourComputedState implements State {
-
-
+public class SelectedIntersectionState implements State {
     @Override
     public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
         try {
             XMLDeserializer.loadMap(cityMap);
             controller.setCurrentState(controller.mapLoadedState);
             tour.clearLists();
-            window.showRequestsPanel();
-            window.setEnabledRequests(false);
-            window.setEnabledTour(false);
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
-                cityMap.getIntersections().clear();
                 tour.clearLists();
+                cityMap.getIntersections().clear();
                 window.displayErrorMessage(e.getMessage());
                 controller.setCurrentState(controller.initialState);
-                window.showRequestsPanel();
-                window.setEnabledRequests(false);
-                window.setEnabledTour(false);
             }
         } finally {
             tour.notifyObservers();
+            window.setEnabledRequests(false);
         }
     }
+
 
     @Override
     public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
         try {
             XMLDeserializer.loadRequests(tour, cityMap);
-            controller.setCurrentState(controller.requestsLoadedState);
-            window.showRequestsPanel();
-            window.setEnabledTour(false);
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
                 tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
                 controller.setCurrentState(controller.mapLoadedState);
-                window.showRequestsPanel();
                 window.setEnabledRequests(false);
-                window.setEnabledTour(false);
             }
         } finally {
             tour.notifyObservers();
@@ -94,7 +78,7 @@ public class TourComputedState implements State {
             requestClicked.setDeliverySelected(true);
         }
         tour.notifyObservers();
-        controller.setCurrentState(controller.selectedIntersectionState);
+        //controller.setCurrentState(controller.selectedIntersectionState);
     }
 
     @Override
@@ -127,6 +111,7 @@ public class TourComputedState implements State {
     public void leftClickOnIcon(int indexIcon, Tour tour, Controller controller) {
         ShortestPath shortestPath = tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexIcon).findFirst().get();
         leftClickOnTourIntersection(tour.getListShortestPaths().indexOf(shortestPath), tour, controller);
-        controller.setCurrentState(controller.selectedIntersectionState);
+        //controller.setCurrentState(controller.selectedIntersectionState);
     }
+
 }

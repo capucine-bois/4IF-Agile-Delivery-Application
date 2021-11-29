@@ -1,15 +1,13 @@
 package controller;
 
-import model.*;
+import model.CityMap;
+import model.Request;
+import model.ShortestPath;
+import model.Tour;
 import view.Window;
 import xml.XMLDeserializer;
 
-/**
- * Request loaded state. State when the application has successfully loaded requests.
- */
-public class RequestsLoadedState implements State {
-
-
+public class SelectedRequestState implements State {
     @Override
     public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
         try {
@@ -46,17 +44,15 @@ public class RequestsLoadedState implements State {
         }
     }
 
-
     @Override
-    public void computeTour(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        tour.computeTour(cityMap.getIntersections());
+    public void showTourPanel(Tour tour, Window window, Controller controller) {
         for (Request request : tour.getPlanningRequests()) {
             request.setPickupSelected(false);
             request.setDeliverySelected(false);
         }
-        controller.setCurrentState(controller.tourComputedState);
         window.showTourPanel();
-        window.setEnabledTour(true);
+        tour.notifyObservers();
+        controller.setCurrentState(controller.tourComputedState);
     }
 
     @Override
@@ -72,12 +68,13 @@ public class RequestsLoadedState implements State {
             }
         }
         tour.notifyObservers();
+        //controller.setCurrentState(controller.selectedRequestState);
     }
 
     @Override
     public void leftClickOnIcon(int indexIcon, Tour tour, Controller controller) {
-        int indexRequest = indexIcon%2 == 0 ? indexIcon/2 - 1 : indexIcon/2;
-        leftClickOnRequest(indexRequest, tour, controller);
+        ShortestPath shortestPath = tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexIcon).findFirst().get();
+        leftClickOnTourIntersection(tour.getListShortestPaths().indexOf(shortestPath), tour, controller);
         controller.setCurrentState(controller.selectedIntersectionState);
     }
 }
