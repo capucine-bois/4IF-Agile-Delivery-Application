@@ -55,15 +55,24 @@ public class XMLdeserializerTest {
         this.listIntersection =  new ArrayList<>();
         this.cityMap = new CityMap();
         this.tour = new Tour();
-        listIntersection.add(new Intersection(1,45.750404,4.8744674));
-        listIntersection.add(new Intersection(2,45.75171,4.8718166));
-        listIntersection.add(new Intersection(3,45.754265,4.886816));
-        listIntersection.add(new Intersection(4,45.755234,4.8867016));
-        listIntersection.add(new Intersection(5,45.754894,4.8855863));
-        listIntersection.add(new Intersection(6,42.754894,4.1155863));
-        listIntersection.add(new Intersection(7,45.354894,4.4855863));
-        listIntersection.add(new Intersection(8,45.234244,4.5355862));
-        listIntersection.add(new Intersection(9,45.221244,4.9955862));
+        cityMap.addDictionaryId(1L,0L);
+        cityMap.addDictionaryId(2L,1L);
+        cityMap.addDictionaryId(3L,2L);
+        cityMap.addDictionaryId(4L,3L);
+        cityMap.addDictionaryId(5L,4L);
+        cityMap.addDictionaryId(6L,5L);
+        cityMap.addDictionaryId(7L,6L);
+        cityMap.addDictionaryId(8L,7L);
+
+        listIntersection.add(new Intersection(0,45.750404,4.8744674));
+        listIntersection.add(new Intersection(1,45.75171,4.8718166));
+        listIntersection.add(new Intersection(2,45.754265,4.886816));
+        listIntersection.add(new Intersection(3,45.755234,4.8867016));
+        listIntersection.add(new Intersection(4,45.754894,4.8855863));
+        listIntersection.add(new Intersection(5,42.754894,4.1155863));
+        listIntersection.add(new Intersection(6,45.354894,4.4855863));
+        listIntersection.add(new Intersection(7,45.234244,4.5355862));
+        listIntersection.add(new Intersection(8,45.221244,4.9955862));
 
         Segment s1 = new Segment(23.662397, "Rue Léon Blum", listIntersection.get(1), listIntersection.get(0));
         Segment s2 = new Segment(28.430933, "Avenue Édouard Herriot", listIntersection.get(3),listIntersection.get(2));
@@ -105,17 +114,16 @@ public class XMLdeserializerTest {
         }
 
         // Dictionnary
-        HashMap<Long,Long> dictionnaryId = new HashMap<>();
-        dictionnaryId.put(1L,0L);
-        dictionnaryId.put(2L,1L);
-        dictionnaryId.put(3L,2L);
-        dictionnaryId.put(4L,3L);
-        dictionnaryId.put(5L,4L);
-        dictionnaryId.put(6L,5L);
-        dictionnaryId.put(7L,6L);
-        dictionnaryId.put(8L,7L);
+        cityMap2.addDictionaryId(1L,0L);
+        cityMap2.addDictionaryId(2L,1L);
+        cityMap2.addDictionaryId(3L,2L);
+        cityMap2.addDictionaryId(4L,3L);
+        cityMap2.addDictionaryId(5L,4L);
+        cityMap2.addDictionaryId(6L,5L);
+        cityMap2.addDictionaryId(7L,6L);
+        cityMap2.addDictionaryId(8L,7L);
         // Function test
-        XMLDeserializer.parseXMLSegments(document,cityMap2,dictionnaryId);
+        XMLDeserializer.parseXMLSegments(document,cityMap2);
         List<Intersection> listIntersection1 = this.cityMap.getIntersections();
         List<Intersection> listIntersection2 = cityMap2.getIntersections();
         assertEquals(listIntersection1.size(),listIntersection2.size(), "Not the same intersections");
@@ -147,17 +155,15 @@ public class XMLdeserializerTest {
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(file);
         CityMap cityMap = new CityMap();
-        // HashMap
-        HashMap<Long,Long> dictionnaryId = new HashMap<>();
         // Function to test
-        XMLDeserializer.parseXMLIntersections(document,cityMap,dictionnaryId);
+        XMLDeserializer.parseXMLIntersections(document,cityMap);
         // Same length
         assertEquals(cityMap.getIntersections().size(), this.listIntersection.size(), "Wrong number of segments");
         // Take all keys
         List<Intersection> listIntersections2 = new ArrayList<>(cityMap.getIntersections());
         // Check if keys are all good
         for(int i = 0; i < this.listIntersection.size(); i++) {
-            assertEquals(this.listIntersection.get(i), listIntersections2.get(i));
+            assertTrue(this.listIntersection.get(i).equals(listIntersections2.get(i)));
         }
     }
 
@@ -171,24 +177,23 @@ public class XMLdeserializerTest {
     @Test
     @DisplayName("Test on parseXMLIntersections - Duplicate intersection")
     void parseXMLIntersectionsDuplicateTest() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
-        File file = new File("src/test/resources/testMap.xml");
+        File file = new File("src/test/resources/testMapDuplicate.xml");
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(file);
         CityMap cityMap = new CityMap();
 
         // Dictionnary
-        HashMap<Long,Long> dictionnaryId = new HashMap<>();
-        dictionnaryId.put(1L,0L);
-        dictionnaryId.put(2L,1L);
-        dictionnaryId.put(3L,2L);
-        dictionnaryId.put(4L,3L);
-        dictionnaryId.put(5L,4L);
-        dictionnaryId.put(6L,5L);
-        dictionnaryId.put(7L,6L);
-        dictionnaryId.put(8L,7L);
+        cityMap.addDictionaryId(1L,0L);
+        cityMap.addDictionaryId(2L,1L);
+        cityMap.addDictionaryId(3L,2L);
+        cityMap.addDictionaryId(4L,3L);
+        cityMap.addDictionaryId(5L,4L);
+        cityMap.addDictionaryId(6L,5L);
+        cityMap.addDictionaryId(7L,6L);
+        cityMap.addDictionaryId(8L,7L);
         // Function to test
-        XMLDeserializer.parseXMLIntersections(document,cityMap,dictionnaryId);
+        XMLDeserializer.parseXMLIntersections(document,cityMap);
         // Same length
         assertEquals(cityMap.getIntersections().size(), this.listIntersection.size(), "Wrong number of segments");
         // Take all keys
@@ -232,11 +237,12 @@ public class XMLdeserializerTest {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(file);
-        CityMap citymap = new CityMap();
         Tour tour = new Tour();
+
         try{
-            XMLDeserializer.deserializeRequests(tour,citymap, document);
+            XMLDeserializer.deserializeRequests(tour,cityMap, document);
         }catch(Exception exception) {
+            System.out.println(exception);
             assertTrue(exception.getMessage().contains("One of the pickup or delivery address is not an intersection of the city map."), "Request is out of the map");
         }
     }
@@ -257,10 +263,11 @@ public class XMLdeserializerTest {
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(file);
         Tour tour = new Tour();
+
         try{
             XMLDeserializer.deserializeRequests(this.tour,this.cityMap, document);
             assertEquals(this.tour.getDepotAddress(), this.listIntersection.get(5), "Bad depot adress");
-            assertEquals(this.tour.getDepartureTime(),"8:0:0" ,"Bad departure adress");
+            assertEquals(this.tour.getDepartureTime(),"08:00:00" ,"Bad departure adress");
         }catch(Exception exception) {
             fail("Exception find!");
         }
@@ -283,14 +290,13 @@ public class XMLdeserializerTest {
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(file);
         try{
-            //TODO add HashMap parameter when calling parseXMLRequests
             XMLDeserializer.parseXMLRequests(this.tour,this.cityMap, document);
             ArrayList<Request> listRequestOutput = this.tour.getPlanningRequests();
             assertEquals(listRequestOutput.size(),this.listRequest.size(),"Wrong number of requests");
             for (int j = 0; j < listRequestOutput.size(); j++) {
                 Request requestA = listRequestOutput.get(j);
                 Request requestB = listRequest.get(j);
-                assertEquals(requestA, requestB, "Request aren't the same");
+                assertTrue(requestA.equals(requestB), "Request aren't the same");
             }
         }catch(Exception exception) {
             fail("Exception find!");
