@@ -7,14 +7,13 @@ import model.Tour;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.io.IOException;
 import java.util.ArrayList;
 
 /**
  * GUI for the application.
  */
-public class Window extends JFrame implements ComponentListener {
+public class Window extends JFrame {
 
     // Titles of window buttons
     protected final static String LOAD_MAP = "Load a map";
@@ -30,11 +29,8 @@ public class Window extends JFrame implements ComponentListener {
 
     // Listeners
     private ButtonListener buttonListener;
-    private KeyboardListener keyboardListener;
-
-    // Window size
-    private int windowWidth = 800;
-    private int windowHeight = 550;
+    private MouseListener mouseListener;
+    private ComponentListener componentListener;
 
     private final String[] buttonTexts = new String[]{LOAD_MAP, LOAD_REQUEST, COMPUTE_TOUR};
     private boolean[] defaultButtonStates = new boolean[]{true, false, false};
@@ -48,32 +44,34 @@ public class Window extends JFrame implements ComponentListener {
      * @throws FontFormatException raised if text font can't be loaded
      */
     public Window(CityMap cityMap, Tour tour, Controller controller) throws IOException, FontFormatException {
-        graphicalView = new GraphicalView(cityMap, tour, this);
-        textualView = new TextualView(tour, this, controller);
+        mouseListener = new MouseListener(controller);
+        buttonListener = new ButtonListener(controller, this);
+        componentListener = new ComponentListener(this, graphicalView);
+        graphicalView = new GraphicalView(cityMap, tour, this, mouseListener);
+        textualView = new TextualView(tour, this, mouseListener, buttonListener);
         popUpView = new PopUpView(this);
         this.cityMap = cityMap;
         this.tour = tour;
-        createHeader(controller);
-        setMinimumSize(new Dimension(windowWidth, windowHeight));
-        setWindowSize();
+        createHeader();
+        int minimumWindowWidth = 800;
+        int minimumWindowHeight = 550;
+        setMinimumSize(new Dimension(minimumWindowWidth, minimumWindowHeight));
+        setWindowSize(minimumWindowWidth, minimumWindowHeight);
         setVisible(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        addComponentListener(this);
     }
 
     /**
      * Create header in GUI window with buttons for map loading, request loading, and computing tour.
-     * @param controller application controller
      * @throws IOException raised if font file can't be found
      * @throws FontFormatException raised if font can't be loaded
      */
-    private void createHeader(Controller controller) throws IOException, FontFormatException {
+    private void createHeader() throws IOException, FontFormatException {
         header = new JPanel();
         FlowLayout headerLayout = new FlowLayout(FlowLayout.LEFT);
         header.setLayout(headerLayout);
         header.setBackground(Constants.COLOR_1);
         addAppName();
-        buttonListener = new ButtonListener(controller, this);
         buttons = new ArrayList<>();
         for (String text : buttonTexts){
             JButton button = new JButton(text);
@@ -119,7 +117,7 @@ public class Window extends JFrame implements ComponentListener {
     /**
      * Set window size using windowWidth and windowHeight attributes.
      */
-    private void setWindowSize() {
+    public void setWindowSize(int windowWidth, int windowHeight) {
         int headerHeight = 50;
         int textualViewWidth = 300;
         setPreferredSize(new Dimension(windowWidth, windowHeight));
@@ -162,45 +160,6 @@ public class Window extends JFrame implements ComponentListener {
     }
 
     /**
-     * Event triggered when the window is resized.
-     * @param e event information
-     */
-    @Override
-    public void componentResized(ComponentEvent e) {
-        windowWidth = e.getComponent().getSize().width;
-        windowHeight = e.getComponent().getSize().height;
-        setWindowSize();
-        graphicalView.repaint();
-    }
-
-    /**
-     * Event triggered when the window is moved.
-     * @param e event information
-     */
-    @Override
-    public void componentMoved(ComponentEvent e) {
-
-    }
-
-    /**
-     * Event triggers when the window shows up.
-     * @param e event information
-     */
-    @Override
-    public void componentShown(ComponentEvent e) {
-
-    }
-
-    /**
-     * Event triggered when the window turns hidden.
-     * @param e event information
-     */
-    @Override
-    public void componentHidden(ComponentEvent e) {
-
-    }
-
-    /**
      * Setter for defaultButtonStates attribute.
      * @param defaultButtonStates wanted value for defaultButtonStates attribute.
      */
@@ -216,6 +175,22 @@ public class Window extends JFrame implements ComponentListener {
     public void hideLoader() {
         this.resetComponentsState();
         this.popUpView.hideLoader();
+    }
+
+    public void showRequestsPanel() {
+        textualView.showRequestsPanel();
+    }
+
+    public void showTourPanel() {
+        textualView.showTourPanel();
+    }
+
+    public void setEnabledRequests(boolean enabled) {
+        textualView.setEnabledRequests(enabled);
+    }
+
+    public void setEnabledTour(boolean enabled) {
+        textualView.setEnabledTour(enabled);
     }
 
 }

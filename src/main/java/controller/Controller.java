@@ -74,31 +74,30 @@ public class Controller {
     /**
      * Compute tour to accomplish all the requests as fast as possible (solving TSP problem).
      */
-    public void computeTour() { currentState.computeTour(cityMap, tour, this); }
+    public void computeTour() { currentState.computeTour(cityMap, tour, window, this); }
+
+    public void showRequestsPanel() { currentState.showRequestsPanel(tour, window); }
+
+    public void showTourPanel() { currentState.showTourPanel(tour, window); }
 
     public void leftClickOnRequest(int indexRequest) {
-        Request requestClicked = tour.getPlanningRequests().get(indexRequest);
-        if (requestClicked.isSelected()) {
-            requestClicked.setSelected(false);
-        } else {
-            requestClicked.setSelected(true);
-            for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
-                if (i != indexRequest) tour.getPlanningRequests().get(i).setSelected(false);
-            }
-        }
-        tour.notifyObservers();
+        currentState.leftClickOnRequest(indexRequest, tour);
     }
 
+    public void leftClickOnTourIntersection(int indexShortestPath) {
+        currentState.leftClickOnTourIntersection(indexShortestPath, tour);
+    }
+
+
     public void leftClickOnShortestPath(int indexShortestPath) {
-        ShortestPath shortestPath = tour.getListShortestPaths().get(indexShortestPath);
-        shortestPath.setSelected(true);
-        tour.notifyObservers();
+        currentState.leftClickOnShortestPath(indexShortestPath, tour);
     }
 
     public void goBackToTour() {
-        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            shortestPath.setSelected(false);
-        }
-        tour.notifyObservers();
+        currentState.goBackToTour(tour);
+    }
+
+    public void leftClickonIcon(int indexIcon) {
+        currentState.leftClickOnIcon(indexIcon, tour);
     }
 }

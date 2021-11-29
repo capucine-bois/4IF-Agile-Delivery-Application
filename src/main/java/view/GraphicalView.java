@@ -7,8 +7,6 @@ import observer.Observer;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
-import java.awt.event.*;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
@@ -17,14 +15,14 @@ import java.util.List;
  * Graphical element on the GUI.
  * Used to display map and tour (with their segments).
  */
-public class GraphicalView extends JPanel implements Observer, MouseWheelListener, MouseListener, MouseMotionListener {
+public class GraphicalView extends JPanel implements Observer {
 
     private Graphics g;
     private final int firstBorder = 10;
     private final int secondBorder = 2;
     private final int fakeBorder = 10;
     private final int allBorders = firstBorder + secondBorder + fakeBorder;
-    private int scale = 1;
+    private double scale = 1;
     private int originX = allBorders;
     private int originY = allBorders;
     private CityMap cityMap;
@@ -32,6 +30,19 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     private boolean canZoom = true;
     private int previousMouseX;
     private int previousMouseY;
+    private Font roadFont;
+    private Font roadShortestPathFont;
+    private double minLatitude;
+    private double maxLatitude;
+    private double minLongitude;
+    private double maxLongitude;
+    private double latitudeLength;
+    private double longitudeLength;
+    private double width;
+    private double height;
+
+    // listeners
+    private MouseListener mouseListener;
 
     /**
      * Create the graphical view
@@ -39,7 +50,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
      * @param tour the tour
      * @param w the window
      */
-    public GraphicalView(CityMap cityMap, Tour tour, Window w) {
+    public GraphicalView(CityMap cityMap, Tour tour, Window w, MouseListener mouseListener) {
         setBackground(Constants.COLOR_5);
         setBorder(new CompoundBorder(BorderFactory.createLineBorder(Constants.COLOR_1, firstBorder),BorderFactory.createLineBorder(Constants.COLOR_4, secondBorder)));
         w.getContentPane().add(this, BorderLayout.CENTER);
@@ -47,22 +58,29 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         tour.addObserver(this);
         this.cityMap = cityMap;
         this.tour = tour;
-        addMouseWheelListener(this);
-        addMouseListener(this);
-        addMouseMotionListener(this);
+        mouseListener.setGraphicalView(this);
+        this.mouseListener = mouseListener;
+        addMouseWheelListener(mouseListener);
+        addMouseListener(mouseListener);
+        addMouseMotionListener(mouseListener);
+        try {
+            roadFont = Constants.getFont("DMSans-Medium.ttf", 12);
+            roadShortestPathFont = Constants.getFont("DMSans-Bold.ttf", 12);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * Creates intersections and segments of a given map with coordinates X and Y
-     * @param adjacenceMap the map to display
      */
     public void displayCityMap(List<Intersection> intersections) {
         if (!intersections.isEmpty()) {
             Intersection firstIntersection = intersections.get(0);
-            double minLatitude = firstIntersection.getLatitude();
-            double maxLatitude = firstIntersection.getLatitude();
-            double minLongitude = firstIntersection.getLongitude();
-            double maxLongitude = firstIntersection.getLongitude();
+            minLatitude = firstIntersection.getLatitude();
+            maxLatitude = firstIntersection.getLatitude();
+            minLongitude = firstIntersection.getLongitude();
+            maxLongitude = firstIntersection.getLongitude();
 
             for (Intersection intersection : intersections) {
                 double latitude = intersection.getLatitude();
@@ -79,7 +97,7 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
                 }
             }
 
-            displayIntersectionsAndSegments(intersections, minLatitude, maxLatitude, minLongitude, maxLongitude);
+            displayIntersectionsAndSegments(intersections);
         }
     }
 
@@ -87,109 +105,166 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
      * Initialize the list of intersections on the GUI.
      * Parse the list of intersections to instantiate all the intersections for the GUI (IntersectionView) with coordinates X and Y.
      * @param intersections map containing an intersection as key and a list of segments where they are part of as value
-     * @param minLatitude minimal geographical latitude of all intersections
-     * @param maxLatitude maximal geographical latitude of all intersections
-     * @param minLongitude minimal geographical longitude of all intersections
-     * @param maxLongitude maximal geographical longitude of all intersections
      */
-    private void displayIntersectionsAndSegments(List<Intersection> intersections, double minLatitude, double maxLatitude, double minLongitude, double maxLongitude) {
-        double latitudeLength = maxLatitude - minLatitude;
-        double longitudeLength = maxLongitude - minLongitude;
+    private void displayIntersectionsAndSegments(List<Intersection> intersections) {
+        latitudeLength = maxLatitude - minLatitude;
+        longitudeLength = maxLongitude - minLongitude;
 
         double viewWidth = g.getClipBounds().width - allBorders * 2;
-        double width = viewWidth * scale;
+        width = viewWidth * scale;
         double viewHeight = g.getClipBounds().height - allBorders * 2;
-        double height = viewHeight * scale;
+        height = viewHeight * scale;
 
         if (originX > allBorders) originX = allBorders;
         if (originY > allBorders) originY = allBorders;
         if (originX + width - allBorders < viewWidth) originX = (int) (viewWidth - width + allBorders);
         if (originY + height - allBorders < viewHeight) originY = (int) (viewHeight - height + allBorders);
 
-        for (Intersection origin : intersections) {
-            int originCoordinateX = getCoordinateX(origin, minLongitude, width, longitudeLength);
-            int originCoordinateY = getCoordinateY(origin, minLatitude, height, latitudeLength);
-            for (Segment segment : origin.getAdjacentSegments()) {
-                int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
-                int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(Constants.COLOR_6);
-                g2.setStroke(new BasicStroke(scale + 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
-            }
-        }
-
-        for (Intersection origin : intersections) {
-            int originCoordinateX = getCoordinateX(origin, minLongitude, width, longitudeLength);
-            int originCoordinateY = getCoordinateY(origin, minLatitude, height, latitudeLength);
-            for (Segment segment : origin.getAdjacentSegments()) {
-                int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
-                int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(Constants.COLOR_7);
-                g2.setStroke(new BasicStroke(scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
-            }
-        }
+        displaySegmentsForEachOrigin(intersections, Constants.COLOR_6, (float) (scale + 2), false);
+        displaySegmentsForEachOrigin(intersections, Constants.COLOR_7, (float) scale, true);
 
         boolean oneShortestPathSelected = tour.getListShortestPaths().stream().anyMatch(ShortestPath::isSelected);
-
         for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            if (!oneShortestPathSelected || shortestPath.isSelected()) {
-                for (Segment segment : shortestPath.getListSegments()) {
-                    int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
-                    int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
-                    int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
-                    int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
-                    Graphics2D g2 = (Graphics2D) g;
-                    g2.setColor(Constants.COLOR_8);
-                    g2.setStroke(new BasicStroke(scale + 4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                    g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
-                }
-            }
+            displayShortestPaths(shortestPath, oneShortestPathSelected && !shortestPath.isSelected(), Constants.COLOR_11, (float) (scale + 4), false);
         }
-
         for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            if (!oneShortestPathSelected || shortestPath.isSelected()) {
-                for (Segment segment : shortestPath.getListSegments()) {
-                    int originCoordinateX = getCoordinateX(segment.getOrigin(), minLongitude, width, longitudeLength);
-                    int originCoordinateY = getCoordinateY(segment.getOrigin(), minLatitude, height, latitudeLength);
-                    int destinationCoordinateX = getCoordinateX(segment.getDestination(), minLongitude, width, longitudeLength);
-                    int destinationCoordinateY = getCoordinateY(segment.getDestination(), minLatitude, height, latitudeLength);
-                    Graphics2D g2 = (Graphics2D) g;
-                    g2.setColor(Constants.COLOR_9);
-                    g2.setStroke(new BasicStroke(scale, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                    g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
-                }
-            }
+            displayShortestPaths(shortestPath, oneShortestPathSelected && !shortestPath.isSelected(), Constants.COLOR_12, (float) scale, true);
+        }
+        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+            displayShortestPaths(shortestPath, !oneShortestPathSelected || shortestPath.isSelected(), Constants.COLOR_8, (float) (scale + 4), false);
+        }
+        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+            displayShortestPaths(shortestPath, !oneShortestPathSelected || shortestPath.isSelected(), Constants.COLOR_9, (float) (scale), true);
         }
 
         if (!tour.getPlanningRequests().isEmpty()) {
-            boolean oneRequestSelected = tour.getPlanningRequests().stream().anyMatch(Request::isSelected);
+            boolean oneRequestPointSelected = tour.getPlanningRequests().stream().anyMatch(req -> req.isDeliverySelected() || req.isPickupSelected());
             for (Request request : tour.getPlanningRequests()) {
-                if (!oneRequestSelected || request.isSelected()) {
-                    Intersection pickupAddress = request.getPickupAddress();
-                    int pickupCoordinateX = getCoordinateX(pickupAddress, minLongitude, width, longitudeLength);
-                    int pickupCoordinateY = getCoordinateY(pickupAddress, minLatitude, height, latitudeLength);
-                    Intersection deliveryAddress = request.getDeliveryAddress();
-                    int deliveryCoordinateX = getCoordinateX(deliveryAddress, minLongitude, width, longitudeLength);
-                    int deliveryCoordinateY = getCoordinateY(deliveryAddress, minLatitude, height, latitudeLength);
-                    drawIcon(request.getColor(), pickupCoordinateX, pickupCoordinateY, "pickup-icon.png");
-                    drawIcon(request.getColor(), deliveryCoordinateX, deliveryCoordinateY, "delivery-icon.png");
+
+                Intersection pickupAddress = request.getPickupAddress();
+                int pickupCoordinateX = getCoordinateX(pickupAddress);
+                int pickupCoordinateY = getCoordinateY(pickupAddress);
+                Intersection deliveryAddress = request.getDeliveryAddress();
+                int deliveryCoordinateX = getCoordinateX(deliveryAddress);
+                int deliveryCoordinateY = getCoordinateY(deliveryAddress);
+                if (!oneRequestPointSelected || request.isPickupSelected()) {
+                    drawIcon(request.getColor(), pickupCoordinateX, pickupCoordinateY, "pickup-icon");
+                } else {
+                    drawIcon(Constants.COLOR_4, pickupCoordinateX, pickupCoordinateY, "pickup-icon");
+                }
+                if (!oneRequestPointSelected || request.isDeliverySelected()) {
+                    drawIcon(request.getColor(), deliveryCoordinateX, deliveryCoordinateY, "delivery-icon");
+                } else {
+                    drawIcon(Constants.COLOR_4, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon");
                 }
             }
-            int depotCoordinateX = getCoordinateX(tour.getDepotAddress(), minLongitude, width, longitudeLength);
-            int depotCoordinateY = getCoordinateY(tour.getDepotAddress(), minLatitude, height, latitudeLength);
-            drawIcon(null, depotCoordinateX, depotCoordinateY, "depot-icon.png");
+            int depotCoordinateX = getCoordinateX(tour.getDepotAddress());
+            int depotCoordinateY = getCoordinateY(tour.getDepotAddress());
+            drawIcon(null, depotCoordinateX, depotCoordinateY, "depot-icon");
         }
     }
-    
-    private int getCoordinateX(Intersection intersection, double minLongitude, double width, double longitudeLength) {
+
+    private void displaySegmentsForEachOrigin(List<Intersection> intersections, Color color, float strokeSize, boolean displayRoadNames) {
+        for (Intersection origin : intersections) {
+            int originCoordinateX = getCoordinateX(origin);
+            int originCoordinateY = getCoordinateY(origin);
+            for (Segment segment : origin.getAdjacentSegments()) {
+                int destinationCoordinateX = getCoordinateX(segment.getDestination());
+                int destinationCoordinateY = getCoordinateY(segment.getDestination());
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(color);
+                g2.setStroke(new BasicStroke(strokeSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+                if (displayRoadNames) {
+                    displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY, false);
+                }
+            }
+        }
+    }
+
+    private void displayShortestPaths(ShortestPath shortestPath, boolean conditionToDisplay, Color color, float strokeSize, boolean displayRoadNames) {
+        if (conditionToDisplay) {
+            for (Segment segment : shortestPath.getListSegments()) {
+                int originCoordinateX = getCoordinateX(segment.getOrigin());
+                int originCoordinateY = getCoordinateY(segment.getOrigin());
+                int destinationCoordinateX = getCoordinateX(segment.getDestination());
+                int destinationCoordinateY = getCoordinateY(segment.getDestination());
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(color);
+                g2.setStroke(new BasicStroke(strokeSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+                displayArrow(g2, originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+                if (displayRoadNames) {
+                    displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY, true);
+                }
+            }
+        }
+    }
+
+    private void displayArrow(Graphics2D g2, int originX, int originY, int destinationX, int destinationY) {
+        double oppositeSide = destinationY - originY;
+        double adjacentSide = destinationX - originX;
+        double hypotenuseSize = Math.sqrt(oppositeSide * oppositeSide + adjacentSide * adjacentSide);
+        if (hypotenuseSize > 80) {
+            double angle = Math.atan(oppositeSide / adjacentSide);
+            int middleX;
+            int middleY;
+            if (originX > destinationX) {
+                middleX = (int) (originX - Math.abs(adjacentSide) / 2);
+                angle -= Math.PI;
+            } else {
+                middleX = (int) (originX + Math.abs(adjacentSide) / 2);
+            }
+            if (originY > destinationY) {
+                middleY = (int) (originY - Math.abs(oppositeSide) / 2);
+            } else {
+                middleY = (int) (originY + Math.abs(oppositeSide) / 2);
+            }
+            g2.translate(middleX, middleY);
+            BasicStroke stroke = (BasicStroke) g2.getStroke();
+            g2.setStroke(new BasicStroke(stroke.getLineWidth()/2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g2.rotate(angle + 3 * Math.PI / 4);
+            g2.drawLine(0, 0, (int) (2 * scale), 0);
+            g2.drawLine(0, 0, 0, (int) (2 * scale));
+            g2.rotate(-(angle + 3 * Math.PI / 4));
+            g2.translate(-middleX, -middleY);
+        }
+    }
+
+    private void displayRoadName(Graphics2D g2, String name, int originX, int destinationX, int originY, int destinationY, boolean shortestPath) {
+        double oppositeSide = destinationY - originY;
+        double adjacentSide = destinationX - originX;
+        double angle = Math.atan(oppositeSide/adjacentSide);
+        int textCoordinateX;
+        int textCoordinateY;
+        textCoordinateX = Math.min(originX, destinationX);
+        if (textCoordinateX == originX) textCoordinateY = originY;
+        else textCoordinateY = destinationY;
+        double hypotenuseSize = Math.sqrt(oppositeSide * oppositeSide + adjacentSide * adjacentSide);
+        if (scale > 5 && name.length() * 10 < hypotenuseSize
+                && !(((originX < 0 && destinationX < 0) || (originX > g.getClipBounds().width && destinationX > g.getClipBounds().width))
+                || ((originY < 0 && destinationY < 0) || (originY > g.getClipBounds().height && destinationY > g.getClipBounds().height)))) {
+            if (shortestPath) {
+                g2.setColor(Constants.COLOR_7);
+                g2.setFont(roadShortestPathFont);
+            } else {
+                g2.setColor(Constants.COLOR_10);
+                g2.setFont(roadFont);
+            }
+            g2.translate(textCoordinateX, textCoordinateY);
+            g2.rotate(angle);
+            g2.drawString(name, (float) (hypotenuseSize / 2 - name.length() * 3), 4);
+            g2.rotate(-angle);
+            g2.translate(-textCoordinateX, -textCoordinateY);
+        }
+    }
+
+    private int getCoordinateX(Intersection intersection) {
         double coordinateLongitude = intersection.getLongitude() - minLongitude;
         return (int) ((coordinateLongitude * width) / longitudeLength) + originX;
     }
 
-    private int getCoordinateY(Intersection intersection, double minLatitude, double height, double latitudeLength) {
+    private int getCoordinateY(Intersection intersection) {
         double coordinateLatitude = intersection.getLatitude() - minLatitude;
         return (int) (height) - (int) ((coordinateLatitude * height) / latitudeLength) + originY;
     }
@@ -208,12 +283,11 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
     /**
      * Draw the icon for a depot, pickup or delivery address
      * @param color color of the icon
-     * @param address address with coordinates X and Y
-     * @param iconFileName name of the icon file
+     * @param iconName name of the icon file
      */
-    private void drawIcon(Color color, int coordinateX, int coordinateY, String iconFileName) {
+    private void drawIcon(Color color, int coordinateX, int coordinateY, String iconName) {
         try {
-            BufferedImage image = Constants.getImage(iconFileName);
+            BufferedImage image = Constants.getImage(iconName);
             if (color != null) fillColorInImage(image, color);
             g.drawImage(image, coordinateX - 20, coordinateY - 40, 40, 40, this);
         } catch (IOException e) {
@@ -255,71 +329,84 @@ public class GraphicalView extends JPanel implements Observer, MouseWheelListene
         repaint();
     }
 
-    /**
-     * Method called each time the mouse wheel is moved
-     */
-    @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        if (canZoom) {
-            int zoomCoefficient = 2;
-            int zoomBorders = allBorders - fakeBorder;
-            if (e.getX() > zoomBorders && e.getX() < g.getClipBounds().width - zoomBorders && e.getY() > zoomBorders && e.getY() < g.getClipBounds().height - zoomBorders) {
-                if ((e.getWheelRotation() < 0) && scale < 20) {
-                    scale *= zoomCoefficient;
-                    originX -= (e.getX() - originX) * (zoomCoefficient - 1);
-                    originY -= (e.getY() - originY) * (zoomCoefficient - 1);
-                    repaint();
-                } else if (e.getWheelRotation() > 0 && scale > 1) {
-                    scale /= zoomCoefficient;
-                    originX += (e.getX() - originX) - (e.getX() - originX) / zoomCoefficient;
-                    originY += (e.getY() - originY) - (e.getY() - originY) / zoomCoefficient;
-                    repaint();
-                }
-            }
-        }
-    }
-
     public void setCanZoom(boolean canZoom) {
         this.canZoom = canZoom;
     }
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
+    public void zoom(int x, int y, double rotation) {
+
+        if (canZoom) {
+            double zoomCoefficient = 1.2;
+            int zoomBorders = allBorders - fakeBorder;
+            if (x > zoomBorders && x < g.getClipBounds().width - zoomBorders && y > zoomBorders && y < g.getClipBounds().height - zoomBorders) {
+                if ((rotation < 0) && scale < 20) {
+                    scale *= zoomCoefficient;
+                    originX -= (x - originX) * (zoomCoefficient - 1);
+                    originY -= (y - originY) * (zoomCoefficient - 1);
+                    repaint();
+                } else if (rotation > 0 && scale > 1) {
+                    scale /= zoomCoefficient;
+                    originX += (x - originX) - (x - originX) / zoomCoefficient;
+                    originY += (y - originY) - (y - originY) / zoomCoefficient;
+                    repaint();
+                }
+            }
+        }
 
     }
 
-    @Override
-    public void mousePressed(MouseEvent e) {
-        previousMouseX = e.getX();
-        previousMouseY = e.getY();
-        setCursor(new Cursor(Cursor.MOVE_CURSOR));
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        originX += e.getX() - previousMouseX;
-        originY += e.getY() - previousMouseY;
-        previousMouseX = e.getX();
-        previousMouseY = e.getY();
+    public void moveMap(int x, int y) {
+        originX += x - previousMouseX;
+        originY += y - previousMouseY;
+        previousMouseX = x;
+        previousMouseY = y;
         repaint();
     }
 
-    @Override
-    public void mouseMoved(MouseEvent e) {
+    public void updatePrevious(int x, int y) {
+        previousMouseX = x;
+        previousMouseY = y;
+    }
+
+    public int findIcon(int x, int y) {
+        int indexIcon = -1;
+        for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
+            Intersection pickupAddress = tour.getPlanningRequests().get(i).getPickupAddress();
+            int pickupCoordinateX = getCoordinateX(pickupAddress);
+            int pickupCoordinateY = getCoordinateY(pickupAddress);
+            if (x >= pickupCoordinateX - 20  && x <= pickupCoordinateX + 20 && y >= pickupCoordinateY - 40 && y <= pickupCoordinateY) {
+                if (checkCursorOnIcon(x - (pickupCoordinateX - 20), y - (pickupCoordinateY - 40), "depot-icon")) {
+                    indexIcon = i * 2 + 1;
+                }
+            }
+            Intersection deliveryAddress = tour.getPlanningRequests().get(i).getDeliveryAddress();
+            int deliveryCoordinateX = getCoordinateX(deliveryAddress);
+            int deliveryCoordinateY = getCoordinateY(deliveryAddress);
+            if (x >= deliveryCoordinateX - 20  && x <= deliveryCoordinateX + 20 && y >= deliveryCoordinateY - 40 && y <= deliveryCoordinateY) {
+                if (checkCursorOnIcon(x - (deliveryCoordinateX - 20), y - (deliveryCoordinateY - 40), "depot-icon")) {
+                    indexIcon = i * 2 + 2;
+                }
+            }
+        }
+        return indexIcon;
+    }
+
+    private boolean checkCursorOnIcon(int x, int y, String iconName) {
+        boolean cursorOnIcon = true;
+        BufferedImage image = null;
+        try {
+            image = Constants.getImage(iconName);
+            x = (x * (image.getWidth())) / 40;
+            y = (y * (image.getHeight())) / 40;
+            if (x == image.getWidth()) x -= 1;
+            if (y == image.getHeight()) y -= 1;
+            Color color = new Color(image.getRGB(x, y), true);
+            if (color.getAlpha() == 0) {
+                cursorOnIcon = false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return cursorOnIcon;
     }
 }

@@ -2,6 +2,7 @@ package model;
 
 import observer.Observable;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,9 @@ import java.util.stream.Collectors;
 public class Tour extends Observable {
 
     /* ATTRIBUTES */
+
+    // km/h
+    private final double speed = 15;
 
     /**
      * The total length of the tour
@@ -30,6 +34,15 @@ public class Tour extends Observable {
      * The time of starting for the tour
      */
     private String departureTime;
+
+    /**
+     * The time of ending for the tour
+     */
+    private String arrivalTime;
+
+    private SimpleDateFormat parser = new SimpleDateFormat("HH:mm:ss");
+
+    private Calendar calendar;
 
     /**
      * All requests the tour need to cover
@@ -64,12 +77,24 @@ public class Tour extends Observable {
         return departureTime;
     }
 
+    public String getArrivalTime() {
+        return arrivalTime;
+    }
+
     public ArrayList<Request> getPlanningRequests() {
         return planningRequests;
     }
 
     public ArrayList<ShortestPath> getListShortestPaths() {
         return listShortestPaths;
+    }
+
+    public SimpleDateFormat getParser() {
+        return parser;
+    }
+
+    public double getSpeed() {
+        return speed;
     }
 
     /* SETTERS */
@@ -83,16 +108,13 @@ public class Tour extends Observable {
     }
 
     public void setDepartureTime(String departureTime) {
-        this.departureTime = departureTime;
-    }
-
-    public void setPlanningRequests(ArrayList<Request> planningRequests) {
-        this.planningRequests = planningRequests;
-    }
-
-
-    public void setListShortestPaths(ArrayList<ShortestPath> listShortestPaths) {
-        this.listShortestPaths = listShortestPaths;
+        this.calendar = Calendar.getInstance();
+        try {
+            this.calendar.setTime(parser.parse(departureTime));
+            this.departureTime = parser.format(calendar.getTime());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /* METHODS */
@@ -122,37 +144,44 @@ public class Tour extends Observable {
         ArrayList<Node> listNodes = new ArrayList<>();
         // get the points useful for the computing : pick-up address, delivery address, depot
         ArrayList<Intersection> listUsefulPoints = new ArrayList<>();
-        for(Request req : planningRequests) {
-            listUsefulPoints.add(req.getPickupAddress());
-            listUsefulPoints.add(req.getDeliveryAddress());
-        }
+        ArrayList<Intersection> listUsefulEndPointsForDepot = new ArrayList<>();
+
         listUsefulPoints.add(depotAddress);
 
-        int iteratorNumber = 1;
-        for(Intersection startPoint : listUsefulPoints) {
+        for(int i=0;i<planningRequests.size();i++) {
+            Intersection pickupReq1 = planningRequests.get(i).getPickupAddress();
+            listUsefulPoints.add(pickupReq1);
+            Intersection deliveryReq1 = planningRequests.get(i).getDeliveryAddress();
+            listUsefulPoints.add(deliveryReq1);
             // gets the ends points useful for the computing according to the start point
-            ArrayList<Intersection> listUsefulEndPoints = new ArrayList<>();
-            for(Intersection endPoint : listUsefulPoints) {
-                //if(endPoint!=startPoint && isPossiblePath(startPoint,endPoint) && !(isPickUp(startPoint) && endPoint==depotAddress) && !(startPoint==depotAddress && isDelivery(endPoint))) {
-                if(isPossiblePath(startPoint,endPoint)) {
-                    listUsefulEndPoints.add(endPoint);
+            ArrayList<Intersection> listUsefulEndPointsPickUp = new ArrayList<>();
+            ArrayList<Intersection> listUsefulEndPointsDelivery = new ArrayList<>();
+
+            listUsefulEndPointsPickUp.add(deliveryReq1);
+            listUsefulEndPointsDelivery.add(depotAddress);
+            // addingpickUp to the endPoints of depot
+            listUsefulEndPointsForDepot.add(pickupReq1);
+
+            for(int j=0;j<planningRequests.size();j++) {
+                Intersection pickupReq2 = planningRequests.get(j).getPickupAddress();
+                Intersection deliveryReq2 = planningRequests.get(j).getDeliveryAddress();
+                if(i!=j) {
+                    listUsefulEndPointsPickUp.add(pickupReq2);
+                    listUsefulEndPointsPickUp.add(deliveryReq2);
+                    listUsefulEndPointsDelivery.add(pickupReq2);
+                    listUsefulEndPointsDelivery.add(deliveryReq2);
                 }
             }
-            ArrayList<ShortestPath> shortestPathsFromStartPoint = dijkstra(allIntersectionsList,listUsefulEndPoints, startPoint);
+            ArrayList<ShortestPath> shortestPathsFromPickUp = dijkstra(allIntersectionsList,listUsefulEndPointsPickUp, pickupReq1);
+            ArrayList<ShortestPath> shortestPathsFromDelivery = dijkstra(allIntersectionsList,listUsefulEndPointsDelivery, deliveryReq1);
 
-            //sorting the shortestPaths in ascending order for optimization
-            Collections.sort(shortestPathsFromStartPoint);
+            listNodes.add(new Node(pickupReq1,shortestPathsFromPickUp,i+1));
+            listNodes.add(new Node(deliveryReq1,shortestPathsFromDelivery,i+2));
 
-            Node nodeToAdd = null;
-            if(startPoint!=depotAddress) {
-                nodeToAdd = new Node(startPoint,shortestPathsFromStartPoint,iteratorNumber);
-                listNodes.add(nodeToAdd);
-                iteratorNumber++;
-            } else {
-                listNodes.add(0,new Node(depotAddress,shortestPathsFromStartPoint,0));
-            }
+
         }
 
+        listNodes.add(0,new Node(depotAddress,dijkstra(allIntersectionsList,listUsefulEndPointsForDepot,depotAddress),0));
 
 
         // Run Tour
@@ -173,48 +202,33 @@ public class Tour extends Observable {
         }
         System.out.println("0");
 
-
-        Intersection previous = null;
-        for (Integer index: intersectionsOrder) {
-            Intersection currentIntersection;
-            if (index == 0)
-                currentIntersection = listUsefulPoints.get(listUsefulPoints.size()-1);
-            else
-                currentIntersection = listUsefulPoints.get(index-1);
-            if (previous != null) {
-                Intersection finalPrevious = previous;
-                for (ShortestPath p: listNodes.stream().filter(x -> x.getIntersection() == finalPrevious).findFirst().get().getListArcs()) {
-                    if (p.getEndAddress().equals(currentIntersection))
-                        listShortestPaths.add(p);
-                }
+        for(int i=0; i< intersectionsOrder.length-1; i++) {
+            Intersection end  = listNodes.get(intersectionsOrder[i+1]).getIntersection();
+            ShortestPath shortestPathToAdd = listNodes.get(intersectionsOrder[i]).getListArcs().stream().filter(x -> x.getEndAddress()==end).findFirst().get();
+            shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i]);
+            shortestPathToAdd.setEndNodeNumber(intersectionsOrder[i+1]);
+            listShortestPaths.add(shortestPathToAdd);
+            calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
+            int indexRequest = intersectionsOrder[i+1]%2 == 0 ? intersectionsOrder[i+1]/2 - 1 : intersectionsOrder[i+1]/2;
+            Request requestEndPath = planningRequests.get(indexRequest);
+            if (intersectionsOrder[i+1]%2 == 1) {
+                requestEndPath.setPickupArrivalTime(parser.format(calendar.getTime()));
+                calendar.add(Calendar.SECOND, requestEndPath.getPickupDuration());
+                requestEndPath.setPickupDepartureTime(parser.format(calendar.getTime()));
+            } else {
+                requestEndPath.setDeliveryArrivalTime(parser.format(calendar.getTime()));
+                calendar.add(Calendar.SECOND, requestEndPath.getDeliveryDuration());
+                requestEndPath.setDeliveryDepartureTime(parser.format(calendar.getTime()));
             }
-            previous = currentIntersection;
-        }
-
-        Intersection finalPrevious1 = previous;
-        for (ShortestPath p: listNodes.stream().filter(x -> x.getIntersection() == finalPrevious1).findFirst().get().getListArcs()) {
-            if (p.getEndAddress().equals(depotAddress))
-                listShortestPaths.add(p);
-        }
-
-        /*
-
-        /*
-        // print order
-        long intm;
-        for (ShortestPath p: listShortestPaths) {
-            System.out.println(p.getStartAddress().getId() + " -> " +
-                    p.getEndAddress().getId());
-            intm = p.getStartAddress().getId();
-            System.out.print( intm );
-            for(Segment s : p.getListSegments()){
-                System.out.print(" -> " );
-                intm = s.getDestination().getId();
-                System.out.print( intm );
+            if(i==intersectionsOrder.length-2) {
+                shortestPathToAdd = listNodes.get(intersectionsOrder[i+1]).getListArcs().stream().filter(x -> x.getEndAddress()==depotAddress).findFirst().get();
+                shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i+1]);
+                shortestPathToAdd.setEndNodeNumber(0);
+                listShortestPaths.add(shortestPathToAdd);
+                calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
+                arrivalTime = parser.format(calendar.getTime());
             }
-            System.out.println();
-        }*/
-
+        }
 
         notifyObservers();
     }
@@ -248,7 +262,13 @@ public class Tour extends Observable {
 
                 int colorNoeudAdj = noeudAdj.getColor();
                 if (colorNoeudAdj == 0 || colorNoeudAdj == 1 ) {
-                    double length = noeudGrisAvecDistMin.getIntersection().getAdjacentSegments().stream().filter(x -> x.getDestination() == noeudAdj.getIntersection()).findFirst().get().getLength();
+                    double length;
+                    if(noeudGrisAvecDistMin.equals(noeudAdj)) {
+                        length = 0;
+                    } else {
+                        length = noeudGrisAvecDistMin.getIntersection().getAdjacentSegments().stream().filter(x -> x.getDestination() == noeudAdj.getIntersection()).findFirst().get().getLength();
+                    }
+
                     relax(noeudGrisAvecDistMin, noeudAdj, length,listDijkstra);
                     if (colorNoeudAdj == 0) {
                         noeudAdj.setColor(1);
@@ -259,45 +279,27 @@ public class Tour extends Observable {
             if(listUsefulEndPoints.contains(noeudGrisAvecDistMin.getIntersection())) {
                 ObjectDijkstra tempoIntersection = noeudGrisAvecDistMin;
                 ArrayList<Segment> listSegments = new ArrayList<>();
-                while(findParent(tempoIntersection,listDijkstra)!=null) {
-                    ObjectDijkstra finalTempoIntersection1 = tempoIntersection;
-                    ObjectDijkstra tmpParent = finalTempoIntersection1.getParent();
-                    listSegments.add(0,tmpParent.getIntersection().getAdjacentSegments().stream().filter(x -> x.getDestination() == finalTempoIntersection1.getIntersection()).findFirst().get());
-                    tempoIntersection = tmpParent;
+                ShortestPath shortestPath;
+                if(origin.equals(noeudGrisAvecDistMin.getIntersection())) {
+                    Segment segmentZero = new Segment(0.0, "segment", noeudGrisAvecDistMin.getIntersection(),origin);
+                    listSegments.add(segmentZero);
+                    shortestPath = new ShortestPath(0.0,listSegments,origin,noeudGrisAvecDistMin.getIntersection());
+                } else {
+                    while(findParent(tempoIntersection,listDijkstra)!=null) {
+                        ObjectDijkstra finalTempoIntersection1 = tempoIntersection;
+                        ObjectDijkstra tmpParent = finalTempoIntersection1.getParent();
+                        listSegments.add(0,tmpParent.getIntersection().getAdjacentSegments().stream().filter(x -> x.getDestination() == finalTempoIntersection1.getIntersection()).findFirst().get());
+                        tempoIntersection = tmpParent;
+                    }
+                    shortestPath = new ShortestPath(noeudGrisAvecDistMin.getDist(),listSegments,origin,noeudGrisAvecDistMin.getIntersection());
                 }
-                ShortestPath shortestPath = new ShortestPath(noeudGrisAvecDistMin.getDist(),listSegments,origin,noeudGrisAvecDistMin.getIntersection());
+
                 listShortestPathFromOrigin.add((shortestPath));
                 if(listShortestPathFromOrigin.size()==listUsefulEndPoints.size())
                     break;
             }
         }
         return listShortestPathFromOrigin;
-    }
-
-
-
-
-    /**
-     * Return true if the two intersections in parameters make a possible path
-     * @param startPoint the beginning of the segment
-     * @param endPoint the end of a segment begin by startPoint
-     * @return true if the path is possible, false otherwise
-     */
-    public boolean isPossiblePath(Intersection startPoint, Intersection endPoint) {
-        boolean retour = true;
-        for(Request req: planningRequests) {
-            // case where the path is not possible : the start and the end are the same, the start is a pick-up address and the end
-            // is the depot, the start is the depot and the end a delivery address, the start is a delivery address and the end is the
-            // pick-up links to this delivery address
-            if((req.getDeliveryAddress() == startPoint && req.getPickupAddress()==endPoint)
-                    || (startPoint==depotAddress && req.getDeliveryAddress()==endPoint)
-                    || (req.getPickupAddress()==startPoint && endPoint==depotAddress)
-                    || startPoint==endPoint) {
-                retour = false;
-                break;
-            }
-        }
-        return retour;
     }
 
     /**
@@ -326,6 +328,10 @@ public class Tour extends Observable {
             }
         }
         return null;
+    }
+
+    public double metersToSeconds(double meters) {
+        return (meters/(speed*1000))*60*60;
     }
 
     /**

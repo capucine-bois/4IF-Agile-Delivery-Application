@@ -3,8 +3,10 @@ package view;
 import controller.Controller;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 
 /**
  * Listener for mouse events.
@@ -12,23 +14,91 @@ import java.awt.event.MouseEvent;
 public class MouseListener extends MouseAdapter {
 
     private Controller controller;
+    private GraphicalView graphicalView;
     private TextualView textualView;
 
-    public MouseListener(Controller controller, TextualView textualView) {
+    public MouseListener(Controller controller) {
         this.controller = controller;
+    }
+
+    public void setGraphicalView(GraphicalView graphicalView) {
+        this.graphicalView = graphicalView;
+    }
+
+    public void setTextualView(TextualView textualView) {
         this.textualView = textualView;
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
-            if (e.getSource() instanceof JPanel && textualView.getRequestPanels().contains((JPanel) e.getSource())) {
-                controller.leftClickOnRequest(textualView.getRequestPanels().indexOf((JPanel) e.getSource()));
-            } else if (e.getSource() instanceof JPanel && textualView.getShortestPathsPanels().contains((JPanel) e.getSource())) {
-                controller.leftClickOnShortestPath(textualView.getShortestPathsPanels().indexOf((JPanel) e.getSource()));
-            } else if (e.getSource() instanceof JLabel && textualView.getBackToTour() == e.getSource()) {
-                controller.goBackToTour();
+            if (TextualView.requestPanels.contains((JPanel) e.getSource())) {
+                controller.leftClickOnRequest(TextualView.requestPanels.indexOf((JPanel) e.getSource()));
+            } else if (TextualView.tourIntersectionsPanels.contains((JPanel) e.getSource())) {
+                controller.leftClickOnTourIntersection(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
+            } else if (graphicalView.contains(e.getX(), e.getY())) {
+               int indexIcon = graphicalView.findIcon(e.getX(), e.getY());
+               if (indexIcon != -1) controller.leftClickonIcon(indexIcon);
             }
+        }
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        if (TextualView.requestPanels.contains((JPanel) e.getSource())) {
+            textualView.setRequestPanelMouseEntered(TextualView.requestPanels.indexOf((JPanel) e.getSource()));
+        } else if (TextualView.tourIntersectionsPanels.contains((JPanel) e.getSource())) {
+           textualView.setTourIntersectionPanelMouseEntered(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
+        }
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        if (TextualView.requestPanels.contains((JPanel) e.getSource())) {
+            textualView.setRequestPanelMouseExited(TextualView.requestPanels.indexOf((JPanel) e.getSource()));
+        } else if (TextualView.tourIntersectionsPanels.contains((JPanel) e.getSource())) {
+            textualView.setTourIntersectionPanelMouseExited(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
+        }
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        graphicalView.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        if (graphicalView.contains(e.getX(), e.getY())) {
+            int indexIcon = graphicalView.findIcon(e.getX(), e.getY());
+            if (indexIcon != -1) graphicalView.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        }
+    }
+
+    /**
+     * Method called each time the mouse wheel is moved
+     */
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        if (e.getSource().equals(graphicalView)) {
+            graphicalView.zoom(e.getX(), e.getY(), e.getWheelRotation());
+        }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if (e.getSource().equals(graphicalView)) {
+            graphicalView.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        }
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        if (e.getSource().equals(graphicalView)) {
+            graphicalView.moveMap(e.getX(), e.getY());
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        if (e.getSource().equals(graphicalView)) {
+            graphicalView.updatePrevious(e.getX(), e.getY());
+            graphicalView.setCursor(new Cursor(Cursor.MOVE_CURSOR));
         }
     }
 }
