@@ -93,12 +93,24 @@ public class XMLDeserializer {
      */
     public static void parseXMLIntersections(Document document, CityMap cityMap) {
         NodeList intersectionNodes = document.getElementsByTagName("intersection");
+        HashMap<Double,ArrayList<Double>> coordonateDictionnary = new HashMap<>();
+        long index = 0;
         for (int x = 0, size = intersectionNodes.getLength(); x < size; x++) {
-            long id = Long.parseLong(intersectionNodes.item(x).getAttributes().getNamedItem("id").getNodeValue());
             double latitude = Double.parseDouble(intersectionNodes.item(x).getAttributes().getNamedItem("latitude").getNodeValue());
             double longitude = Double.parseDouble(intersectionNodes.item(x).getAttributes().getNamedItem("longitude").getNodeValue());
+            // check duplicate
+            boolean isKeyPresent = coordonateDictionnary.containsKey(latitude);
+            if(isKeyPresent){
+                ArrayList<Double> list = coordonateDictionnary.get(latitude);
+                for(double lat : list){
+
+                }
+            }
             // create the intersection object and add it to the city map
-            cityMap.addIntersection(new Intersection(id, latitude, longitude));
+            Intersection i1 = new Intersection(index, latitude, longitude);
+            index++;
+            cityMap.addIntersection(i1);
+            listIntersection.add(i1);
         }
     }
 
