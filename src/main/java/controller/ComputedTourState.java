@@ -7,6 +7,8 @@ import model.Tour;
 import view.Window;
 import xml.XMLDeserializer;
 
+import java.util.Optional;
+
 /**
  * Computed tour state. State of the application when a tour has been computed.
  */
@@ -59,41 +61,110 @@ public class ComputedTourState implements State {
     }
 
     @Override
-    public void showRequestsPanel(Window window) {
+    public void showRequestsPanel(Tour tour, Window window) {
+        for (Request request : tour.getPlanningRequests()) {
+            request.setPickupSelected(false);
+            request.setDeliverySelected(false);
+        }
         window.showRequestsPanel();
+        tour.notifyObservers();
     }
 
     @Override
-    public void showTourPanel(Window window) {
+    public void showTourPanel(Tour tour, Window window) {
+        for (Request request : tour.getPlanningRequests()) {
+            request.setPickupSelected(false);
+            request.setDeliverySelected(false);
+        }
         window.showTourPanel();
+        Optional<ShortestPath> optionalShortestPath = tour.getListShortestPaths().stream().filter(ShortestPath::isSelected).findFirst();
+        if (optionalShortestPath.isPresent()) {
+            leftClickOnShortestPath(tour.getListShortestPaths().indexOf(optionalShortestPath.get()), tour);
+        } else {
+            tour.notifyObservers();
+        }
     }
 
     @Override
     public void leftClickOnRequest(int indexRequest, Tour tour) {
-        Request requestClicked = tour.getPlanningRequests().get(indexRequest);
-        if (requestClicked.isSelected()) {
-            requestClicked.setSelected(false);
-        } else {
-            requestClicked.setSelected(true);
-            for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
-                if (i != indexRequest) tour.getPlanningRequests().get(i).setSelected(false);
+        for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
+            Request request = tour.getPlanningRequests().get(i);
+            if (i != indexRequest || (request.isPickupSelected() && request.isDeliverySelected())) {
+                request.setPickupSelected(false);
+                request.setDeliverySelected(false);
+            } else {
+                request.setPickupSelected(true);
+                request.setDeliverySelected(true);
             }
         }
         tour.notifyObservers();
     }
 
     @Override
+    public void leftClickOnTourIntersection(int indexShortestPath, Tour tour) {
+        ShortestPath shortestPath = tour.getListShortestPaths().get(indexShortestPath);
+        Request requestClicked;
+        boolean pickupWasSelected = false;
+        boolean deliveryWasSelected = false;
+        if (shortestPath.getEndNodeNumber() % 2 == 1) {
+            requestClicked = tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2);
+            pickupWasSelected = requestClicked.isPickupSelected();
+        } else {
+            requestClicked = tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2 - 1);
+            deliveryWasSelected = requestClicked.isDeliverySelected();
+        }
+        for (Request request : tour.getPlanningRequests()) {
+            request.setPickupSelected(false);
+            request.setDeliverySelected(false);
+        }
+        if (!pickupWasSelected && shortestPath.getEndNodeNumber() % 2 == 1)  {
+            requestClicked.setPickupSelected(true);
+        } else if (!deliveryWasSelected && shortestPath.getEndNodeNumber() % 2 == 0) {
+            requestClicked.setDeliverySelected(true);
+        }
+        tour.notifyObservers();
+    }
+
+    @Override
     public void leftClickOnShortestPath(int indexShortestPath, Tour tour) {
+        for (Request request : tour.getPlanningRequests()) {
+            request.setPickupSelected(false);
+            request.setDeliverySelected(false);
+        }
         ShortestPath shortestPath = tour.getListShortestPaths().get(indexShortestPath);
         shortestPath.setSelected(true);
+        if (shortestPath.getStartNodeNumber() != 0) {
+            if (shortestPath.getStartNodeNumber() % 2 == 1) {
+                tour.getPlanningRequests().get(shortestPath.getStartNodeNumber() / 2).setPickupSelected(true);
+            } else {
+                tour.getPlanningRequests().get(shortestPath.getStartNodeNumber() / 2 - 1).setDeliverySelected(true);
+            }
+        }
+        if (shortestPath.getEndNodeNumber() != 0) {
+            if (shortestPath.getEndNodeNumber() % 2 == 1) {
+                tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2).setPickupSelected(true);
+            } else {
+                tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2 - 1).setDeliverySelected(true);
+            }
+        }
         tour.notifyObservers();
     }
 
     @Override
     public void goBackToTour(Tour tour) {
+        for (Request request : tour.getPlanningRequests()) {
+            request.setPickupSelected(false);
+            request.setDeliverySelected(false);
+        }
         for (ShortestPath shortestPath : tour.getListShortestPaths()) {
             shortestPath.setSelected(false);
         }
         tour.notifyObservers();
+    }
+
+    @Override
+    public void leftClickOnIcon(int indexIcon, Tour tour) {
+        ShortestPath shortestPath = tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexIcon).findFirst().get();
+        leftClickOnTourIntersection(tour.getListShortestPaths().indexOf(shortestPath), tour);
     }
 }

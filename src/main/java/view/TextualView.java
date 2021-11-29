@@ -23,6 +23,7 @@ public class TextualView extends JPanel implements Observer {
     protected static final String GO_BACK_TO_TOUR = "Back to tour";
     protected static final String PATH_DETAILS = "Show path";
     protected static List<JPanel> requestPanels;
+    protected static List<JPanel> tourIntersectionsPanels;
     protected static List<JButton> pathDetailsButtons;
     private Tour tour;
     private final int gap = 20;
@@ -53,7 +54,9 @@ public class TextualView extends JPanel implements Observer {
         tour.addObserver(this);
         this.tour = tour;
         requestPanels = new ArrayList<>();
+        tourIntersectionsPanels = new ArrayList<>();
         pathDetailsButtons = new ArrayList<>();
+        mouseListener.setTextualView(this);
         this.mouseListener = mouseListener;
         this.buttonListener = buttonListener;
         this.window = w;
@@ -116,10 +119,11 @@ public class TextualView extends JPanel implements Observer {
     private void addTourIntersections() {
         tourMainPanel.setBackground(Constants.COLOR_4);
         pathDetailsButtons.clear();
+        tourIntersectionsPanels.clear();
         Optional<ShortestPath> optionalShortestPath = tour.getListShortestPaths().stream().filter(ShortestPath::isSelected).findFirst();
         if (optionalShortestPath.isPresent()) {
             tourMainPanel.setLayout(new BorderLayout());
-            displaySegmentsHeader(tourMainPanel);
+            displaySegmentsHeader(tourMainPanel, optionalShortestPath.get());
             displaySegments(tourMainPanel, optionalShortestPath.get().getListSegments());
         } else {
             tourMainPanel.setLayout(new BoxLayout(tourMainPanel, BoxLayout.Y_AXIS));
@@ -127,14 +131,17 @@ public class TextualView extends JPanel implements Observer {
             displayTourGlobalInformation();
             displayDepotPoint(tourMainPanel, tour.getDepartureTime(), true);
             for (int i=0; i<tour.getListShortestPaths().size(); i++) {
-                displayPoint(tourMainPanel, tour.getListShortestPaths().get(i));
+                displayShortestPath(tourMainPanel, tour.getListShortestPaths().get(i), false);
+                displayPoint(tourMainPanel, tour.getListShortestPaths().get(i), false);
             }
             displayDepotPoint(tourMainPanel, tour.getArrivalTime(), false);
             tourMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
         }
     }
 
-    private void displaySegmentsHeader(JPanel parentPanel) {
+    private void displaySegmentsHeader(JPanel parentPanel, ShortestPath shortestPath) {
+        JPanel segmentsHeader = new JPanel();
+        segmentsHeader.setLayout(new BorderLayout());
         backToTour = new JButton(GO_BACK_TO_TOUR);
         try {
             window.setStyle(backToTour);
@@ -143,7 +150,27 @@ public class TextualView extends JPanel implements Observer {
             e.printStackTrace();
         }
         backToTour.addActionListener(buttonListener);
-        parentPanel.add(backToTour, BorderLayout.PAGE_START);
+        segmentsHeader.add(backToTour, BorderLayout.PAGE_START);
+
+        JPanel pathInformation = new JPanel();
+        pathInformation.add(Box.createRigidArea(new Dimension(0, gap)));
+        pathInformation.setLayout(new BoxLayout(pathInformation, BoxLayout.Y_AXIS));
+        pathInformation.setBackground(Constants.COLOR_4);
+        int indexShortestPath = tour.getListShortestPaths().indexOf(shortestPath);
+        if (indexShortestPath == 0) {
+            displayDepotPoint(pathInformation, tour.getDepartureTime(), true);
+        } else {
+            displayPoint(pathInformation, tour.getListShortestPaths().get(indexShortestPath - 1), true);
+        }
+        displayShortestPath(pathInformation, shortestPath, true);
+        displayPoint(pathInformation, shortestPath, true);
+        if (indexShortestPath == tour.getListShortestPaths().size() - 1) {
+            displayDepotPoint(pathInformation, tour.getArrivalTime(), false);
+        }
+        pathInformation.add(Box.createRigidArea(new Dimension(0, gap)));
+        segmentsHeader.add(pathInformation);
+
+        parentPanel.add(segmentsHeader, BorderLayout.PAGE_START);
     }
 
     private void displayTourGlobalInformation() {
@@ -169,29 +196,31 @@ public class TextualView extends JPanel implements Observer {
         displayInformation(parentPanel, depotInformation, Color.black, null, false);
     }
 
-    private void displayPoint(JPanel parentPanel, ShortestPath shortestPath) {
+    private void displayPoint(JPanel parentPanel, ShortestPath shortestPath, boolean segmentDetails) {
         Map<String, String> pointsInformation = new HashMap<>();
-        displayShortestPath(parentPanel, shortestPath);
         if (shortestPath.getEndNodeNumber() != 0) {
             boolean endAddressIsPickup = shortestPath.getEndNodeNumber()%2 == 1;
             pointsInformation.put("Type", endAddressIsPickup ? "Pickup" : "Delivery");
 
             int requestIndex = endAddressIsPickup ? shortestPath.getEndNodeNumber()/2 : shortestPath.getEndNodeNumber()/2 - 1;
             Request request = tour.getPlanningRequests().get(requestIndex);
+            boolean pointSelected;
             if (endAddressIsPickup) {
                 pointsInformation.put("Arrival time", request.getPickupArrivalTime());
                 pointsInformation.put("Process time", request.getPickupDuration()/60 + " min");
                 pointsInformation.put("Departure time", request.getPickupDepartureTime());
+                pointSelected = request.isPickupSelected();
             } else {
                 pointsInformation.put("Arrival time", request.getDeliveryArrivalTime());
                 pointsInformation.put("Process time", request.getDeliveryDuration()/60 + " min");
                 pointsInformation.put("Departure time", request.getDeliveryDepartureTime());
+                pointSelected = request.isDeliverySelected();
             }
-            displayInformation(parentPanel, pointsInformation, request.getColor(), null, false);
+            displayInformation(parentPanel, pointsInformation, request.getColor(), segmentDetails ? null : tourIntersectionsPanels, pointSelected && !segmentDetails);
         }
     }
 
-    private void displayShortestPath(JPanel parentPanel, ShortestPath shortestPath) {
+    private void displayShortestPath(JPanel parentPanel, ShortestPath shortestPath, boolean segmentDetails) {
         JPanel pathPanel = new JPanel();
         pathPanel.setLayout(new BorderLayout());
         pathPanel.setBorder(BorderFactory.createMatteBorder(0,0,0,10, Constants.COLOR_4));
@@ -206,16 +235,18 @@ public class TextualView extends JPanel implements Observer {
 
         addLine(pathPanel,"Length", String.format("%.1f",shortestPath.getPathLength() / (double) 1000) + " km", false, 12);
 
-        JButton pathDetail = new JButton(PATH_DETAILS);
-        try {
-            window.setStyle(pathDetail);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (!segmentDetails) {
+            JButton pathDetail = new JButton(PATH_DETAILS);
+            try {
+                window.setStyle(pathDetail);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            pathDetail.setPreferredSize(new Dimension(pathDetail.getPreferredSize().width, 30));
+            pathDetailsButtons.add(pathDetail);
+            pathDetail.addActionListener(buttonListener);
+            pathPanel.add(pathDetail, BorderLayout.LINE_END);
         }
-        pathDetail.setPreferredSize(new Dimension(pathDetail.getPreferredSize().width, 30));
-        pathDetailsButtons.add(pathDetail);
-        pathDetail.addActionListener(buttonListener);
-        pathPanel.add(pathDetail, BorderLayout.LINE_END);
 
         parentPanel.add(Box.createRigidArea(new Dimension(0, gap)));
         parentPanel.add(pathPanel);
@@ -242,6 +273,7 @@ public class TextualView extends JPanel implements Observer {
             segmentPanel.setMaximumSize(new Dimension(getPreferredSize().width, 53));
             segmentsPanel.add(segmentPanel);
         }
+        segmentsPanel.add(Box.createRigidArea(new Dimension(0, gap)));
         parentPanel.add(segmentsPanel);
     }
 
@@ -285,7 +317,7 @@ public class TextualView extends JPanel implements Observer {
             requestInformation.put("Pickup duration", pickupDuration);
             requestInformation.put("Delivery address", deliveryCoordinates);
             requestInformation.put("Delivery duration", deliveryDuration);
-            displayInformation(parentPanel, requestInformation, request.getColor(), requestPanels, request.isSelected());
+            displayInformation(parentPanel, requestInformation, request.getColor(), requestPanels, request.isPickupSelected() && request.isDeliverySelected());
             parentPanel.add(Box.createRigidArea(new Dimension(0, gap)));
         }
     }
@@ -346,10 +378,6 @@ public class TextualView extends JPanel implements Observer {
         label.setForeground(Constants.COLOR_3);
     }
 
-    public List<JPanel> getRequestPanels() {
-        return requestPanels;
-    }
-
     /**
      * Method called by observable instances when the textual view must be updated.
      * @param o observable instance which send the notification
@@ -401,4 +429,47 @@ public class TextualView extends JPanel implements Observer {
         }
     }
 
+    public void setRequestPanelMouseEntered(int indexPanel) {
+        for (Component childComponent : requestPanels.get(indexPanel).getComponents()) {
+            JPanel childPanel = (JPanel) childComponent;
+            childPanel.setBackground(Constants.COLOR_2);
+            childPanel.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, Constants.COLOR_2));
+        }
+    }
+
+    public void setTourIntersectionPanelMouseEntered(int indexPanel) {
+        for (Component childComponent : tourIntersectionsPanels.get(indexPanel).getComponents()) {
+            JPanel childPanel = (JPanel) childComponent;
+            childPanel.setBackground(Constants.COLOR_2);
+            childPanel.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, Constants.COLOR_2));
+        }
+    }
+
+    public void setRequestPanelMouseExited(int indexPanel) {
+        Request request = tour.getPlanningRequests().get(indexPanel);
+        if (!request.isDeliverySelected() || !request.isPickupSelected()) {
+            for (Component childComponent : requestPanels.get(indexPanel).getComponents()) {
+                JPanel childPanel = (JPanel) childComponent;
+                childPanel.setBackground(Constants.COLOR_4);
+                childPanel.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, Constants.COLOR_4));
+            }
+        }
+    }
+
+    public void setTourIntersectionPanelMouseExited(int indexPanel) {
+        ShortestPath shortestPath = tour.getListShortestPaths().get(indexPanel);
+        boolean tourIntersectionSelected;
+        if (shortestPath.getEndNodeNumber() % 2 == 1) {
+            tourIntersectionSelected = tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2).isPickupSelected();
+        } else {
+            tourIntersectionSelected = tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2 - 1).isDeliverySelected();
+        }
+        if (!tourIntersectionSelected) {
+            for (Component childComponent : tourIntersectionsPanels.get(indexPanel).getComponents()) {
+                JPanel childPanel = (JPanel) childComponent;
+                childPanel.setBackground(Constants.COLOR_4);
+                childPanel.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, Constants.COLOR_4));
+            }
+        }
+    }
 }

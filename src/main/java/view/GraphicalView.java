@@ -138,7 +138,7 @@ public class GraphicalView extends JPanel implements Observer {
         }
 
         if (!tour.getPlanningRequests().isEmpty()) {
-            boolean oneRequestSelected = tour.getPlanningRequests().stream().anyMatch(Request::isSelected);
+            boolean oneRequestPointSelected = tour.getPlanningRequests().stream().anyMatch(req -> req.isDeliverySelected() || req.isPickupSelected());
             for (Request request : tour.getPlanningRequests()) {
 
                 Intersection pickupAddress = request.getPickupAddress();
@@ -147,11 +147,14 @@ public class GraphicalView extends JPanel implements Observer {
                 Intersection deliveryAddress = request.getDeliveryAddress();
                 int deliveryCoordinateX = getCoordinateX(deliveryAddress);
                 int deliveryCoordinateY = getCoordinateY(deliveryAddress);
-                if (!oneRequestSelected || request.isSelected()) {
+                if (!oneRequestPointSelected || request.isPickupSelected()) {
                     drawIcon(request.getColor(), pickupCoordinateX, pickupCoordinateY, "pickup-icon");
-                    drawIcon(request.getColor(), deliveryCoordinateX, deliveryCoordinateY, "delivery-icon");
                 } else {
                     drawIcon(Constants.COLOR_4, pickupCoordinateX, pickupCoordinateY, "pickup-icon");
+                }
+                if (!oneRequestPointSelected || request.isDeliverySelected()) {
+                    drawIcon(request.getColor(), deliveryCoordinateX, deliveryCoordinateY, "delivery-icon");
+                } else {
                     drawIcon(Constants.COLOR_4, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon");
                 }
             }
@@ -190,10 +193,41 @@ public class GraphicalView extends JPanel implements Observer {
                 g2.setColor(color);
                 g2.setStroke(new BasicStroke(strokeSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                 g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+                displayArrow(g2, originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
                 if (displayRoadNames) {
                     displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY, true);
                 }
             }
+        }
+    }
+
+    private void displayArrow(Graphics2D g2, int originX, int originY, int destinationX, int destinationY) {
+        double oppositeSide = destinationY - originY;
+        double adjacentSide = destinationX - originX;
+        double hypotenuseSize = Math.sqrt(oppositeSide * oppositeSide + adjacentSide * adjacentSide);
+        if (hypotenuseSize > 80) {
+            double angle = Math.atan(oppositeSide / adjacentSide);
+            int middleX;
+            int middleY;
+            if (originX > destinationX) {
+                middleX = (int) (originX - Math.abs(adjacentSide) / 2);
+                angle -= Math.PI;
+            } else {
+                middleX = (int) (originX + Math.abs(adjacentSide) / 2);
+            }
+            if (originY > destinationY) {
+                middleY = (int) (originY - Math.abs(oppositeSide) / 2);
+            } else {
+                middleY = (int) (originY + Math.abs(oppositeSide) / 2);
+            }
+            g2.translate(middleX, middleY);
+            BasicStroke stroke = (BasicStroke) g2.getStroke();
+            g2.setStroke(new BasicStroke(stroke.getLineWidth()/2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g2.rotate(angle + 3 * Math.PI / 4);
+            g2.drawLine(0, 0, (int) (2 * scale), 0);
+            g2.drawLine(0, 0, 0, (int) (2 * scale));
+            g2.rotate(-(angle + 3 * Math.PI / 4));
+            g2.translate(-middleX, -middleY);
         }
     }
 
@@ -334,4 +368,45 @@ public class GraphicalView extends JPanel implements Observer {
         previousMouseY = y;
     }
 
+    public int findIcon(int x, int y) {
+        int indexIcon = -1;
+        for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
+            Intersection pickupAddress = tour.getPlanningRequests().get(i).getPickupAddress();
+            int pickupCoordinateX = getCoordinateX(pickupAddress);
+            int pickupCoordinateY = getCoordinateY(pickupAddress);
+            if (x >= pickupCoordinateX - 20  && x <= pickupCoordinateX + 20 && y >= pickupCoordinateY - 40 && y <= pickupCoordinateY) {
+                if (checkCursorOnIcon(x - (pickupCoordinateX - 20), y - (pickupCoordinateY - 40), "depot-icon")) {
+                    indexIcon = i * 2 + 1;
+                }
+            }
+            Intersection deliveryAddress = tour.getPlanningRequests().get(i).getDeliveryAddress();
+            int deliveryCoordinateX = getCoordinateX(deliveryAddress);
+            int deliveryCoordinateY = getCoordinateY(deliveryAddress);
+            if (x >= deliveryCoordinateX - 20  && x <= deliveryCoordinateX + 20 && y >= deliveryCoordinateY - 40 && y <= deliveryCoordinateY) {
+                if (checkCursorOnIcon(x - (deliveryCoordinateX - 20), y - (deliveryCoordinateY - 40), "depot-icon")) {
+                    indexIcon = i * 2 + 2;
+                }
+            }
+        }
+        return indexIcon;
+    }
+
+    private boolean checkCursorOnIcon(int x, int y, String iconName) {
+        boolean cursorOnIcon = true;
+        BufferedImage image = null;
+        try {
+            image = Constants.getImage(iconName);
+            x = (x * (image.getWidth())) / 40;
+            y = (y * (image.getHeight())) / 40;
+            if (x == image.getWidth()) x -= 1;
+            if (y == image.getHeight()) y -= 1;
+            Color color = new Color(image.getRGB(x, y), true);
+            if (color.getAlpha() == 0) {
+                cursorOnIcon = false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return cursorOnIcon;
+    }
 }

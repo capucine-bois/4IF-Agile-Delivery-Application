@@ -52,6 +52,10 @@ public class RequestsLoadedState implements State {
     @Override
     public void computeTour(CityMap cityMap, Tour tour, Window window, Controller controller) {
         tour.computeTour(cityMap.getIntersections());
+        for (Request request : tour.getPlanningRequests()) {
+            request.setPickupSelected(false);
+            request.setDeliverySelected(false);
+        }
         controller.setCurrentState(controller.computedTourState);
         window.showTourPanel();
         window.setEnabledTour(true);
@@ -59,15 +63,22 @@ public class RequestsLoadedState implements State {
 
     @Override
     public void leftClickOnRequest(int indexRequest, Tour tour) {
-        Request requestClicked = tour.getPlanningRequests().get(indexRequest);
-        if (requestClicked.isSelected()) {
-            requestClicked.setSelected(false);
-        } else {
-            requestClicked.setSelected(true);
-            for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
-                if (i != indexRequest) tour.getPlanningRequests().get(i).setSelected(false);
+        for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
+            Request request = tour.getPlanningRequests().get(i);
+            if (i != indexRequest || (request.isPickupSelected() && request.isDeliverySelected())) {
+                request.setPickupSelected(false);
+                request.setDeliverySelected(false);
+            } else {
+                request.setPickupSelected(true);
+                request.setDeliverySelected(true);
             }
         }
         tour.notifyObservers();
+    }
+
+    @Override
+    public void leftClickOnIcon(int indexIcon, Tour tour) {
+        int indexRequest = indexIcon%2 == 0 ? indexIcon/2 - 1 : indexIcon/2;
+        leftClickOnRequest(indexRequest, tour);
     }
 }

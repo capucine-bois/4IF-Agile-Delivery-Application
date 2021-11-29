@@ -76,13 +76,18 @@ public class Controller {
      */
     public void computeTour() { currentState.computeTour(cityMap, tour, window, this); }
 
-    public void showRequestsPanel() { currentState.showRequestsPanel(window); }
+    public void showRequestsPanel() { currentState.showRequestsPanel(tour, window); }
 
-    public void showTourPanel() { currentState.showTourPanel(window); }
+    public void showTourPanel() { currentState.showTourPanel(tour, window); }
 
     public void leftClickOnRequest(int indexRequest) {
         currentState.leftClickOnRequest(indexRequest, tour);
     }
+
+    public void leftClickOnTourIntersection(int indexShortestPath) {
+        currentState.leftClickOnTourIntersection(indexShortestPath, tour);
+    }
+
 
     public void leftClickOnShortestPath(int indexShortestPath) {
         currentState.leftClickOnShortestPath(indexShortestPath, tour);
@@ -90,5 +95,9 @@ public class Controller {
 
     public void goBackToTour() {
         currentState.goBackToTour(tour);
+    }
+
+    public void leftClickonIcon(int indexIcon) {
+        currentState.leftClickOnIcon(indexIcon, tour);
     }
 }
