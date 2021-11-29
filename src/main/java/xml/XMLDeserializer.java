@@ -118,6 +118,9 @@ public class XMLDeserializer {
             // create the intersection object and add it to the city map
             Intersection i1 = new Intersection(index, latitude, longitude);
             cityMap.addIntersection(i1);
+            if(dictionnaryId.containsKey(idMap)) {
+                throw new ExceptionXML("Duplicate index found for the intersection, index = " + idMap);
+            }
             dictionnaryId.put(idMap,index);
             index++;
         }
