@@ -99,6 +99,7 @@ public class XMLDeserializer {
         for (int x = 0, size = intersectionNodes.getLength(); x < size; x++) {
             double latitude = Double.parseDouble(intersectionNodes.item(x).getAttributes().getNamedItem("latitude").getNodeValue());
             double longitude = Double.parseDouble(intersectionNodes.item(x).getAttributes().getNamedItem("longitude").getNodeValue());
+            long idMap = Long.parseLong(intersectionNodes.item(x).getAttributes().getNamedItem("id").getNodeValue());
             // check duplicate
             boolean isKeyPresent = coordonateDictionnary.containsKey(latitude);
             if(isKeyPresent){
@@ -116,8 +117,9 @@ public class XMLDeserializer {
             }
             // create the intersection object and add it to the city map
             Intersection i1 = new Intersection(index, latitude, longitude);
-            index++;
             cityMap.addIntersection(i1);
+            dictionnaryId.put(idMap,index);
+            index++;
         }
     }
 
