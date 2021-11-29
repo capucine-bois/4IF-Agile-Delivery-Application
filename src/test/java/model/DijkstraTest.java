@@ -362,42 +362,41 @@ public class DijkstraTest {
             assertEquals(3,sp5.get(2).getListSegments().get(0).getDestination().getId(), "Wrong id for Intersection5/SP3/EL1/DESTINATION");
 
         }
+
+        /**
+         * Method to test:
+         * dijkstra()
+         *
+         * What it does:
+         * Expect dijkstra to handle impossible graph
+         */
+        @Test
+        @DisplayName("Unreachable intersection")
+        void impossiblePathDijkstraTest(){
+            // Add request alone impossible to access by any segment
+            Intersection aloneIntersec = new Intersection(10,45.3112,33.2245);
+            Intersection aloneIntersec2 = new Intersection(11,45.5112,33.2245);
+            Request request =  new Request(100,120, aloneIntersec,aloneIntersec2,new Color(65, 65, 65));
+            listRequest.add(request);
+
+            //
+            listIntersectionsDijkstra.add(aloneIntersec);
+            listIntersectionsDijkstra.add(aloneIntersec2);
+            listUsefulEndPoints.add(aloneIntersec);
+            listUsefulEndPoints.add(aloneIntersec2);
+
+            Intersection origin1 = cityMap.getIntersections().get(0);
+
+
+
+            ArrayList<ShortestPath> sp1 = tour.dijkstra(listIntersectionsDijkstra, listUsefulEndPoints, origin1);
+
+
+            assertEquals(6,sp1.size(),"Dijkstra find impossible path");
+        }
     }
 
 
 
-    /**
-     * Method to test:
-     * dijkstra()
-     *
-     * What it does:
-     * Expect dijkstra to handle impossible graph
-     */
-    @Test
-    @DisplayName("Test on dijkstra - Unreachable intersection")
-    void impossiblePathDijkstraTest(){
-        // Add request alone impossible to access by any segment
-        Intersection aloneIntersec = new Intersection(10,45.3112,33.2245);
-        Intersection aloneIntersec2 = new Intersection(11,45.5112,33.2245);
-        Request request =  new Request(100,120, aloneIntersec,aloneIntersec2,new Color(65, 65, 65));
-        listRequest.add(request);
-
-        //
-        List<Intersection> listIntersectionsDijkstra = cityMap.getIntersections();
-        ArrayList<Intersection> listUsefulEndPoints = (ArrayList<Intersection>) cityMap.getIntersections();
-
-
-        Intersection origin1 = cityMap.getIntersections().get(0);
-
-
-
-        ArrayList<ShortestPath> sp1 = tour.dijkstra(listIntersectionsDijkstra, listUsefulEndPoints, origin1);
-
-
-        // Verify answer
-        // TODO: Add answer and check that dijkstra hasn't added cost to the unreachable intersection
-        // TODO: Notify user that some intersections can't be access
-        fail();
-    }
 
 }
