@@ -80,9 +80,8 @@ public class XMLDeserializer {
      */
     public static void deserializeMap(CityMap cityMap, Document document) throws ExceptionXML {
         if(document != null) {
-            HashMap<Long,Long> dictionnaryId = new HashMap<>();
-            parseXMLIntersections(document, cityMap,dictionnaryId);
-            parseXMLSegments(document, cityMap,dictionnaryId);
+            parseXMLIntersections(document, cityMap);
+            parseXMLSegments(document, cityMap);
         }
     }
 
@@ -133,6 +132,7 @@ public class XMLDeserializer {
      * @param cityMap structure to fill
      */
     public static void parseXMLSegments(Document document, CityMap cityMap, HashMap dictionnaryId) throws ExceptionXML{
+        //TODO get HashMap via CityMap instead of having it as a parameter
         NodeList nodeSegment = document.getElementsByTagName("segment");
         HashMap<Long,ArrayList<Long>> idIntersectionsDictionnary = new HashMap<>();
         for (int x = 0, size = nodeSegment.getLength(); x < size; x++) {
@@ -175,13 +175,17 @@ public class XMLDeserializer {
      * in city map.
      */
     public static void deserializeRequests(Tour tour, CityMap cityMap, Document document) throws ExceptionXML {
+
         if(document != null) {
-            parseXMLRequests(tour, cityMap, document);
+            HashMap<Long,Long> dictionnaryId = new HashMap<>();
+            //TODO : dictionnaryId = cityMap.get...
+            parseXMLRequests(tour, cityMap, document, dictionnaryId);
             // parse XMLDepot
             NodeList nodeDepot = document.getElementsByTagName("depot");
             long address = Long.parseLong(nodeDepot.item(0).getAttributes().getNamedItem("address").getNodeValue());
+            long newAddress = dictionnaryId.get(address);
             String departureTime = nodeDepot.item(0).getAttributes().getNamedItem("departureTime").getNodeValue();
-            Optional<Intersection> optionalDepotAddress = cityMap.getIntersections().stream().filter(i->i.getId() == address).findFirst();
+            Optional<Intersection> optionalDepotAddress = cityMap.getIntersections().stream().filter(i->i.getId() == newAddress).findFirst();
 
             if (optionalDepotAddress.isPresent()) {
                 Intersection depotAddress = optionalDepotAddress.get();
@@ -203,7 +207,7 @@ public class XMLDeserializer {
      * @param document opened XML file
      * @throws ExceptionXML raised if requests intersections can't be found in cityMap parameter.
      */
-    public static void parseXMLRequests(Tour tour, CityMap cityMap, Document document) throws ExceptionXML {
+    public static void parseXMLRequests(Tour tour, CityMap cityMap, Document document, HashMap<Long,Long> dictionnaryId) throws ExceptionXML {
 
         float[] hsv = new float[3];
         Color initialColor = Color.red;
@@ -216,9 +220,11 @@ public class XMLDeserializer {
             long deliveryAddressId = Long.parseLong(nodeRequest.item(x).getAttributes().getNamedItem("deliveryAddress").getNodeValue());
             int pickupDuration = Integer.parseInt(nodeRequest.item(x).getAttributes().getNamedItem("pickupDuration").getNodeValue());
             int deliveryDuration = Integer.parseInt(nodeRequest.item(x).getAttributes().getNamedItem("deliveryDuration").getNodeValue());
+            long newPickupAddressId = dictionnaryId.get(pickupAddressId);
+            long newDeliveryAddressId = dictionnaryId.get(deliveryAddressId);
 
-            Optional<Intersection> pickupAddress = cityMap.getIntersections().stream().filter(i->i.getId() == pickupAddressId).findFirst();
-            Optional<Intersection> deliveryAddress = cityMap.getIntersections().stream().filter(i->i.getId() == deliveryAddressId).findFirst();
+            Optional<Intersection> pickupAddress = cityMap.getIntersections().stream().filter(i->i.getId() == newPickupAddressId).findFirst();
+            Optional<Intersection> deliveryAddress = cityMap.getIntersections().stream().filter(i->i.getId() == newDeliveryAddressId).findFirst();
             if (pickupAddress.isPresent() && deliveryAddress.isPresent()) {
                 Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
                 Request request = new Request(pickupDuration, deliveryDuration, pickupAddress.get(), deliveryAddress.get(), requestColor);

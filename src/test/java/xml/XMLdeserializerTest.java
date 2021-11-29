@@ -283,6 +283,7 @@ public class XMLdeserializerTest {
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(file);
         try{
+            //TODO add HashMap parameter when calling parseXMLRequests
             XMLDeserializer.parseXMLRequests(this.tour,this.cityMap, document);
             ArrayList<Request> listRequestOutput = this.tour.getPlanningRequests();
             assertEquals(listRequestOutput.size(),this.listRequest.size(),"Wrong number of requests");
