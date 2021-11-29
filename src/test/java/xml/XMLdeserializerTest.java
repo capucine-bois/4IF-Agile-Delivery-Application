@@ -137,7 +137,7 @@ public class XMLdeserializerTest {
         Document document = db.parse(file);
         CityMap cityMap = new CityMap();
 
-        // Function test
+        // Function to test
         XMLDeserializer.parseXMLIntersections(document,cityMap);
         // Same length
         assertEquals(cityMap.getIntersections().size(), this.listIntersection.size(), "Wrong number of segments");

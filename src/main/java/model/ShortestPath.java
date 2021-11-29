@@ -30,6 +30,17 @@ public class ShortestPath implements Comparable<ShortestPath> {
      * The end intersection
      */
     private Intersection endAddress;
+
+    /**
+     * The number of the start node used in TSP
+     */
+    private int startNodeNumber;
+
+    /**
+     * The number of the end node used in TSP
+     */
+    private int endNodeNumber;
+
     private boolean selected;
 
     /* CONSTRUCTORS */
@@ -66,6 +77,14 @@ public class ShortestPath implements Comparable<ShortestPath> {
         return endAddress;
     }
 
+    public int getStartNodeNumber() {
+        return startNodeNumber;
+    }
+
+    public int getEndNodeNumber() {
+        return endNodeNumber;
+    }
+
     /**
      * Getter for selection attribute
      * @return selected state
@@ -89,6 +108,14 @@ public class ShortestPath implements Comparable<ShortestPath> {
 
     public void setEndAddress(Intersection endAddress) {
         this.endAddress = endAddress;
+    }
+
+    public void setStartNodeNumber(int startNodeNumber) {
+        this.startNodeNumber = startNodeNumber;
+    }
+
+    public void setEndNodeNumber(int endNodeNumber) {
+        this.endNodeNumber = endNodeNumber;
     }
 
     /**

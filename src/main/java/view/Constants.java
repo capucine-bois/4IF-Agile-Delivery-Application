@@ -22,6 +22,9 @@ public class Constants {
     public static final Color COLOR_7 = new Color(255, 255, 255); // Segments background
     public static final Color COLOR_8 = new Color(25, 103, 210); // Tour segments stroke
     public static final Color COLOR_9 = new Color(102, 157, 246); // Tour segments background
+    public static final Color COLOR_10 = new Color(103, 114, 119); // Roads name on segments
+    public static final Color COLOR_11 = new Color(146, 148, 151); // Tour unselected segments stroke
+    public static final Color COLOR_12 = new Color(187, 189, 191); // Tour unselected segments background
 
     /**
      * Get Font instance for a given font name and a given font size
@@ -37,11 +40,18 @@ public class Constants {
 
     /**
      * Get image for a given image name
-     * @param filename name of the image file
+     * @param iconName name of the icon in the image file
      * @return buffered image linked to the image
      * @throws IOException raised if the file can not be read
      */
-    public static BufferedImage getImage(String filename) throws IOException {
-        return ImageIO.read(new File("src/main/resources/img/" + filename));
+    public static BufferedImage getImage(String iconName) throws IOException {
+        int screenSize = Toolkit.getDefaultToolkit().getScreenSize().width;
+        String iconSize = "-";
+        if (screenSize > 1800) {
+            iconSize += "large";
+        } else {
+            iconSize += "medium";
+        }
+        return ImageIO.read(new File("src/main/resources/img/" + iconName + iconSize + ".png"));
     }
 }

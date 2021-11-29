@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<map>
+    <intersection id="1" latitude="45.75406" />
+    <intersection id="2" latitude="45.750404" />
+    <intersection id="3" latitude="45.75407" />
+    <intersection id="4" latitude="45.75408" />
+    <segment destination="1" length="69.979805" name="Rue Danton" origin="2"/>
+    <segment destination="3" length="136.00636" name="Rue de l'Abondance" origin="4"/>
+</map>

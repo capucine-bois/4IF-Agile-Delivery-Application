@@ -18,7 +18,7 @@ public class ButtonListener implements ActionListener {
     /**
      * The application controller
      */
-    private  Controller controller;
+    private Controller controller;
 
     /**
      * The window
@@ -44,9 +44,11 @@ public class ButtonListener implements ActionListener {
         switch (e.getActionCommand()) {
             case Window.LOAD_MAP -> controller.loadMap();
             case Window.LOAD_REQUEST -> controller.loadRequests();
-            case Window.COMPUTE_TOUR -> {
-                this.computeTour();
-            }
+            case Window.COMPUTE_TOUR -> this.computeTour();
+            case TextualView.REQUESTS_HEADER -> controller.showRequestsPanel();
+            case TextualView.TOUR_HEADER -> controller.showTourPanel();
+            case TextualView.GO_BACK_TO_TOUR -> controller.goBackToTour();
+            case TextualView.PATH_DETAILS -> controller.leftClickOnShortestPath(TextualView.pathDetailsButtons.indexOf((JButton) e.getSource()));
         }
     }
 

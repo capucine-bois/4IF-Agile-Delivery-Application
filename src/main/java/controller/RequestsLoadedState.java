@@ -4,6 +4,8 @@ import model.*;
 import view.Window;
 import xml.XMLDeserializer;
 
+import javax.swing.*;
+
 /**
  * Request loaded state. State when the application has successfully loaded requests.
  */
@@ -25,6 +27,7 @@ public class RequestsLoadedState implements State {
             }
         } finally {
             tour.notifyObservers();
+            window.setEnabledRequests(false);
         }
     }
 
@@ -38,6 +41,7 @@ public class RequestsLoadedState implements State {
                 tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
                 controller.setCurrentState(controller.mapLoadedState);
+                window.setEnabledRequests(false);
             }
         } finally {
             tour.notifyObservers();
@@ -46,9 +50,35 @@ public class RequestsLoadedState implements State {
 
 
     @Override
-    public void computeTour(CityMap cityMap, Tour tour, Controller controller) {
+    public void computeTour(CityMap cityMap, Tour tour, Window window, Controller controller) {
         tour.computeTour(cityMap.getIntersections());
+        for (Request request : tour.getPlanningRequests()) {
+            request.setPickupSelected(false);
+            request.setDeliverySelected(false);
+        }
         controller.setCurrentState(controller.computedTourState);
+        window.showTourPanel();
+        window.setEnabledTour(true);
     }
 
+    @Override
+    public void leftClickOnRequest(int indexRequest, Tour tour) {
+        for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
+            Request request = tour.getPlanningRequests().get(i);
+            if (i != indexRequest || (request.isPickupSelected() && request.isDeliverySelected())) {
+                request.setPickupSelected(false);
+                request.setDeliverySelected(false);
+            } else {
+                request.setPickupSelected(true);
+                request.setDeliverySelected(true);
+            }
+        }
+        tour.notifyObservers();
+    }
+
+    @Override
+    public void leftClickOnIcon(int indexIcon, Tour tour) {
+        int indexRequest = indexIcon%2 == 0 ? indexIcon/2 - 1 : indexIcon/2;
+        leftClickOnRequest(indexRequest, tour);
+    }
 }
