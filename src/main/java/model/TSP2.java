@@ -6,8 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 
 public class TSP2 extends TSP1 {
-
-    protected int bound(Integer currentVertex, Collection<Integer> unvisited, Collection<Integer> visited, Graph g) {
+    @Override
+    protected double bound(Integer currentVertex, Collection<Integer> unvisited, Collection<Integer> visited, Graph g) {
 
         double sum = 0;
 
@@ -32,7 +32,7 @@ public class TSP2 extends TSP1 {
             sum = sum + minCost;
         }
 
-        return (int)sum;
+        return sum;
     }
 
 

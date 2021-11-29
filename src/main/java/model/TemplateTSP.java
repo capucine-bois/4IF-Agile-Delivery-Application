@@ -68,7 +68,7 @@ public abstract class TemplateTSP implements TSP {
      * @return a lower bound of the cost of paths in <code>g</code> starting from <code>currentVertex</code>, visiting
      * every vertex in <code>unvisited</code> exactly once, and returning back to vertex <code>0</code>.
      */
-    protected abstract int bound(Integer currentVertex, Collection<Integer> unvisited);
+    protected abstract double bound(Integer currentVertex, Collection<Integer> unvisited, Collection<Integer> visited, Graph g);
 
     /**
      * Method that must be defined in TemplateTSP subclasses
@@ -96,8 +96,8 @@ public abstract class TemplateTSP implements TSP {
                     bestSolCost = currentCost+g.getCost(currentVertex,0);
                 }
             }
-        } else if (currentCost+bound(currentVertex,unvisited) < bestSolCost){
-            SeqIter it = (SeqIter) iterator(currentVertex, unvisited, g);
+        } else if (currentCost+bound(currentVertex,unvisited, visited, g) < bestSolCost){
+            Iterator<Integer> it = iterator(currentVertex, unvisited, g);
             while (it.hasNext()){
                 Integer nextVertex = it.next();
                 visited.add(nextVertex);

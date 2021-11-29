@@ -1,6 +1,8 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * The graphe used in TSP
@@ -68,6 +70,18 @@ public class CompleteGraph implements Graph {
     }
 
     @Override
+    public Integer[] getDestinationsInOrder(int currentVertex) {
+        Node currentNode = listNodesGraph.get(currentVertex);
+        Integer[] destinations = null;
+        int i = 0;
+        for (ShortestPath arc : currentNode.getListArcs()){
+            destinations[i] = arc.getEndNodeNumber();
+            i++;
+        }
+        return destinations;
+    }
+
+    @Override
     public int getNbVertices() {
         return nbVertices;
     }
@@ -78,7 +92,6 @@ public class CompleteGraph implements Graph {
             return -1;
         return cost[i][j];
     }
-
 
     @Override
     public boolean isArc(int i, int j) {
