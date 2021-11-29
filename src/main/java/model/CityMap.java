@@ -3,6 +3,7 @@ package model;
 import observer.Observable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -17,6 +18,7 @@ public class CityMap extends Observable {
      * List of all intersections.
      */
     private List<Intersection> intersections;
+    private HashMap<Long,Long> dictionaryId;
 
     /* CONSTRUCTORS */
 
@@ -25,6 +27,7 @@ public class CityMap extends Observable {
      */
     public CityMap() {
         this.intersections = new ArrayList<>();
+        this.dictionaryId = new HashMap<>();
     }
 
     /* METHODS */
@@ -37,11 +40,39 @@ public class CityMap extends Observable {
         intersections.add(i);
     }
 
+    /**
+     * Add an entry to hashmap of id .
+     * @param idXML id of the original XML
+     * @param id id choosen by the application
+     */
+    public void addDictionaryId(Long idXML, Long id) {
+        dictionaryId.put(idXML,id);
+    }
+
+    /**
+     * Check is id is in the dictionary .
+     * @param idXML id of the original XML
+     */
+    public boolean containsDictionaryIdKey(Long idXML) {
+        return dictionaryId.containsKey(idXML);
+    }
+
+    /**
+     * Return dictionary value .
+     * @param idXML id of the original XML
+     * @return id of the dictionary
+     */
+    public long getValueDictionary(Long idXML) {
+        return dictionaryId.get(idXML);
+    }
+
     /* GETTERS */
 
     public List<Intersection> getIntersections() {
         return intersections;
     }
+
+
 
     /**
      * Check if two citymaps have the same attributes
