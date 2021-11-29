@@ -2,8 +2,11 @@ package controller;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import model.CityMap;
+import model.Request;
+import model.ShortestPath;
 import model.Tour;
 import view.Window;
 
@@ -121,5 +124,62 @@ public class Controller {
 
     public void exitMouseOnTourIntersection(int indexShortestPath) {
         currentState.exitMouseOnTourIntersection(indexShortestPath, tour, window);
+    }
+
+    public void deleteRequest(int indexRequest) {
+        System.out.println("Controller.deleteRequest");
+        System.out.println("indexRequest = " + indexRequest);
+        ArrayList<Request> planning = tour.getPlanningRequests();
+        ArrayList<ShortestPath> shortestPaths = tour.getListShortestPaths();
+        Request requestToDelete = planning.get(indexRequest);
+
+        // remove request
+        planning.remove(indexRequest);
+
+        // remove paths with this
+        int i = 0;
+        while (i<shortestPaths.size()) {
+            //System.out.println("StartNode: " + shortestPaths.get(i).getStartNodeNumber());
+            //System.out.println("EndNode: " + shortestPaths.get(i).getEndNodeNumber());
+            ShortestPath path = shortestPaths.get(i);
+            if (path.getStartAddress().equals(requestToDelete.getPickupAddress()) ||
+                    path.getStartAddress().equals(requestToDelete.getDeliveryAddress()) ||
+                    path.getEndAddress().equals(requestToDelete.getPickupAddress()) ||
+                    path.getEndAddress().equals(requestToDelete.getDeliveryAddress())) {
+
+                /*
+                if (i-1 >= 0) {
+                    shortestPaths.get(i - 1).setEndNodeNumber(path.getEndNodeNumber());
+                }
+
+                 */
+
+                int removedNode = path.getStartNodeNumber();
+                shortestPaths.remove(i);
+
+                /*
+                for (int j=0; j<shortestPaths.size();j++) {
+                    ShortestPath path2 = shortestPaths.get(j);
+                    int start = path2.getStartNodeNumber();
+                    int end = path2.getEndNodeNumber();
+                    if (start > removedNode)
+                        path2.setStartNodeNumber(start-1);
+                    if (end > removedNode)
+                        path2.setEndNodeNumber(end-1);
+                }
+
+                 */
+
+            } else {
+                i++;
+            }
+        }
+
+        for (ShortestPath p: shortestPaths) {
+            System.out.println("Start: " + p.getStartNodeNumber());
+            System.out.println("End: " + p.getEndNodeNumber());
+        }
+
+        tour.notifyObservers();
     }
 }
