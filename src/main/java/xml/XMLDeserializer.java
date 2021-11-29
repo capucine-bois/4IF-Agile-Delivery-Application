@@ -137,22 +137,24 @@ public class XMLDeserializer {
             double length = Double.parseDouble(nodeSegment.item(x).getAttributes().getNamedItem("length").getNodeValue());
             String name = nodeSegment.item(x).getAttributes().getNamedItem("name").getNodeValue();
             long originId = Long.parseLong(nodeSegment.item(x).getAttributes().getNamedItem("origin").getNodeValue());
+            long newOriginId = (long) dictionnaryId.get(originId);
+            long newDestinationId = (long) dictionnaryId.get(destinationId);
             // find the origin and destination intersections
-            Intersection origin = cityMap.getIntersections().stream().filter(i->i.getId()==originId).findFirst().get();
-            Intersection destination = cityMap.getIntersections().stream().filter(i->i.getId()==destinationId).findFirst().get();
+            Intersection origin = cityMap.getIntersections().stream().filter(i->i.getId()==newOriginId).findFirst().get();
+            Intersection destination = cityMap.getIntersections().stream().filter(i->i.getId()==newDestinationId).findFirst().get();
             // check duplicate
-            boolean isKeyPresent = idIntersectionsDictionnary.containsKey(originId);
+            boolean isKeyPresent = idIntersectionsDictionnary.containsKey(newOriginId);
             if(isKeyPresent){
-                ArrayList<Long> listDestIds = idIntersectionsDictionnary.get(originId);
+                ArrayList<Long> listDestIds = idIntersectionsDictionnary.get(newOriginId);
                 for(long dest: listDestIds){
-                    if(dest == destinationId){
+                    if(dest == newDestinationId){
                         throw new ExceptionXML("The selected map contains a duplicate road which origin identifier is : "+ originId + " and destination identifier is : " + destinationId);
                     }
                 }
             }else{
                 ArrayList<Long> listDestinationsId = new ArrayList<>();
-                listDestinationsId.add(destinationId);
-                idIntersectionsDictionnary.put(originId,listDestinationsId);
+                listDestinationsId.add(newDestinationId);
+                idIntersectionsDictionnary.put(newOriginId,listDestinationsId);
             }
 
             // create the Segment object and add it to the city map
