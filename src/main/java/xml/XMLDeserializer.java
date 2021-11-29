@@ -78,7 +78,7 @@ public class XMLDeserializer {
      * @param cityMap city map to fill
      * @param document document to parse
      */
-    public static void deserializeMap(CityMap cityMap, Document document) {
+    public static void deserializeMap(CityMap cityMap, Document document) throws ExceptionXML {
         if(document != null) {
             parseXMLIntersections(document, cityMap);
             parseXMLSegments(document, cityMap);
@@ -91,7 +91,7 @@ public class XMLDeserializer {
      * @param document document to parse
      * @param cityMap structure to fill
      */
-    public static void parseXMLIntersections(Document document, CityMap cityMap) {
+    public static void parseXMLIntersections(Document document, CityMap cityMap) throws ExceptionXML {
         NodeList intersectionNodes = document.getElementsByTagName("intersection");
         HashMap<Double,ArrayList<Double>> coordonateDictionnary = new HashMap<>();
         long index = 0;
@@ -102,15 +102,21 @@ public class XMLDeserializer {
             boolean isKeyPresent = coordonateDictionnary.containsKey(latitude);
             if(isKeyPresent){
                 ArrayList<Double> list = coordonateDictionnary.get(latitude);
-                for(double lat : list){
-
+                for(double longitu : list){
+                    if(longitu == longitude) {
+                        throw new ExceptionXML("Duplicate intersection found, latitude = " + latitude + " longitude = " + longitude);
+                    }
                 }
+                list.add(longitude);
+            } else {
+                ArrayList<Double> list = new ArrayList<>();
+                list.add(longitude);
+                coordonateDictionnary.put(latitude,list);
             }
             // create the intersection object and add it to the city map
             Intersection i1 = new Intersection(index, latitude, longitude);
             index++;
             cityMap.addIntersection(i1);
-            listIntersection.add(i1);
         }
     }
 
