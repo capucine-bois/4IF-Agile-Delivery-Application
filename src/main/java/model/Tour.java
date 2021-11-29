@@ -50,7 +50,7 @@ public class Tour extends Observable {
     private ArrayList<Request> planningRequests;
 
     /**
-     * A list of shortest path which is used to print the best path
+     * A list of shortest path which is used to print the best path. Sorted ascending for optimization.
      */
     private ArrayList<ShortestPath> listShortestPaths;
 
