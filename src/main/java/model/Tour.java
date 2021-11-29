@@ -404,38 +404,72 @@ public class Tour extends Observable {
 
     /**
      * Check if the two intersections in parameter are in the same strongly connected part
-     * @param firstIntersection
-     * @param secondIntersection
      * @param listIntersection the list of all intersections
      * @return true if there are in the same strongly connected part, false otherwise
      */
-    public boolean sameStronglyConnected(Intersection firstIntersection, Intersection secondIntersection, ArrayList<Intersection> listIntersection) {
-        ArrayList<ObjectDijkstra> listObjectDijkstra = foretDFS(listIntersection);
-        ObjectDijkstra objFirst = listObjectDijkstra.stream().filter(x -> x.getIntersection()==firstIntersection).findFirst().get();
-        ObjectDijkstra objSecond = listObjectDijkstra.stream().filter(x -> x.getIntersection()==secondIntersection).findFirst().get();
-        while(objFirst.getParent()!=null)
-            objFirst = objFirst.getParent();
-        while(objSecond.getParent()!=null) {
-            objSecond = objSecond.getParent();
+    public ArrayList<ArrayList<Integer>> stronglyConnectedComponents(ArrayList<Intersection> listIntersection) {
+
+        ArrayList<ArrayList<Integer>> scc = new ArrayList<>();
+        ArrayList<ObjectDijkstra> listObjectDijkstra = new ArrayList<>();
+        Integer [] num   = foretDFSnum(listIntersection, listObjectDijkstra);
+        List<Integer>[] graphTranspose = getTranspose(listIntersection);
+        /*for(int i=0; i<graphTranspose.length;i++) {
+            System.out.println("---------------");
+            System.out.println("on part de " + i);
+            for(int k=0; k<graphTranspose[i].size(); k++) {
+                System.out.print(graphTranspose[i].get(k) + "  -  ");
+            }
+            System.out.println("");
+        }*/
+
+        Integer [] color = new Integer[graphTranspose.length];
+        for(int i=0; i<color.length; i++) {
+            color[i] = 0;
         }
-        return objFirst.equals(objSecond);
+
+        for(int j = num.length-1; j>=0; j--) {
+            ArrayList<Integer> set = new ArrayList<>();
+            if(color[j]==0) {
+                Map<Integer, Integer> B = new HashMap<>();
+                for(int k=0; k<color.length; k++) {
+                    if(color[k]==0) {
+                        B.put(k,0);
+                    }
+                }
+
+                DFSrec(graphTranspose, j, color, B);
+                set = (ArrayList<Integer>) B.keySet().stream().filter(x -> B.get(x)==2).collect(Collectors.toList());
+                /*for(int l=0; l<B.size(); l++) {
+                    if(B.get(l)==2)
+                        set.add(B.get(l));
+                }*/
+                scc.add(set);
+            }
+
+        }
+        return scc;
+
+
     }
 
     /**
      * Return an array with a predecessor for each intersection
      * @param listIntersections list of all intersections
+     * @param listObjectDijkstra an empty list to fill
      * @return a list of dijkstra object (thus each will have his parent)
      */
-    public ArrayList<ObjectDijkstra> foretDFS(ArrayList<Intersection> listIntersections) {
-        ArrayList<ObjectDijkstra> listObjectDijkstra = new ArrayList<>();
+    public Integer[] foretDFSnum(ArrayList<Intersection> listIntersections, ArrayList<ObjectDijkstra> listObjectDijkstra) {
+        Integer [] num = new Integer[listIntersections.size()];
         for(Intersection intersection : listIntersections) {
             listObjectDijkstra.add(new ObjectDijkstra(intersection, null, 0.0, 0));
+            num[(int)intersection.getId()] = 0;
         }
+        int cpt = 1;
         for(ObjectDijkstra objectDijkstra : listObjectDijkstra) {
             if(objectDijkstra.getColor()==0)
-                DFSrec(listObjectDijkstra,objectDijkstra);
+                DFSrecNUM(listObjectDijkstra,objectDijkstra, num,cpt);
         }
-        return listObjectDijkstra;
+        return num;
     }
 
     /**
@@ -443,16 +477,59 @@ public class Tour extends Observable {
      * @param listObjectDijsktra list of all dijkstra object
      * @param origin the vertex which we look the successor
      */
-    public void DFSrec(ArrayList<ObjectDijkstra> listObjectDijsktra, ObjectDijkstra origin) {
+    public int DFSrecNUM(ArrayList<ObjectDijkstra> listObjectDijsktra, ObjectDijkstra origin, Integer [] num, int cpt) {
         origin.setColor(1);
         for(Segment successor : origin.getIntersection().getAdjacentSegments()) {
             ObjectDijkstra objTmp = listObjectDijsktra.stream().filter(x -> x.getIntersection().equals(successor.getDestination())).findFirst().get();
             if(objTmp.getColor()==0) {
                 objTmp.setParent(origin);
-                DFSrec(listObjectDijsktra, objTmp);
+                cpt = DFSrecNUM(listObjectDijsktra, objTmp,num,cpt);
+                cpt++;
             }
         }
         origin.setColor(2);
+        for(int i=0; i<num.length; i++) {
+            if(i==(int)origin.getIntersection().getId())
+                num[i] = cpt;
+        }
+        return cpt;
+
+    }
+
+
+    /**
+     * function to get transpose of graph
+     * @param listIntersection
+     * @return an array of list of successor
+     */
+    public List<Integer>[] getTranspose(ArrayList<Intersection> listIntersection)
+    {
+        int V = listIntersection.size();
+        List<Integer>[] g = new List[V];
+        for (int i = 0; i < V; i++)
+            g[i] = new ArrayList<Integer>();
+        for (int v = 0; v < V; v++)
+            for (int i = 0; i < listIntersection.get(v).getAdjacentSegments().size(); i++)
+                g[(int)listIntersection.get(v).getAdjacentSegments().get(i).getDestination().getId()].add(v);
+        return g;
+    }
+
+    /**
+     * Put in black the vertex of the graph for a same strongly connected component
+     * @param graph the transpose graph
+     * @param vertex
+     * @param color the array with color of each vertex
+     */
+    public void DFSrec(List<Integer> [] graph, int vertex, Integer [] color,  Map<Integer, Integer> B) {
+        color[vertex] = 1;
+        B.replace(vertex, 1);
+        for(int i=0; i<graph[vertex].size(); i++) {
+            if(color[graph[vertex].get(i)]==0) {
+                DFSrec(graph, graph[vertex].get(i),color, B);
+            }
+        }
+        color[vertex] = 2;
+        B.replace(vertex, 2);
     }
 
     /**
