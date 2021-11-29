@@ -130,7 +130,7 @@ public class XMLdeserializerTest {
      */
     @Test
     @DisplayName("Test on parseXMLIntersections")
-    void parseXMLIntersectionsTest() throws ParserConfigurationException, IOException, SAXException {
+    void parseXMLIntersectionsTest() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
         File file = new File("src/test/resources/testMap.xml");
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
