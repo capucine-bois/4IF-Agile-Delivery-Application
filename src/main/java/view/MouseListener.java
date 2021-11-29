@@ -46,18 +46,18 @@ public class MouseListener extends MouseAdapter {
     @Override
     public void mouseEntered(MouseEvent e) {
         if (TextualView.requestPanels.contains((JPanel) e.getSource())) {
-            textualView.setRequestPanelMouseEntered(TextualView.requestPanels.indexOf((JPanel) e.getSource()));
+            controller.enterMouseOnRequest(TextualView.requestPanels.indexOf((JPanel) e.getSource()));
         } else if (TextualView.tourIntersectionsPanels.contains((JPanel) e.getSource())) {
-           textualView.setTourIntersectionPanelMouseEntered(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
+            controller.enterMouseOnTourIntersection(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
         }
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
         if (TextualView.requestPanels.contains((JPanel) e.getSource())) {
-            textualView.setRequestPanelMouseExited(TextualView.requestPanels.indexOf((JPanel) e.getSource()));
+            controller.exitMouseOnRequest(TextualView.requestPanels.indexOf((JPanel) e.getSource()));
         } else if (TextualView.tourIntersectionsPanels.contains((JPanel) e.getSource())) {
-            textualView.setTourIntersectionPanelMouseExited(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
+            controller.exitMouseOnTourIntersection(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
         }
     }
 

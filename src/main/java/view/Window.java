@@ -193,4 +193,19 @@ public class Window extends JFrame {
         textualView.setEnabledTour(enabled);
     }
 
+    public void colorRequestPanelOnMouseEntered(int indexRequest) {
+        textualView.colorRequestPanelOnMouseEntered(indexRequest);
+    }
+
+    public void colorRequestPanelOnMouseExited(int indexRequest) {
+        textualView.colorRequestPanelOnMouseExited(indexRequest);
+    }
+
+    public void colorTourIntersectionPanelOnMouseEntered(int indexShortestPath) {
+        textualView.colorTourIntersectionPanelOnMouseEntered(indexShortestPath);
+    }
+
+    public void colorTourIntersectionPanelOnMouseExited(int indexShortestPath) {
+        textualView.colorTourIntersectionPanelOnMouseExited(indexShortestPath);
+    }
 }

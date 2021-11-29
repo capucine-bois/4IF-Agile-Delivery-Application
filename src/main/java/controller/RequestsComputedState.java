@@ -89,4 +89,17 @@ public class RequestsComputedState implements State{
         leftClickOnTourIntersection(tour.getListShortestPaths().indexOf(shortestPath), tour, controller);
         controller.setCurrentState(controller.selectedIntersectionState);
     }
+
+    @Override
+    public void enterMouseOnRequest(int indexRequest, Window window) {
+        window.colorRequestPanelOnMouseEntered(indexRequest);
+    }
+
+    @Override
+    public void exitMouseOnRequest(int indexRequest, Tour tour, Window window) {
+        Request request = tour.getPlanningRequests().get(indexRequest);
+        if (!request.isDeliverySelected() || !request.isPickupSelected()) {
+            window.colorRequestPanelOnMouseExited(indexRequest);
+        }
+    }
 }

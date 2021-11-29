@@ -105,4 +105,21 @@ public class Controller {
     public void leftClickonIcon(int indexIcon) {
         currentState.leftClickOnIcon(indexIcon, tour, this);
     }
+
+
+    public void enterMouseOnRequest(int indexRequest) {
+        currentState.enterMouseOnRequest(indexRequest, window);
+    }
+
+    public void enterMouseOnTourIntersection(int indexShortestPath) {
+        currentState.enterMouseOnTourIntersection(indexShortestPath, window);
+    }
+
+    public void exitMouseOnRequest(int indexRequest) {
+        currentState.exitMouseOnRequest(indexRequest, tour, window);
+    }
+
+    public void exitMouseOnTourIntersection(int indexShortestPath) {
+        currentState.exitMouseOnTourIntersection(indexShortestPath, tour, window);
+    }
 }
