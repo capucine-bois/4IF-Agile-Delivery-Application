@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class TSP2 extends TSP1 {
-    @Override
+
     protected int bound(Integer currentVertex, Collection<Integer> unvisited, Collection<Integer> visited, Graph g) {
 
         double sum = 0;
@@ -25,7 +25,7 @@ public class TSP2 extends TSP1 {
             //For unvisited vertex
             double minCost = g.getCost(i, 0);
             for(Integer j : unvisited) {
-                if( (g.getCost(i, j) < minCost) && (i != j)  ) {
+                if( (g.getCost(i, j) < minCost) && (!i.equals(j))  ) {
                     minCost = g.getCost(i, j);
                 }
             }

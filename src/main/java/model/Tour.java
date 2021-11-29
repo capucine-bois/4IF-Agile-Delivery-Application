@@ -159,7 +159,7 @@ public class Tour extends Observable {
 
             listUsefulEndPointsPickUp.add(deliveryReq1);
             listUsefulEndPointsDelivery.add(depotAddress);
-            // addingpickUp to the endPoints of depot
+            // adding pickUp to the endPoints of depot
             listUsefulEndPointsForDepot.add(pickupReq1);
 
             for(int j=0;j<planningRequests.size();j++) {
@@ -174,6 +174,11 @@ public class Tour extends Observable {
             }
             ArrayList<ShortestPath> shortestPathsFromPickUp = dijkstra(allIntersectionsList,listUsefulEndPointsPickUp, pickupReq1);
             ArrayList<ShortestPath> shortestPathsFromDelivery = dijkstra(allIntersectionsList,listUsefulEndPointsDelivery, deliveryReq1);
+
+            //sorting the shortestPaths in ascending order for optimization
+            Collections.sort(shortestPathsFromPickUp);
+            Collections.sort(shortestPathsFromDelivery);
+
 
             listNodes.add(new Node(pickupReq1,shortestPathsFromPickUp,i+1));
             listNodes.add(new Node(deliveryReq1,shortestPathsFromDelivery,i+2));
