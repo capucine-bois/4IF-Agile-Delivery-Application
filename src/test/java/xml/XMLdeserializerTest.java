@@ -91,7 +91,7 @@ public class XMLdeserializerTest {
      */
     @Test
     @DisplayName("Test on parseXMLSegments")
-    void parseXMLSegmentsTest() throws ParserConfigurationException, IOException, SAXException {
+    void parseXMLSegmentsTest() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
         // Create input of parseXMLSegments
         CityMap cityMap2 = new CityMap();
         File file = new File("src/test/resources/testMap.xml");

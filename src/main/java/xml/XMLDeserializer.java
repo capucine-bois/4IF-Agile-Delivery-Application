@@ -78,7 +78,7 @@ public class XMLDeserializer {
      * @param cityMap city map to fill
      * @param document document to parse
      */
-    public static void deserializeMap(CityMap cityMap, Document document) {
+    public static void deserializeMap(CityMap cityMap, Document document) throws ExceptionXML {
         if(document != null) {
             parseXMLIntersections(document, cityMap);
             parseXMLSegments(document, cityMap);
@@ -120,8 +120,9 @@ public class XMLDeserializer {
      * @param document document to parse
      * @param cityMap structure to fill
      */
-    public static void parseXMLSegments(Document document, CityMap cityMap) {
+    public static void parseXMLSegments(Document document, CityMap cityMap) throws ExceptionXML {
         NodeList nodeSegment = document.getElementsByTagName("segment");
+        HashMap<Long,ArrayList<Long>> idIntersectionsDictionnary = new HashMap<>();
         for (int x = 0, size = nodeSegment.getLength(); x < size; x++) {
             long destinationId = Long.parseLong(nodeSegment.item(x).getAttributes().getNamedItem("destination").getNodeValue());
             double length = Double.parseDouble(nodeSegment.item(x).getAttributes().getNamedItem("length").getNodeValue());
@@ -130,6 +131,21 @@ public class XMLDeserializer {
             // find the origin and destination intersections
             Intersection origin = cityMap.getIntersections().stream().filter(i->i.getId()==originId).findFirst().get();
             Intersection destination = cityMap.getIntersections().stream().filter(i->i.getId()==destinationId).findFirst().get();
+            // check duplicate
+            boolean isKeyPresent = idIntersectionsDictionnary.containsKey(originId);
+            if(isKeyPresent){
+                ArrayList<Long> listDestIds = idIntersectionsDictionnary.get(originId);
+                for(long dest: listDestIds){
+                    if(dest == destinationId){
+                        throw new ExceptionXML("The selected map contains a duplicate road which origin identifier is : "+ originId + " and destination identifier is : " + destinationId);
+                    }
+                }
+            }else{
+                ArrayList<Long> listDestinationsId = new ArrayList<>();
+                listDestinationsId.add(destinationId);
+                idIntersectionsDictionnary.put(originId,listDestinationsId);
+            }
+
             // create the Segment object and add it to the city map
             origin.addAdjacentSegment(new Segment(length, name, destination, origin));
         }
