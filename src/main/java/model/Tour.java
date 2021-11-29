@@ -175,6 +175,10 @@ public class Tour extends Observable {
             ArrayList<ShortestPath> shortestPathsFromPickUp = dijkstra(allIntersectionsList,listUsefulEndPointsPickUp, pickupReq1);
             ArrayList<ShortestPath> shortestPathsFromDelivery = dijkstra(allIntersectionsList,listUsefulEndPointsDelivery, deliveryReq1);
 
+            //sorting the shortestPaths in ascending order for optimization
+            Collections.sort(shortestPathsFromPickUp);
+            Collections.sort(shortestPathsFromDelivery);
+
             listNodes.add(new Node(pickupReq1,shortestPathsFromPickUp,i+1));
             listNodes.add(new Node(deliveryReq1,shortestPathsFromDelivery,i+2));
 
