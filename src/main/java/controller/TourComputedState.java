@@ -12,7 +12,7 @@ import java.util.Optional;
 /**
  * Computed tour state. State of the application when a tour has been computed.
  */
-public class ComputedTourState implements State {
+public class TourComputedState implements State {
 
 
     @Override
@@ -61,28 +61,14 @@ public class ComputedTourState implements State {
     }
 
     @Override
-    public void showRequestsPanel(Tour tour, Window window) {
+    public void showRequestsPanel(Tour tour, Window window, Controller controller) {
         for (Request request : tour.getPlanningRequests()) {
             request.setPickupSelected(false);
             request.setDeliverySelected(false);
         }
         window.showRequestsPanel();
         tour.notifyObservers();
-    }
-
-    @Override
-    public void showTourPanel(Tour tour, Window window) {
-        for (Request request : tour.getPlanningRequests()) {
-            request.setPickupSelected(false);
-            request.setDeliverySelected(false);
-        }
-        window.showTourPanel();
-        Optional<ShortestPath> optionalShortestPath = tour.getListShortestPaths().stream().filter(ShortestPath::isSelected).findFirst();
-        if (optionalShortestPath.isPresent()) {
-            leftClickOnShortestPath(tour.getListShortestPaths().indexOf(optionalShortestPath.get()), tour);
-        } else {
-            tour.notifyObservers();
-        }
+        controller.setCurrentState(controller.requestsComputedState);
     }
 
     @Override
@@ -126,7 +112,7 @@ public class ComputedTourState implements State {
     }
 
     @Override
-    public void leftClickOnShortestPath(int indexShortestPath, Tour tour) {
+    public void leftClickOnShortestPath(int indexShortestPath, Tour tour, Controller controller) {
         for (Request request : tour.getPlanningRequests()) {
             request.setPickupSelected(false);
             request.setDeliverySelected(false);
@@ -147,18 +133,7 @@ public class ComputedTourState implements State {
                 tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2 - 1).setDeliverySelected(true);
             }
         }
-        tour.notifyObservers();
-    }
-
-    @Override
-    public void goBackToTour(Tour tour) {
-        for (Request request : tour.getPlanningRequests()) {
-            request.setPickupSelected(false);
-            request.setDeliverySelected(false);
-        }
-        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            shortestPath.setSelected(false);
-        }
+        controller.setCurrentState(controller.pathDetailsComputedState);
         tour.notifyObservers();
     }
 

@@ -40,7 +40,7 @@ public class Tour extends Observable {
      */
     private String arrivalTime;
 
-    private SimpleDateFormat parser = new SimpleDateFormat("HH:mm:ss");
+    private SimpleDateFormat parser = new SimpleDateFormat("HH:mm");
 
     private Calendar calendar;
 
