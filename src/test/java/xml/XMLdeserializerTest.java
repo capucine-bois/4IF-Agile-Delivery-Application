@@ -16,6 +16,7 @@ import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -103,8 +104,18 @@ public class XMLdeserializerTest {
             cityMap2.addIntersection(intersection);
         }
 
+        // Dictionnary
+        HashMap<Long,Long> dictionnaryId = new HashMap<>();
+        dictionnaryId.put(1L,0L);
+        dictionnaryId.put(2L,1L);
+        dictionnaryId.put(3L,2L);
+        dictionnaryId.put(4L,3L);
+        dictionnaryId.put(5L,4L);
+        dictionnaryId.put(6L,5L);
+        dictionnaryId.put(7L,6L);
+        dictionnaryId.put(8L,7L);
         // Function test
-        XMLDeserializer.parseXMLSegments(document,cityMap2);
+        XMLDeserializer.parseXMLSegments(document,cityMap2,dictionnaryId);
         List<Intersection> listIntersection1 = this.cityMap.getIntersections();
         List<Intersection> listIntersection2 = cityMap2.getIntersections();
         assertEquals(listIntersection1.size(),listIntersection2.size(), "Not the same intersections");
@@ -136,9 +147,10 @@ public class XMLdeserializerTest {
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document document = db.parse(file);
         CityMap cityMap = new CityMap();
-
+        // HashMap
+        HashMap<Long,Long> dictionnaryId = new HashMap<>();
         // Function to test
-        XMLDeserializer.parseXMLIntersections(document,cityMap);
+        XMLDeserializer.parseXMLIntersections(document,cityMap,dictionnaryId);
         // Same length
         assertEquals(cityMap.getIntersections().size(), this.listIntersection.size(), "Wrong number of segments");
         // Take all keys
@@ -165,8 +177,18 @@ public class XMLdeserializerTest {
         Document document = db.parse(file);
         CityMap cityMap = new CityMap();
 
+        // Dictionnary
+        HashMap<Long,Long> dictionnaryId = new HashMap<>();
+        dictionnaryId.put(1L,0L);
+        dictionnaryId.put(2L,1L);
+        dictionnaryId.put(3L,2L);
+        dictionnaryId.put(4L,3L);
+        dictionnaryId.put(5L,4L);
+        dictionnaryId.put(6L,5L);
+        dictionnaryId.put(7L,6L);
+        dictionnaryId.put(8L,7L);
         // Function to test
-        XMLDeserializer.parseXMLIntersections(document,cityMap);
+        XMLDeserializer.parseXMLIntersections(document,cityMap,dictionnaryId);
         // Same length
         assertEquals(cityMap.getIntersections().size(), this.listIntersection.size(), "Wrong number of segments");
         // Take all keys
