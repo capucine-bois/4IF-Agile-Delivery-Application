@@ -149,6 +149,34 @@ public class XMLdeserializerTest {
         }
     }
 
+    /**
+     * Method to test:
+     * parseXMLIntersections()
+     *
+     * What it does:
+     * Read XML to convert in intersections
+     */
+    @Test
+    @DisplayName("Test on parseXMLIntersections - Duplicate intersection")
+    void parseXMLIntersectionsDuplicateTest() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
+        File file = new File("src/test/resources/testMap.xml");
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document document = db.parse(file);
+        CityMap cityMap = new CityMap();
+
+        // Function to test
+        XMLDeserializer.parseXMLIntersections(document,cityMap);
+        // Same length
+        assertEquals(cityMap.getIntersections().size(), this.listIntersection.size(), "Wrong number of segments");
+        // Take all keys
+        List<Intersection> listIntersections2 = new ArrayList<>(cityMap.getIntersections());
+        // Check if keys are all good
+        for(int i = 0; i < this.listIntersection.size(); i++) {
+            assertEquals(this.listIntersection.get(i), listIntersections2.get(i));
+        }
+    }
+
 
 
 

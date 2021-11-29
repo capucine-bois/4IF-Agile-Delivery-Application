@@ -80,8 +80,9 @@ public class XMLDeserializer {
      */
     public static void deserializeMap(CityMap cityMap, Document document) throws ExceptionXML {
         if(document != null) {
-            parseXMLIntersections(document, cityMap);
-            parseXMLSegments(document, cityMap);
+            HashMap<Long,Long> dictionnaryId = new HashMap<>();
+            parseXMLIntersections(document, cityMap,dictionnaryId);
+            parseXMLSegments(document, cityMap,dictionnaryId);
         }
     }
 
@@ -91,9 +92,9 @@ public class XMLDeserializer {
      * @param document document to parse
      * @param cityMap structure to fill
      */
-    public static void parseXMLIntersections(Document document, CityMap cityMap) throws ExceptionXML {
+    public static void parseXMLIntersections(Document document, CityMap cityMap, HashMap dictionnaryId) throws ExceptionXML {
         NodeList intersectionNodes = document.getElementsByTagName("intersection");
-        HashMap<Double,ArrayList<Double>> coordonateDictionnary = new HashMap<>();
+        Map<Double,ArrayList<Double>> coordonateDictionnary = new HashMap<>();
         long index = 0;
         for (int x = 0, size = intersectionNodes.getLength(); x < size; x++) {
             double latitude = Double.parseDouble(intersectionNodes.item(x).getAttributes().getNamedItem("latitude").getNodeValue());
@@ -126,7 +127,7 @@ public class XMLDeserializer {
      * @param document document to parse
      * @param cityMap structure to fill
      */
-    public static void parseXMLSegments(Document document, CityMap cityMap) {
+    public static void parseXMLSegments(Document document, CityMap cityMap, HashMap dictionnaryId) {
         NodeList nodeSegment = document.getElementsByTagName("segment");
         for (int x = 0, size = nodeSegment.getLength(); x < size; x++) {
             long destinationId = Long.parseLong(nodeSegment.item(x).getAttributes().getNamedItem("destination").getNodeValue());
