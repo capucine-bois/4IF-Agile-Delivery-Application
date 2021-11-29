@@ -141,6 +141,8 @@ public class Tour extends Observable {
      */
     public void  computeTour(List<Intersection> allIntersectionsList) {
 
+        long startTimeDijkstra = System.currentTimeMillis();
+
         ArrayList<Node> listNodes = new ArrayList<>();
         // get the points useful for the computing : pick-up address, delivery address, depot
         ArrayList<Intersection> listUsefulPoints = new ArrayList<>();
@@ -176,8 +178,8 @@ public class Tour extends Observable {
             ArrayList<ShortestPath> shortestPathsFromDelivery = dijkstra(allIntersectionsList,listUsefulEndPointsDelivery, deliveryReq1);
 
             //sorting the shortestPaths in ascending order for optimization
-            Collections.sort(shortestPathsFromPickUp);
-            Collections.sort(shortestPathsFromDelivery);
+            //Collections.sort(shortestPathsFromPickUp);
+            //Collections.sort(shortestPathsFromDelivery);
 
             listNodes.add(new Node(pickupReq1,shortestPathsFromPickUp,i+1));
             listNodes.add(new Node(deliveryReq1,shortestPathsFromDelivery,i+2));
@@ -187,15 +189,18 @@ public class Tour extends Observable {
 
         listNodes.add(0,new Node(depotAddress,dijkstra(allIntersectionsList,listUsefulEndPointsForDepot,depotAddress),0));
 
+        // print the time to compute Dijkstra
+        System.out.println("Dijkstra finished in "
+                +(System.currentTimeMillis() - startTimeDijkstra)+"ms\n");
 
         // Run Tour
-        TSP tsp = new TSP1();
+        TSP tsp = new TSP3();
         Graph g = new CompleteGraph(listNodes, this);
         long startTime = System.currentTimeMillis();
         tsp.searchSolution(20000, g);
         this.setTourLength(tsp.getSolutionCost());
 
-        // print the cost of the solution
+        // print the cost of the solution and the TSP time
         System.out.print("Solution of cost "+this.tourLength+" found in "
                 +(System.currentTimeMillis() - startTime)+"ms : ");
 
