@@ -40,6 +40,7 @@ public class GraphicalView extends JPanel implements Observer {
     private double longitudeLength;
     private double width;
     private double height;
+    private double proportion;
 
     // listeners
     private MouseListener mouseListener;
@@ -101,6 +102,21 @@ public class GraphicalView extends JPanel implements Observer {
         }
     }
 
+    private double computeDistanceFromCoordinates(double latitude1, double latitude2, double longitude1, double longitude2) {
+        latitude1 = Math.toRadians(latitude1);
+        latitude2 = Math.toRadians(latitude2);
+        longitude1 = Math.toRadians(longitude1);
+        longitude2 = Math.toRadians(longitude2);
+
+        // Haversine formula
+        double distLongitude = longitude2 - longitude1;
+        double distLatitude = latitude2 - latitude1;
+        double a = Math.pow(Math.sin(distLatitude / 2), 2) + Math.cos(distLatitude) * Math.cos(distLatitude) * Math.pow(Math.sin(distLongitude / 2),2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+        double r = 6371; // Radius of earth in kilometers.
+        return c * r;
+    }
+
     /**
      * Initialize the list of intersections on the GUI.
      * Parse the list of intersections to instantiate all the intersections for the GUI (IntersectionView) with coordinates X and Y.
@@ -110,10 +126,29 @@ public class GraphicalView extends JPanel implements Observer {
         latitudeLength = maxLatitude - minLatitude;
         longitudeLength = maxLongitude - minLongitude;
 
+        double widthDistance = computeDistanceFromCoordinates(minLatitude, minLatitude, minLongitude, maxLongitude);
+        double heightDistance = computeDistanceFromCoordinates(minLatitude, maxLatitude, minLongitude, minLongitude);
+        proportion = heightDistance/widthDistance;
+
         double viewWidth = g.getClipBounds().width - allBorders * 2;
-        width = viewWidth * scale;
         double viewHeight = g.getClipBounds().height - allBorders * 2;
-        height = viewHeight * scale;
+        if (viewWidth >= viewHeight) {
+            width = viewWidth * scale;
+            height = width * proportion;
+            while (scale * proportion < 1) {
+                zoom(g.getClipBounds().width/2, g.getClipBounds().height/2, -1);
+                width = viewWidth * scale;
+                height = width * proportion;
+            }
+        } else {
+            height = viewHeight * scale;
+            width = height / proportion;
+            while (scale / proportion < 1) {
+                zoom(g.getClipBounds().width/2, g.getClipBounds().height/2, -1);
+                height = viewHeight * scale;
+                width = height / proportion;
+            }
+        }
 
         if (originX > allBorders) originX = allBorders;
         if (originY > allBorders) originY = allBorders;
@@ -334,8 +369,9 @@ public class GraphicalView extends JPanel implements Observer {
     }
 
     public void zoom(int x, int y, double rotation) {
-
         if (canZoom) {
+            double viewWidth = g.getClipBounds().width - allBorders * 2;
+            double viewHeight = g.getClipBounds().height - allBorders * 2;
             double zoomCoefficient = 1.2;
             int zoomBorders = allBorders - fakeBorder;
             if (x > zoomBorders && x < g.getClipBounds().width - zoomBorders && y > zoomBorders && y < g.getClipBounds().height - zoomBorders) {
@@ -344,7 +380,7 @@ public class GraphicalView extends JPanel implements Observer {
                     originX -= (x - originX) * (zoomCoefficient - 1);
                     originY -= (y - originY) * (zoomCoefficient - 1);
                     repaint();
-                } else if (rotation > 0 && scale > 1) {
+                } else if (rotation > 0 && scale > 1 && !(viewWidth >= viewHeight && (scale/zoomCoefficient) * proportion < 1) && !(viewWidth <= viewHeight && (scale/zoomCoefficient) / proportion < 1)) {
                     scale /= zoomCoefficient;
                     originX += (x - originX) - (x - originX) / zoomCoefficient;
                     originY += (y - originY) - (y - originY) / zoomCoefficient;
@@ -375,7 +411,7 @@ public class GraphicalView extends JPanel implements Observer {
             int pickupCoordinateX = getCoordinateX(pickupAddress);
             int pickupCoordinateY = getCoordinateY(pickupAddress);
             if (x >= pickupCoordinateX - 20  && x <= pickupCoordinateX + 20 && y >= pickupCoordinateY - 40 && y <= pickupCoordinateY) {
-                if (checkCursorOnIcon(x - (pickupCoordinateX - 20), y - (pickupCoordinateY - 40), "depot-icon")) {
+                if (checkCursorOnIcon(x - (pickupCoordinateX - 20), y - (pickupCoordinateY - 40), "pickup-icon")) {
                     indexIcon = i * 2 + 1;
                 }
             }
@@ -383,7 +419,7 @@ public class GraphicalView extends JPanel implements Observer {
             int deliveryCoordinateX = getCoordinateX(deliveryAddress);
             int deliveryCoordinateY = getCoordinateY(deliveryAddress);
             if (x >= deliveryCoordinateX - 20  && x <= deliveryCoordinateX + 20 && y >= deliveryCoordinateY - 40 && y <= deliveryCoordinateY) {
-                if (checkCursorOnIcon(x - (deliveryCoordinateX - 20), y - (deliveryCoordinateY - 40), "depot-icon")) {
+                if (checkCursorOnIcon(x - (deliveryCoordinateX - 20), y - (deliveryCoordinateY - 40), "delivery-icon")) {
                     indexIcon = i * 2 + 2;
                 }
             }
