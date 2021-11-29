@@ -429,7 +429,7 @@ public class TextualView extends JPanel implements Observer {
         }
     }
 
-    public void setRequestPanelMouseEntered(int indexPanel) {
+    public void colorRequestPanelOnMouseEntered(int indexPanel) {
         for (Component childComponent : requestPanels.get(indexPanel).getComponents()) {
             JPanel childPanel = (JPanel) childComponent;
             childPanel.setBackground(Constants.COLOR_2);
@@ -437,7 +437,7 @@ public class TextualView extends JPanel implements Observer {
         }
     }
 
-    public void setTourIntersectionPanelMouseEntered(int indexPanel) {
+    public void colorTourIntersectionPanelOnMouseEntered(int indexPanel) {
         for (Component childComponent : tourIntersectionsPanels.get(indexPanel).getComponents()) {
             JPanel childPanel = (JPanel) childComponent;
             childPanel.setBackground(Constants.COLOR_2);
@@ -445,31 +445,19 @@ public class TextualView extends JPanel implements Observer {
         }
     }
 
-    public void setRequestPanelMouseExited(int indexPanel) {
-        Request request = tour.getPlanningRequests().get(indexPanel);
-        if (!request.isDeliverySelected() || !request.isPickupSelected()) {
-            for (Component childComponent : requestPanels.get(indexPanel).getComponents()) {
-                JPanel childPanel = (JPanel) childComponent;
-                childPanel.setBackground(Constants.COLOR_4);
-                childPanel.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, Constants.COLOR_4));
-            }
+    public void colorRequestPanelOnMouseExited(int indexPanel) {
+        for (Component childComponent : requestPanels.get(indexPanel).getComponents()) {
+            JPanel childPanel = (JPanel) childComponent;
+            childPanel.setBackground(Constants.COLOR_4);
+            childPanel.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, Constants.COLOR_4));
         }
     }
 
-    public void setTourIntersectionPanelMouseExited(int indexPanel) {
-        ShortestPath shortestPath = tour.getListShortestPaths().get(indexPanel);
-        boolean tourIntersectionSelected;
-        if (shortestPath.getEndNodeNumber() % 2 == 1) {
-            tourIntersectionSelected = tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2).isPickupSelected();
-        } else {
-            tourIntersectionSelected = tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2 - 1).isDeliverySelected();
-        }
-        if (!tourIntersectionSelected) {
-            for (Component childComponent : tourIntersectionsPanels.get(indexPanel).getComponents()) {
-                JPanel childPanel = (JPanel) childComponent;
-                childPanel.setBackground(Constants.COLOR_4);
-                childPanel.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, Constants.COLOR_4));
-            }
+    public void colorTourIntersectionPanelOnMouseExited(int indexPanel) {
+        for (Component childComponent : tourIntersectionsPanels.get(indexPanel).getComponents()) {
+            JPanel childPanel = (JPanel) childComponent;
+            childPanel.setBackground(Constants.COLOR_4);
+            childPanel.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, Constants.COLOR_4));
         }
     }
 }

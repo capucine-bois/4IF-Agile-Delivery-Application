@@ -142,4 +142,23 @@ public class TourComputedState implements State {
         ShortestPath shortestPath = tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexIcon).findFirst().get();
         leftClickOnTourIntersection(tour.getListShortestPaths().indexOf(shortestPath), tour);
     }
+
+    @Override
+    public void enterMouseOnTourIntersection(int indexShortestPath, Window window) {
+        window.colorTourIntersectionPanelOnMouseEntered(indexShortestPath);
+    }
+
+    @Override
+    public void exitMouseOnTourIntersection(int indexShortestPath, Tour tour, Window window) {
+        ShortestPath shortestPath = tour.getListShortestPaths().get(indexShortestPath);
+        boolean tourIntersectionSelected;
+        if (shortestPath.getEndNodeNumber() % 2 == 1) {
+            tourIntersectionSelected = tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2).isPickupSelected();
+        } else {
+            tourIntersectionSelected = tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2 - 1).isDeliverySelected();
+        }
+        if (!tourIntersectionSelected) {
+            window.colorTourIntersectionPanelOnMouseExited(indexShortestPath);
+        }
+    }
 }
