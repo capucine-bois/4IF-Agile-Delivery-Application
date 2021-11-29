@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DijkstraTest {
     private Tour tour ;
     private CityMap cityMap ;
-    private ArrayList<Intersection> listUsefulPoints;
+    private ArrayList<Intersection> listUsefulPointsSameDeliveries;
     private ArrayList<Request> listRequest;
     public DijkstraTest(){
         resetCityMap();
@@ -37,7 +37,7 @@ public class DijkstraTest {
         tour = new Tour();
         cityMap = new CityMap();
         listRequest = new ArrayList<>();
-        listUsefulPoints = new ArrayList<>();
+        listUsefulPointsSameDeliveries = new ArrayList<>();
         // Setup intersection
         Intersection i1 = new Intersection(1,45.75406,4.857418);
         Intersection i2 = new Intersection(2,45.750404,4.8744674);
@@ -89,11 +89,10 @@ public class DijkstraTest {
         tour.addRequest(r2);
 
         // Setup Dijkstra input
-        listUsefulPoints.add(i2);
-        listUsefulPoints.add(i3);
-        listUsefulPoints.add(i4);
-        listUsefulPoints.add(i5);
-
+        listUsefulPointsSameDeliveries.add(i2);
+        listUsefulPointsSameDeliveries.add(i2);
+        listUsefulPointsSameDeliveries.add(i4);
+        listUsefulPointsSameDeliveries.add(i5);
     }
 
 
@@ -177,6 +176,37 @@ public class DijkstraTest {
             assertEquals(3,sp1.get(5).getListSegments().get(2).getDestination().getId(), "Wrong id for Intersection1/SP6/EL3/DESTINATION");
         }
 
+        @Test
+        @DisplayName("Origin - 2 ")
+        void origin2SameDeliveriesAddresses() {
+            //origin
+            Intersection origin2 = cityMap.getIntersections().get(1);
+            //original method to test
+            ArrayList<ShortestPath> sp2 = tour.dijkstra(listIntersectionsDijkstra, listUsefulPointsSameDeliveries, origin2);
+            //number of shortest paths
+            assertEquals(3,sp2.size(), "Wrong number of shortest paths for Intersection 2");
+            //sp2.stream().filter(x->x.getEndAddress().getId()==6).findFirst().get();
+            //number of segments in each shortest paths
+            assertEquals(1, sp2.stream().filter(x->x.getEndAddress().getId()==2).findFirst().get().getListSegments().size(), "Wrong number of segments in first SP for Intersection 2 to Intersection 2");
+            assertEquals(1,sp2.stream().filter(x->x.getEndAddress().getId()==4).findFirst().get().getListSegments().size(), "Wrong number of segments in second SP for Intersection 2 to Intersection 4");
+            assertEquals(2,sp2.stream().filter(x->x.getEndAddress().getId()==5).findFirst().get().getListSegments().size(), "Wrong number of segments in first SP for Intersection 2 to Intersection 5");
+            //check each length of each shortest path
+            assertEquals(0,sp2.stream().filter(x->x.getEndAddress().getId()==2).findFirst().get().getPathLength(), "Wrong length for first shortest path of Intersection 2");
+            assertEquals(16,sp2.stream().filter(x->x.getEndAddress().getId()==4).findFirst().get().getPathLength(),"Wrong length for second shortest path of Intersection 2");
+            assertEquals(86,sp2.stream().filter(x->x.getEndAddress().getId()==5).findFirst().get().getPathLength(),"Wrong length for third shortest path of Intersection 2");
+
+            //Intersection of each list of segment (each shortest path)
+            //first shortest path
+            assertEquals(2,sp2.stream().filter(x->x.getEndAddress().getId()==2).findFirst().get().getListSegments().get(0).getOrigin().getId(), "Wrong id for Intersection2/SP1/EL1/ORIGIN");
+            assertEquals(2,sp2.stream().filter(x->x.getEndAddress().getId()==2).findFirst().get().getListSegments().get(0).getDestination().getId(), "Wrong id for Intersection2/SP1/EL1/DESTINATION");
+            //second shortest path
+            assertEquals(2,sp2.stream().filter(x->x.getEndAddress().getId()==4).findFirst().get().getListSegments().get(0).getOrigin().getId(), "Wrong id for Intersection2/SP2/EL1/ORIGIN");
+            assertEquals(4,sp2.stream().filter(x->x.getEndAddress().getId()==4).findFirst().get().getListSegments().get(0).getDestination().getId(), "Wrong id for Intersection2/SP2/EL1/DESTINATION");
+            //third shortest path
+            assertEquals(2,sp2.stream().filter(x->x.getEndAddress().getId()==5).findFirst().get().getListSegments().get(0).getOrigin().getId(), "Wrong id for Intersection2/SP3/EL1/ORIGIN");
+            assertEquals(6,sp2.stream().filter(x->x.getEndAddress().getId()==5).findFirst().get().getListSegments().get(0).getDestination().getId(), "Wrong id for Intersection2/SP3/EL1/DESTINATION");
+        }
+
 
 
 
@@ -184,20 +214,19 @@ public class DijkstraTest {
         /**
          * Method to test:
          * dijkstra()
-         *
+         * <p>
          * What it does:
          * Expect dijkstra to handle impossible graph
          */
         @Test
         @DisplayName("Unreachable intersection")
-        void impossiblePathDijkstraTest(){
+        void impossiblePathDijkstraTest() {
             // Add request alone impossible to access by any segment
-            Intersection aloneIntersec = new Intersection(10,45.3112,33.2245);
-            Intersection aloneIntersec2 = new Intersection(11,45.5112,33.2245);
-            Request request =  new Request(100,120, aloneIntersec,aloneIntersec2,new Color(65, 65, 65));
+            Intersection aloneIntersec = new Intersection(10, 45.3112, 33.2245);
+            Intersection aloneIntersec2 = new Intersection(11, 45.5112, 33.2245);
+            Request request = new Request(100, 120, aloneIntersec, aloneIntersec2, new Color(65, 65, 65));
             listRequest.add(request);
 
-            //
             listIntersectionsDijkstra.add(aloneIntersec);
             listIntersectionsDijkstra.add(aloneIntersec2);
             listUsefulEndPoints.add(aloneIntersec);
@@ -206,15 +235,12 @@ public class DijkstraTest {
             Intersection origin1 = cityMap.getIntersections().get(0);
 
 
-
             ArrayList<ShortestPath> sp1 = tour.dijkstra(listIntersectionsDijkstra, listUsefulEndPoints, origin1);
 
 
             assertEquals(6,sp1.size(),"Dijkstra find impossible path");
         }
+
     }
-
-
-
 
 }
