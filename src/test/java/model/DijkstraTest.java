@@ -176,7 +176,7 @@ public class DijkstraTest {
         }
 
         @Test
-        @DisplayName("Origin - 2 ")
+        @DisplayName("Origin - 2 Two same delivery addresses")
         void origin2SameDeliveriesAddresses() {
             //origin
             Intersection origin2 = cityMap.getIntersections().get(1);
@@ -223,7 +223,6 @@ public class DijkstraTest {
             Request request = new Request(100, 120, aloneIntersec, aloneIntersec2, new Color(65, 65, 65));
             listRequest.add(request);
 
-            //
             listIntersectionsDijkstra.add(aloneIntersec);
             listIntersectionsDijkstra.add(aloneIntersec2);
             listUsefulEndPoints.add(aloneIntersec);
@@ -237,7 +236,7 @@ public class DijkstraTest {
 
             assertEquals(6,sp1.size(),"Dijkstra find impossible path");
         }
-        }
+
     }
 
 }
