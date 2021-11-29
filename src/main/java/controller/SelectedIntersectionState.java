@@ -66,8 +66,8 @@ public class SelectedIntersectionState implements State {
     }
 
     @Override
-    public void leftClickOnTourIntersection(int indexShortestPath, Tour tour, Controller controller) {
-        ShortestPath shortestPath = tour.getListShortestPaths().get(indexShortestPath);
+    public void leftClickOnTourIntersection(int indexIntersection, Tour tour, Controller controller) {
+        ShortestPath shortestPath = tour.getListShortestPaths().get(indexIntersection);
         Request requestClicked;
         boolean pickupWasSelected = false;
         boolean deliveryWasSelected = false;
@@ -88,7 +88,10 @@ public class SelectedIntersectionState implements State {
             requestClicked.setDeliverySelected(true);
         }
         tour.notifyObservers();
-        //controller.setCurrentState(controller.selectedIntersectionState);
+
+        if (pickupWasSelected || deliveryWasSelected) {
+            controller.setCurrentState(controller.tourComputedState);
+        }
     }
 
     @Override

@@ -304,7 +304,6 @@ public class TextualView extends JPanel implements Observer {
     }
 
     private void displayRequestsInformation(JPanel parentPanel) {
-        System.out.println("TextualView.displayRequestsInformation");
         requestPanels.clear();
         for (Request request : tour.getPlanningRequests()) {
             Map<String, String> requestInformation = new HashMap<>();

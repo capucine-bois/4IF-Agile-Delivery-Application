@@ -89,8 +89,8 @@ public class Controller {
         currentState.leftClickOnRequest(indexRequest, tour, this);
     }
 
-    public void leftClickOnTourIntersection(int indexShortestPath) {
-        currentState.leftClickOnTourIntersection(indexShortestPath, tour, this);
+    public void leftClickOnTourIntersection(int indexIntersection) {
+        currentState.leftClickOnTourIntersection(indexIntersection, tour, this);
     }
 
 

@@ -78,7 +78,11 @@ public class SelectedRequestState implements State {
             }
         }
         tour.notifyObservers();
-        //controller.setCurrentState(controller.selectedRequestState);
+        if (!tour.getPlanningRequests().get(indexRequest).isDeliverySelected() ||
+                !tour.getPlanningRequests().get(indexRequest).isPickupSelected()) {
+            controller.setCurrentState(controller.requestsComputedState);
+        }
+
     }
 
     @Override
