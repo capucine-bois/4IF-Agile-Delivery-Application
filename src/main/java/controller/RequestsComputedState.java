@@ -97,9 +97,6 @@ public class RequestsComputedState implements State{
 
     @Override
     public void exitMouseOnRequest(int indexRequest, Tour tour, Window window) {
-        Request request = tour.getPlanningRequests().get(indexRequest);
-        if (!request.isDeliverySelected() || !request.isPickupSelected()) {
-            window.colorRequestPanelOnMouseExited(indexRequest);
-        }
+        window.colorRequestPanelOnMouseExited(indexRequest);
     }
 }

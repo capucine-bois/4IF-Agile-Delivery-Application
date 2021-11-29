@@ -137,15 +137,6 @@ public class TourComputedState implements State {
 
     @Override
     public void exitMouseOnTourIntersection(int indexShortestPath, Tour tour, Window window) {
-        ShortestPath shortestPath = tour.getListShortestPaths().get(indexShortestPath);
-        boolean tourIntersectionSelected;
-        if (shortestPath.getEndNodeNumber() % 2 == 1) {
-            tourIntersectionSelected = tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2).isPickupSelected();
-        } else {
-            tourIntersectionSelected = tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2 - 1).isDeliverySelected();
-        }
-        if (!tourIntersectionSelected) {
-            window.colorTourIntersectionPanelOnMouseExited(indexShortestPath);
-        }
+        window.colorTourIntersectionPanelOnMouseExited(indexShortestPath);
     }
 }
