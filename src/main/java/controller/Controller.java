@@ -4,8 +4,6 @@ import java.awt.*;
 import java.io.IOException;
 
 import model.CityMap;
-import model.Request;
-import model.ShortestPath;
 import model.Tour;
 import view.Window;
 
@@ -23,7 +21,9 @@ public class Controller {
     protected final InitialState initialState = new InitialState();
     protected final MapLoadedState mapLoadedState = new MapLoadedState();
     protected final RequestsLoadedState requestsLoadedState = new RequestsLoadedState();
-    protected final ComputedTourState computedTourState = new ComputedTourState();
+    protected final TourComputedState tourComputedState = new TourComputedState();
+    protected final RequestsComputedState requestsComputedState = new RequestsComputedState();
+    protected final PathDetailsComputedState pathDetailsComputedState = new PathDetailsComputedState();
 
 
     /** Constructor taking already filled cityMap and tour structures
@@ -45,7 +45,8 @@ public class Controller {
         this.currentState = state;
         if (state == initialState) {
             window.setDefaultButtonStates(new boolean[]{true, false, false});
-        } else if (state == mapLoadedState || state == computedTourState){
+        } else if (state == mapLoadedState || state == tourComputedState ||
+                state == pathDetailsComputedState || state == requestsComputedState){
             window.setDefaultButtonStates(new boolean[]{true, true, false});
         } else {
             window.setDefaultButtonStates(new boolean[]{true, true, true});
@@ -76,9 +77,9 @@ public class Controller {
      */
     public void computeTour() { currentState.computeTour(cityMap, tour, window, this); }
 
-    public void showRequestsPanel() { currentState.showRequestsPanel(tour, window); }
+    public void showRequestsPanel() { currentState.showRequestsPanel(tour, window, this); }
 
-    public void showTourPanel() { currentState.showTourPanel(tour, window); }
+    public void showTourPanel() { currentState.showTourPanel(tour, window, this); }
 
     public void leftClickOnRequest(int indexRequest) {
         currentState.leftClickOnRequest(indexRequest, tour);
@@ -90,11 +91,11 @@ public class Controller {
 
 
     public void leftClickOnShortestPath(int indexShortestPath) {
-        currentState.leftClickOnShortestPath(indexShortestPath, tour);
+        currentState.leftClickOnShortestPath(indexShortestPath, tour, this);
     }
 
     public void goBackToTour() {
-        currentState.goBackToTour(tour);
+        currentState.goBackToTour(tour, this);
     }
 
     public void leftClickonIcon(int indexIcon) {
