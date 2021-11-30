@@ -66,7 +66,6 @@ public class ButtonListener implements ActionListener {
 
             @Override
             protected void done() {
-                System.out.println("ButtonListener.done");
                 window.hideLoader();
             }
         };

@@ -133,7 +133,6 @@ public class TextualView extends JPanel implements Observer {
             tourMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
             displayTourGlobalInformation();
             displayDepotPoint(tourMainPanel, tour.getDepartureTime(), true);
-            System.out.println("Nb shortest path: " + tour.getListShortestPaths().size());
             for (int i=0; i<tour.getListShortestPaths().size(); i++) {
                 displayShortestPath(tourMainPanel, tour.getListShortestPaths().get(i), false);
                 displayPoint(tourMainPanel, tour.getListShortestPaths().get(i), false);

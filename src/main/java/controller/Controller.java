@@ -126,8 +126,8 @@ public class Controller {
     }
 
     public void deleteRequest(int indexRequest) {
-        System.out.println("Controller.deleteRequest");
-        System.out.println("indexRequest = " + indexRequest);
+        //System.out.println("Controller.deleteRequest");
+        //System.out.println("indexRequest = " + indexRequest);
         ArrayList<Request> planning = tour.getPlanningRequests();
         ArrayList<ShortestPath> shortestPaths = tour.getListShortestPaths();
         ArrayList<Intersection> intersections = new ArrayList<Intersection>();
@@ -141,8 +141,6 @@ public class Controller {
             order.add(path.getEndNodeNumber());
             intersections.add(path.getEndAddress());
         }
-
-        System.out.println("order: " + order);
 
         // remove request
         planning.remove(indexRequest);
@@ -169,8 +167,8 @@ public class Controller {
             }
         }
 
-        System.out.println("order: " + order);
-        System.out.println("toDelete: " + intersectionToRemove);
+        //System.out.println("order: " + order);
+        //System.out.println("toDelete: " + intersectionToRemove);
 
         boolean skipped = false;
         boolean alreadyAdded = false;
@@ -197,7 +195,11 @@ public class Controller {
                 }
 
                 // create path and insert
-                ShortestPath newPath = new ShortestPath(0,new ArrayList< Segment >(), previousIntersection, nextIntersection);
+                ArrayList<Intersection> endPoints = new ArrayList<Intersection>();
+                endPoints.add(nextIntersection);
+                ShortestPath newPath = tour.dijkstra(cityMap.getIntersections(),
+                        endPoints, previousIntersection).get(0);
+                //ShortestPath newPath = new ShortestPath(0,new ArrayList< Segment >(), previousIntersection, nextIntersection);
                 newPath.setStartNodeNumber(startNode);
                 newPath.setEndNodeNumber(endNode);
                 if (alreadyAdded) {
@@ -216,21 +218,20 @@ public class Controller {
             int currentStartNode = path.getStartNodeNumber();
             if (currentStartNode > Collections.min(intersectionToRemove)) {
                 path.setStartNodeNumber(currentStartNode-intersectionToRemove.size());
-                System.out.println("DECREASE");
             }
 
             int currentEndNode = path.getEndNodeNumber();
             if (currentEndNode > Collections.min(intersectionToRemove)) {
                 path.setEndNodeNumber(currentEndNode-intersectionToRemove.size());
-                System.out.println("DECREASE");
             }
         }
 
         // debug
+        /*
         for (ShortestPath path: shortestPaths) {
             System.out.println(path.getStartAddress().getId() + " -> " + path.getEndAddress().getId()); // debug
         }
-
+         */
 
         tour.notifyObservers();
     }
