@@ -99,43 +99,83 @@ public class XMLdeserializerTest {
      * What it does:
      * Read XML to convert in segment
      */
-    @Test
+    @Nested
     @DisplayName("Test on parseXMLSegments")
-    void parseXMLSegmentsTest() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
-        // Create input of parseXMLSegments
-        CityMap cityMap2 = new CityMap();
-        File file = new File("src/test/resources/testMap.xml");
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document document = db.parse(file);
+    class parseSegment {
 
-        for (Intersection intersection : this.listIntersection) {
-            cityMap2.addIntersection(intersection);
+
+        @Test
+        @DisplayName("Normal scenario")
+        void parseXMLSegmentsTest() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
+            // Create input of parseXMLSegments
+            CityMap cityMap2 = new CityMap();
+            File file = new File("src/test/resources/testMap.xml");
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document document = db.parse(file);
+
+            for (Intersection intersection : listIntersection) {
+                cityMap2.addIntersection(intersection);
+            }
+
+            // Dictionnary
+            cityMap2.addDictionaryId(1L,0L);
+            cityMap2.addDictionaryId(2L,1L);
+            cityMap2.addDictionaryId(3L,2L);
+            cityMap2.addDictionaryId(4L,3L);
+            cityMap2.addDictionaryId(5L,4L);
+            cityMap2.addDictionaryId(6L,5L);
+            cityMap2.addDictionaryId(7L,6L);
+            cityMap2.addDictionaryId(8L,7L);
+            // Function test
+            XMLDeserializer.parseXMLSegments(document,cityMap2);
+            List<Intersection> listIntersection1 = cityMap.getIntersections();
+            List<Intersection> listIntersection2 = cityMap2.getIntersections();
+            assertEquals(listIntersection1.size(),listIntersection2.size(), "Not the same intersections");
+            for(int i = 0; i < listIntersection1.size(); i++) {
+                List<Segment> listSegments = listIntersection1.get(i).getAdjacentSegments();
+                List<Segment> listSegments2 = listIntersection2.get(i).getAdjacentSegments();
+                if(listSegments != null ) {
+                    for (int j = 0; j < listSegments.size(); j++) {
+                        Segment segmentA = listSegments.get(j);
+                        Segment segmentB = listSegments2.get(j);
+                        assertEquals(segmentA, segmentB, "Segment aren't the same");
+                    }
+                }
+            }
         }
 
-        // Dictionnary
-        cityMap2.addDictionaryId(1L,0L);
-        cityMap2.addDictionaryId(2L,1L);
-        cityMap2.addDictionaryId(3L,2L);
-        cityMap2.addDictionaryId(4L,3L);
-        cityMap2.addDictionaryId(5L,4L);
-        cityMap2.addDictionaryId(6L,5L);
-        cityMap2.addDictionaryId(7L,6L);
-        cityMap2.addDictionaryId(8L,7L);
-        // Function test
-        XMLDeserializer.parseXMLSegments(document,cityMap2);
-        List<Intersection> listIntersection1 = this.cityMap.getIntersections();
-        List<Intersection> listIntersection2 = cityMap2.getIntersections();
-        assertEquals(listIntersection1.size(),listIntersection2.size(), "Not the same intersections");
-        for(int i = 0; i < listIntersection1.size(); i++) {
-            List<Segment> listSegments = listIntersection1.get(i).getAdjacentSegments();
-            List<Segment> listSegments2 = listIntersection2.get(i).getAdjacentSegments();
-            if(listSegments != null ) {
-                for (int j = 0; j < listSegments.size(); j++) {
-                    Segment segmentA = listSegments.get(j);
-                    Segment segmentB = listSegments2.get(j);
-                    assertEquals(segmentA, segmentB, "Segment aren't the same");
-                }
+        @Test
+        @DisplayName("Duplicate segment")
+        void parseXMLSegmentsDuplicateTest() throws ParserConfigurationException, IOException, SAXException {
+            File file = new File("src/test/resources/testMapDuplicateSegment.xml");
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document document = db.parse(file);
+            // Function to test
+            try{
+                XMLDeserializer.parseXMLSegments(document,cityMap);
+                // Need to fail
+                fail();
+            } catch(Exception exception) {
+                assertEquals(exception.getMessage(),"The selected map contains a duplicate road which origin identifier is : 7 and destination identifier is : 8");
+            }
+        }
+
+        @Test
+        @DisplayName("Impossible segment")
+        void parseXMLSegmentsImpossibleTest() throws ParserConfigurationException, IOException, SAXException {
+            File file = new File("src/test/resources/testMapImpossibleSegment.xml");
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document document = db.parse(file);
+            // Function to test
+            try{
+                XMLDeserializer.parseXMLSegments(document,cityMap);
+                // Need to fail
+                fail();
+            } catch(Exception exception) {
+                assertEquals(exception.getMessage(),"The selected map contains an impossible road which origin identifier is : 12 and destination identifier is : 11");
             }
         }
     }
@@ -147,78 +187,65 @@ public class XMLdeserializerTest {
      * What it does:
      * Read XML to convert in intersections
      */
-    @Test
-    @DisplayName("Test on parseXMLIntersections")
-    void parseXMLIntersectionsTest() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
-        File file = new File("src/test/resources/testMap.xml");
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document document = db.parse(file);
-        CityMap cityMap = new CityMap();
-        // Function to test
-        XMLDeserializer.parseXMLIntersections(document,cityMap);
-        // Same length
-        assertEquals(cityMap.getIntersections().size(), this.listIntersection.size(), "Wrong number of segments");
-        // Take all keys
-        List<Intersection> listIntersections2 = new ArrayList<>(cityMap.getIntersections());
-        // Check if keys are all good
-        for(int i = 0; i < this.listIntersection.size(); i++) {
-            assertTrue(this.listIntersection.get(i).equals(listIntersections2.get(i)));
+    @Nested
+    @DisplayName("Test on parseXMLIntersection")
+    class parseIntersections {
+        @Test
+        @DisplayName("Normal scenario")
+        void parseXMLIntersectionsTest() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
+            File file = new File("src/test/resources/testMap.xml");
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document document = db.parse(file);
+            CityMap cityMap = new CityMap();
+            // Function to test
+            XMLDeserializer.parseXMLIntersections(document,cityMap);
+            // Same length
+            assertEquals(cityMap.getIntersections().size(), listIntersection.size(), "Wrong number of segments");
+            // Take all keys
+            List<Intersection> listIntersections2 = new ArrayList<>(cityMap.getIntersections());
+            // Check if keys are all good
+            for(int i = 0; i < listIntersection.size(); i++) {
+                assertTrue(listIntersection.get(i).equals(listIntersections2.get(i)));
+            }
         }
-    }
 
-    /**
-     * Method to test:
-     * parseXMLIntersections()
-     *
-     * What it does:
-     * Read XML to convert in intersections
-     */
-    @Test
-    @DisplayName("Test on parseXMLIntersections - Duplicate intersection")
-    void parseXMLIntersectionsDuplicateTest() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
-        File file = new File("src/test/resources/testMapDuplicate.xml");
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document document = db.parse(file);
-        CityMap cityMap = new CityMap();
+        @Test
+        @DisplayName("Duplicate intersection")
+        void parseXMLIntersectionsDuplicateTest() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
+            File file = new File("src/test/resources/testMapDuplicateIntersection.xml");
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document document = db.parse(file);
+            CityMap cityMap = new CityMap();
 
-        // Dictionnary
-        cityMap.addDictionaryId(1L,0L);
-        cityMap.addDictionaryId(2L,1L);
-        cityMap.addDictionaryId(3L,2L);
-        cityMap.addDictionaryId(4L,3L);
-        cityMap.addDictionaryId(5L,4L);
-        cityMap.addDictionaryId(6L,5L);
-        cityMap.addDictionaryId(7L,6L);
-        cityMap.addDictionaryId(8L,7L);
-        // Function to test
-        XMLDeserializer.parseXMLIntersections(document,cityMap);
-        // Same length
-        assertEquals(cityMap.getIntersections().size(), this.listIntersection.size(), "Wrong number of segments");
-        // Take all keys
-        List<Intersection> listIntersections2 = new ArrayList<>(cityMap.getIntersections());
-        // Check if keys are all good
-        for(int i = 0; i < this.listIntersection.size(); i++) {
-            assertEquals(this.listIntersection.get(i), listIntersections2.get(i));
+            // Function to test
+            try{
+                XMLDeserializer.parseXMLIntersections(document,cityMap);
+                // Need to fail
+                fail();
+            } catch(Exception exception) {
+                assertEquals(exception.getMessage(),"Duplicate index found for the intersection, index = 8");
+            }
         }
-    }
 
-
-
-
-    /**
-     * Method to test:
-     * load()
-     *
-     * What it does:
-     * Load an XML map file
-     *
-     */
-    @Test
-    @DisplayName("Test on load() map")
-    void load() {
-
+        @Test
+        @DisplayName("Duplicate intersection coordinate")
+        void parseXMLIntersectionsDuplicateCoordinateTest() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
+            File file = new File("src/test/resources/testMapDuplicateIntersectionCoordinate.xml");
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document document = db.parse(file);
+            CityMap cityMap = new CityMap();
+            // Function to test
+            try{
+                XMLDeserializer.parseXMLIntersections(document,cityMap);
+                // Need to fail
+                fail();
+            } catch(Exception exception) {
+                assertEquals(exception.getMessage(),"Duplicate intersection found, latitude = 45.354894 longitude = 4.1155863");
+            }
+        }
     }
 
 
@@ -230,78 +257,94 @@ public class XMLdeserializerTest {
      * Check wether a request can be added or not
      *
      */
-    @Test
-    @DisplayName("Test on deserializeRequests - fail wanted")
-    void deserializeRequestsFail() throws ParserConfigurationException, IOException, SAXException {
-        File file = new File("src/test/resources/requestTest.xml");
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document document = db.parse(file);
-        Tour tour = new Tour();
+    @Nested
+    @DisplayName("Test on deserializeRequests")
+    class deserializeRequest {
 
-        try{
-            XMLDeserializer.deserializeRequests(tour,cityMap, document);
-        }catch(Exception exception) {
-            System.out.println(exception);
-            assertTrue(exception.getMessage().contains("One of the pickup or delivery address is not an intersection of the city map."), "Request is out of the map");
+        @Test
+        @DisplayName("Normal scenario")
+        void deserializeRequests() throws ParserConfigurationException, IOException, SAXException {
+            File file = new File("src/test/resources/requestTestValid.xml");
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document document = db.parse(file);
+
+            try{
+                XMLDeserializer.deserializeRequests(tour,cityMap, document);
+                assertEquals(tour.getDepotAddress(), listIntersection.get(5), "Bad depot adress");
+                assertEquals("08:00",tour.getDepartureTime(),"Bad departure adress");
+            }catch(Exception exception) {
+                fail("Exception find!");
+            }
+        }
+
+        @Test
+        @DisplayName("Request out of the map")
+        void deserializeRequestsFail() throws ParserConfigurationException, IOException, SAXException {
+            File file = new File("src/test/resources/requestTest.xml");
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document document = db.parse(file);
+            Tour tour = new Tour();
+
+            try{
+                XMLDeserializer.deserializeRequests(tour,cityMap, document);
+            }catch(Exception exception) {
+                assertTrue(exception.getMessage().contains("One of the pickup or delivery address is not an intersection of the city map."), "Request is out of the map");
+            }
         }
     }
-
-    /**
-     * Method to test:
-     * deserializeRequests()
-     *
-     * What it does:
-     * Check if request XML is eligible
-     *
-     */
-    @Test
-    @DisplayName("Test on deserializeRequests()")
-    void deserializeRequests() throws ParserConfigurationException, IOException, SAXException {
-        File file = new File("src/test/resources/requestTestValid.xml");
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document document = db.parse(file);
-        Tour tour = new Tour();
-
-        try{
-            XMLDeserializer.deserializeRequests(this.tour,this.cityMap, document);
-            assertEquals(this.tour.getDepotAddress(), this.listIntersection.get(5), "Bad depot adress");
-            assertEquals(this.tour.getDepartureTime(),"08:00:00" ,"Bad departure adress");
-        }catch(Exception exception) {
-            fail("Exception find!");
-        }
-    }
-
 
     /**
      * Method to test:
      * parseXMLRequests()
      *
      * What it does:
-     * Check if request are well parsed
+     * Parse XML requests
      *
      */
-    @Test
-    @DisplayName("Test on parseXMLRequests()")
-    void parseXMLRequests() throws ParserConfigurationException, IOException, SAXException {
-        File file = new File("src/test/resources/requestTestValid.xml");
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document document = db.parse(file);
-        try{
-            XMLDeserializer.parseXMLRequests(this.tour,this.cityMap, document);
-            ArrayList<Request> listRequestOutput = this.tour.getPlanningRequests();
-            assertEquals(listRequestOutput.size(),this.listRequest.size(),"Wrong number of requests");
-            for (int j = 0; j < listRequestOutput.size(); j++) {
-                Request requestA = listRequestOutput.get(j);
-                Request requestB = listRequest.get(j);
-                assertTrue(requestA.equals(requestB), "Request aren't the same");
+    @Nested
+    @DisplayName("Test on parseXMLRequests")
+    class parseRequest {
+        @Test
+        @DisplayName("Normal scenario")
+        void parseXMLRequests() throws ParserConfigurationException, IOException, SAXException {
+            File file = new File("src/test/resources/requestTestValid.xml");
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document document = db.parse(file);
+            try{
+                XMLDeserializer.parseXMLRequests(tour,cityMap, document);
+                ArrayList<Request> listRequestOutput = tour.getPlanningRequests();
+                assertEquals(listRequestOutput.size(),listRequest.size(),"Wrong number of requests");
+                for (int j = 0; j < listRequestOutput.size(); j++) {
+                    Request requestA = listRequestOutput.get(j);
+                    Request requestB = listRequest.get(j);
+                    assertTrue(requestA.equals(requestB), "Request aren't the same");
+                }
+            }catch(Exception exception) {
+                fail("Exception find!");
             }
-        }catch(Exception exception) {
-            fail("Exception find!");
         }
+
+        @Test
+        @DisplayName("Impossible request")
+        void parseXMLRequestsImpossible() throws ParserConfigurationException, IOException, SAXException {
+            File file = new File("src/test/resources/requestTest.xml");
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document document = db.parse(file);
+            try{
+                XMLDeserializer.parseXMLRequests(tour,cityMap, document);
+                // Should fail
+                fail();
+            }catch(Exception exception) {
+                assertTrue(exception.getMessage().contains("One of the pickup or delivery address is not an intersection of the city map."), "Request is out of the map");
+            }
+        }
+
     }
+
 
 
 
