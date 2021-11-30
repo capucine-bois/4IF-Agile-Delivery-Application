@@ -18,6 +18,9 @@ public class PathDetailsComputedState implements State {
     }
 
     @Override
+    public void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {}
+
+    @Override
     public void showRequestsPanel(Tour tour, Window window, Controller controller) {
         for (Request request : tour.getPlanningRequests()) {
             request.setPickupSelected(false);

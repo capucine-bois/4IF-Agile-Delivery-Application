@@ -28,21 +28,6 @@ public class RequestsLoadedState implements State {
     }
 
     @Override
-    public void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {
-        for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
-            Request request = tour.getPlanningRequests().get(i);
-            if (i != indexRequest || (request.isPickupSelected() && request.isDeliverySelected())) {
-                request.setPickupSelected(false);
-                request.setDeliverySelected(false);
-            } else {
-                request.setPickupSelected(true);
-                request.setDeliverySelected(true);
-            }
-        }
-        tour.notifyObservers();
-    }
-
-    @Override
     public void leftClickOnIcon(int indexIcon, Tour tour, Controller controller) {
         int indexRequest = indexIcon%2 == 0 ? indexIcon/2 - 1 : indexIcon/2;
         leftClickOnRequest(indexRequest, tour, controller);

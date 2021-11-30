@@ -28,17 +28,7 @@ public class SelectedRequestState implements State {
 
     @Override
     public void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {
-        for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
-            Request request = tour.getPlanningRequests().get(i);
-            if (i != indexRequest || (request.isPickupSelected() && request.isDeliverySelected())) {
-                request.setPickupSelected(false);
-                request.setDeliverySelected(false);
-            } else {
-                request.setPickupSelected(true);
-                request.setDeliverySelected(true);
-            }
-        }
-        tour.notifyObservers();
+        State.super.leftClickOnRequest(indexRequest, tour, controller);
         if (!tour.getPlanningRequests().get(indexRequest).isDeliverySelected() ||
                 !tour.getPlanningRequests().get(indexRequest).isPickupSelected()) {
             controller.setCurrentState(controller.requestsComputedState);

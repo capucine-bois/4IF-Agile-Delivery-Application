@@ -23,4 +23,7 @@ public class InitialState implements State {
 
     @Override
     public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {}
+
+    @Override
+    public void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {}
 }

@@ -1,6 +1,7 @@
 package controller;
 
 import model.CityMap;
+import model.Request;
 import model.Tour;
 import view.Window;
 import xml.XMLDeserializer;
@@ -78,7 +79,19 @@ public interface State {
 
     default void showTourPanel(Tour tour, Window window, Controller controller) {};
 
-    default void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {};
+    default void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {
+        for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
+            Request request = tour.getPlanningRequests().get(i);
+            if (i != indexRequest || (request.isPickupSelected() && request.isDeliverySelected())) {
+                request.setPickupSelected(false);
+                request.setDeliverySelected(false);
+            } else {
+                request.setPickupSelected(true);
+                request.setDeliverySelected(true);
+            }
+        }
+        tour.notifyObservers();
+    };
 
     default void leftClickOnTourIntersection(int indexShortestPath, Tour tour, Controller controller) {};
 

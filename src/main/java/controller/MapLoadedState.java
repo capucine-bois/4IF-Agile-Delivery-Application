@@ -31,4 +31,7 @@ public class MapLoadedState implements State {
             }
         }
     }
+
+    @Override
+    public void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {}
 }
