@@ -28,7 +28,7 @@ public class XMLDeserializer {
         Document document = extractDocument(file);
         Element racine = document.getDocumentElement();
         if (racine.getNodeName().equals("map")) {
-            cityMap.getIntersections().clear();
+            cityMap.clearLists();
             deserializeMap(cityMap, document);
         } else {
             throw new ExceptionXML("Bad document");
