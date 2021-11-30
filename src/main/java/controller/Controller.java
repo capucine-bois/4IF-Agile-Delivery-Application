@@ -3,11 +3,10 @@ package controller;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
-import model.CityMap;
-import model.Request;
-import model.ShortestPath;
-import model.Tour;
+import model.*;
 import view.Window;
 
 /**
@@ -131,54 +130,107 @@ public class Controller {
         System.out.println("indexRequest = " + indexRequest);
         ArrayList<Request> planning = tour.getPlanningRequests();
         ArrayList<ShortestPath> shortestPaths = tour.getListShortestPaths();
+        ArrayList<Intersection> intersections = new ArrayList<Intersection>();
         Request requestToDelete = planning.get(indexRequest);
+
+        // getting TSP order
+        ArrayList<Integer> order = new ArrayList<Integer>();
+        order.add(0);
+        intersections.add(tour.getDepotAddress());
+        for (ShortestPath path: shortestPaths) {
+            order.add(path.getEndNodeNumber());
+            intersections.add(path.getEndAddress());
+        }
+
+        System.out.println("order: " + order);
 
         // remove request
         planning.remove(indexRequest);
 
-        // remove paths with this
+        // remove paths starting or ending by a point of the request to delete
         int i = 0;
+        ArrayList<Integer> intersectionToRemove = new ArrayList<Integer>();
         while (i<shortestPaths.size()) {
-            //System.out.println("StartNode: " + shortestPaths.get(i).getStartNodeNumber());
-            //System.out.println("EndNode: " + shortestPaths.get(i).getEndNodeNumber());
             ShortestPath path = shortestPaths.get(i);
-            if (path.getStartAddress().equals(requestToDelete.getPickupAddress()) ||
-                    path.getStartAddress().equals(requestToDelete.getDeliveryAddress()) ||
-                    path.getEndAddress().equals(requestToDelete.getPickupAddress()) ||
+            if (path.getEndAddress().equals(requestToDelete.getPickupAddress()) ||
                     path.getEndAddress().equals(requestToDelete.getDeliveryAddress())) {
-
-                /*
-                if (i-1 >= 0) {
-                    shortestPaths.get(i - 1).setEndNodeNumber(path.getEndNodeNumber());
+                if (!intersectionToRemove.contains(path.getEndNodeNumber())) {
+                    intersectionToRemove.add(path.getEndNodeNumber());
                 }
-
-                 */
-
-                int removedNode = path.getStartNodeNumber();
                 shortestPaths.remove(i);
-
-                /*
-                for (int j=0; j<shortestPaths.size();j++) {
-                    ShortestPath path2 = shortestPaths.get(j);
-                    int start = path2.getStartNodeNumber();
-                    int end = path2.getEndNodeNumber();
-                    if (start > removedNode)
-                        path2.setStartNodeNumber(start-1);
-                    if (end > removedNode)
-                        path2.setEndNodeNumber(end-1);
+            } else if (path.getStartAddress().equals(requestToDelete.getPickupAddress()) ||
+                    path.getStartAddress().equals(requestToDelete.getDeliveryAddress())) {
+                if (!intersectionToRemove.contains(path.getStartNodeNumber())) {
+                    intersectionToRemove.add(path.getStartNodeNumber());
                 }
-
-                 */
-
+                shortestPaths.remove(i);
             } else {
                 i++;
             }
         }
 
-        for (ShortestPath p: shortestPaths) {
-            System.out.println("Start: " + p.getStartNodeNumber());
-            System.out.println("End: " + p.getEndNodeNumber());
+        System.out.println("order: " + order);
+        System.out.println("toDelete: " + intersectionToRemove);
+
+        boolean skipped = false;
+        boolean alreadyAdded = false;
+        i = 1;
+        while (i<order.size()-1 && !skipped) {
+            if (intersectionToRemove.contains(order.get(i))) {
+
+                // check if points removed are following
+                if (intersectionToRemove.contains(order.get(i+1))) {
+                    skipped = true;
+                }
+
+                // find intersections of new path
+                int startNode = order.get(i-1);
+                int endNode;
+                Intersection previousIntersection = intersections.get(i-1);
+                Intersection nextIntersection;
+                if (skipped) {
+                    endNode = order.get(i+2);
+                    nextIntersection = intersections.get(i+2);
+                } else {
+                    endNode = order.get(i+1);
+                    nextIntersection = intersections.get(i+1);
+                }
+
+                // create path and insert
+                ShortestPath newPath = new ShortestPath(0,new ArrayList< Segment >(), previousIntersection, nextIntersection);
+                newPath.setStartNodeNumber(startNode);
+                newPath.setEndNodeNumber(endNode);
+                if (alreadyAdded) {
+                    shortestPaths.add(i-2, newPath);
+                } else {
+                    shortestPaths.add(i-1, newPath);
+                }
+                alreadyAdded = true;
+
+            }
+            i++;
         }
+
+        // decrease node numbers
+        for (ShortestPath path: shortestPaths) {
+            int currentStartNode = path.getStartNodeNumber();
+            if (currentStartNode > Collections.min(intersectionToRemove)) {
+                path.setStartNodeNumber(currentStartNode-intersectionToRemove.size());
+                System.out.println("DECREASE");
+            }
+
+            int currentEndNode = path.getEndNodeNumber();
+            if (currentEndNode > Collections.min(intersectionToRemove)) {
+                path.setEndNodeNumber(currentEndNode-intersectionToRemove.size());
+                System.out.println("DECREASE");
+            }
+        }
+
+        // debug
+        for (ShortestPath path: shortestPaths) {
+            System.out.println(path.getStartAddress().getId() + " -> " + path.getEndAddress().getId()); // debug
+        }
+
 
         tour.notifyObservers();
     }
