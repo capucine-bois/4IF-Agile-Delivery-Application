@@ -6,7 +6,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of an algorithm to detect the strongly connected components
+ */
 public class StronglyConnectedComponents {
+
+    public StronglyConnectedComponents () {
+
+    }
+
+
     /**
      * Check if the two intersections in parameter are in the same strongly connected part
      * @param listIntersection the list of all intersections
