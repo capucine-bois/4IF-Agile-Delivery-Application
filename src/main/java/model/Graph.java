@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Collection;
+
 public interface Graph {
 
     public abstract int getNbVertices();
@@ -14,5 +16,12 @@ public interface Graph {
      * @return boolean
      */
     public abstract boolean isArc(int i, int j);
+
+    /**
+     * Return the destinations of a Node in order
+     * @param currentVertex
+     * @return
+     */
+    public abstract Integer[] getDestinationsInOrder(int currentVertex);
 
 }

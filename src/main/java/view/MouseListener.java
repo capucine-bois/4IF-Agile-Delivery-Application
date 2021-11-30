@@ -15,6 +15,7 @@ public class MouseListener extends MouseAdapter {
 
     private Controller controller;
     private GraphicalView graphicalView;
+    private TextualView textualView;
 
     public MouseListener(Controller controller) {
         this.controller = controller;
@@ -24,12 +25,48 @@ public class MouseListener extends MouseAdapter {
         this.graphicalView = graphicalView;
     }
 
+    public void setTextualView(TextualView textualView) {
+        this.textualView = textualView;
+    }
+
     @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             if (TextualView.requestPanels.contains((JPanel) e.getSource())) {
                 controller.leftClickOnRequest(TextualView.requestPanels.indexOf((JPanel) e.getSource()));
+            } else if (TextualView.tourIntersectionsPanels.contains((JPanel) e.getSource())) {
+                controller.leftClickOnTourIntersection(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
+            } else if (graphicalView.contains(e.getX(), e.getY())) {
+               int indexIcon = graphicalView.findIcon(e.getX(), e.getY());
+               if (indexIcon != -1) controller.leftClickonIcon(indexIcon);
             }
+        }
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        if (TextualView.requestPanels.contains((JPanel) e.getSource())) {
+            controller.enterMouseOnRequest(TextualView.requestPanels.indexOf((JPanel) e.getSource()));
+        } else if (TextualView.tourIntersectionsPanels.contains((JPanel) e.getSource())) {
+            controller.enterMouseOnTourIntersection(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
+        }
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        if (TextualView.requestPanels.contains((JPanel) e.getSource())) {
+            controller.exitMouseOnRequest(TextualView.requestPanels.indexOf((JPanel) e.getSource()));
+        } else if (TextualView.tourIntersectionsPanels.contains((JPanel) e.getSource())) {
+            controller.exitMouseOnTourIntersection(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
+        }
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        graphicalView.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        if (graphicalView.contains(e.getX(), e.getY())) {
+            int indexIcon = graphicalView.findIcon(e.getX(), e.getY());
+            if (indexIcon != -1) graphicalView.setCursor(new Cursor(Cursor.HAND_CURSOR));
         }
     }
 

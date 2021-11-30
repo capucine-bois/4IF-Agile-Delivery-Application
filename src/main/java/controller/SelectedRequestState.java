@@ -1,14 +1,13 @@
 package controller;
 
-import model.*;
+import model.CityMap;
+import model.Request;
+import model.ShortestPath;
+import model.Tour;
 import view.Window;
 import xml.XMLDeserializer;
 
-/**
- * Request loaded state. State when the application has successfully loaded requests.
- */
-public class RequestsLoadedState implements State {
-
+public class SelectedRequestState implements State {
 
     @Override
     public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
@@ -16,47 +15,54 @@ public class RequestsLoadedState implements State {
             XMLDeserializer.loadMap(cityMap);
             controller.setCurrentState(controller.mapLoadedState);
             tour.clearLists();
+            window.showRequestsPanel();
+            window.setEnabledRequests(false);
+            window.setEnabledTour(false);
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
-                tour.clearLists();
                 cityMap.getIntersections().clear();
+                tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
                 controller.setCurrentState(controller.initialState);
+                window.showRequestsPanel();
+                window.setEnabledRequests(false);
+                window.setEnabledTour(false);
             }
         } finally {
             tour.notifyObservers();
-            window.setEnabledRequests(false);
         }
     }
-
 
     @Override
     public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
         try {
             XMLDeserializer.loadRequests(tour, cityMap);
+            controller.setCurrentState(controller.requestsLoadedState);
+            window.showRequestsPanel();
+            window.setEnabledTour(false);
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
                 tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
                 controller.setCurrentState(controller.mapLoadedState);
+                window.showRequestsPanel();
                 window.setEnabledRequests(false);
+                window.setEnabledTour(false);
             }
         } finally {
             tour.notifyObservers();
         }
     }
 
-
     @Override
-    public void computeTour(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        tour.computeTour(cityMap.getIntersections());
+    public void showTourPanel(Tour tour, Window window, Controller controller) {
         for (Request request : tour.getPlanningRequests()) {
             request.setPickupSelected(false);
             request.setDeliverySelected(false);
         }
-        controller.setCurrentState(controller.tourComputedState);
         window.showTourPanel();
-        window.setEnabledTour(true);
+        tour.notifyObservers();
+        controller.setCurrentState(controller.tourComputedState);
     }
 
     @Override
@@ -72,12 +78,17 @@ public class RequestsLoadedState implements State {
             }
         }
         tour.notifyObservers();
+        if (!tour.getPlanningRequests().get(indexRequest).isDeliverySelected() ||
+                !tour.getPlanningRequests().get(indexRequest).isPickupSelected()) {
+            controller.setCurrentState(controller.requestsComputedState);
+        }
+
     }
 
     @Override
     public void leftClickOnIcon(int indexIcon, Tour tour, Controller controller) {
-        int indexRequest = indexIcon%2 == 0 ? indexIcon/2 - 1 : indexIcon/2;
-        leftClickOnRequest(indexRequest, tour, controller);
+        ShortestPath shortestPath = tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexIcon).findFirst().get();
+        leftClickOnTourIntersection(tour.getListShortestPaths().indexOf(shortestPath), tour, controller);
         controller.setCurrentState(controller.selectedIntersectionState);
     }
 

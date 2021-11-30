@@ -7,11 +7,9 @@ import model.Tour;
 import view.Window;
 import xml.XMLDeserializer;
 
-/**
- * Computed tour state. State of the application when a tour has been computed.
- */
-public class ComputedTourState implements State {
+import java.util.Optional;
 
+public class RequestsComputedState implements State{
 
     @Override
     public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
@@ -59,41 +57,46 @@ public class ComputedTourState implements State {
     }
 
     @Override
-    public void showRequestsPanel(Window window) {
-        window.showRequestsPanel();
-    }
-
-    @Override
-    public void showTourPanel(Window window) {
+    public void showTourPanel(Tour tour, Window window, Controller controller) {
+        for (Request request : tour.getPlanningRequests()) {
+            request.setPickupSelected(false);
+            request.setDeliverySelected(false);
+        }
         window.showTourPanel();
+        tour.notifyObservers();
+        controller.setCurrentState(controller.tourComputedState);
     }
 
     @Override
-    public void leftClickOnRequest(int indexRequest, Tour tour) {
-        Request requestClicked = tour.getPlanningRequests().get(indexRequest);
-        if (requestClicked.isSelected()) {
-            requestClicked.setSelected(false);
-        } else {
-            requestClicked.setSelected(true);
-            for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
-                if (i != indexRequest) tour.getPlanningRequests().get(i).setSelected(false);
+    public void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {
+        for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
+            Request request = tour.getPlanningRequests().get(i);
+            if (i != indexRequest || (request.isPickupSelected() && request.isDeliverySelected())) {
+                request.setPickupSelected(false);
+                request.setDeliverySelected(false);
+            } else {
+                request.setPickupSelected(true);
+                request.setDeliverySelected(true);
             }
         }
         tour.notifyObservers();
+        controller.setCurrentState(controller.selectedRequestState);
     }
 
     @Override
-    public void leftClickOnShortestPath(int indexShortestPath, Tour tour) {
-        ShortestPath shortestPath = tour.getListShortestPaths().get(indexShortestPath);
-        shortestPath.setSelected(true);
-        tour.notifyObservers();
+    public void leftClickOnIcon(int indexIcon, Tour tour, Controller controller) {
+        ShortestPath shortestPath = tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexIcon).findFirst().get();
+        leftClickOnTourIntersection(tour.getListShortestPaths().indexOf(shortestPath), tour, controller);
+        controller.setCurrentState(controller.selectedIntersectionState);
     }
 
     @Override
-    public void goBackToTour(Tour tour) {
-        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            shortestPath.setSelected(false);
-        }
-        tour.notifyObservers();
+    public void enterMouseOnRequest(int indexRequest, Window window) {
+        window.colorRequestPanelOnMouseEntered(indexRequest);
+    }
+
+    @Override
+    public void exitMouseOnRequest(int indexRequest, Tour tour, Window window) {
+        window.colorRequestPanelOnMouseExited(indexRequest);
     }
 }

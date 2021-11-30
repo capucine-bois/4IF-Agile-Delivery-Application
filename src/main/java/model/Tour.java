@@ -46,6 +46,7 @@ public class Tour extends Observable {
     private ArrayList<Intersection> intersectionsNotInSameSccOfDepot;
 
     private SimpleDateFormat parser = new SimpleDateFormat("HH:mm:ss");
+    private SimpleDateFormat parser = new SimpleDateFormat("HH:mm");
 
     private Calendar calendar;
 
@@ -55,7 +56,7 @@ public class Tour extends Observable {
     private ArrayList<Request> planningRequests;
 
     /**
-     * A list of shortest path which is used to print the best path
+     * A list of shortest path which is used to print the best path. Sorted ascending for optimization.
      */
     private ArrayList<ShortestPath> listShortestPaths;
 
@@ -149,6 +150,8 @@ public class Tour extends Observable {
      */
     public void  computeTour(List<Intersection> allIntersectionsList) {
 
+        long startTimeDijkstra = System.currentTimeMillis();
+
         ArrayList<Node> listNodes = new ArrayList<>();
         // get the points useful for the computing : pick-up address, delivery address, depot
         ArrayList<Intersection> listUsefulPoints = new ArrayList<>();
@@ -205,6 +208,9 @@ public class Tour extends Observable {
 
 
 
+        // print the time to compute Dijkstra
+        System.out.println("Dijkstra finished in "
+                +(System.currentTimeMillis() - startTimeDijkstra)+"ms\n");
 
             // Run Tour
             TSP tsp = new TSP1();
@@ -282,5 +288,12 @@ public class Tour extends Observable {
             check = false;
         }
         return check;
+    }
+
+    public void updateLength() {
+        this.tourLength = 0;
+        for (ShortestPath p: this.listShortestPaths) {
+            this.tourLength += p.getPathLength();
+        }
     }
 }

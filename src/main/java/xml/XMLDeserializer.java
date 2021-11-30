@@ -28,7 +28,7 @@ public class XMLDeserializer {
         Document document = extractDocument(file);
         Element racine = document.getDocumentElement();
         if (racine.getNodeName().equals("map")) {
-            cityMap.getIntersections().clear();
+            cityMap.clearLists();
             deserializeMap(cityMap, document);
         } else {
             throw new ExceptionXML("Bad document");
@@ -78,7 +78,7 @@ public class XMLDeserializer {
      * @param cityMap city map to fill
      * @param document document to parse
      */
-    public static void deserializeMap(CityMap cityMap, Document document) {
+    public static void deserializeMap(CityMap cityMap, Document document) throws ExceptionXML {
         if(document != null) {
             parseXMLIntersections(document, cityMap);
             parseXMLSegments(document, cityMap);
@@ -91,14 +91,37 @@ public class XMLDeserializer {
      * @param document document to parse
      * @param cityMap structure to fill
      */
-    public static void parseXMLIntersections(Document document, CityMap cityMap) {
+    public static void parseXMLIntersections(Document document, CityMap cityMap) throws ExceptionXML {
         NodeList intersectionNodes = document.getElementsByTagName("intersection");
+        Map<Double,ArrayList<Double>> coordonateDictionnary = new HashMap<>();
+        long index = 0;
         for (int x = 0, size = intersectionNodes.getLength(); x < size; x++) {
-            long id = Long.parseLong(intersectionNodes.item(x).getAttributes().getNamedItem("id").getNodeValue());
             double latitude = Double.parseDouble(intersectionNodes.item(x).getAttributes().getNamedItem("latitude").getNodeValue());
             double longitude = Double.parseDouble(intersectionNodes.item(x).getAttributes().getNamedItem("longitude").getNodeValue());
+            long idMap = Long.parseLong(intersectionNodes.item(x).getAttributes().getNamedItem("id").getNodeValue());
+            // check duplicate
+            boolean isKeyPresent = coordonateDictionnary.containsKey(latitude);
+            if(isKeyPresent){
+                ArrayList<Double> list = coordonateDictionnary.get(latitude);
+                for(double longitu : list){
+                    if(longitu == longitude) {
+                        throw new ExceptionXML("Duplicate intersection found, latitude = " + latitude + " longitude = " + longitude);
+                    }
+                }
+                list.add(longitude);
+            } else {
+                ArrayList<Double> list = new ArrayList<>();
+                list.add(longitude);
+                coordonateDictionnary.put(latitude,list);
+            }
             // create the intersection object and add it to the city map
-            cityMap.addIntersection(new Intersection(id, latitude, longitude));
+            Intersection i1 = new Intersection(index, latitude, longitude);
+            cityMap.addIntersection(i1);
+            if(cityMap.containsDictionaryIdKey(idMap)) {
+                throw new ExceptionXML("Duplicate index found for the intersection, index = " + idMap);
+            }
+            cityMap.addDictionaryId(idMap,index);
+            index++;
         }
     }
 
@@ -108,16 +131,34 @@ public class XMLDeserializer {
      * @param document document to parse
      * @param cityMap structure to fill
      */
-    public static void parseXMLSegments(Document document, CityMap cityMap) {
+    public static void parseXMLSegments(Document document, CityMap cityMap) throws ExceptionXML{
         NodeList nodeSegment = document.getElementsByTagName("segment");
+        HashMap<Long,ArrayList<Long>> idIntersectionsDictionnary = new HashMap<>();
         for (int x = 0, size = nodeSegment.getLength(); x < size; x++) {
             long destinationId = Long.parseLong(nodeSegment.item(x).getAttributes().getNamedItem("destination").getNodeValue());
             double length = Double.parseDouble(nodeSegment.item(x).getAttributes().getNamedItem("length").getNodeValue());
             String name = nodeSegment.item(x).getAttributes().getNamedItem("name").getNodeValue();
             long originId = Long.parseLong(nodeSegment.item(x).getAttributes().getNamedItem("origin").getNodeValue());
+            long newOriginId = cityMap.getValueDictionary(originId);
+            long newDestinationId = cityMap.getValueDictionary(destinationId);
             // find the origin and destination intersections
-            Intersection origin = cityMap.getIntersections().stream().filter(i->i.getId()==originId).findFirst().get();
-            Intersection destination = cityMap.getIntersections().stream().filter(i->i.getId()==destinationId).findFirst().get();
+            Intersection origin = cityMap.getIntersections().stream().filter(i->i.getId()==newOriginId).findFirst().get();
+            Intersection destination = cityMap.getIntersections().stream().filter(i->i.getId()==newDestinationId).findFirst().get();
+            // check duplicate
+            boolean isKeyPresent = idIntersectionsDictionnary.containsKey(newOriginId);
+            if(isKeyPresent){
+                ArrayList<Long> listDestIds = idIntersectionsDictionnary.get(newOriginId);
+                for(long dest: listDestIds){
+                    if(dest == newDestinationId){
+                        throw new ExceptionXML("The selected map contains a duplicate road which origin identifier is : "+ originId + " and destination identifier is : " + destinationId);
+                    }
+                }
+            }else{
+                ArrayList<Long> listDestinationsId = new ArrayList<>();
+                listDestinationsId.add(newDestinationId);
+                idIntersectionsDictionnary.put(newOriginId,listDestinationsId);
+            }
+
             // create the Segment object and add it to the city map
             origin.addAdjacentSegment(new Segment(length, name, destination, origin));
         }
@@ -133,13 +174,20 @@ public class XMLDeserializer {
      * in city map.
      */
     public static void deserializeRequests(Tour tour, CityMap cityMap, Document document) throws ExceptionXML {
+
         if(document != null) {
             parseXMLRequests(tour, cityMap, document);
             // parse XMLDepot
             NodeList nodeDepot = document.getElementsByTagName("depot");
             long address = Long.parseLong(nodeDepot.item(0).getAttributes().getNamedItem("address").getNodeValue());
+            long newAddress;
+            if(cityMap.containsDictionaryIdKey(address)){
+                newAddress = cityMap.getValueDictionary(address);
+            } else {
+                throw new ExceptionXML("The depot address is not an intersection of the city map.");
+            }
             String departureTime = nodeDepot.item(0).getAttributes().getNamedItem("departureTime").getNodeValue();
-            Optional<Intersection> optionalDepotAddress = cityMap.getIntersections().stream().filter(i->i.getId() == address).findFirst();
+            Optional<Intersection> optionalDepotAddress = cityMap.getIntersections().stream().filter(i->i.getId() == newAddress).findFirst();
 
             if (optionalDepotAddress.isPresent()) {
                 Intersection depotAddress = optionalDepotAddress.get();
@@ -174,9 +222,14 @@ public class XMLDeserializer {
             long deliveryAddressId = Long.parseLong(nodeRequest.item(x).getAttributes().getNamedItem("deliveryAddress").getNodeValue());
             int pickupDuration = Integer.parseInt(nodeRequest.item(x).getAttributes().getNamedItem("pickupDuration").getNodeValue());
             int deliveryDuration = Integer.parseInt(nodeRequest.item(x).getAttributes().getNamedItem("deliveryDuration").getNodeValue());
+            if(!(cityMap.containsDictionaryIdKey(pickupAddressId) && cityMap.containsDictionaryIdKey(deliveryAddressId))){
+                throw new ExceptionXML("One of the pickup or delivery address is not an intersection of the city map.");
+            }
+            long newPickupAddressId = cityMap.getValueDictionary(pickupAddressId);
+            long newDeliveryAddressId = cityMap.getValueDictionary(deliveryAddressId);
 
-            Optional<Intersection> pickupAddress = cityMap.getIntersections().stream().filter(i->i.getId() == pickupAddressId).findFirst();
-            Optional<Intersection> deliveryAddress = cityMap.getIntersections().stream().filter(i->i.getId() == deliveryAddressId).findFirst();
+            Optional<Intersection> pickupAddress = cityMap.getIntersections().stream().filter(i->i.getId() == newPickupAddressId).findFirst();
+            Optional<Intersection> deliveryAddress = cityMap.getIntersections().stream().filter(i->i.getId() == newDeliveryAddressId).findFirst();
             if (pickupAddress.isPresent() && deliveryAddress.isPresent()) {
                 Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
                 Request request = new Request(pickupDuration, deliveryDuration, pickupAddress.get(), deliveryAddress.get(), requestColor);

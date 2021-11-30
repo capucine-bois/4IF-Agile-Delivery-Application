@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * It is used to find the fastest way to accomplish a request, going from its pickup address to its delivery address.
  * A path has a length in meters and is the sum of the duration of its segments.
  */
-public class ShortestPath {
+public class ShortestPath implements Comparable<ShortestPath> {
 
     /* ATTRIBUTES */
 
@@ -143,5 +143,19 @@ public class ShortestPath {
             check = false;
         }
         return check;
+    }
+
+    @Override
+    public int compareTo(ShortestPath other) {
+        if (other == null) {
+            return -1; // this < other
+        }
+        int delta = (int)(this.pathLength - other.pathLength);
+        if (delta != 0) {
+            return delta;
+        }
+        //case where delta == 0
+        int delta2 = (int)(this.startAddress.getLatitude() - other.startAddress.getLatitude());
+        return delta2;
     }
 }
