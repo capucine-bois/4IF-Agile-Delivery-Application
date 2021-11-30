@@ -19,9 +19,9 @@ public class StronglyConnectedComponents {
      * @param listIntersection the list of all intersections
      * @return true if there are in the same strongly connected part, false otherwise
      */
-    public ArrayList<ArrayList<Integer>> getAllStronglyConnectedComponents(ArrayList<Intersection> listIntersection) {
+    public ArrayList<Intersection> getAllStronglyConnectedComponents(ArrayList<Intersection> listIntersection, Intersection depot, ArrayList<Request> planning) {
 
-        ArrayList<ArrayList<Integer>> scc = new ArrayList<>();
+        ArrayList<Intersection> intersectionsNotWithDepot = new ArrayList<>();
         ArrayList<ObjectDijkstra> listObjectDijkstra = new ArrayList<>();
         Integer [] num  = foretDFSnum(listIntersection, listObjectDijkstra);
         List<Integer>[] graphTranspose = getTranspose(listIntersection);
@@ -43,12 +43,31 @@ public class StronglyConnectedComponents {
                 }
                 DFSrec(graphTranspose, j, color, B);
                 set = (ArrayList<Integer>) B.keySet().stream().filter(x -> B.get(x)==2).collect(Collectors.toList());
-                scc.add(set);
+                if(set.contains((int)depot.getId())) {
+                    System.out.println("on passe dans le set contains");
+                    checkIntersectionsWithDepot(set,intersectionsNotWithDepot, planning);
+                    break;
+                }
             }
         }
-        return scc;
+        return intersectionsNotWithDepot;
 
 
+    }
+
+    /**
+     * Check if all the intersections of the planning are in the same strongly connected components of the depot
+     * @param scc the strongly connected component which contains the depot
+     * @param intersectionsNotWithDepot the list we fill with all intersection present in the planning but not in scc
+     * @param planning the planning request
+     */
+    private void checkIntersectionsWithDepot(ArrayList<Integer> scc, ArrayList<Intersection> intersectionsNotWithDepot, ArrayList<Request> planning) {
+        for(Request req : planning) {
+            if(!scc.contains((int)req.getDeliveryAddress().getId()))
+                intersectionsNotWithDepot.add(req.getDeliveryAddress());
+            if(!scc.contains((int)req.getPickupAddress().getId()))
+                intersectionsNotWithDepot.add(req.getPickupAddress());
+        }
     }
 
     /**

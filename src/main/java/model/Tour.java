@@ -41,9 +41,9 @@ public class Tour extends Observable {
     private String arrivalTime;
 
     /**
-     * True if all the intersection of the planning request are in the same strongly connected components. False otherwise
+     * A list which is empty if all request of the planning request are in the same scc of the depot. Otherwise it contains all intersections not in the same scc of the depot
      */
-    private boolean tourPossible;
+    private ArrayList<Intersection> intersectionsNotInSameSccOfDepot;
 
     private SimpleDateFormat parser = new SimpleDateFormat("HH:mm:ss");
 
@@ -67,7 +67,7 @@ public class Tour extends Observable {
     public Tour() {
         planningRequests = new ArrayList<>();
         listShortestPaths = new ArrayList<>();
-        tourPossible = true;
+        intersectionsNotInSameSccOfDepot = new ArrayList<>();
     }
 
     /* GETTERS */
@@ -159,121 +159,109 @@ public class Tour extends Observable {
         Dijkstra dijkstra = new Dijkstra();
         StronglyConnectedComponents scc = new StronglyConnectedComponents();
 
-        ArrayList<ArrayList<Integer>> allScc = scc.getAllStronglyConnectedComponents((ArrayList<Intersection>) allIntersectionsList);
-        for(int index=0; index<allScc.size(); index++) {
-            if(allScc.get(index).contains((int)depotAddress.getId())) {
-                tourPossible = checkpossibleTour(allScc.get(index));
-            }
-        }
+        System.out.println("avant l'appel");
+        intersectionsNotInSameSccOfDepot = scc.getAllStronglyConnectedComponents((ArrayList<Intersection>) allIntersectionsList, depotAddress, planningRequests);
+        System.out.println("apres l'appel");
 
-        for(int i=0;i<planningRequests.size();i++) {
-            Intersection pickupReq1 = planningRequests.get(i).getPickupAddress();
-            listUsefulPoints.add(pickupReq1);
-            Intersection deliveryReq1 = planningRequests.get(i).getDeliveryAddress();
-            listUsefulPoints.add(deliveryReq1);
-            // gets the ends points useful for the computing according to the start point
-            ArrayList<Intersection> listUsefulEndPointsPickUp = new ArrayList<>();
-            ArrayList<Intersection> listUsefulEndPointsDelivery = new ArrayList<>();
+        if(intersectionsNotInSameSccOfDepot.isEmpty()) {
+            System.out.println("on passe ici");
+            for(int i=0;i<planningRequests.size();i++) {
+                Intersection pickupReq1 = planningRequests.get(i).getPickupAddress();
+                listUsefulPoints.add(pickupReq1);
+                Intersection deliveryReq1 = planningRequests.get(i).getDeliveryAddress();
+                listUsefulPoints.add(deliveryReq1);
+                // gets the ends points useful for the computing according to the start point
+                ArrayList<Intersection> listUsefulEndPointsPickUp = new ArrayList<>();
+                ArrayList<Intersection> listUsefulEndPointsDelivery = new ArrayList<>();
 
-            listUsefulEndPointsPickUp.add(deliveryReq1);
-            listUsefulEndPointsDelivery.add(depotAddress);
-            // addingpickUp to the endPoints of depot
-            listUsefulEndPointsForDepot.add(pickupReq1);
+                listUsefulEndPointsPickUp.add(deliveryReq1);
+                listUsefulEndPointsDelivery.add(depotAddress);
+                // addingpickUp to the endPoints of depot
+                listUsefulEndPointsForDepot.add(pickupReq1);
 
-            for(int j=0;j<planningRequests.size();j++) {
-                Intersection pickupReq2 = planningRequests.get(j).getPickupAddress();
-                Intersection deliveryReq2 = planningRequests.get(j).getDeliveryAddress();
-                if(i!=j) {
-                    listUsefulEndPointsPickUp.add(pickupReq2);
-                    listUsefulEndPointsPickUp.add(deliveryReq2);
-                    listUsefulEndPointsDelivery.add(pickupReq2);
-                    listUsefulEndPointsDelivery.add(deliveryReq2);
+                for(int j=0;j<planningRequests.size();j++) {
+                    Intersection pickupReq2 = planningRequests.get(j).getPickupAddress();
+                    Intersection deliveryReq2 = planningRequests.get(j).getDeliveryAddress();
+                    if(i!=j) {
+                        listUsefulEndPointsPickUp.add(pickupReq2);
+                        listUsefulEndPointsPickUp.add(deliveryReq2);
+                        listUsefulEndPointsDelivery.add(pickupReq2);
+                        listUsefulEndPointsDelivery.add(deliveryReq2);
+                    }
                 }
+                ArrayList<ShortestPath> shortestPathsFromPickUp = dijkstra.dijkstra(allIntersectionsList,listUsefulEndPointsPickUp, pickupReq1);
+                ArrayList<ShortestPath> shortestPathsFromDelivery = dijkstra.dijkstra(allIntersectionsList,listUsefulEndPointsDelivery, deliveryReq1);
+
+                listNodes.add(new Node(pickupReq1,shortestPathsFromPickUp,i+1));
+                listNodes.add(new Node(deliveryReq1,shortestPathsFromDelivery,i+2));
+
+
             }
-            ArrayList<ShortestPath> shortestPathsFromPickUp = dijkstra.dijkstra(allIntersectionsList,listUsefulEndPointsPickUp, pickupReq1);
-            ArrayList<ShortestPath> shortestPathsFromDelivery = dijkstra.dijkstra(allIntersectionsList,listUsefulEndPointsDelivery, deliveryReq1);
 
-            listNodes.add(new Node(pickupReq1,shortestPathsFromPickUp,i+1));
-            listNodes.add(new Node(deliveryReq1,shortestPathsFromDelivery,i+2));
+            listNodes.add(0,new Node(depotAddress,dijkstra.dijkstra(allIntersectionsList,listUsefulEndPointsForDepot,depotAddress),0));
 
 
-        }
-
-        listNodes.add(0,new Node(depotAddress,dijkstra.dijkstra(allIntersectionsList,listUsefulEndPointsForDepot,depotAddress),0));
-
-
-        // check if the intersection in the planning request are in the same component of the graph
+            // check if the intersection in the planning request are in the same component of the graph
 
 
 
 
-        // Run Tour
-        TSP tsp = new TSP1();
-        Graph g = new CompleteGraph(listNodes, this);
-        long startTime = System.currentTimeMillis();
-        tsp.searchSolution(20000, g);
-        this.setTourLength(tsp.getSolutionCost());
+            // Run Tour
+            TSP tsp = new TSP1();
+            Graph g = new CompleteGraph(listNodes, this);
+            long startTime = System.currentTimeMillis();
+            tsp.searchSolution(20000, g);
+            this.setTourLength(tsp.getSolutionCost());
 
-        // print the cost of the solution
-        System.out.print("Solution of cost "+this.tourLength+" found in "
-                +(System.currentTimeMillis() - startTime)+"ms : ");
+            // print the cost of the solution
+            System.out.print("Solution of cost "+this.tourLength+" found in "
+                    +(System.currentTimeMillis() - startTime)+"ms : ");
 
-        // print the solution with number which correspond to the order in the planning request
-        Integer[] intersectionsOrder = tsp.getBestSol();
-        for(int i = 0; i<intersectionsOrder.length; i++) {
-            System.out.print(intersectionsOrder[i] + "  ");
-        }
-        System.out.println("0");
-
-        for(int i=0; i< intersectionsOrder.length-1; i++) {
-            Intersection end  = listNodes.get(intersectionsOrder[i+1]).getIntersection();
-            ShortestPath shortestPathToAdd = listNodes.get(intersectionsOrder[i]).getListArcs().stream().filter(x -> x.getEndAddress()==end).findFirst().get();
-            shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i]);
-            shortestPathToAdd.setEndNodeNumber(intersectionsOrder[i+1]);
-            listShortestPaths.add(shortestPathToAdd);
-            calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
-            int indexRequest = intersectionsOrder[i+1]%2 == 0 ? intersectionsOrder[i+1]/2 - 1 : intersectionsOrder[i+1]/2;
-            Request requestEndPath = planningRequests.get(indexRequest);
-            if (intersectionsOrder[i+1]%2 == 1) {
-                requestEndPath.setPickupArrivalTime(parser.format(calendar.getTime()));
-                calendar.add(Calendar.SECOND, requestEndPath.getPickupDuration());
-                requestEndPath.setPickupDepartureTime(parser.format(calendar.getTime()));
-            } else {
-                requestEndPath.setDeliveryArrivalTime(parser.format(calendar.getTime()));
-                calendar.add(Calendar.SECOND, requestEndPath.getDeliveryDuration());
-                requestEndPath.setDeliveryDepartureTime(parser.format(calendar.getTime()));
+            // print the solution with number which correspond to the order in the planning request
+            Integer[] intersectionsOrder = tsp.getBestSol();
+            for(int i = 0; i<intersectionsOrder.length; i++) {
+                System.out.print(intersectionsOrder[i] + "  ");
             }
-            if(i==intersectionsOrder.length-2) {
-                shortestPathToAdd = listNodes.get(intersectionsOrder[i+1]).getListArcs().stream().filter(x -> x.getEndAddress()==depotAddress).findFirst().get();
-                shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i+1]);
-                shortestPathToAdd.setEndNodeNumber(0);
+            System.out.println("0");
+
+            for(int i=0; i< intersectionsOrder.length-1; i++) {
+                Intersection end  = listNodes.get(intersectionsOrder[i+1]).getIntersection();
+                ShortestPath shortestPathToAdd = listNodes.get(intersectionsOrder[i]).getListArcs().stream().filter(x -> x.getEndAddress()==end).findFirst().get();
+                shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i]);
+                shortestPathToAdd.setEndNodeNumber(intersectionsOrder[i+1]);
                 listShortestPaths.add(shortestPathToAdd);
                 calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
-                arrivalTime = parser.format(calendar.getTime());
+                int indexRequest = intersectionsOrder[i+1]%2 == 0 ? intersectionsOrder[i+1]/2 - 1 : intersectionsOrder[i+1]/2;
+                Request requestEndPath = planningRequests.get(indexRequest);
+                if (intersectionsOrder[i+1]%2 == 1) {
+                    requestEndPath.setPickupArrivalTime(parser.format(calendar.getTime()));
+                    calendar.add(Calendar.SECOND, requestEndPath.getPickupDuration());
+                    requestEndPath.setPickupDepartureTime(parser.format(calendar.getTime()));
+                } else {
+                    requestEndPath.setDeliveryArrivalTime(parser.format(calendar.getTime()));
+                    calendar.add(Calendar.SECOND, requestEndPath.getDeliveryDuration());
+                    requestEndPath.setDeliveryDepartureTime(parser.format(calendar.getTime()));
+                }
+                if(i==intersectionsOrder.length-2) {
+                    shortestPathToAdd = listNodes.get(intersectionsOrder[i+1]).getListArcs().stream().filter(x -> x.getEndAddress()==depotAddress).findFirst().get();
+                    shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i+1]);
+                    shortestPathToAdd.setEndNodeNumber(0);
+                    listShortestPaths.add(shortestPathToAdd);
+                    calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
+                    arrivalTime = parser.format(calendar.getTime());
+                }
             }
-        }
+        } else {
+            // TODO : return an error for the view
 
+        }
         notifyObservers();
+
     }
 
 
     public double metersToSeconds(double meters) {
         return (meters/(speed*1000))*60*60;
-    }
-
-    /**
-     * Check if all intersections of planning requests are in the strongly connected components in parameter
-     */
-    public Intersection checkpossibleTour(ArrayList<Integer> scc) {
-        Intersection intersectionStop = new Intersection();
-        for(int i = 0; i<planningRequests.size(); i++) {
-            if(!scc.contains((int)planningRequests.get(i).getPickupAddress().getId()) || !scc.contains((int)planningRequests.get(i).getDeliveryAddress().getId())) {
-                intersectionStop =
-                tourPossible = false;
-                break;
-            }
-        }
-        return intersectionStop;
     }
 
     /**
