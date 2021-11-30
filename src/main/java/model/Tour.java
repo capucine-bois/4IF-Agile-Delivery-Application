@@ -428,4 +428,111 @@ public class Tour extends Observable {
             this.tourLength += p.getPathLength();
         }
     }
+
+    // TODO: implement
+    public void insertRequest(Request requestToInsert, int indexRequest) {}
+
+    public void removeRequest(Request requestToDelete, int indexRequest, List<Intersection> allIntersections) {
+
+        ArrayList<Intersection> intersections = new ArrayList<Intersection>();
+
+        // getting TSP order
+        ArrayList<Integer> order = new ArrayList<Integer>();
+        order.add(0);
+        intersections.add(getDepotAddress());
+        for (ShortestPath path: listShortestPaths) {
+            order.add(path.getEndNodeNumber());
+            intersections.add(path.getEndAddress());
+        }
+
+        // remove request
+        planningRequests.remove(indexRequest);
+
+        // remove paths starting or ending by a point of the request to delete
+        int i = 0;
+        ArrayList<Integer> intersectionToRemove = new ArrayList<Integer>();
+        while (i<listShortestPaths.size()) {
+            ShortestPath path = listShortestPaths.get(i);
+            if (path.getEndAddress().equals(requestToDelete.getPickupAddress()) ||
+                    path.getEndAddress().equals(requestToDelete.getDeliveryAddress())) {
+                if (!intersectionToRemove.contains(path.getEndNodeNumber())) {
+                    intersectionToRemove.add(path.getEndNodeNumber());
+                }
+                listShortestPaths.remove(i);
+            } else if (path.getStartAddress().equals(requestToDelete.getPickupAddress()) ||
+                    path.getStartAddress().equals(requestToDelete.getDeliveryAddress())) {
+                if (!intersectionToRemove.contains(path.getStartNodeNumber())) {
+                    intersectionToRemove.add(path.getStartNodeNumber());
+                }
+                listShortestPaths.remove(i);
+            } else {
+                i++;
+            }
+        }
+
+        boolean skipped = false;
+        boolean alreadyAdded = false;
+        i = 1;
+        while (i<order.size()-1 && !skipped) {
+            if (intersectionToRemove.contains(order.get(i))) {
+
+                // check if points removed are following
+                if (intersectionToRemove.contains(order.get(i+1))) {
+                    skipped = true;
+                }
+
+                // find intersections of new path
+                int startNode = order.get(i-1);
+                int endNode;
+                Intersection previousIntersection = intersections.get(i-1);
+                Intersection nextIntersection;
+                if (skipped) {
+                    endNode = order.get(i+2);
+                    nextIntersection = intersections.get(i+2);
+                } else {
+                    endNode = order.get(i+1);
+                    nextIntersection = intersections.get(i+1);
+                }
+
+                // create path and insert
+                ArrayList<Intersection> endPoints = new ArrayList<Intersection>();
+                endPoints.add(nextIntersection);
+                ShortestPath newPath = dijkstra(allIntersections,
+                        endPoints, previousIntersection).get(0);
+                //ShortestPath newPath = new ShortestPath(0,new ArrayList< Segment >(), previousIntersection, nextIntersection);
+                newPath.setStartNodeNumber(startNode);
+                newPath.setEndNodeNumber(endNode);
+                if (alreadyAdded) {
+                    listShortestPaths.add(i-2, newPath);
+                } else {
+                    listShortestPaths.add(i-1, newPath);
+                }
+                alreadyAdded = true;
+
+            }
+            i++;
+        }
+
+        // decrease node numbers
+        for (ShortestPath path: listShortestPaths) {
+            int currentStartNode = path.getStartNodeNumber();
+            if (currentStartNode > Collections.min(intersectionToRemove)) {
+                path.setStartNodeNumber(currentStartNode-intersectionToRemove.size());
+            }
+
+            int currentEndNode = path.getEndNodeNumber();
+            if (currentEndNode > Collections.min(intersectionToRemove)) {
+                path.setEndNodeNumber(currentEndNode-intersectionToRemove.size());
+            }
+        }
+
+        /*
+        for (ShortestPath path: shortestPaths) {
+            System.out.println(path.getStartAddress().getId() + " -> " + path.getEndAddress().getId()); // debug
+        }
+        */
+
+        updateLength();
+        notifyObservers();
+    }
 }
