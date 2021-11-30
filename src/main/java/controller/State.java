@@ -28,7 +28,7 @@ public interface State {
             window.setEnabledTour(false);
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
-                cityMap.getIntersections().clear();
+                cityMap.clearLists();
                 tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
                 controller.setCurrentState(controller.initialState);
