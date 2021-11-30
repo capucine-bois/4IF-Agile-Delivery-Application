@@ -250,7 +250,7 @@ public class Tour extends Observable {
      * @param origin the intersection from which we search the shortest paths
      * @return listShortestPathFromOrigin, the list of shortest paths from the origin to the intersection in the list of useful end points
      */
-    ArrayList<ShortestPath> dijkstra(List<Intersection> listIntersections, ArrayList<Intersection> listUsefulEndPoints, Intersection origin) {
+    public ArrayList<ShortestPath> dijkstra(List<Intersection> listIntersections, ArrayList<Intersection> listUsefulEndPoints, Intersection origin) {
         ArrayList<ObjectDijkstra> listDijkstra = new ArrayList<>();
         ArrayList<ShortestPath> listShortestPathFromOrigin = new ArrayList<>();
         for (Intersection noeud : listIntersections) {
@@ -420,5 +420,12 @@ public class Tour extends Observable {
             check = false;
         }
         return check;
+    }
+
+    public void updateLength() {
+        this.tourLength = 0;
+        for (ShortestPath p: this.listShortestPaths) {
+            this.tourLength += p.getPathLength();
+        }
     }
 }
