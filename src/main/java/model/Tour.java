@@ -421,4 +421,11 @@ public class Tour extends Observable {
         }
         return check;
     }
+
+    public void updateLength() {
+        this.tourLength = 0;
+        for (ShortestPath p: this.listShortestPaths) {
+            this.tourLength += p.getPathLength();
+        }
+    }
 }

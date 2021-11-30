@@ -231,8 +231,9 @@ public class Controller {
         for (ShortestPath path: shortestPaths) {
             System.out.println(path.getStartAddress().getId() + " -> " + path.getEndAddress().getId()); // debug
         }
-         */
+        */
 
+        tour.updateLength();
         tour.notifyObservers();
     }
 }
