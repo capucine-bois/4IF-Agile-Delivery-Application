@@ -8,11 +8,11 @@ import xml.XMLDeserializer;
 /**
  * Map loaded state. State of the application when map has been loaded.
  */
-public class MapLoadedState implements State {
+public class MapLoadedState extends State {
 
     @Override
     public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        State.super.loadMap(cityMap, tour, window, controller);
+        super.loadMap(cityMap, tour, window, controller);
         cityMap.notifyObservers();
     }
 
@@ -31,7 +31,4 @@ public class MapLoadedState implements State {
             }
         }
     }
-
-    @Override
-    public void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {}
 }

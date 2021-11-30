@@ -13,17 +13,15 @@ import java.io.IOException;
 /**
  * Initial state. State of the application when its launches, and when map is not loaded.
  */
-public class InitialState implements State {
+public class InitialState extends State {
 
     @Override
     public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        State.super.loadMap(cityMap, tour, window, controller);
+        super.loadMap(cityMap, tour, window, controller);
         cityMap.notifyObservers();
     }
 
     @Override
     public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {}
 
-    @Override
-    public void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {}
 }

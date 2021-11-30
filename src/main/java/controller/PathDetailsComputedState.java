@@ -9,16 +9,13 @@ import xml.XMLDeserializer;
 
 import java.util.Optional;
 
-public class PathDetailsComputedState implements State {
+public class PathDetailsComputedState extends State {
 
     @Override
     public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        State.super.loadMap(cityMap, tour, window, controller);
+        super.loadMap(cityMap, tour, window, controller);
         tour.notifyObservers();
     }
-
-    @Override
-    public void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {}
 
     @Override
     public void showRequestsPanel(Tour tour, Window window, Controller controller) {
@@ -34,22 +31,6 @@ public class PathDetailsComputedState implements State {
         window.showRequestsPanel();
         tour.notifyObservers();
         controller.setCurrentState(controller.requestsComputedState);
-    }
-
-    @Override
-    public void showTourPanel(Tour tour, Window window, Controller controller) {
-        for (Request request : tour.getPlanningRequests()) {
-            request.setPickupSelected(false);
-            request.setDeliverySelected(false);
-        }
-        window.showTourPanel();
-        Optional<ShortestPath> optionalShortestPath = tour.getListShortestPaths().stream().filter(ShortestPath::isSelected).findFirst();
-        if (optionalShortestPath.isPresent()) {
-            leftClickOnShortestPath(tour.getListShortestPaths().indexOf(optionalShortestPath.get()), tour, controller);
-        } else {
-            tour.notifyObservers();
-        }
-        controller.setCurrentState(controller.tourComputedState);
     }
 
     @Override
