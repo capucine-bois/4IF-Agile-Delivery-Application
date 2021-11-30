@@ -27,18 +27,18 @@ public class SeqIter implements Iterator<Integer> {
      * Vertices are traversed in the same order as in <code>unvisited</code>
      * @param unvisited the unvisited vertex
      * @param currentVertex the current vertex
-     * @param g
+     * @param g the graph containing all the costs
      */
     public SeqIter(Collection<Integer> unvisited, int currentVertex, Graph g){
         this.candidates = new Integer[unvisited.size()];
         for (Integer s : unvisited){
             // if we found a delivery Address and the pick-up linked is in the unvisited nodes, we don't add the delivery address to the candidates
-            if (g.isArc(currentVertex, s) && !(s%2==0 && unvisited.contains(s-1))) {
+            if (g.isArc(currentVertex, s) && !(s % 2 == 0 && unvisited.contains(s - 1))) {
                 candidates[nbCandidates++] = s;
             }
         }
 
-        System.out.println("Candidates SeqIter : \n" + Arrays.toString(candidates));
+        //System.out.println("Candidates SeqIter : \n" + Arrays.toString(candidates));
 
     }
 
