@@ -12,22 +12,19 @@ import java.util.stream.Collectors;
 public class StronglyConnectedComponents {
 
     public StronglyConnectedComponents () {
-
     }
-
 
     /**
      * Check if the two intersections in parameter are in the same strongly connected part
      * @param listIntersection the list of all intersections
      * @return true if there are in the same strongly connected part, false otherwise
      */
-    public ArrayList<ArrayList<Integer>> stronglyConnectedComponents(ArrayList<Intersection> listIntersection) {
+    public ArrayList<ArrayList<Integer>> getAllStronglyConnectedComponents(ArrayList<Intersection> listIntersection) {
 
         ArrayList<ArrayList<Integer>> scc = new ArrayList<>();
         ArrayList<ObjectDijkstra> listObjectDijkstra = new ArrayList<>();
-        Integer [] num   = foretDFSnum(listIntersection, listObjectDijkstra);
+        Integer [] num  = foretDFSnum(listIntersection, listObjectDijkstra);
         List<Integer>[] graphTranspose = getTranspose(listIntersection);
-
 
         Integer [] color = new Integer[graphTranspose.length];
         for(int i=0; i<color.length; i++) {
@@ -37,19 +34,17 @@ public class StronglyConnectedComponents {
         for(int j = num.length-1; j>=0; j--) {
             ArrayList<Integer> set = new ArrayList<>();
             if(color[j]==0) {
+                // map with the id of an intersection and the color
                 Map<Integer, Integer> B = new HashMap<>();
                 for(int k=0; k<color.length; k++) {
                     if(color[k]==0) {
                         B.put(k,0);
                     }
                 }
-
                 DFSrec(graphTranspose, j, color, B);
                 set = (ArrayList<Integer>) B.keySet().stream().filter(x -> B.get(x)==2).collect(Collectors.toList());
-
                 scc.add(set);
             }
-
         }
         return scc;
 
@@ -97,7 +92,6 @@ public class StronglyConnectedComponents {
                 num[i] = cpt;
         }
         return cpt;
-
     }
 
 

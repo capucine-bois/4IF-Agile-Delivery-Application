@@ -40,6 +40,11 @@ public class Tour extends Observable {
      */
     private String arrivalTime;
 
+    /**
+     * True if all the intersection of the planning request are in the same strongly connected components. False otherwise
+     */
+    private boolean tourPossible;
+
     private SimpleDateFormat parser = new SimpleDateFormat("HH:mm:ss");
 
     private Calendar calendar;
@@ -62,6 +67,7 @@ public class Tour extends Observable {
     public Tour() {
         planningRequests = new ArrayList<>();
         listShortestPaths = new ArrayList<>();
+        tourPossible = true;
     }
 
     /* GETTERS */
@@ -152,6 +158,13 @@ public class Tour extends Observable {
 
         Dijkstra dijkstra = new Dijkstra();
         StronglyConnectedComponents scc = new StronglyConnectedComponents();
+
+        ArrayList<ArrayList<Integer>> allScc = scc.getAllStronglyConnectedComponents((ArrayList<Intersection>) allIntersectionsList);
+        for(int index=0; index<allScc.size(); index++) {
+            if(allScc.get(index).contains((int)depotAddress.getId())) {
+                tourPossible = checkpossibleTour(allScc.get(index));
+            }
+        }
 
         for(int i=0;i<planningRequests.size();i++) {
             Intersection pickupReq1 = planningRequests.get(i).getPickupAddress();
@@ -248,7 +261,20 @@ public class Tour extends Observable {
         return (meters/(speed*1000))*60*60;
     }
 
-
+    /**
+     * Check if all intersections of planning requests are in the strongly connected components in parameter
+     */
+    public Intersection checkpossibleTour(ArrayList<Integer> scc) {
+        Intersection intersectionStop = new Intersection();
+        for(int i = 0; i<planningRequests.size(); i++) {
+            if(!scc.contains((int)planningRequests.get(i).getPickupAddress().getId()) || !scc.contains((int)planningRequests.get(i).getDeliveryAddress().getId())) {
+                intersectionStop =
+                tourPossible = false;
+                break;
+            }
+        }
+        return intersectionStop;
+    }
 
     /**
      * Check if two tours have the same attributes
