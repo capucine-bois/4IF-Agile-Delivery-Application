@@ -23,7 +23,9 @@ public class StronglyConnectedComponents {
 
         ArrayList<Intersection> intersectionsNotWithDepot = new ArrayList<>();
         ArrayList<ObjectDijkstra> listObjectDijkstra = new ArrayList<>();
-        Integer [] num  = foretDFSnum(listIntersection, listObjectDijkstra);
+        ArrayList<Integer> [] listVertex = new ArrayList[listIntersection.size()];
+        Integer [] colorDFSnum = new Integer[listIntersection.size()];
+        Integer [] num  = foretDFSnum(listIntersection, listVertex, colorDFSnum);
         List<Integer>[] graphTranspose = getTranspose(listIntersection);
 
         Integer [] color = new Integer[graphTranspose.length];
@@ -70,43 +72,49 @@ public class StronglyConnectedComponents {
     /**
      * Return an array with a predecessor for each intersection
      * @param listIntersections list of all intersections
-     * @param listObjectDijkstra an empty list to fill
+     * @param listVertex an empty list to fill
+     * @param color an array with the color of the vertex
      * @return a list of dijkstra object (thus each will have his parent)
      */
-    public Integer[] foretDFSnum(ArrayList<Intersection> listIntersections, ArrayList<ObjectDijkstra> listObjectDijkstra) {
+    public Integer[] foretDFSnum(ArrayList<Intersection> listIntersections, ArrayList<Integer> [] listVertex, Integer [] color) {
         Integer [] num = new Integer[listIntersections.size()];
+        int index = 0;
         for(Intersection intersection : listIntersections) {
-            listObjectDijkstra.add(new ObjectDijkstra(intersection, null, 0.0, 0));
+            listVertex[index] = new ArrayList<>();
+            for(int i=0; i<intersection.getAdjacentSegments().size(); i++) {
+                listVertex[index].add((int)intersection.getAdjacentSegments().get(i).getDestination().getId());
+            }
+            color[index] = 0;
+            index++;
             num[(int)intersection.getId()] = 0;
         }
         int cpt = 1;
-        for(ObjectDijkstra objectDijkstra : listObjectDijkstra) {
-            if(objectDijkstra.getColor()==0)
-                DFSrecNUM(listObjectDijkstra,objectDijkstra, num,cpt);
+        for(int j=0; j<listVertex.length; j++) {
+            if(color[j] == 0)
+                DFSrecNUM(listVertex,color,j, num,cpt);
         }
         return num;
     }
 
     /**
      * Depth first search to put a parent for each intersection
-     * @param listObjectDijsktra list of all dijkstra object
+     * @param listVertex list of all vertex
      * @param origin the vertex which we look the successor
+     * @param color the array with colors of vertex
+     * @param cpt the number to put in num
+     * @param num the array with the order of transition to black
      */
-    public int DFSrecNUM(ArrayList<ObjectDijkstra> listObjectDijsktra, ObjectDijkstra origin, Integer [] num, int cpt) {
-        origin.setColor(1);
-        for(Segment successor : origin.getIntersection().getAdjacentSegments()) {
-            ObjectDijkstra objTmp = listObjectDijsktra.stream().filter(x -> x.getIntersection().equals(successor.getDestination())).findFirst().get();
-            if(objTmp.getColor()==0) {
-                objTmp.setParent(origin);
-                cpt = DFSrecNUM(listObjectDijsktra, objTmp,num,cpt);
+    public int DFSrecNUM(List<Integer> [] listVertex, Integer [] color, int origin, Integer [] num, int cpt) {
+        color[origin] = 1;
+        for(Integer successor : listVertex[origin]) {
+            if(color[successor] == 0) {
+                //objTmp.setParent(origin);
+                cpt = DFSrecNUM(listVertex, color, successor,num,cpt);
                 cpt++;
             }
         }
-        origin.setColor(2);
-        for(int i=0; i<num.length; i++) {
-            if(i==(int)origin.getIntersection().getId())
-                num[i] = cpt;
-        }
+        color[origin] = 2;
+        num[origin] = cpt;
         return cpt;
     }
 

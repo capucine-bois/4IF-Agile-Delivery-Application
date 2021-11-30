@@ -4,7 +4,6 @@ import observer.Observable;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * A tour is composed of a list of shortest paths. This list corresponds to all path which need to accomplish every request that must
