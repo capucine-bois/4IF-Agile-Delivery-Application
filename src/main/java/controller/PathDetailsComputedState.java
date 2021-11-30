@@ -18,27 +18,6 @@ public class PathDetailsComputedState implements State {
     }
 
     @Override
-    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        try {
-            XMLDeserializer.loadRequests(tour, cityMap);
-            controller.setCurrentState(controller.requestsLoadedState);
-            window.showRequestsPanel();
-            window.setEnabledTour(false);
-        } catch (Exception e) {
-            if(!e.getMessage().equals("Cancel opening file")) {
-                tour.clearLists();
-                window.displayErrorMessage(e.getMessage());
-                controller.setCurrentState(controller.mapLoadedState);
-                window.showRequestsPanel();
-                window.setEnabledRequests(false);
-                window.setEnabledTour(false);
-            }
-        } finally {
-            tour.notifyObservers();
-        }
-    }
-
-    @Override
     public void showRequestsPanel(Tour tour, Window window, Controller controller) {
         for (Request request : tour.getPlanningRequests()) {
             request.setPickupSelected(false);

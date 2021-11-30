@@ -16,23 +16,6 @@ public class RequestsLoadedState implements State {
     }
 
     @Override
-    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        try {
-            XMLDeserializer.loadRequests(tour, cityMap);
-        } catch (Exception e) {
-            if(!e.getMessage().equals("Cancel opening file")) {
-                tour.clearLists();
-                window.displayErrorMessage(e.getMessage());
-                controller.setCurrentState(controller.mapLoadedState);
-                window.setEnabledRequests(false);
-            }
-        } finally {
-            tour.notifyObservers();
-        }
-    }
-
-
-    @Override
     public void computeTour(CityMap cityMap, Tour tour, Window window, Controller controller) {
         tour.computeTour(cityMap.getIntersections());
         for (Request request : tour.getPlanningRequests()) {
