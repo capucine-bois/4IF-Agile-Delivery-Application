@@ -44,15 +44,12 @@ public class StronglyConnectedComponents {
                 DFSrec(graphTranspose, j, color, B);
                 set = (ArrayList<Integer>) B.keySet().stream().filter(x -> B.get(x)==2).collect(Collectors.toList());
                 if(set.contains((int)depot.getId())) {
-                    System.out.println("on passe dans le set contains");
                     checkIntersectionsWithDepot(set,intersectionsNotWithDepot, planning);
                     break;
                 }
             }
         }
         return intersectionsNotWithDepot;
-
-
     }
 
     /**

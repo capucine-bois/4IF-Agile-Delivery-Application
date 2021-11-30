@@ -45,7 +45,6 @@ public class Tour extends Observable {
      */
     private ArrayList<Intersection> intersectionsNotInSameSccOfDepot;
 
-    private SimpleDateFormat parser = new SimpleDateFormat("HH:mm:ss");
     private SimpleDateFormat parser = new SimpleDateFormat("HH:mm");
 
     private Calendar calendar;
@@ -162,12 +161,9 @@ public class Tour extends Observable {
         Dijkstra dijkstra = new Dijkstra();
         StronglyConnectedComponents scc = new StronglyConnectedComponents();
 
-        System.out.println("avant l'appel");
         intersectionsNotInSameSccOfDepot = scc.getAllStronglyConnectedComponents((ArrayList<Intersection>) allIntersectionsList, depotAddress, planningRequests);
-        System.out.println("apres l'appel");
 
         if(intersectionsNotInSameSccOfDepot.isEmpty()) {
-            System.out.println("on passe ici");
             for(int i=0;i<planningRequests.size();i++) {
                 Intersection pickupReq1 = planningRequests.get(i).getPickupAddress();
                 listUsefulPoints.add(pickupReq1);

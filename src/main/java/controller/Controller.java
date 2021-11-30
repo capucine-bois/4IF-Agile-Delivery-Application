@@ -126,6 +126,7 @@ public class Controller {
     }
 
     public void deleteRequest(int indexRequest) {
+        Dijkstra dijkstra = new Dijkstra();
         //System.out.println("Controller.deleteRequest");
         //System.out.println("indexRequest = " + indexRequest);
         ArrayList<Request> planning = tour.getPlanningRequests();
@@ -197,7 +198,7 @@ public class Controller {
                 // create path and insert
                 ArrayList<Intersection> endPoints = new ArrayList<Intersection>();
                 endPoints.add(nextIntersection);
-                ShortestPath newPath = tour.dijkstra(cityMap.getIntersections(),
+                ShortestPath newPath = dijkstra.dijkstra(cityMap.getIntersections(),
                         endPoints, previousIntersection).get(0);
                 //ShortestPath newPath = new ShortestPath(0,new ArrayList< Segment >(), previousIntersection, nextIntersection);
                 newPath.setStartNodeNumber(startNode);
