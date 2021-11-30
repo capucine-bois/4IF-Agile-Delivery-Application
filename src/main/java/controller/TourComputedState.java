@@ -14,29 +14,10 @@ import java.util.Optional;
  */
 public class TourComputedState implements State {
 
-
     @Override
     public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        try {
-            XMLDeserializer.loadMap(cityMap);
-            controller.setCurrentState(controller.mapLoadedState);
-            tour.clearLists();
-            window.showRequestsPanel();
-            window.setEnabledRequests(false);
-            window.setEnabledTour(false);
-        } catch (Exception e) {
-            if(!e.getMessage().equals("Cancel opening file")) {
-                cityMap.getIntersections().clear();
-                tour.clearLists();
-                window.displayErrorMessage(e.getMessage());
-                controller.setCurrentState(controller.initialState);
-                window.showRequestsPanel();
-                window.setEnabledRequests(false);
-                window.setEnabledTour(false);
-            }
-        } finally {
-            tour.notifyObservers();
-        }
+        State.super.loadMap(cityMap, tour, window, controller);
+        tour.notifyObservers();
     }
 
     @Override
@@ -55,8 +36,6 @@ public class TourComputedState implements State {
                 window.setEnabledRequests(false);
                 window.setEnabledTour(false);
             }
-        } finally {
-            tour.notifyObservers();
         }
     }
 

@@ -15,18 +15,9 @@ import java.io.IOException;
  */
 public class InitialState implements State {
 
+    @Override
     public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        try {
-            XMLDeserializer.loadMap(cityMap);
-            controller.setCurrentState(controller.mapLoadedState);
-        } catch (Exception e) {
-            if(!e.getMessage().equals("Cancel opening file")) {
-                cityMap.getIntersections().clear();
-                window.displayErrorMessage(e.getMessage());
-            }
-        } finally {
-            cityMap.notifyObservers();
-        }
+        State.super.loadMap(cityMap, tour, window, controller);
+        cityMap.notifyObservers();
     }
-
 }
