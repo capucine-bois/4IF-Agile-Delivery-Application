@@ -134,17 +134,23 @@ public class Controller {
     public void deleteRequest(int indexRequest) {
         Request requestToDelete = tour.getPlanningRequests().get(indexRequest);
         listOfCommands.add(new DeleteCommand(tour, requestToDelete, indexRequest, cityMap.getIntersections()));
+        window.setUndoButtonState(true);
     }
 
     public void undo() {
         currentState.undo(listOfCommands);
+        if (listOfCommands.size() == 0) {
+            window.setUndoButtonState(false);
+        }
     }
 
     public void moveIntersectionBefore(int indexIntersection) {
         currentState.moveIntersectionBefore(listOfCommands, tour, indexIntersection, cityMap.getIntersections());
+        window.setUndoButtonState(true);
     }
 
     public void moveIntersectionAfter(int indexIntersection) {
         currentState.moveIntersectionAfter(listOfCommands, tour, indexIntersection, cityMap.getIntersections());
+        window.setUndoButtonState(true);
     }
 }

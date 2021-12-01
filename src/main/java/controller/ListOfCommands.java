@@ -67,4 +67,8 @@ public class ListOfCommands {
         currentIndex = -1;
         list.clear();
     }
+
+    public int size() {
+        return this.currentIndex+1;
+    }
 }

@@ -36,7 +36,7 @@ public class Window extends JFrame {
     private KeyboardListener keyboardListener;
 
     private final String[] buttonTexts = new String[]{LOAD_MAP, LOAD_REQUEST, COMPUTE_TOUR, UNDO};
-    private boolean[] defaultButtonStates = new boolean[]{true, false, false};
+    private boolean[] defaultButtonStates = new boolean[]{true, false, false, false};
 
     /**
      * Complete constructor
@@ -149,9 +149,12 @@ public class Window extends JFrame {
         for (int i=0; i<buttons.size(); i++) {
             if (i < defaultButtonStates.length) {
                 buttons.get(i).setEnabled(defaultButtonStates[i]);
-            } else {
-                buttons.get(i).setEnabled(true); // by default, enable button
             }
+            /*
+            else {
+                buttons.get(i).setEnabled(false); // by default, enable button
+            }
+            */
         }
         // city map zoom
         graphicalView.setCanZoom(true);
@@ -220,5 +223,9 @@ public class Window extends JFrame {
 
     public void setHandCursorOnIcon() {
         graphicalView.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
+    public void setUndoButtonState(boolean state) {
+        buttons.get(buttons.size()-1).setEnabled(state);
     }
 }
