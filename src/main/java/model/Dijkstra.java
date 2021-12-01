@@ -9,8 +9,45 @@ import java.util.stream.Collectors;
 public class Dijkstra {
 
 
-    public Dijkstra() {
-        
+    static class undeterminedIntersection implements Comparator<undeterminedIntersection> {
+        /* ATTRIBUTES */
+
+        /**
+         * The calculed distance to access the intersection from the origin(most of the time temporary)
+         */
+        double distance;
+
+        /**
+         * The intersection to release arcs
+         */
+        Intersection intersection;
+
+        /**
+         * Empty constructor
+         */
+        public undeterminedIntersection(){
+        }
+
+        /**
+         * Complete constructor
+         * @param i         intersection
+         * @param distance  distance to the intersection
+         */
+        public undeterminedIntersection(Intersection i, double distance){
+            this.distance = distance;
+            this.intersection = i;
+        }
+
+        @Override
+        /**
+         * Compare method used by PriorityQueue
+         * @param o1 undeterminedIntersection to compare
+         * @param o2 undeterminedIntersection to compare
+         * @return 0,1 or -1 to sort the PriorityQueue
+         */
+        public int compare(undeterminedIntersection o1, undeterminedIntersection o2) {
+            return Double.compare(o1.distance,o2.distance);
+        }
     }
 
 
@@ -23,72 +60,73 @@ public class Dijkstra {
      */
     public static ArrayList<ShortestPath> compute(List<Intersection> listIntersections, ArrayList<Intersection> listUsefulEndPoints, Intersection origin) {
 
+        ArrayList<ShortestPath> listShortestPathFromOrigin = new ArrayList<>();
+
+        int intersectionsSize = listIntersections.size();
+
+        /**
+         * Initiate PriorityQueue ( for undetermined Intersection )
+         * O(logN) worst case insertion
+         * Keep the minimum distance on top of the queue
+        * */
+        PriorityQueue<undeterminedIntersection> undeterminedIntersection = new PriorityQueue<>(intersectionsSize, new undeterminedIntersection());
+
+        // Datatype
+        /**
+         *  We take advantage of having intersections that start with index 0 to be able to directly
+         *  access the distance, the parent and whether the path of the intersection is determined or not.
+         *  O(1) access
+         * */
+        boolean[] settledNodes = new boolean[intersectionsSize];
+        double [] distance = new double[intersectionsSize];
+        int [] parent = new int[intersectionsSize];
 
 
-
-        DijkstraNode originNode = new DijkstraNode(origin,0);
-        // Initiate Dijkstra Binary Heap
-        Set<DijkstraNode> settledNodes = new HashSet<>();
-        Set<DijkstraNode> unsettledNodes = new HashSet<>();
-
-
-        unsettledNodes.add(originNode);
-
-
-
-        while (unsettledNodes.size() != 0) {
-            DijkstraNode currentNode = getLowestDistanceNode(unsettledNodes);
-            unsettledNodes.remove(currentNode);
-            for (Map.Entry < DijkstraNode, Double> adjacencyPair:
-                    currentNode.getAdjacentNodes().entrySet()) {
-                DijkstraNode adjacentNode = adjacencyPair.getKey();
-                Double edgeWeight = adjacencyPair.getValue();
-                if (!settledNodes.contains(adjacentNode)) {
-                    calculateMinimumDistance(adjacentNode, edgeWeight, currentNode);
-                    unsettledNodes.add(adjacentNode);
-                }
-            }
-            settledNodes.add(currentNode);
+        for(int i = 0; i< intersectionsSize ; i++) {
+            distance[i] = Double.MAX_VALUE;
+            parent[i] = -1;
         }
-            ObjectDijkstra noeudGrisAvecDistMin = listDijkstra.stream().filter(x-> x.getColor() == 1).min(Comparator.comparing(ObjectDijkstra::getDist)).get();
-            List<ObjectDijkstra> listDest = listDijkstra.stream()
-                    .filter(x -> noeudGrisAvecDistMin.getIntersection().getAdjacentSegments()
-                            .stream().map(Segment::getDestination).collect(Collectors.toList()).contains(x.getIntersection())).collect(Collectors.toList());
 
-            for (ObjectDijkstra noeudAdj :listDest) {
+        // First node
+        distance[(int) origin.getId()] = 0;
+        undeterminedIntersection.add(new undeterminedIntersection(origin,0));
 
-                int colorNoeudAdj = noeudAdj.getColor();
-                if (colorNoeudAdj == 0 || colorNoeudAdj == 1 ) {
-                    double length;
-                    if(noeudGrisAvecDistMin.equals(noeudAdj)) {
-                        length = 0;
-                    } else {
-                        length = noeudGrisAvecDistMin.getIntersection().getAdjacentSegments().stream().filter(x -> x.getDestination() == noeudAdj.getIntersection()).findFirst().get().getLength();
-                    }
-
-                    relax(noeudGrisAvecDistMin, noeudAdj, length,listDijkstra);
-                    if (colorNoeudAdj == 0) {
-                        noeudAdj.setColor(1);
-                    }
+        while (!undeterminedIntersection.isEmpty()) {
+            Intersection currentNode = undeterminedIntersection.remove().intersection;
+            // Do not care of duplicate
+            if(settledNodes[(int)currentNode.getId()]){
+                continue;
+            }
+            List<Segment> adjacentSegment = currentNode.getAdjacentSegments();
+            for (Segment seg: adjacentSegment) {
+                int start = (int) seg.getOrigin().getId();
+                int end = (int) seg.getDestination().getId();
+                // Not fixed distance intersection
+                if(!settledNodes[end]) {
+                    Intersection destination = seg.getDestination();
+                    double cost = seg.getLength();
+                    relaxArc(start,end,cost,distance,parent);
+                    undeterminedIntersection.add(new undeterminedIntersection(destination,distance[end]));
                 }
             }
-            noeudGrisAvecDistMin.setColor(2);
-            if(listUsefulEndPoints.contains(noeudGrisAvecDistMin.getIntersection())) {
-                ObjectDijkstra tempoIntersection = noeudGrisAvecDistMin;
+            settledNodes[(int) currentNode.getId()] = true;
+
+            if(listUsefulEndPoints.contains(currentNode)) {
+                Intersection tempoIntersection = currentNode;
                 ArrayList<Segment> listSegments = new ArrayList<>();
                 ShortestPath shortestPath;
-                if(origin.equals(noeudGrisAvecDistMin.getIntersection())) {
-                    Segment segmentZero = new Segment(0.0, "segment", noeudGrisAvecDistMin.getIntersection(),origin);
+                if(origin.equals(currentNode)) {
+                    Segment segmentZero = new Segment(0.0, "segment", currentNode,origin);
                     listSegments.add(segmentZero);
-                    shortestPath = new ShortestPath(0.0,listSegments,origin,noeudGrisAvecDistMin.getIntersection());
+                    shortestPath = new ShortestPath(0.0,listSegments,origin,currentNode);
                 } else {
-                    while(findParent(tempoIntersection,listDijkstra)!=null) {
-                        ObjectDijkstra finalTempoIntersection1 = tempoIntersection;
-                        ObjectDijkstra tmpParent = finalTempoIntersection1.getParent();
-                        listSegments.add(0,tmpParent.getIntersection().getAdjacentSegments().stream().filter(x -> x.getDestination() == finalTempoIntersection1.getIntersection()).findFirst().get());
+                    while(parent[(int) tempoIntersection.getId()]!= -1) {
+                        Intersection finalTempoIntersection1 = tempoIntersection;
+                        Intersection tmpParent = listIntersections.get(parent[(int) finalTempoIntersection1.getId()]);
+                        listSegments.add(0,tmpParent.getAdjacentSegments().stream().filter(x -> x.getDestination() == finalTempoIntersection1).findFirst().get());
                         tempoIntersection = tmpParent;
                     }
-                    shortestPath = new ShortestPath(noeudGrisAvecDistMin.getDist(),listSegments,origin,noeudGrisAvecDistMin.getIntersection());
+                    shortestPath = new ShortestPath(distance[(int) currentNode.getId()],listSegments,origin,currentNode);
                 }
 
                 listShortestPathFromOrigin.add((shortestPath));
@@ -100,58 +138,22 @@ public class Dijkstra {
     }
 
 
-
-
-    private static DijkstraNode getLowestDistanceNode(Set < DijkstraNode > unsettledNodes) {
-        DijkstraNode lowestDistanceNode = null;
-        double lowestDistance = Double.MAX_VALUE;
-        for (DijkstraNode DijkstraNode: unsettledNodes) {
-            double nodeDistance = DijkstraNode.getDistance();
-            if (nodeDistance < lowestDistance) {
-                lowestDistance = nodeDistance;
-                lowestDistanceNode = DijkstraNode;
-            }
-        }
-        return lowestDistanceNode;
-    }
-
-    private static void calculateMinimumDistance(DijkstraNode evaluationNode,
-                                                 Double edgeWeigh, DijkstraNode sourceNode) {
-        Double sourceDistance = sourceNode.getDistance();
-        if (sourceDistance + edgeWeigh < evaluationNode.getDistance()) {
-            evaluationNode.setDistance(sourceDistance + edgeWeigh);
-            LinkedList<DijkstraNode> shortestPath = new LinkedList<>(sourceNode.getShortestPath());
-            shortestPath.add(sourceNode);
-            evaluationNode.setShortestPath(shortestPath);
-        }
-    }
-
     /**
      * Check if the path is shorter
-     * @param noeudInit the DijkstraNode which contains the intersection where the segment begins
-     * @param noeudDest the DijkstraNode which contains the intersection where the segment ends
+     * @param noeudInit index of the intersection which starts the segment
+     * @param noeudDest index of the intersection which ends the segment
      * @param cost the cost of the segment
-     * @param listDijkstra the list of all dijkstra objects with their infos (the Intersection with its cost, parent and color)
+     * @param distance array with all intersection distance
+     * @param parent array with all parent intersection index
      */
-    private static void relax(ObjectDijkstra noeudInit, ObjectDijkstra noeudDest, double cost, ArrayList<ObjectDijkstra> listDijkstra) {
-        if(noeudDest.getDist() > noeudInit.getDist() + cost) {
-            listDijkstra.stream().filter(x -> x==noeudDest).findFirst().get().setDist(noeudInit.getDist() + cost);
-            listDijkstra.stream().filter(x -> x==noeudDest).findFirst().get().setParent(noeudInit); }
+    private static void relaxArc(int noeudInit, int noeudDest, double cost, double[] distance, int[] parent) {
+        if(distance[noeudDest] > distance[noeudInit] + cost) {
+            distance[noeudDest] = distance[noeudInit] + cost;
+            parent[noeudDest] = noeudInit;
+        }
     }
 
-    /**
-     * Return the parent of the intersection of the dijkstra object in parameter
-     * @param intersectionToFind the dijkstra object which contains the intersection we want to get the parent of
-     * @param listDijkstra the list of all ObjectDijkstra
-     * @return the parent of the intersection
-     */
-    public static ObjectDijkstra findParent(ObjectDijkstra intersectionToFind, ArrayList<ObjectDijkstra> listDijkstra) {
-        for(ObjectDijkstra obj : listDijkstra) {
-            if(obj==intersectionToFind) {
-                return obj.getParent();
-            }
-        }
-        return null;
-    }
+
+
 
 }
