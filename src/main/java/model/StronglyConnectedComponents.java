@@ -34,7 +34,8 @@ public class StronglyConnectedComponents {
 
         for(int j = num.length-1; j>=0; j--) {
             ArrayList<Integer> set = new ArrayList<>();
-            if(color[j]==0) {
+
+            if(color[num[j]]==0) {
                 // map with the id of an intersection and the color
                 Map<Integer, Integer> B = new HashMap<>();
                 for(int k=0; k<color.length; k++) {
@@ -42,7 +43,9 @@ public class StronglyConnectedComponents {
                         B.put(k,0);
                     }
                 }
-                DFSrec(graphTranspose, j, color, B);
+
+
+                DFSrec(graphTranspose, num[j], color, B);
                 set = (ArrayList<Integer>) B.keySet().stream().filter(x -> B.get(x)==2).collect(Collectors.toList());
                 if(set.contains((int)depot.getId())) {
                     checkIntersectionsWithDepot(set,intersectionsNotWithDepot, planning);
@@ -89,8 +92,10 @@ public class StronglyConnectedComponents {
         }
         int cpt = 1;
         for(int j=0; j<listVertex.length; j++) {
-            if(color[j] == 0)
-                DFSrecNUM(listVertex,color,j, num,cpt);
+            if(color[j] == 0) {
+                cpt = DFSrecNUM(listVertex, color, j, num, cpt);
+                cpt++;
+            }
         }
         return num;
     }
@@ -113,7 +118,7 @@ public class StronglyConnectedComponents {
             }
         }
         color[origin] = 2;
-        num[origin] = cpt;
+        num[cpt-1] = origin;
         return cpt;
     }
 
