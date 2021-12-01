@@ -52,7 +52,7 @@ public class ButtonListener implements ActionListener {
             case TextualView.PATH_DETAILS -> controller.leftClickOnShortestPath(TextualView.pathDetailsButtons.indexOf((JButton) e.getSource()));
             case TextualView.DELETE_REQUEST -> controller.deleteRequest(TextualView.deleteRequestButtons.indexOf((JButton) e.getSource()));
             case TextualView.GO_UP -> controller.moveIntersectionBefore(TextualView.goUpButtons.indexOf((JButton) e.getSource()));
-            case TextualView.GO_DOWN -> controller.moveIntersectionAfter(TextualView.goUpButtons.indexOf((JButton) e.getSource()));
+            case TextualView.GO_DOWN -> controller.moveIntersectionAfter(TextualView.goDownButtons.indexOf((JButton) e.getSource()));
         }
     }
 

@@ -21,7 +21,7 @@ public class MoveRequestAfterCommand implements Command {
 
     @Override
     public void doCommand() {
-
+        System.out.println("MoveRequestAfterCommand.doCommand");
         tour.moveIntersectionBefore(indexIntersection+1, intersections);
     }
 
