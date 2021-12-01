@@ -1,8 +1,6 @@
 package model;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * The iterator use for the TSP

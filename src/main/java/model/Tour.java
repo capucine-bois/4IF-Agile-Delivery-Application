@@ -210,7 +210,7 @@ public class Tour extends Observable {
             TSP tsp = new TSP3();
             Graph g = new CompleteGraph(listNodes, this);
             long startTime = System.currentTimeMillis();
-            tsp.searchSolution(1000000, g);
+            tsp.searchSolution(10000, g);
             this.setTourLength(tsp.getSolutionCost());
 
             // print the cost of the solution and the TSP time
