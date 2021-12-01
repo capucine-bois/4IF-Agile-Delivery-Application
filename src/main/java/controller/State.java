@@ -1,13 +1,16 @@
 package controller;
 
 import model.CityMap;
+import model.Request;
+import model.ShortestPath;
 import model.Tour;
 import view.Window;
+import xml.XMLDeserializer;
 
 /**
  * Interface for state design pattern. Define every method corresponding to main features.
  */
-public interface State {
+public abstract class State {
 
     /**
      * Loading a map (intersections and segments) from XML file.
@@ -17,7 +20,26 @@ public interface State {
      * @param window the window where to show map and popup messages
      * @param controller application controller
      */
-    public default void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {};
+    public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
+        try {
+            XMLDeserializer.loadMap(cityMap);
+            controller.setCurrentState(controller.mapLoadedState);
+            tour.clearLists();
+            window.showRequestsPanel();
+            window.setEnabledRequests(false);
+            window.setEnabledTour(false);
+        } catch (Exception e) {
+            if(!e.getMessage().equals("Cancel opening file")) {
+                cityMap.clearLists();
+                tour.clearLists();
+                window.displayErrorMessage(e.getMessage());
+                controller.setCurrentState(controller.initialState);
+                window.showRequestsPanel();
+                window.setEnabledRequests(false);
+                window.setEnabledTour(false);
+            }
+        }
+    };
 
     /**
      * Loading a planning requests (pickup and deliveries) from XML file.
@@ -26,7 +48,25 @@ public interface State {
      * @param window the window where to show map and popup messages
      * @param controller application controller
      */
-    public default void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {};
+    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
+        try {
+            XMLDeserializer.loadRequests(tour, cityMap);
+            controller.setCurrentState(controller.requestsLoadedState);
+            window.showRequestsPanel();
+            window.setEnabledTour(false);
+        } catch (Exception e) {
+            if(!e.getMessage().equals("Cancel opening file")) {
+                tour.clearLists();
+                window.displayErrorMessage(e.getMessage());
+                controller.setCurrentState(controller.mapLoadedState);
+                window.showRequestsPanel();
+                window.setEnabledRequests(false);
+                window.setEnabledTour(false);
+            }
+        } finally {
+            tour.notifyObservers();
+        }
+    };
 
     /**
      * Compute tour to accomplish all the requests as fast as possible (solving TSP problem).
@@ -34,29 +74,98 @@ public interface State {
      * @param tour the tour which contains all the requests
      * @param controller the controller of our application
      */
-    public default void computeTour(CityMap cityMap, Tour tour, Window window, Controller controller) {};
+    public void computeTour(CityMap cityMap, Tour tour, Window window, Controller controller) {};
 
-    public default void showRequestsPanel(Tour tour, Window window, Controller controller) {};
+    public void showRequestsPanel(Tour tour, Window window, Controller controller) {};
 
-    public default void showTourPanel(Tour tour, Window window, Controller controller) {};
+    public void showTourPanel(Tour tour, Window window, Controller controller) {};
 
-    public default void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {};
+    public void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {};
 
-    public default void leftClickOnTourIntersection(int indexShortestPath, Tour tour, Controller controller) {};
+    protected void defaultLeftClickOnRequest(int indexRequest, Tour tour) {
+        for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
+            Request request = tour.getPlanningRequests().get(i);
+            if (i != indexRequest || (request.isPickupSelected() && request.isDeliverySelected())) {
+                request.setPickupSelected(false);
+                request.setDeliverySelected(false);
+            } else {
+                request.setPickupSelected(true);
+                request.setDeliverySelected(true);
+            }
+        }
+        tour.notifyObservers();
+    }
 
-    public default void leftClickOnShortestPath(int indexShortestPath, Tour tour, Controller controller) {};
+    public void leftClickOnTourIntersection(int indexShortestPath, Tour tour, Controller controller) {};
 
-    public default void goBackToTour(Tour tour, Controller controller) {};
+    protected boolean defaultLeftClickOnTourIntersection(int indexShortestPath, Tour tour) {
+        ShortestPath shortestPath = tour.getListShortestPaths().get(indexShortestPath);
+        Request requestClicked;
+        boolean pickupWasSelected = false;
+        boolean deliveryWasSelected = false;
+        if (shortestPath.getEndNodeNumber() % 2 == 1) {
+            requestClicked = tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2);
+            pickupWasSelected = requestClicked.isPickupSelected();
+        } else {
+            requestClicked = tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2 - 1);
+            deliveryWasSelected = requestClicked.isDeliverySelected();
+        }
+        for (Request request : tour.getPlanningRequests()) {
+            request.setPickupSelected(false);
+            request.setDeliverySelected(false);
+        }
+        if (!pickupWasSelected && shortestPath.getEndNodeNumber() % 2 == 1)  {
+            requestClicked.setPickupSelected(true);
+        } else if (!deliveryWasSelected && shortestPath.getEndNodeNumber() % 2 == 0) {
+            requestClicked.setDeliverySelected(true);
+        }
+        tour.notifyObservers();
+        return pickupWasSelected || deliveryWasSelected;
+    }
 
-    public default void leftClickOnIcon(int indexIcon, Tour tour, Controller controller) {};
+    public void leftClickOnShortestPath(int indexShortestPath, Tour tour, Controller controller) {};
 
-    public default void enterMouseOnRequest(int indexRequest, Window window) {};
+    protected void defaultLeftClickOnShortestPath(int indexShortestPath, Tour tour, Controller controller) {
+        for (Request request : tour.getPlanningRequests()) {
+            request.setPickupSelected(false);
+            request.setDeliverySelected(false);
+        }
+        ShortestPath shortestPath = tour.getListShortestPaths().get(indexShortestPath);
+        shortestPath.setSelected(true);
+        if (shortestPath.getStartNodeNumber() != 0) {
+            if (shortestPath.getStartNodeNumber() % 2 == 1) {
+                tour.getPlanningRequests().get(shortestPath.getStartNodeNumber() / 2).setPickupSelected(true);
+            } else {
+                tour.getPlanningRequests().get(shortestPath.getStartNodeNumber() / 2 - 1).setDeliverySelected(true);
+            }
+        }
+        if (shortestPath.getEndNodeNumber() != 0) {
+            if (shortestPath.getEndNodeNumber() % 2 == 1) {
+                tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2).setPickupSelected(true);
+            } else {
+                tour.getPlanningRequests().get(shortestPath.getEndNodeNumber() / 2 - 1).setDeliverySelected(true);
+            }
+        }
+        controller.setCurrentState(controller.pathDetailsComputedState);
+        tour.notifyObservers();
+    }
 
-    public default void enterMouseOnTourIntersection(int indexShortestPath, Window window) {};
+    public void goBackToTour(Tour tour, Controller controller) {};
 
-    public default void exitMouseOnRequest(int indexRequest, Tour tour, Window window) {};
+    public void leftClickOnIcon(int indexIcon, Tour tour, Controller controller) {};
 
-    public default void exitMouseOnTourIntersection(int indexShortestPath, Tour tour, Window window) {};
+    public void enterMouseOnRequest(int indexRequest, Window window) {};
 
-    public default void undo(ListOfCommands l) {};
+    public void exitMouseOnTourIntersection(int indexShortestPath, Tour tour, Window window) {};
+
+    public void undo(ListOfCommands l) {
+        l.undo();
+    }
+
+    public void enterMouseOnTourIntersection(int indexShortestPath, Window window) {};
+
+    public void exitMouseOnRequest(int indexRequest, Tour tour, Window window) {};
+
+    public void moveMouseOnIcon(Window window) {};
+
 }

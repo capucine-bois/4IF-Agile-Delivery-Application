@@ -111,7 +111,7 @@ public class GraphicalView extends JPanel implements Observer {
         // Haversine formula
         double distLongitude = longitude2 - longitude1;
         double distLatitude = latitude2 - latitude1;
-        double a = Math.pow(Math.sin(distLatitude / 2), 2) + Math.cos(distLatitude) * Math.cos(distLatitude) * Math.pow(Math.sin(distLongitude / 2),2);
+        double a = Math.pow(Math.sin(distLatitude / 2), 2) + Math.cos(latitude1) * Math.cos(latitude2) * Math.pow(Math.sin(distLongitude / 2),2);
         double c = 2 * Math.asin(Math.sqrt(a));
         double r = 6371; // Radius of earth in kilometers.
         return c * r;
@@ -136,7 +136,7 @@ public class GraphicalView extends JPanel implements Observer {
             width = viewWidth * scale;
             height = width * proportion;
             while (scale * proportion < 1) {
-                zoom(g.getClipBounds().width/2, g.getClipBounds().height/2, -1);
+                zoom((int) (viewWidth/2), (int) (viewHeight/2), -1);
                 width = viewWidth * scale;
                 height = width * proportion;
             }
@@ -144,7 +144,7 @@ public class GraphicalView extends JPanel implements Observer {
             height = viewHeight * scale;
             width = height / proportion;
             while (scale / proportion < 1) {
-                zoom(g.getClipBounds().width/2, g.getClipBounds().height/2, -1);
+                zoom((int) (viewWidth/2), (int) (viewHeight/2), -1);
                 height = viewHeight * scale;
                 width = height / proportion;
             }

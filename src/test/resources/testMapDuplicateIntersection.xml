@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<map>
+    <intersection id="1" latitude="45.750404" longitude="4.8744674"/>
+    <intersection id="2" latitude="45.75171" longitude="4.8718166"/>
+    <intersection id="3" latitude="45.754265" longitude="4.886816"/>
+    <intersection id="4" latitude="45.755234" longitude="4.8867016"/>
+    <intersection id="5" latitude="45.754894" longitude="4.8855863"/>
+    <intersection id="6" latitude="42.754894" longitude="4.1155863"/>
+    <intersection id="8" latitude="45.354894" longitude="4.4855863"/>
+    <intersection id="8" latitude="45.234244" longitude="4.5355862"/>
+    <segment destination="2" length="23.662397" name="Rue Léon Blum" origin="1"/>
+    <segment destination="4" length="28.430933" name="Avenue Édouard Herriot" origin="3"/>
+    <segment destination="6" length="233.383" name="Avenue Edouard" origin="5"/>
+    <segment destination="8" length="202.5549" name="Rue des coquelicots" origin="7"/>
+    <segment destination="8" length="201.5549" name="Rue des coquelicots" origin="7"/>
+    <intersection id="9" latitude="45.221244" longitude="4.9955862"/>
+</map>

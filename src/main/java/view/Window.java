@@ -211,4 +211,8 @@ public class Window extends JFrame {
     public void colorTourIntersectionPanelOnMouseExited(int indexShortestPath) {
         textualView.colorTourIntersectionPanelOnMouseExited(indexShortestPath);
     }
+
+    public void setHandCursorOnIcon() {
+        graphicalView.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
 }

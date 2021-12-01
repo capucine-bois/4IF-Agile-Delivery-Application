@@ -7,51 +7,12 @@ import model.Tour;
 import view.Window;
 import xml.XMLDeserializer;
 
-public class SelectedRequestState implements State {
+public class SelectedRequestState extends State {
 
     @Override
     public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        try {
-            XMLDeserializer.loadMap(cityMap);
-            controller.setCurrentState(controller.mapLoadedState);
-            tour.clearLists();
-            window.showRequestsPanel();
-            window.setEnabledRequests(false);
-            window.setEnabledTour(false);
-        } catch (Exception e) {
-            if(!e.getMessage().equals("Cancel opening file")) {
-                cityMap.getIntersections().clear();
-                tour.clearLists();
-                window.displayErrorMessage(e.getMessage());
-                controller.setCurrentState(controller.initialState);
-                window.showRequestsPanel();
-                window.setEnabledRequests(false);
-                window.setEnabledTour(false);
-            }
-        } finally {
-            tour.notifyObservers();
-        }
-    }
-
-    @Override
-    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        try {
-            XMLDeserializer.loadRequests(tour, cityMap);
-            controller.setCurrentState(controller.requestsLoadedState);
-            window.showRequestsPanel();
-            window.setEnabledTour(false);
-        } catch (Exception e) {
-            if(!e.getMessage().equals("Cancel opening file")) {
-                tour.clearLists();
-                window.displayErrorMessage(e.getMessage());
-                controller.setCurrentState(controller.mapLoadedState);
-                window.showRequestsPanel();
-                window.setEnabledRequests(false);
-                window.setEnabledTour(false);
-            }
-        } finally {
-            tour.notifyObservers();
-        }
+        super.loadMap(cityMap, tour, window, controller);
+        tour.notifyObservers();
     }
 
     @Override
@@ -67,17 +28,7 @@ public class SelectedRequestState implements State {
 
     @Override
     public void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {
-        for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
-            Request request = tour.getPlanningRequests().get(i);
-            if (i != indexRequest || (request.isPickupSelected() && request.isDeliverySelected())) {
-                request.setPickupSelected(false);
-                request.setDeliverySelected(false);
-            } else {
-                request.setPickupSelected(true);
-                request.setDeliverySelected(true);
-            }
-        }
-        tour.notifyObservers();
+        defaultLeftClickOnRequest(indexRequest, tour);
         if (!tour.getPlanningRequests().get(indexRequest).isDeliverySelected() ||
                 !tour.getPlanningRequests().get(indexRequest).isPickupSelected()) {
             controller.setCurrentState(controller.requestsComputedState);
@@ -87,9 +38,8 @@ public class SelectedRequestState implements State {
 
     @Override
     public void leftClickOnIcon(int indexIcon, Tour tour, Controller controller) {
-        ShortestPath shortestPath = tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexIcon).findFirst().get();
-        leftClickOnTourIntersection(tour.getListShortestPaths().indexOf(shortestPath), tour, controller);
-        controller.setCurrentState(controller.selectedIntersectionState);
+        int indexRequest = indexIcon%2 == 0 ? indexIcon/2 - 1 : indexIcon/2;
+        leftClickOnRequest(indexRequest, tour, controller);
     }
 
     @Override
@@ -103,5 +53,10 @@ public class SelectedRequestState implements State {
         if (!request.isDeliverySelected() || !request.isPickupSelected()) {
             window.colorRequestPanelOnMouseExited(indexRequest);
         }
+    }
+
+    @Override
+    public void moveMouseOnIcon(Window window) {
+        window.setHandCursorOnIcon();
     }
 }

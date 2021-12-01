@@ -9,51 +9,12 @@ import xml.XMLDeserializer;
 
 import java.util.Optional;
 
-public class PathDetailsComputedState implements State {
+public class PathDetailsComputedState extends State {
 
     @Override
     public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        try {
-            XMLDeserializer.loadMap(cityMap);
-            controller.setCurrentState(controller.mapLoadedState);
-            tour.clearLists();
-            window.showRequestsPanel();
-            window.setEnabledRequests(false);
-            window.setEnabledTour(false);
-        } catch (Exception e) {
-            if(!e.getMessage().equals("Cancel opening file")) {
-                cityMap.getIntersections().clear();
-                tour.clearLists();
-                window.displayErrorMessage(e.getMessage());
-                controller.setCurrentState(controller.initialState);
-                window.showRequestsPanel();
-                window.setEnabledRequests(false);
-                window.setEnabledTour(false);
-            }
-        } finally {
-            tour.notifyObservers();
-        }
-    }
-
-    @Override
-    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        try {
-            XMLDeserializer.loadRequests(tour, cityMap);
-            controller.setCurrentState(controller.requestsLoadedState);
-            window.showRequestsPanel();
-            window.setEnabledTour(false);
-        } catch (Exception e) {
-            if(!e.getMessage().equals("Cancel opening file")) {
-                tour.clearLists();
-                window.displayErrorMessage(e.getMessage());
-                controller.setCurrentState(controller.mapLoadedState);
-                window.showRequestsPanel();
-                window.setEnabledRequests(false);
-                window.setEnabledTour(false);
-            }
-        } finally {
-            tour.notifyObservers();
-        }
+        super.loadMap(cityMap, tour, window, controller);
+        tour.notifyObservers();
     }
 
     @Override
@@ -70,22 +31,6 @@ public class PathDetailsComputedState implements State {
         window.showRequestsPanel();
         tour.notifyObservers();
         controller.setCurrentState(controller.requestsComputedState);
-    }
-
-    @Override
-    public void showTourPanel(Tour tour, Window window, Controller controller) {
-        for (Request request : tour.getPlanningRequests()) {
-            request.setPickupSelected(false);
-            request.setDeliverySelected(false);
-        }
-        window.showTourPanel();
-        Optional<ShortestPath> optionalShortestPath = tour.getListShortestPaths().stream().filter(ShortestPath::isSelected).findFirst();
-        if (optionalShortestPath.isPresent()) {
-            leftClickOnShortestPath(tour.getListShortestPaths().indexOf(optionalShortestPath.get()), tour, controller);
-        } else {
-            tour.notifyObservers();
-        }
-        controller.setCurrentState(controller.tourComputedState);
     }
 
     @Override

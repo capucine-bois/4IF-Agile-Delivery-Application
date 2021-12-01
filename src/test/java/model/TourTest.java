@@ -50,12 +50,12 @@ class TourTest {
         listIntersection = new ArrayList<>();
         listRequest = new ArrayList<>();
         // Setup intersection
-        Intersection i1 = new Intersection(1,45.75406,4.857418);
-        Intersection i2 = new Intersection(2,45.750404,4.8744674);
-        Intersection i3 = new Intersection(3,45.75871,4.8704023);
-        Intersection i4 = new Intersection(4,45.75171,4.871819);
-        Intersection i5 = new Intersection(5,45.750896,4.859119);
-        Intersection i6 = new Intersection(6,45.75159,4.8700043);
+        Intersection i1 = new Intersection(0,45.75406,4.857418);
+        Intersection i2 = new Intersection(1,45.750404,4.8744674);
+        Intersection i3 = new Intersection(2,45.75871,4.8704023);
+        Intersection i4 = new Intersection(3,45.75171,4.871819);
+        Intersection i5 = new Intersection(4,45.750896,4.859119);
+        Intersection i6 = new Intersection(5,45.75159,4.8700043);
         // Setup segment
         Segment s1 = new Segment(75,"Rue du Dauphiné",i1,i6);
         Segment s2 = new Segment(75,"Rue du Pardo",i6,i1);
@@ -123,12 +123,12 @@ class TourTest {
 
         // Check answer
         assertEquals(tourLength,565,"Length of the best path isn't find ");
-        assertEquals(listShortestPaths.get(0).getStartAddress().getId(), 1,"Start point isn't right");
-        assertEquals(listShortestPaths.get(1).getStartAddress().getId(), 4,"Not the best order of request");
-        assertEquals(listShortestPaths.get(2).getStartAddress().getId(), 2,"Not the best order of request");
-        assertEquals(listShortestPaths.get(3).getStartAddress().getId(), 5,"Not the best order of request");
-        assertEquals(listShortestPaths.get(4).getStartAddress().getId(), 3,"Not the best order of request");
-        assertEquals(listShortestPaths.get(4).getEndAddress().getId(), 1,"End of the tour isn't equal to start ");
+        assertEquals(listShortestPaths.get(0).getStartAddress().getId(), 0,"Start point isn't right");
+        assertEquals(listShortestPaths.get(1).getStartAddress().getId(), 3,"Not the best order of request");
+        assertEquals(listShortestPaths.get(2).getStartAddress().getId(), 1,"Not the best order of request");
+        assertEquals(listShortestPaths.get(3).getStartAddress().getId(), 4,"Not the best order of request");
+        assertEquals(listShortestPaths.get(4).getStartAddress().getId(), 2,"Not the best order of request");
+        assertEquals(listShortestPaths.get(4).getEndAddress().getId(), 0,"End of the tour isn't equal to start ");
     }
 
     /**

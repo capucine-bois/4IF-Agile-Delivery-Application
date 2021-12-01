@@ -38,6 +38,7 @@ public class DijkstraTest {
         cityMap = new CityMap();
         listRequest = new ArrayList<>();
         listUsefulPointsSameDeliveries = new ArrayList<>();
+
         // Setup intersection
         Intersection i1 = new Intersection(1,45.75406,4.857418);
         Intersection i2 = new Intersection(2,45.750404,4.8744674);
@@ -126,7 +127,7 @@ public class DijkstraTest {
             //origin
             Intersection origin1 = cityMap.getIntersections().get(0);
             //original method to test
-            ArrayList<ShortestPath> sp1 = tour.dijkstra(listIntersectionsDijkstra, listUsefulEndPoints, origin1);
+            ArrayList<ShortestPath> sp1 = Dijkstra.compute(listIntersectionsDijkstra, listUsefulEndPoints, origin1);
 
             //number of shortest paths
             assertEquals(6,sp1.size(), "Wrong number of shortest paths for Intersection 1");
@@ -182,7 +183,7 @@ public class DijkstraTest {
             //origin
             Intersection origin2 = cityMap.getIntersections().get(1);
             //original method to test
-            ArrayList<ShortestPath> sp2 = tour.dijkstra(listIntersectionsDijkstra, listUsefulPointsSameDeliveries, origin2);
+            ArrayList<ShortestPath> sp2 = Dijkstra.compute(listIntersectionsDijkstra, listUsefulPointsSameDeliveries, origin2);
             //number of shortest paths
             assertEquals(3,sp2.size(), "Wrong number of shortest paths for Intersection 2");
             //sp2.stream().filter(x->x.getEndAddress().getId()==6).findFirst().get();
@@ -235,7 +236,7 @@ public class DijkstraTest {
             Intersection origin1 = cityMap.getIntersections().get(0);
 
 
-            ArrayList<ShortestPath> sp1 = tour.dijkstra(listIntersectionsDijkstra, listUsefulEndPoints, origin1);
+            ArrayList<ShortestPath> sp1 = Dijkstra.compute(listIntersectionsDijkstra, listUsefulEndPoints, origin1);
 
 
             assertEquals(6,sp1.size(),"Dijkstra find impossible path");
