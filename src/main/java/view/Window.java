@@ -70,6 +70,11 @@ public class Window extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
+    /**
+     * Initiate graphical view.
+     * @throws IOException
+     * @throws FontFormatException
+     */
     private void createGraphicalView() throws IOException, FontFormatException {
         graphicalPanel = new JPanel();
         graphicalPanel.setLayout(new BorderLayout());
@@ -201,61 +206,110 @@ public class Window extends JFrame {
         this.defaultButtonStates = defaultButtonStates;
     }
 
+    /**
+     * Display loader while computing.
+     */
     public void showLoader() {
         this.disableElements();
         this.popUpView.showLoader();
     }
 
+    /**
+     * Hide loading when TSP solution has been found.
+     */
     public void hideLoader() {
         this.resetComponentsState();
         this.popUpView.hideLoader();
     }
 
+    /**
+     * Show requests panel on textual view.
+     */
     public void showRequestsPanel() {
         textualView.showRequestsPanel();
     }
 
+    /**
+     * Show tour panel on textual view.
+     */
     public void showTourPanel() {
         textualView.showTourPanel();
     }
 
+    /**
+     * Disable or enable requests panels.
+     * @param enabled whether panels must be enabled or not.
+     */
     public void setEnabledRequests(boolean enabled) {
         textualView.setEnabledRequests(enabled);
     }
 
+    /**
+     * Disable or enable tour panels.
+     * @param enabled whether panels must be enabled or not.
+     */
     public void setEnabledTour(boolean enabled) {
         textualView.setEnabledTour(enabled);
     }
 
+    /**
+     * Change background color of a request when mouse enters its panel.
+     * @param indexRequest index of the panel concerned
+     */
     public void colorRequestPanelOnMouseEntered(int indexRequest) {
         textualView.colorRequestPanelOnMouseEntered(indexRequest);
     }
 
+    /**
+     * Change background color of a request when mouse leaves its panel.
+     * @param indexRequest index of the panel concerned
+     */
     public void colorRequestPanelOnMouseExited(int indexRequest) {
         textualView.colorRequestPanelOnMouseExited(indexRequest);
     }
 
-    public void colorTourIntersectionPanelOnMouseEntered(int indexShortestPath) {
-        textualView.colorTourIntersectionPanelOnMouseEntered(indexShortestPath);
+    /**
+     * Change background color of an intersection when mouse enters its panel.
+     * @param indexIntersection index of the panel concerned
+     */
+    public void colorTourIntersectionPanelOnMouseEntered(int indexIntersection) {
+        textualView.colorTourIntersectionPanelOnMouseEntered(indexIntersection);
     }
 
-    public void colorTourIntersectionPanelOnMouseExited(int indexShortestPath) {
-        textualView.colorTourIntersectionPanelOnMouseExited(indexShortestPath);
+    /**
+     * Change background color of an intersection when mouse leaves its panel.
+     * @param indexIntersection index of the panel concerned
+     */
+    public void colorTourIntersectionPanelOnMouseExited(int indexIntersection) {
+        textualView.colorTourIntersectionPanelOnMouseExited(indexIntersection);
     }
 
+    /**
+     * Change cursor to "hand cursor" when mouse is on the graphical view.
+     */
     public void setHandCursorOnIcon() {
         graphicalView.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
+    /**
+     * Change state of the "Undo" button
+     * @param state new state
+     */
     public void setUndoButtonState(boolean state) {
         buttons.get(buttons.size()-1).setEnabled(state);
     }
 
+    /**
+     * Show computing panel when TSP computation starts.
+     */
     public void showComputingPanel() {
         graphicalPanel.add(computingPanel, BorderLayout.PAGE_START);
         revalidate();
     }
 
+    /**
+     * Hide computing panel when TSP solution has been found.
+     */
     public void hideComputingPanel() {
         graphicalPanel.remove(computingPanel);
         revalidate();

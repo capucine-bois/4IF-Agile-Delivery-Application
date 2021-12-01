@@ -5,8 +5,14 @@ import java.awt.event.KeyEvent;
 
 import controller.Controller;
 
+/**
+ * Listener to handle keyboard events.
+ */
 public class KeyboardListener extends KeyAdapter {
 
+    /**
+     * Application controller.
+     */
     private Controller controller;
 
     public KeyboardListener(Controller controller){
