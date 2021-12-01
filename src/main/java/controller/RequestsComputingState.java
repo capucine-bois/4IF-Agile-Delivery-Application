@@ -5,6 +5,10 @@ import model.Request;
 import model.Tour;
 import view.Window;
 
+/**
+ * Computing tour state.
+ * State of the application when a tour is currently computing and the textual view is displaying "Requests" tab.
+ */
 public class RequestsComputingState extends State {
 
     @Override

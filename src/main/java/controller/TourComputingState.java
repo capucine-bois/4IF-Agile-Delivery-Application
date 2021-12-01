@@ -6,6 +6,10 @@ import model.ShortestPath;
 import model.Tour;
 import view.Window;
 
+/**
+ * Computing tour state.
+ * State of the application when a tour is currently computing and the textual view is displaying "Tour" tab.
+ */
 public class TourComputingState extends State {
 
     @Override

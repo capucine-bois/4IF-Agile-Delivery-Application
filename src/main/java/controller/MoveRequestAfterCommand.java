@@ -8,6 +8,9 @@ import model.Tour;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Move an intersection to earlier.
+ */
 public class MoveRequestAfterCommand implements Command {
     private Tour tour;
     private int indexIntersection;
@@ -21,7 +24,6 @@ public class MoveRequestAfterCommand implements Command {
 
     @Override
     public void doCommand() {
-        System.out.println("MoveRequestAfterCommand.doCommand");
         tour.moveIntersectionBefore(indexIntersection+1, intersections);
     }
 

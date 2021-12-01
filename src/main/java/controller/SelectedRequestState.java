@@ -7,6 +7,9 @@ import model.Tour;
 import view.Window;
 import xml.XMLDeserializer;
 
+/**
+ * State when a request is selected.
+ */
 public class SelectedRequestState extends State {
 
     @Override

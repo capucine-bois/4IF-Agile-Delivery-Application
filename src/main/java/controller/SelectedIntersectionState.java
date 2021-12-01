@@ -7,6 +7,9 @@ import model.Tour;
 import view.Window;
 import xml.XMLDeserializer;
 
+/**
+ * State when an intersection is selected.
+ */
 public class SelectedIntersectionState extends State {
 
     @Override

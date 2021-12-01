@@ -7,7 +7,8 @@ import xml.XMLDeserializer;
 import java.util.List;
 
 /**
- * Interface for state design pattern. Define every method corresponding to main features.
+ * Abstract class for state design pattern.
+ * Define every method corresponding to main features.
  */
 public abstract class State {
 
@@ -77,12 +78,36 @@ public abstract class State {
      */
     public void computeTour(CityMap cityMap, Tour tour, Window window, Controller controller) {};
 
+    /**
+     * Display requests on the textual view.
+     * @param tour tour with the requests to show
+     * @param window the GUI
+     * @param controller application controller
+     */
     public void showRequestsPanel(Tour tour, Window window, Controller controller) {};
 
+    /**
+     * Display tour intersections and paths on the textual view.
+     * @param tour tour with the intersections and the paths to show
+     * @param window the GUI
+     * @param controller application controller
+     */
     public void showTourPanel(Tour tour, Window window, Controller controller) {};
 
+    /**
+     * Called when user clicks on a request on the textual view.
+     * @param indexRequest index of the clicked request
+     * @param tour tour with the clicked request
+     * @param controller application controller
+     */
     public void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {};
 
+    /**
+     * Default behaviour when users click on a request on the textual view.
+     * Set request to selected or not (if it was already), and update GUI to change its background.
+     * @param indexRequest index of the clicked request
+     * @param tour the tour with the clicked request
+     */
     protected void defaultLeftClickOnRequest(int indexRequest, Tour tour) {
         for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
             Request request = tour.getPlanningRequests().get(i);
@@ -97,8 +122,22 @@ public abstract class State {
         tour.notifyObservers();
     }
 
+    /**
+     * Called when user clicks on an intersection on the textual view.
+     * @param indexShortestPath index of the clicked
+     * @param tour tour with the intersections and the paths to show
+     * @param controller application controller
+     */
     public void leftClickOnTourIntersection(int indexShortestPath, Tour tour, Controller controller) {};
 
+    /**
+     * Default behaviour when users click on an intersection on the textual view.
+     * Set intersection to selected or not (if it was already), and update GUI to change its background and its icon
+     * on the graphical view.
+     * @param indexShortestPath index of shortest path
+     * @param tour tour
+     * @return whether an intersection is currently selected or not
+     */
     protected boolean defaultLeftClickOnTourIntersection(int indexShortestPath, Tour tour) {
         ShortestPath shortestPath = tour.getListShortestPaths().get(indexShortestPath);
         Request requestClicked;
@@ -124,8 +163,20 @@ public abstract class State {
         return pickupWasSelected || deliveryWasSelected;
     }
 
+    /**
+     *
+     * @param indexShortestPath
+     * @param tour
+     * @param controller
+     */
     public void leftClickOnShortestPath(int indexShortestPath, Tour tour, Controller controller) {};
 
+    /**
+     *
+     * @param indexShortestPath
+     * @param tour
+     * @param controller
+     */
     protected void defaultLeftClickOnShortestPath(int indexShortestPath, Tour tour, Controller controller) {
         for (Request request : tour.getPlanningRequests()) {
             request.setPickupSelected(false);

@@ -9,6 +9,10 @@ import xml.XMLDeserializer;
 
 import java.util.Optional;
 
+/**
+ * Computed tour state.
+ * State of the application when a tour has been computed and the textual view is displaying "Requests" tab.
+ */
 public class RequestsComputedState extends State{
 
     @Override

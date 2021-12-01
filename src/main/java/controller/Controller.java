@@ -89,58 +89,108 @@ public class Controller {
      */
     public void computeTour() { currentState.computeTour(cityMap, tour, window, this); }
 
+    /**
+     * Display requests on the textual view.
+     */
     public void showRequestsPanel() { currentState.showRequestsPanel(tour, window, this); }
 
+    /**
+     * Display tour (order of visited intersections, details of paths, length...) on textual view.
+     */
     public void showTourPanel() { currentState.showTourPanel(tour, window, this); }
 
+    /**
+     * Called when user clicks on a request on textual view.
+     * @param indexRequest index of clicked request
+     */
     public void leftClickOnRequest(int indexRequest) {
         currentState.leftClickOnRequest(indexRequest, tour, this);
     }
 
+    /**
+     * Called when user clicks on an intersection on textual view.
+     * @param indexIntersection index of clicked intersection
+     */
     public void leftClickOnTourIntersection(int indexIntersection) {
         currentState.leftClickOnTourIntersection(indexIntersection, tour, this);
     }
 
-
+    /**
+     * Called when user clicks on "Show details" buttons on textual view.
+     * @param indexShortestPath index of the shortest path clicked
+     */
     public void leftClickOnShortestPath(int indexShortestPath) {
         currentState.leftClickOnShortestPath(indexShortestPath, tour, this);
     }
 
+    /**
+     * Called when user clicks on "Go back" button.
+     * Go back to previous display.
+     */
     public void goBackToTour() {
         currentState.goBackToTour(tour, this);
     }
 
+    /**
+     * Called when user clicks on an intersection icon on graphical view.
+     * @param indexIcon index of the clicked icon
+     */
     public void leftClickOnIcon(int indexIcon) {
         currentState.leftClickOnIcon(indexIcon, tour, this);
     }
 
-
+    /**
+     * Called when user hover a request on the textual view.
+     * @param indexRequest index of the hovered request
+     */
     public void enterMouseOnRequest(int indexRequest) {
         currentState.enterMouseOnRequest(indexRequest, window);
     }
 
+    /**
+     * Called when user hover an intersection on the textual view.
+     * @param indexShortestPath index of the hovered request
+     */
     public void enterMouseOnTourIntersection(int indexShortestPath) {
         currentState.enterMouseOnTourIntersection(indexShortestPath, window);
     }
 
+    /**
+     * Called when mouse leave a request on the textual view.
+     * @param indexRequest
+     */
     public void exitMouseOnRequest(int indexRequest) {
         currentState.exitMouseOnRequest(indexRequest, tour, window);
     }
 
+    /**
+     * Called when mouse leave an intersection on the textual view.
+     * @param indexShortestPath
+     */
     public void exitMouseOnTourIntersection(int indexShortestPath) {
         currentState.exitMouseOnTourIntersection(indexShortestPath, tour, window);
     }
 
+    /**
+     * Set specific cursor when user's mouse hovers an icon on the graphical view.
+     */
     public void moveMouseOnIcon() {
         currentState.moveMouseOnIcon(window);
     }
 
+    /**
+     * Delete a request in an already computed tour.
+     * @param indexRequest index of the request to delete
+     */
     public void deleteRequest(int indexRequest) {
         Request requestToDelete = tour.getPlanningRequests().get(indexRequest);
         listOfCommands.add(new DeleteCommand(tour, requestToDelete, indexRequest, cityMap.getIntersections()));
         window.setUndoButtonState(true);
     }
 
+    /**
+     * Undo last command.
+     */
     public void undo() {
         currentState.undo(listOfCommands);
         if (listOfCommands.size() == 0) {
@@ -148,16 +198,27 @@ public class Controller {
         }
     }
 
+    /**
+     * For a computed tour, change order by visiting an intersection (pickup or delivery address) earlier.
+     * @param indexIntersection the intersection to visit earlier
+     */
     public void moveIntersectionBefore(int indexIntersection) {
         currentState.moveIntersectionBefore(listOfCommands, tour, indexIntersection, cityMap.getIntersections());
         window.setUndoButtonState(true);
     }
 
+    /**
+     * For a computed tour, change order by visiting an intersection (pickup or delivery address) later.
+     * @param indexIntersection the intersection to visit later
+     */
     public void moveIntersectionAfter(int indexIntersection) {
         currentState.moveIntersectionAfter(listOfCommands, tour, indexIntersection, cityMap.getIntersections());
         window.setUndoButtonState(true);
     }
 
+    /**
+     * Stop TSP solving computation.
+     */
     public void stopTourComputation() {
         currentState.stopTourComputation(tour);
     }

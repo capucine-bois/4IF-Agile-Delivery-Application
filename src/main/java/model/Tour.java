@@ -45,8 +45,14 @@ public class Tour extends Observable {
      */
     private ArrayList<Intersection> intersectionsUnreachableFromDepot;
 
+    /**
+     * Parser used to convert a Calendar object into a string (to show date and time).
+     */
     private SimpleDateFormat parser = new SimpleDateFormat("HH:mm");
 
+    /**
+     * Calendar to generate arrival and departure time.
+     */
     private Calendar calendar;
 
     /**
@@ -59,6 +65,9 @@ public class Tour extends Observable {
      */
     private ArrayList<ShortestPath> listShortestPaths;
 
+    /**
+     * Boolean indicating if the tour has already been computed.
+     */
     private boolean tourComputed;
 
     /* CONSTRUCTORS */
@@ -139,6 +148,10 @@ public class Tour extends Observable {
 
     /* METHODS */
 
+    /**
+     * Update arrival and departure times for every intersection visited.
+     * Update ending time of tour.
+     */
     public void updateTimes() {
         // reset calendar
         try {
@@ -184,10 +197,7 @@ public class Tour extends Observable {
                 arrivalTime = arrivageTime;
             }
 
-
         }
-
-
 
     }
 
@@ -275,6 +285,12 @@ public class Tour extends Observable {
 
     }
 
+    /**
+     *
+     * @param listNodes
+     * @param startTime
+     * @param tsp
+     */
     public void updateTourInformation(ArrayList<Node> listNodes, long startTime, TSP tsp) {
         this.setTourLength(tsp.getSolutionCost());
         // print the cost of the solution and the TSP time
@@ -321,6 +337,11 @@ public class Tour extends Observable {
     }
 
 
+    /**
+     * Convert meters to seconds, according to speed attribute.
+     * @param meters the distance
+     * @return number of seconds to cover the distance
+     */
     public double metersToSeconds(double meters) {
         return (meters/(speed*1000))*60*60;
     }
@@ -345,6 +366,9 @@ public class Tour extends Observable {
         return check;
     }
 
+    /**
+     * Update tour length by doing the sum of its paths length.
+     */
     public void updateLength() {
         this.tourLength = 0;
         for (ShortestPath p: this.listShortestPaths) {
@@ -352,7 +376,14 @@ public class Tour extends Observable {
         }
     }
 
-    public void insertRequest(Request requestToInsert, int indexRequest, List<ShortestPath> paths) {
+    /**
+     * Insert a request to an already computed tour.
+     * Position of intersections are stored in Request.
+     * Some paths are deleted, some are created to accomplish every request including the new one.
+     * @param requestToInsert request to insert
+     * @param paths all the paths of the map
+     */
+    public void insertRequest(Request requestToInsert, List<ShortestPath> paths) {
 
         System.out.println("Tour.insertRequest");
 
@@ -426,10 +457,16 @@ public class Tour extends Observable {
         planningRequests.add(requestToInsert);
         updateLength();
         notifyObservers();
-
-
     }
 
+    /**
+     * Remove a request in an already computed tour.
+     * Some paths are deleted, some are created to accomplish every request without the deleted one.
+     * @param requestToDelete the request to delete
+     * @param indexRequest index of the request to remove in the planning
+     * @param allIntersections all the intersections of the map
+     * @return
+     */
     public ArrayList<ShortestPath> removeRequest(Request requestToDelete, int indexRequest, List<Intersection> allIntersections) {
 
         for (ShortestPath path: listShortestPaths) {
@@ -540,6 +577,12 @@ public class Tour extends Observable {
         return deleted;
     }
 
+    /**
+     * Change order of the tour to visit an intersection earlier.
+     * Some paths are deleted, some are created to accomplish every request with the new order.
+     * @param indexIntersection
+     * @param allIntersections
+     */
     public void moveIntersectionBefore(int indexIntersection, List<Intersection> allIntersections) {
         System.out.println("Tour.moveIntersectionBefore");
         System.out.println("indexIntersection = " + indexIntersection);

@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Computed tour state. State of the application when a tour has been computed.
+ * Computed tour state.
+ * State of the application when a tour has been computed and the textual view is displaying "Tour" tab.
  */
 public class TourComputedState extends State {
 
