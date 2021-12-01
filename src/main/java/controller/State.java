@@ -1,11 +1,10 @@
 package controller;
 
-import model.CityMap;
-import model.Request;
-import model.ShortestPath;
-import model.Tour;
+import model.*;
 import view.Window;
 import xml.XMLDeserializer;
+
+import java.util.List;
 
 /**
  * Interface for state design pattern. Define every method corresponding to main features.
@@ -167,5 +166,9 @@ public abstract class State {
     public void exitMouseOnRequest(int indexRequest, Tour tour, Window window) {};
 
     public void moveMouseOnIcon(Window window) {};
+
+    public void moveIntersectionBefore(ListOfCommands l, Tour tour, int indexIntersection, List<Intersection> allIntersections) {};
+
+    public void moveIntersectionAfter(ListOfCommands l, Tour tour, int indexIntersection, List<Intersection> allIntersections) {};
 
 }

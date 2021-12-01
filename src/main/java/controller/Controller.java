@@ -139,4 +139,12 @@ public class Controller {
     public void undo() {
         currentState.undo(listOfCommands);
     }
+
+    public void moveIntersectionBefore(int indexIntersection) {
+        currentState.moveIntersectionBefore(listOfCommands, tour, indexIntersection, cityMap.getIntersections());
+    }
+
+    public void moveIntersectionAfter(int indexIntersection) {
+        currentState.moveIntersectionAfter(listOfCommands, tour, indexIntersection, cityMap.getIntersections());
+    }
 }
