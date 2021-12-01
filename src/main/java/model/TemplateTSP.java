@@ -47,6 +47,7 @@ public abstract class TemplateTSP implements TSP {
         visited.add(0); // The first visited vertex is 0 which is the depot
         bestSolCost = Double.MAX_VALUE;
         branchAndBound(0, unvisited, visited, 0, tour);
+        tour.setTourComputed(true);
     }
 
     public Integer getSolution(int i){
@@ -90,7 +91,7 @@ public abstract class TemplateTSP implements TSP {
      */
     private void branchAndBound(int currentVertex, Collection<Integer> unvisited,
                                 Collection<Integer> visited, double currentCost, Tour tour){
-        if (System.currentTimeMillis() - startTime > timeLimit) return;
+        if (tour.isTourComputed()) return;
         if (unvisited.size() == 0){
             if (g.isArc(currentVertex,0)){
                 if (currentCost+g.getCost(currentVertex,0) < bestSolCost){

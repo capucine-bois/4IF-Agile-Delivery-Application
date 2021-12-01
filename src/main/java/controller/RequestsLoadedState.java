@@ -20,10 +20,23 @@ public class RequestsLoadedState extends State {
             request.setPickupSelected(false);
             request.setDeliverySelected(false);
         }
-        controller.setCurrentState(controller.tourComputedState);
+        controller.setCurrentState(controller.tourComputingState);
         window.showTourPanel();
         window.setEnabledTour(true);
-        tour.computeTour(cityMap.getIntersections());
+        window.showComputingPanel();
+        Thread TSPThread = new Thread(() -> {
+            tour.computeTour(cityMap.getIntersections());
+            window.hideComputingPanel();
+            if (!tour.getListShortestPaths().isEmpty()) {
+                controller.setCurrentState(controller.tourComputedState);
+            } else {
+                window.showRequestsPanel();
+                window.setEnabledTour(false);
+                controller.setCurrentState(controller.requestsLoadedState);
+            }
+            tour.notifyObservers();
+        });
+        TSPThread.start();
     }
 
     @Override

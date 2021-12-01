@@ -45,6 +45,7 @@ public class ButtonListener implements ActionListener {
             case Window.LOAD_MAP -> controller.loadMap();
             case Window.LOAD_REQUEST -> controller.loadRequests();
             case Window.COMPUTE_TOUR -> controller.computeTour();
+            case Window.STOP_COMPUTATION -> controller.stopTourComputation();
             case Window.UNDO -> controller.undo();
             case TextualView.REQUESTS_HEADER -> controller.showRequestsPanel();
             case TextualView.TOUR_HEADER -> controller.showTourPanel();

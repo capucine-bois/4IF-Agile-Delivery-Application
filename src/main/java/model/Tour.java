@@ -58,6 +58,8 @@ public class Tour extends Observable {
      */
     private ArrayList<ShortestPath> listShortestPaths;
 
+    private boolean tourComputed;
+
     /* CONSTRUCTORS */
 
     /**
@@ -67,6 +69,7 @@ public class Tour extends Observable {
         planningRequests = new ArrayList<>();
         listShortestPaths = new ArrayList<>();
         intersectionsUnreachableFromDepot = new ArrayList<>();
+        tourComputed = false;
     }
 
     /* GETTERS */
@@ -106,6 +109,9 @@ public class Tour extends Observable {
         return speed;
     }
 
+    public boolean isTourComputed() {
+        return tourComputed;
+    }
     /* SETTERS */
 
     public void setTourLength(double tourLength) {
@@ -124,6 +130,10 @@ public class Tour extends Observable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void setTourComputed(boolean tourComputed) {
+        this.tourComputed = tourComputed;
     }
 
     /* METHODS */
@@ -156,7 +166,7 @@ public class Tour extends Observable {
      * @param allIntersectionsList the list with all intersections of the map
      */
     public void  computeTour(List<Intersection> allIntersectionsList) {
-        Thread TSPThread = new Thread(() -> {
+
 
             long startTimeDijkstra = System.currentTimeMillis();
 
@@ -200,20 +210,16 @@ public class Tour extends Observable {
 
             listNodes.add(0, new Node(depotAddress, Dijkstra.compute(allIntersectionsList, listUsefulEndPointsForDepot, depotAddress), 0));
 
-
             // print the time to compute Dijkstra
             System.out.println("Dijkstra finished in "
                     + (System.currentTimeMillis() - startTimeDijkstra) + "ms\n");
 
-            long startTime = System.currentTimeMillis();
             TSP tsp = new TSP3();
             Graph g = new CompleteGraph(listNodes, this);
 
             // Run Tour
             tsp.searchSolution(1000000, g, this);
-        });
-        TSPThread.start();
-        System.out.println("finish compute");
+
     }
 
     public void updateTourInformation(ArrayList<Node> listNodes, long startTime, TSP tsp) {
