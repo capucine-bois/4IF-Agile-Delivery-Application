@@ -148,8 +148,7 @@ public class Tour extends Observable {
      * Fill the list of intersections which are not in the same strongly connected components than depot
      */
     public void checkIntersectionsUnreachable(List<Intersection> allIntersectionsList) {
-        StronglyConnectedComponents scc = new StronglyConnectedComponents();
-        intersectionsUnreachableFromDepot = scc.getAllStronglyConnectedComponents((ArrayList<Intersection>) allIntersectionsList,depotAddress, planningRequests);
+        intersectionsUnreachableFromDepot = StronglyConnectedComponents.getAllUnreachableIntersections((ArrayList<Intersection>) allIntersectionsList,depotAddress, planningRequests);
     }
 
     /**
