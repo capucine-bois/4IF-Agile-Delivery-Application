@@ -22,7 +22,6 @@ public class StronglyConnectedComponents {
     public ArrayList<Intersection> getAllStronglyConnectedComponents(ArrayList<Intersection> listIntersection, Intersection depot, ArrayList<Request> planning) {
 
         ArrayList<Intersection> intersectionsNotWithDepot = new ArrayList<>();
-        ArrayList<ObjectDijkstra> listObjectDijkstra = new ArrayList<>();
         ArrayList<Integer> [] listVertex = new ArrayList[listIntersection.size()];
         Integer [] colorDFSnum = new Integer[listIntersection.size()];
         Integer [] num  = foretDFSnum(listIntersection, listVertex, colorDFSnum);

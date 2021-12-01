@@ -23,7 +23,7 @@ public class Dijkstra {
      * @param origin the intersection from which we search the shortest paths
      * @return listShortestPathFromOrigin, the list of shortest paths from the origin to the intersection in the list of useful end points
      */
-    public ArrayList<ShortestPath> dijkstra(List<Intersection> listIntersections, ArrayList<Intersection> listUsefulEndPoints, Intersection origin) {
+    public static ArrayList<ShortestPath> compute(List<Intersection> listIntersections, ArrayList<Intersection> listUsefulEndPoints, Intersection origin) {
         ArrayList<ObjectDijkstra> listDijkstra = new ArrayList<>();
         ArrayList<ShortestPath> listShortestPathFromOrigin = new ArrayList<>();
         for (Intersection noeud : listIntersections) {
@@ -91,7 +91,7 @@ public class Dijkstra {
      * @param cost the cost of the segment
      * @param listDijkstra the list of all dijkstra objects with their infos (the Intersection with its cost, parent and color)
      */
-    private void relax(ObjectDijkstra noeudInit, ObjectDijkstra noeudDest, double cost, ArrayList<ObjectDijkstra> listDijkstra) {
+    private static void relax(ObjectDijkstra noeudInit, ObjectDijkstra noeudDest, double cost, ArrayList<ObjectDijkstra> listDijkstra) {
         if(noeudDest.getDist() > noeudInit.getDist() + cost) {
             listDijkstra.stream().filter(x -> x==noeudDest).findFirst().get().setDist(noeudInit.getDist() + cost);
             listDijkstra.stream().filter(x -> x==noeudDest).findFirst().get().setParent(noeudInit); }
@@ -103,7 +103,7 @@ public class Dijkstra {
      * @param listDijkstra the list of all ObjectDijkstra
      * @return the parent of the intersection
      */
-    public ObjectDijkstra findParent(ObjectDijkstra intersectionToFind, ArrayList<ObjectDijkstra> listDijkstra) {
+    public static ObjectDijkstra findParent(ObjectDijkstra intersectionToFind, ArrayList<ObjectDijkstra> listDijkstra) {
         for(ObjectDijkstra obj : listDijkstra) {
             if(obj==intersectionToFind) {
                 return obj.getParent();

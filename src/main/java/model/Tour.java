@@ -155,7 +155,6 @@ public class Tour extends Observable {
 
         listUsefulPoints.add(depotAddress);
 
-        Dijkstra dijkstra = new Dijkstra();
         StronglyConnectedComponents scc = new StronglyConnectedComponents();
 
 
@@ -187,8 +186,8 @@ public class Tour extends Observable {
                         listUsefulEndPointsDelivery.add(deliveryReq2);
                     }
                 }
-                ArrayList<ShortestPath> shortestPathsFromPickUp = dijkstra.dijkstra(allIntersectionsList,listUsefulEndPointsPickUp, pickupReq1);
-                ArrayList<ShortestPath> shortestPathsFromDelivery = dijkstra.dijkstra(allIntersectionsList,listUsefulEndPointsDelivery, deliveryReq1);
+                ArrayList<ShortestPath> shortestPathsFromPickUp = Dijkstra.compute(allIntersectionsList,listUsefulEndPointsPickUp, pickupReq1);
+                ArrayList<ShortestPath> shortestPathsFromDelivery = Dijkstra.compute(allIntersectionsList,listUsefulEndPointsDelivery, deliveryReq1);
 
                 listNodes.add(new Node(pickupReq1,shortestPathsFromPickUp,i+1));
                 listNodes.add(new Node(deliveryReq1,shortestPathsFromDelivery,i+2));
@@ -196,7 +195,7 @@ public class Tour extends Observable {
 
             }
 
-            listNodes.add(0,new Node(depotAddress,dijkstra.dijkstra(allIntersectionsList,listUsefulEndPointsForDepot,depotAddress),0));
+            listNodes.add(0,new Node(depotAddress,Dijkstra.compute(allIntersectionsList,listUsefulEndPointsForDepot,depotAddress),0));
 
 
             // check if the intersection in the planning request are in the same component of the graph
