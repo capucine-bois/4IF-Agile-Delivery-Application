@@ -196,9 +196,9 @@ public class Controller {
      * Add a request in an already computed tour.
      *
      */
-    public void addRequest() {
+    public void addRequest(Request request) {
         //TODO implement
-        //listOfCommands.add(new AddCommand(tour,requestToAdd));
+        listOfCommands.add(new AddCommand(tour,request, cityMap.getIntersections()));
         window.setUndoButtonState(true);
     }
 
