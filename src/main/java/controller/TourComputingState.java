@@ -1,5 +1,6 @@
 package controller;
 
+import model.CityMap;
 import model.Request;
 import model.ShortestPath;
 import model.Tour;
@@ -15,20 +16,23 @@ public class TourComputingState extends State {
         }
         window.showRequestsPanel();
         tour.notifyObservers();
-        controller.setCurrentState(controller.requestsComputedState);
+        controller.setCurrentState(controller.requestsComputingState);
     }
+
+    @Override
+    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {}
 
     @Override
     public void leftClickOnTourIntersection(int indexShortestPath, Tour tour, Controller controller) {
         defaultLeftClickOnTourIntersection(indexShortestPath, tour);
-        controller.setCurrentState(controller.selectedIntersectionState);
     }
 
     @Override
     public void leftClickOnIcon(int indexIcon, Tour tour, Controller controller) {
-        ShortestPath shortestPath = tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexIcon).findFirst().get();
-        leftClickOnTourIntersection(tour.getListShortestPaths().indexOf(shortestPath), tour, controller);
-        controller.setCurrentState(controller.selectedIntersectionState);
+        if (!tour.getListShortestPaths().isEmpty()) {
+            ShortestPath shortestPath = tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexIcon).findFirst().get();
+            leftClickOnTourIntersection(tour.getListShortestPaths().indexOf(shortestPath), tour, controller);
+        }
     }
 
     @Override

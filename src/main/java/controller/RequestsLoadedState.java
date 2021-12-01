@@ -25,9 +25,11 @@ public class RequestsLoadedState extends State {
         window.setEnabledTour(true);
         window.showComputingPanel();
         Thread TSPThread = new Thread(() -> {
+            // TODO: first call compute scc and dijkstra and add conditions for tourComputed to stop scc or dijkstra when stop button clicked
             tour.computeTour(cityMap.getIntersections());
             window.hideComputingPanel();
             if (!tour.getListShortestPaths().isEmpty()) {
+                window.showTourPanel();
                 controller.setCurrentState(controller.tourComputedState);
             } else {
                 window.showRequestsPanel();
