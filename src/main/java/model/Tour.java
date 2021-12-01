@@ -478,4 +478,114 @@ public class Tour extends Observable {
 
         return deleted;
     }
+
+    public ArrayList<ShortestPath> moveIntersectionBefore(int indexIntersection, List<Intersection> allIntersections) {
+        System.out.println("Tour.moveIntersectionBefore");
+        System.out.println("indexIntersection = " + indexIntersection);
+
+        ArrayList<ShortestPath> deletedPaths = new ArrayList<>();
+        ArrayList<Intersection> intersections = new ArrayList<>();
+        ArrayList<Integer> newOrder = new ArrayList<>();
+
+        // sanity check to verify it is not the first intersection to visit
+        if (indexIntersection > 0) {
+
+            // get intersections for future paths
+            intersections.add(listShortestPaths.get(indexIntersection-1).getStartAddress());
+            intersections.add(listShortestPaths.get(indexIntersection+1).getStartAddress());
+            intersections.add(listShortestPaths.get(indexIntersection).getStartAddress());
+            intersections.add(listShortestPaths.get(indexIntersection+1).getEndAddress());
+
+            newOrder.add(listShortestPaths.get(indexIntersection-1).getStartNodeNumber());
+            newOrder.add(listShortestPaths.get(indexIntersection+1).getStartNodeNumber());
+            newOrder.add(listShortestPaths.get(indexIntersection).getStartNodeNumber());
+            newOrder.add(listShortestPaths.get(indexIntersection+1).getEndNodeNumber());
+
+            // remove paths from tour
+            deletedPaths.add(listShortestPaths.get(indexIntersection-1));
+            deletedPaths.add(listShortestPaths.get(indexIntersection));
+            deletedPaths.add(listShortestPaths.get(indexIntersection+1));
+            listShortestPaths.remove(indexIntersection-1);
+            listShortestPaths.remove(indexIntersection-1);
+            listShortestPaths.remove(indexIntersection-1);
+
+
+
+            for (int i=0; i<intersections.size()-1; i++) {
+                // init data for dijkstra
+                ArrayList<Intersection> endPoint = new ArrayList<>();
+                endPoint.add(intersections.get(i+1));
+
+                // compute path
+                ShortestPath path = Dijkstra.compute(allIntersections, endPoint, intersections.get(i)).get(0);
+                path.setStartNodeNumber(newOrder.get(i));
+                path.setEndNodeNumber(newOrder.get(i+1));
+
+                // add path
+                listShortestPaths.add(indexIntersection-1+i, path);
+            }
+
+            updateLength();
+            notifyObservers();
+
+        }
+
+        return deletedPaths;
+    }
+
+    public ArrayList<ShortestPath> moveIntersectionAfter(int indexIntersection, List<Intersection> allIntersections) {
+        System.out.println("Tour.moveIntersectionAfter");
+        System.out.println("indexIntersection = " + indexIntersection);
+
+        ArrayList<ShortestPath> deletedPaths = new ArrayList<>();
+        ArrayList<Intersection> intersections = new ArrayList<>();
+        ArrayList<Integer> newOrder = new ArrayList<>();
+
+        // sanity check to verify it is not the first intersection to visit
+        if (indexIntersection < listShortestPaths.size()-2) {
+
+            // get intersections for future paths
+            intersections.add(listShortestPaths.get(indexIntersection).getStartAddress());
+            intersections.add(listShortestPaths.get(indexIntersection+1).getEndAddress());
+            intersections.add(listShortestPaths.get(indexIntersection).getEndAddress());
+            intersections.add(listShortestPaths.get(indexIntersection+2).getEndAddress());
+
+            newOrder.add(listShortestPaths.get(indexIntersection).getStartNodeNumber());
+            newOrder.add(listShortestPaths.get(indexIntersection+1).getEndNodeNumber());
+            newOrder.add(listShortestPaths.get(indexIntersection).getEndNodeNumber());
+            newOrder.add(listShortestPaths.get(indexIntersection+2).getEndNodeNumber());
+
+
+
+            // remove paths from tour
+            //deletedPaths.add(listShortestPaths.get(indexIntersection-1));
+            //deletedPaths.add(listShortestPaths.get(indexIntersection));
+            //deletedPaths.add(listShortestPaths.get(indexIntersection+1));
+            listShortestPaths.remove(indexIntersection);
+            listShortestPaths.remove(indexIntersection);
+            listShortestPaths.remove(indexIntersection);
+
+
+
+            for (int i=0; i<intersections.size()-1; i++) {
+                // init data for dijkstra
+                ArrayList<Intersection> endPoint = new ArrayList<>();
+                endPoint.add(intersections.get(i+1));
+
+                // compute path
+                ShortestPath path = Dijkstra.compute(allIntersections, endPoint, intersections.get(i)).get(0);
+                path.setStartNodeNumber(newOrder.get(i));
+                path.setEndNodeNumber(newOrder.get(i+1));
+
+                // add path
+                listShortestPaths.add(indexIntersection+i, path);
+            }
+
+            updateLength();
+            notifyObservers();
+
+        }
+
+        return deletedPaths;
+    }
 }
