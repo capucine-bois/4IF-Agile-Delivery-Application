@@ -104,7 +104,7 @@ public class Controller {
         currentState.goBackToTour(tour, this);
     }
 
-    public void leftClickonIcon(int indexIcon) {
+    public void leftClickOnIcon(int indexIcon) {
         currentState.leftClickOnIcon(indexIcon, tour, this);
     }
 
@@ -123,6 +123,10 @@ public class Controller {
 
     public void exitMouseOnTourIntersection(int indexShortestPath) {
         currentState.exitMouseOnTourIntersection(indexShortestPath, tour, window);
+    }
+
+    public void moveMouseOnIcon() {
+        currentState.moveMouseOnIcon(window);
     }
 
     public void deleteRequest(int indexRequest) {

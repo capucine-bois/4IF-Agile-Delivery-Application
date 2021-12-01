@@ -12,24 +12,13 @@ import java.util.ArrayList;
 /**
  * Map loaded state. State of the application when map has been loaded.
  */
-public class MapLoadedState implements State {
-
+public class MapLoadedState extends State {
 
     @Override
     public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        try {
-            XMLDeserializer.loadMap(cityMap);
-        } catch (Exception e) {
-            if(!e.getMessage().equals("Cancel opening file")) {
-                cityMap.getIntersections().clear();
-                window.displayErrorMessage(e.getMessage());
-                controller.setCurrentState(controller.initialState);
-            }
-        } finally {
-            cityMap.notifyObservers();
-        }
+        super.loadMap(cityMap, tour, window, controller);
+        cityMap.notifyObservers();
     }
-
 
     @Override
     public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {

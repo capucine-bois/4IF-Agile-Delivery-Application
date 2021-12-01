@@ -103,12 +103,17 @@ public class XMLDeserializer {
             boolean isKeyPresent = coordonateDictionnary.containsKey(latitude);
             if(isKeyPresent){
                 ArrayList<Double> list = coordonateDictionnary.get(latitude);
+                boolean acceptIntersection = true;
                 for(double longitu : list){
                     if(longitu == longitude) {
-                        throw new ExceptionXML("Duplicate intersection found, latitude = " + latitude + " longitude = " + longitude);
+                        acceptIntersection = false;
                     }
                 }
-                list.add(longitude);
+                if(acceptIntersection){
+                    list.add(longitude);
+                } else {
+                    throw new ExceptionXML("Duplicate intersection found, latitude = " + latitude + " longitude = " + longitude);
+                }
             } else {
                 ArrayList<Double> list = new ArrayList<>();
                 list.add(longitude);
@@ -116,12 +121,13 @@ public class XMLDeserializer {
             }
             // create the intersection object and add it to the city map
             Intersection i1 = new Intersection(index, latitude, longitude);
-            cityMap.addIntersection(i1);
             if(cityMap.containsDictionaryIdKey(idMap)) {
                 throw new ExceptionXML("Duplicate index found for the intersection, index = " + idMap);
+            } else {
+                cityMap.addDictionaryId(idMap,index);
+                cityMap.addIntersection(i1);
+                index++;
             }
-            cityMap.addDictionaryId(idMap,index);
-            index++;
         }
     }
 
@@ -139,28 +145,36 @@ public class XMLDeserializer {
             double length = Double.parseDouble(nodeSegment.item(x).getAttributes().getNamedItem("length").getNodeValue());
             String name = nodeSegment.item(x).getAttributes().getNamedItem("name").getNodeValue();
             long originId = Long.parseLong(nodeSegment.item(x).getAttributes().getNamedItem("origin").getNodeValue());
-            long newOriginId = cityMap.getValueDictionary(originId);
-            long newDestinationId = cityMap.getValueDictionary(destinationId);
-            // find the origin and destination intersections
-            Intersection origin = cityMap.getIntersections().stream().filter(i->i.getId()==newOriginId).findFirst().get();
-            Intersection destination = cityMap.getIntersections().stream().filter(i->i.getId()==newDestinationId).findFirst().get();
-            // check duplicate
-            boolean isKeyPresent = idIntersectionsDictionnary.containsKey(newOriginId);
-            if(isKeyPresent){
-                ArrayList<Long> listDestIds = idIntersectionsDictionnary.get(newOriginId);
-                for(long dest: listDestIds){
-                    if(dest == newDestinationId){
-                        throw new ExceptionXML("The selected map contains a duplicate road which origin identifier is : "+ originId + " and destination identifier is : " + destinationId);
+            long newOriginId;
+            long newDestinationId;
+            if(cityMap.containsDictionaryIdKey(originId) && cityMap.containsDictionaryIdKey(destinationId)){
+                newOriginId = cityMap.getValueDictionary(originId);
+                newDestinationId = cityMap.getValueDictionary(destinationId);
+
+                // find the origin and destination intersections
+                Intersection origin = cityMap.getIntersections().stream().filter(i->i.getId()==newOriginId).findFirst().get();
+                Intersection destination = cityMap.getIntersections().stream().filter(i->i.getId()==newDestinationId).findFirst().get();
+                // check duplicate
+                boolean isKeyPresent = idIntersectionsDictionnary.containsKey(newOriginId);
+                if(isKeyPresent){
+                    ArrayList<Long> listDestIds = idIntersectionsDictionnary.get(newOriginId);
+                    for(long dest: listDestIds){
+                        if(dest == newDestinationId){
+                            throw new ExceptionXML("The selected map contains a duplicate road which origin identifier is : "+ originId + " and destination identifier is : " + destinationId);
+                        }
                     }
+                }else{
+                    ArrayList<Long> listDestinationsId = new ArrayList<>();
+                    listDestinationsId.add(newDestinationId);
+                    idIntersectionsDictionnary.put(newOriginId,listDestinationsId);
                 }
-            }else{
-                ArrayList<Long> listDestinationsId = new ArrayList<>();
-                listDestinationsId.add(newDestinationId);
-                idIntersectionsDictionnary.put(newOriginId,listDestinationsId);
+
+                // create the Segment object and add it to the city map
+                origin.addAdjacentSegment(new Segment(length, name, destination, origin));
+            } else {
+                throw new ExceptionXML("The selected map contains an impossible road which origin identifier is : "+ originId + " and destination identifier is : " + destinationId);
             }
 
-            // create the Segment object and add it to the city map
-            origin.addAdjacentSegment(new Segment(length, name, destination, origin));
         }
     }
 
@@ -211,6 +225,9 @@ public class XMLDeserializer {
      */
     public static void parseXMLRequests(Tour tour, CityMap cityMap, Document document) throws ExceptionXML {
 
+        // Hashmap to detect duplicate
+        HashMap<Long,ArrayList<Long>> listRequest = new HashMap<>();
+
         float[] hsv = new float[3];
         Color initialColor = Color.red;
         Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
@@ -224,20 +241,21 @@ public class XMLDeserializer {
             int deliveryDuration = Integer.parseInt(nodeRequest.item(x).getAttributes().getNamedItem("deliveryDuration").getNodeValue());
             if(!(cityMap.containsDictionaryIdKey(pickupAddressId) && cityMap.containsDictionaryIdKey(deliveryAddressId))){
                 throw new ExceptionXML("One of the pickup or delivery address is not an intersection of the city map.");
-            }
-            long newPickupAddressId = cityMap.getValueDictionary(pickupAddressId);
-            long newDeliveryAddressId = cityMap.getValueDictionary(deliveryAddressId);
-
-            Optional<Intersection> pickupAddress = cityMap.getIntersections().stream().filter(i->i.getId() == newPickupAddressId).findFirst();
-            Optional<Intersection> deliveryAddress = cityMap.getIntersections().stream().filter(i->i.getId() == newDeliveryAddressId).findFirst();
-            if (pickupAddress.isPresent() && deliveryAddress.isPresent()) {
-                Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
-                Request request = new Request(pickupDuration, deliveryDuration, pickupAddress.get(), deliveryAddress.get(), requestColor);
-                tour.addRequest(request);
-                hsv[0] += goldenRatioConjugate;
-                hsv[0] %= 1;
             } else {
-                throw new ExceptionXML("One of the pickup or delivery address is not an intersection of the city map.");
+                long newPickupAddressId = cityMap.getValueDictionary(pickupAddressId);
+                long newDeliveryAddressId = cityMap.getValueDictionary(deliveryAddressId);
+
+                Optional<Intersection> pickupAddress = cityMap.getIntersections().stream().filter(i -> i.getId() == newPickupAddressId).findFirst();
+                Optional<Intersection> deliveryAddress = cityMap.getIntersections().stream().filter(i -> i.getId() == newDeliveryAddressId).findFirst();
+                if (pickupAddress.isPresent() && deliveryAddress.isPresent()) {
+                    Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
+                    Request request = new Request(pickupDuration, deliveryDuration, pickupAddress.get(), deliveryAddress.get(), requestColor);
+                    tour.addRequest(request);
+                    hsv[0] += goldenRatioConjugate;
+                    hsv[0] %= 1;
+                } else {
+                    throw new ExceptionXML("One of the pickup or delivery address is not an intersection of the city map.");
+                }
             }
         }
     }
