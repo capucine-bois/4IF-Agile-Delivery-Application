@@ -1,8 +1,6 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -24,17 +22,34 @@ public class Dijkstra {
      * @return listShortestPathFromOrigin, the list of shortest paths from the origin to the intersection in the list of useful end points
      */
     public static ArrayList<ShortestPath> compute(List<Intersection> listIntersections, ArrayList<Intersection> listUsefulEndPoints, Intersection origin) {
-        ArrayList<ObjectDijkstra> listDijkstra = new ArrayList<>();
-        ArrayList<ShortestPath> listShortestPathFromOrigin = new ArrayList<>();
-        for (Intersection noeud : listIntersections) {
-            ObjectDijkstra object = new ObjectDijkstra(noeud,null,Double.MAX_VALUE,0);
-            listDijkstra.add(object);
+
+
+
+
+        DijkstraNode originNode = new DijkstraNode(origin,0);
+        // Initiate Dijkstra Binary Heap
+        Set<DijkstraNode> settledNodes = new HashSet<>();
+        Set<DijkstraNode> unsettledNodes = new HashSet<>();
+
+
+        unsettledNodes.add(originNode);
+
+
+
+        while (unsettledNodes.size() != 0) {
+            DijkstraNode currentNode = getLowestDistanceNode(unsettledNodes);
+            unsettledNodes.remove(currentNode);
+            for (Map.Entry < DijkstraNode, Double> adjacencyPair:
+                    currentNode.getAdjacentNodes().entrySet()) {
+                DijkstraNode adjacentNode = adjacencyPair.getKey();
+                Double edgeWeight = adjacencyPair.getValue();
+                if (!settledNodes.contains(adjacentNode)) {
+                    calculateMinimumDistance(adjacentNode, edgeWeight, currentNode);
+                    unsettledNodes.add(adjacentNode);
+                }
+            }
+            settledNodes.add(currentNode);
         }
-
-        listDijkstra.stream().filter(x -> x.getIntersection()==origin).findFirst().get().setDist(0.0);
-        listDijkstra.stream().filter(x -> x.getIntersection()==origin).findFirst().get().setColor(1);
-
-        while (listDijkstra.stream().anyMatch(x -> x.getColor() == 1)) {
             ObjectDijkstra noeudGrisAvecDistMin = listDijkstra.stream().filter(x-> x.getColor() == 1).min(Comparator.comparing(ObjectDijkstra::getDist)).get();
             List<ObjectDijkstra> listDest = listDijkstra.stream()
                     .filter(x -> noeudGrisAvecDistMin.getIntersection().getAdjacentSegments()
@@ -84,10 +99,37 @@ public class Dijkstra {
         return listShortestPathFromOrigin;
     }
 
+
+
+
+    private static DijkstraNode getLowestDistanceNode(Set < DijkstraNode > unsettledNodes) {
+        DijkstraNode lowestDistanceNode = null;
+        double lowestDistance = Double.MAX_VALUE;
+        for (DijkstraNode DijkstraNode: unsettledNodes) {
+            double nodeDistance = DijkstraNode.getDistance();
+            if (nodeDistance < lowestDistance) {
+                lowestDistance = nodeDistance;
+                lowestDistanceNode = DijkstraNode;
+            }
+        }
+        return lowestDistanceNode;
+    }
+
+    private static void calculateMinimumDistance(DijkstraNode evaluationNode,
+                                                 Double edgeWeigh, DijkstraNode sourceNode) {
+        Double sourceDistance = sourceNode.getDistance();
+        if (sourceDistance + edgeWeigh < evaluationNode.getDistance()) {
+            evaluationNode.setDistance(sourceDistance + edgeWeigh);
+            LinkedList<DijkstraNode> shortestPath = new LinkedList<>(sourceNode.getShortestPath());
+            shortestPath.add(sourceNode);
+            evaluationNode.setShortestPath(shortestPath);
+        }
+    }
+
     /**
      * Check if the path is shorter
-     * @param noeudInit the node which contains the intersection where the segment begins
-     * @param noeudDest the node which contains the intersection where the segment ends
+     * @param noeudInit the DijkstraNode which contains the intersection where the segment begins
+     * @param noeudDest the DijkstraNode which contains the intersection where the segment ends
      * @param cost the cost of the segment
      * @param listDijkstra the list of all dijkstra objects with their infos (the Intersection with its cost, parent and color)
      */
