@@ -2,6 +2,7 @@ package model;
 
 import observer.Observable;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -127,6 +128,58 @@ public class Tour extends Observable {
     }
 
     /* METHODS */
+
+    public void updateTimes() {
+        // reset calendar
+        try {
+            this.calendar.setTime(parser.parse(departureTime));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        for (ShortestPath path: listShortestPaths) {
+
+            calendar.add(Calendar.SECOND, (int) metersToSeconds(path.getPathLength()));
+            String arrivageTime = parser.format(calendar.getTime());
+
+            System.out.println("EndNode: " + path.getEndNodeNumber());
+
+            int processDuration;
+            if (path.getEndNodeNumber() != 0) {
+                boolean endAddressIsPickup = path.getEndNodeNumber()%2 == 1;
+                int indexRequest = endAddressIsPickup ? path.getEndNodeNumber()/2 : path.getEndNodeNumber()/2 - 1;
+
+                if (endAddressIsPickup) {
+                    // pickup
+                    processDuration = planningRequests.get(indexRequest).getPickupDuration();
+                } else {
+                    // delivery
+                    processDuration = planningRequests.get(indexRequest).getDeliveryDuration();
+                }
+
+                calendar.add(Calendar.SECOND, processDuration);
+                String departureTime = parser.format(calendar.getTime());
+
+                if (endAddressIsPickup) {
+                    // pickup
+                    planningRequests.get(indexRequest).setPickupArrivalTime(arrivageTime);
+                    planningRequests.get(indexRequest).setPickupDepartureTime(departureTime);
+                } else {
+                    // delivery
+                    planningRequests.get(indexRequest).setDeliveryArrivalTime(arrivageTime);
+                    planningRequests.get(indexRequest).setDeliveryDepartureTime(departureTime);
+                }
+            } else {
+                System.out.println("Depot!");
+                arrivalTime = arrivageTime;
+            }
+
+
+        }
+
+
+
+    }
 
     /**
      * Adding a request in the planning requests.
@@ -291,7 +344,6 @@ public class Tour extends Observable {
         }
     }
 
-    // TODO: implement
     public void insertRequest(Request requestToInsert, int indexRequest, List<ShortestPath> paths) {
 
         System.out.println("Tour.insertRequest");
@@ -474,12 +526,13 @@ public class Tour extends Observable {
         }
 
         updateLength();
+        updateTimes();
         notifyObservers();
 
         return deleted;
     }
 
-    public ArrayList<ShortestPath> moveIntersectionBefore(int indexIntersection, List<Intersection> allIntersections) {
+    public void moveIntersectionBefore(int indexIntersection, List<Intersection> allIntersections) {
         System.out.println("Tour.moveIntersectionBefore");
         System.out.println("indexIntersection = " + indexIntersection);
 
@@ -526,11 +579,10 @@ public class Tour extends Observable {
             }
 
             updateLength();
+            updateTimes();
             notifyObservers();
 
         }
-
-        return deletedPaths;
     }
 
 }
