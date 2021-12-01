@@ -42,7 +42,7 @@ public class Tour extends Observable {
     /**
      * A list which is empty if all request of the planning request are in the same scc of the depot. Otherwise it contains all intersections not in the same scc of the depot
      */
-    private ArrayList<Intersection> intersectionsNotInSameSccOfDepot;
+    private ArrayList<Intersection> intersectionsUnreachableFromDepot;
 
     private SimpleDateFormat parser = new SimpleDateFormat("HH:mm");
 
@@ -66,7 +66,7 @@ public class Tour extends Observable {
     public Tour() {
         planningRequests = new ArrayList<>();
         listShortestPaths = new ArrayList<>();
-        intersectionsNotInSameSccOfDepot = new ArrayList<>();
+        intersectionsUnreachableFromDepot = new ArrayList<>();
     }
 
     /* GETTERS */
@@ -92,6 +92,10 @@ public class Tour extends Observable {
 
     public ArrayList<ShortestPath> getListShortestPaths() {
         return listShortestPaths;
+    }
+
+    public ArrayList<Intersection> getIntersectionsUnreachableFromDepot() {
+        return intersectionsUnreachableFromDepot;
     }
 
     public SimpleDateFormat getParser() {
@@ -141,10 +145,17 @@ public class Tour extends Observable {
     }
 
     /**
+     * Fill the list of intersections which are not in the same strongly connected components than depot
+     */
+    public void checkIntersectionsUnreachable(List<Intersection> allIntersectionsList) {
+        intersectionsUnreachableFromDepot = StronglyConnectedComponents.getAllUnreachableIntersections((ArrayList<Intersection>) allIntersectionsList,depotAddress, planningRequests);
+    }
+
+    /**
      * Method which calls dijkstra method, creates a graphe according to the result of dijkstra and then calls the TSP method
      * @param allIntersectionsList the list with all intersections of the map
      */
-    public void computeTour(List<Intersection> allIntersectionsList) {
+    public void  computeTour(List<Intersection> allIntersectionsList) {
         Thread TSPThread = new Thread(() -> {
 
             long startTimeDijkstra = System.currentTimeMillis();
@@ -156,69 +167,53 @@ public class Tour extends Observable {
 
             listUsefulPoints.add(depotAddress);
 
-            StronglyConnectedComponents scc = new StronglyConnectedComponents();
+            for (int i = 0; i < planningRequests.size(); i++) {
+                Intersection pickupReq1 = planningRequests.get(i).getPickupAddress();
+                listUsefulPoints.add(pickupReq1);
+                Intersection deliveryReq1 = planningRequests.get(i).getDeliveryAddress();
+                listUsefulPoints.add(deliveryReq1);
+                // gets the ends points useful for the computing according to the start point
+                ArrayList<Intersection> listUsefulEndPointsPickUp = new ArrayList<>();
+                ArrayList<Intersection> listUsefulEndPointsDelivery = new ArrayList<>();
 
+                listUsefulEndPointsPickUp.add(deliveryReq1);
+                listUsefulEndPointsDelivery.add(depotAddress);
+                // addingpickUp to the endPoints of depot
+                listUsefulEndPointsForDepot.add(pickupReq1);
 
-            intersectionsNotInSameSccOfDepot = scc.getAllStronglyConnectedComponents((ArrayList<Intersection>) allIntersectionsList, depotAddress, planningRequests);
-
-            System.out.println("temps pris par scc = " + (System.currentTimeMillis() - startTimeDijkstra));
-            if (intersectionsNotInSameSccOfDepot.isEmpty()) {
-                for (int i = 0; i < planningRequests.size(); i++) {
-                    Intersection pickupReq1 = planningRequests.get(i).getPickupAddress();
-                    listUsefulPoints.add(pickupReq1);
-                    Intersection deliveryReq1 = planningRequests.get(i).getDeliveryAddress();
-                    listUsefulPoints.add(deliveryReq1);
-                    // gets the ends points useful for the computing according to the start point
-                    ArrayList<Intersection> listUsefulEndPointsPickUp = new ArrayList<>();
-                    ArrayList<Intersection> listUsefulEndPointsDelivery = new ArrayList<>();
-
-                    listUsefulEndPointsPickUp.add(deliveryReq1);
-                    listUsefulEndPointsDelivery.add(depotAddress);
-                    // addingpickUp to the endPoints of depot
-                    listUsefulEndPointsForDepot.add(pickupReq1);
-
-                    for (int j = 0; j < planningRequests.size(); j++) {
-                        Intersection pickupReq2 = planningRequests.get(j).getPickupAddress();
-                        Intersection deliveryReq2 = planningRequests.get(j).getDeliveryAddress();
-                        if (i != j) {
-                            listUsefulEndPointsPickUp.add(pickupReq2);
-                            listUsefulEndPointsPickUp.add(deliveryReq2);
-                            listUsefulEndPointsDelivery.add(pickupReq2);
-                            listUsefulEndPointsDelivery.add(deliveryReq2);
-                        }
+                for (int j = 0; j < planningRequests.size(); j++) {
+                    Intersection pickupReq2 = planningRequests.get(j).getPickupAddress();
+                    Intersection deliveryReq2 = planningRequests.get(j).getDeliveryAddress();
+                    if (i != j) {
+                        listUsefulEndPointsPickUp.add(pickupReq2);
+                        listUsefulEndPointsPickUp.add(deliveryReq2);
+                        listUsefulEndPointsDelivery.add(pickupReq2);
+                        listUsefulEndPointsDelivery.add(deliveryReq2);
                     }
-                    ArrayList<ShortestPath> shortestPathsFromPickUp = Dijkstra.compute(allIntersectionsList, listUsefulEndPointsPickUp, pickupReq1);
-                    ArrayList<ShortestPath> shortestPathsFromDelivery = Dijkstra.compute(allIntersectionsList, listUsefulEndPointsDelivery, deliveryReq1);
-
-                    listNodes.add(new Node(pickupReq1, shortestPathsFromPickUp, i + 1));
-                    listNodes.add(new Node(deliveryReq1, shortestPathsFromDelivery, i + 2));
-
-
                 }
+                ArrayList<ShortestPath> shortestPathsFromPickUp = Dijkstra.compute(allIntersectionsList, listUsefulEndPointsPickUp, pickupReq1);
+                ArrayList<ShortestPath> shortestPathsFromDelivery = Dijkstra.compute(allIntersectionsList, listUsefulEndPointsDelivery, deliveryReq1);
 
-                listNodes.add(0, new Node(depotAddress, Dijkstra.compute(allIntersectionsList, listUsefulEndPointsForDepot, depotAddress), 0));
-
-
-                // check if the intersection in the planning request are in the same component of the graph
-
-
-                // print the time to compute Dijkstra
-                System.out.println("Dijkstra finished in "
-                        + (System.currentTimeMillis() - startTimeDijkstra) + "ms\n");
-
-                long startTime = System.currentTimeMillis();
-                TSP tsp = new TSP3();
-                Graph g = new CompleteGraph(listNodes, this);
-
-                // Run Tour
-                tsp.searchSolution(1000000, g, this);
-
+                listNodes.add(new Node(pickupReq1, shortestPathsFromPickUp, i + 1));
+                listNodes.add(new Node(deliveryReq1, shortestPathsFromDelivery, i + 2));
             }
+
+            listNodes.add(0, new Node(depotAddress, Dijkstra.compute(allIntersectionsList, listUsefulEndPointsForDepot, depotAddress), 0));
+
+
+            // print the time to compute Dijkstra
+            System.out.println("Dijkstra finished in "
+                    + (System.currentTimeMillis() - startTimeDijkstra) + "ms\n");
+
+            long startTime = System.currentTimeMillis();
+            TSP tsp = new TSP3();
+            Graph g = new CompleteGraph(listNodes, this);
+
+            // Run Tour
+            tsp.searchSolution(1000000, g, this);
         });
         TSPThread.start();
-
         System.out.println("finish compute");
-
     }
 
     public void updateTourInformation(ArrayList<Node> listNodes, long startTime, TSP tsp) {
@@ -297,4 +292,247 @@ public class Tour extends Observable {
             this.tourLength += p.getPathLength();
         }
     }
+
+    // TODO: implement
+    public void insertRequest(Request requestToInsert, int indexRequest, List<ShortestPath> paths) {
+
+        System.out.println("Tour.insertRequest");
+
+        for (ShortestPath path: listShortestPaths) {
+            System.out.println(path.getStartAddress().getId() + " -> " + path.getEndAddress().getId()); // debug
+        }
+
+        // get TSP values of deleted points
+        ArrayList<Integer> intersectionsToAdd = new ArrayList<>();
+        if (paths.size() == 3) {
+            // deleted points are following
+            intersectionsToAdd.add(paths.get(0).getEndNodeNumber());
+            intersectionsToAdd.add(paths.get(1).getEndNodeNumber());
+        } else {
+            // deleted points are not following
+            intersectionsToAdd.add(paths.get(0).getEndNodeNumber());
+            intersectionsToAdd.add(paths.get(2).getEndNodeNumber());
+        }
+
+
+        // increase TSP node values
+        for (ShortestPath path: listShortestPaths) {
+            int currentStartNode = path.getStartNodeNumber();
+            if (currentStartNode >= Collections.min(intersectionsToAdd)) {
+                path.setStartNodeNumber(currentStartNode+intersectionsToAdd.size());
+            }
+
+            int currentEndNode = path.getEndNodeNumber();
+            if (currentEndNode >= Collections.min(intersectionsToAdd)) {
+                path.setEndNodeNumber(currentEndNode+intersectionsToAdd.size());
+            }
+        }
+
+        int i = 0;
+        while (i<listShortestPaths.size()) {
+            ShortestPath path = listShortestPaths.get(i);
+            if (!paths.isEmpty() && path.getStartAddress().equals(paths.get(0).getStartAddress())) {
+                listShortestPaths.remove(i);
+                if (paths.size() == 3) {
+                    // add all paths
+                    listShortestPaths.add(i, paths.get(0));
+                    listShortestPaths.add(i+1, paths.get(1));
+                    listShortestPaths.add(i+2, paths.get(2));
+                    paths.clear();
+                } else {
+                    // add only two paths
+                    listShortestPaths.add(i, paths.get(0));
+                    listShortestPaths.add(i+1, paths.get(1));
+                    paths.remove(0);
+                    paths.remove(0);
+                }
+            } else {
+                i++;
+            }
+        }
+
+
+        // testing purpose
+        for (ShortestPath p: listShortestPaths) {
+            System.out.print(p.getEndNodeNumber() + " ");
+        }
+        System.out.println("");
+
+
+        for (ShortestPath path: listShortestPaths) {
+            System.out.println(path.getStartAddress().getId() + " -> " + path.getEndAddress().getId()); // debug
+        }
+
+
+        // insert request in planning
+        planningRequests.add(requestToInsert);
+        updateLength();
+        notifyObservers();
+
+
+    }
+
+    public ArrayList<ShortestPath> removeRequest(Request requestToDelete, int indexRequest, List<Intersection> allIntersections) {
+
+        for (ShortestPath path: listShortestPaths) {
+            System.out.println(path.getStartAddress().getId() + " -> " + path.getEndAddress().getId()); // debug
+        }
+
+        ArrayList<Intersection> intersections = new ArrayList<Intersection>();
+        ArrayList<ShortestPath> deleted = new ArrayList<ShortestPath>();
+
+        // getting TSP order
+        ArrayList<Integer> order = new ArrayList<Integer>();
+        order.add(0);
+        intersections.add(getDepotAddress());
+        for (ShortestPath path: listShortestPaths) {
+            order.add(path.getEndNodeNumber());
+            intersections.add(path.getEndAddress());
+        }
+
+        // remove request
+        planningRequests.remove(indexRequest);
+
+        // remove paths starting or ending by a point of the request to delete
+        int i = 0;
+        ArrayList<Integer> intersectionToRemove = new ArrayList<Integer>();
+        while (i<listShortestPaths.size()) {
+            ShortestPath path = listShortestPaths.get(i);
+            if (path.getEndAddress().equals(requestToDelete.getPickupAddress()) ||
+                    path.getEndAddress().equals(requestToDelete.getDeliveryAddress())) {
+                if (!intersectionToRemove.contains(path.getEndNodeNumber())) {
+                    intersectionToRemove.add(path.getEndNodeNumber());
+                }
+                deleted.add(listShortestPaths.get(i));
+                listShortestPaths.remove(i);
+            } else if (path.getStartAddress().equals(requestToDelete.getPickupAddress()) ||
+                    path.getStartAddress().equals(requestToDelete.getDeliveryAddress())) {
+                if (!intersectionToRemove.contains(path.getStartNodeNumber())) {
+                    intersectionToRemove.add(path.getStartNodeNumber());
+                }
+                deleted.add(listShortestPaths.get(i));
+                listShortestPaths.remove(i);
+            } else {
+                i++;
+            }
+        }
+
+        System.out.println("ToDelete: " + intersectionToRemove);
+
+        boolean skipped = false;
+        boolean alreadyAdded = false;
+        i = 1;
+        while (i<order.size()-1 && !skipped) {
+            if (intersectionToRemove.contains(order.get(i))) {
+
+                // check if points removed are following
+                if (intersectionToRemove.contains(order.get(i+1))) {
+                    skipped = true;
+                }
+
+                // find intersections of new path
+                int startNode = order.get(i-1);
+                int endNode;
+                Intersection previousIntersection = intersections.get(i-1);
+                Intersection nextIntersection;
+                if (skipped) {
+                    endNode = order.get(i+2);
+                    nextIntersection = intersections.get(i+2);
+                } else {
+                    endNode = order.get(i+1);
+                    nextIntersection = intersections.get(i+1);
+                }
+
+                // create path and insert
+                ArrayList<Intersection> endPoints = new ArrayList<Intersection>();
+                endPoints.add(nextIntersection);
+                ShortestPath newPath = Dijkstra.compute(allIntersections,
+                        endPoints, previousIntersection).get(0);
+                //ShortestPath newPath = new ShortestPath(0,new ArrayList< Segment >(), previousIntersection, nextIntersection);
+                newPath.setStartNodeNumber(startNode);
+                newPath.setEndNodeNumber(endNode);
+                if (alreadyAdded) {
+                    listShortestPaths.add(i-2, newPath);
+                } else {
+                    listShortestPaths.add(i-1, newPath);
+                }
+                alreadyAdded = true;
+
+            }
+            i++;
+        }
+
+        // decrease node numbers
+        for (ShortestPath path: listShortestPaths) {
+            int currentStartNode = path.getStartNodeNumber();
+            if (currentStartNode > Collections.min(intersectionToRemove)) {
+                path.setStartNodeNumber(currentStartNode-intersectionToRemove.size());
+            }
+
+            int currentEndNode = path.getEndNodeNumber();
+            if (currentEndNode > Collections.min(intersectionToRemove)) {
+                path.setEndNodeNumber(currentEndNode-intersectionToRemove.size());
+            }
+        }
+
+        updateLength();
+        notifyObservers();
+
+        return deleted;
+    }
+
+    public ArrayList<ShortestPath> moveIntersectionBefore(int indexIntersection, List<Intersection> allIntersections) {
+        System.out.println("Tour.moveIntersectionBefore");
+        System.out.println("indexIntersection = " + indexIntersection);
+
+        ArrayList<ShortestPath> deletedPaths = new ArrayList<>();
+        ArrayList<Intersection> intersections = new ArrayList<>();
+        ArrayList<Integer> newOrder = new ArrayList<>();
+
+        // sanity check to verify it is not the first intersection to visit
+        if (indexIntersection > 0 && indexIntersection < listShortestPaths.size()-1) {
+
+            // get intersections for future paths
+            intersections.add(listShortestPaths.get(indexIntersection-1).getStartAddress());
+            intersections.add(listShortestPaths.get(indexIntersection+1).getStartAddress());
+            intersections.add(listShortestPaths.get(indexIntersection).getStartAddress());
+            intersections.add(listShortestPaths.get(indexIntersection+1).getEndAddress());
+
+            newOrder.add(listShortestPaths.get(indexIntersection-1).getStartNodeNumber());
+            newOrder.add(listShortestPaths.get(indexIntersection+1).getStartNodeNumber());
+            newOrder.add(listShortestPaths.get(indexIntersection).getStartNodeNumber());
+            newOrder.add(listShortestPaths.get(indexIntersection+1).getEndNodeNumber());
+
+            // remove paths from tour
+            deletedPaths.add(listShortestPaths.get(indexIntersection-1));
+            deletedPaths.add(listShortestPaths.get(indexIntersection));
+            deletedPaths.add(listShortestPaths.get(indexIntersection+1));
+            listShortestPaths.remove(indexIntersection-1);
+            listShortestPaths.remove(indexIntersection-1);
+            listShortestPaths.remove(indexIntersection-1);
+
+
+
+            for (int i=0; i<intersections.size()-1; i++) {
+                // init data for dijkstra
+                ArrayList<Intersection> endPoint = new ArrayList<>();
+                endPoint.add(intersections.get(i+1));
+
+                // compute path
+                ShortestPath path = Dijkstra.compute(allIntersections, endPoint, intersections.get(i)).get(0);
+                path.setStartNodeNumber(newOrder.get(i));
+                path.setEndNodeNumber(newOrder.get(i+1));
+
+                // add path
+                listShortestPaths.add(indexIntersection-1+i, path);
+            }
+
+            updateLength();
+            notifyObservers();
+
+        }
+
+        return deletedPaths;
+    }
+
 }

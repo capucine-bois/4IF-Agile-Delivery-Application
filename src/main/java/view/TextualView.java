@@ -23,10 +23,16 @@ public class TextualView extends JPanel implements Observer {
     protected static final String GO_BACK_TO_TOUR = "Back to tour";
     protected static final String PATH_DETAILS = "Show path";
     protected static final String DELETE_REQUEST = "Delete request";
+    protected static final String GO_UP = "Go up";
+    protected static final String GO_DOWN = "Go down";
+
     protected static List<JPanel> requestPanels;
     protected static List<JPanel> tourIntersectionsPanels;
     protected static List<JButton> pathDetailsButtons;
     protected static List<JButton> deleteRequestButtons;
+    protected static List<JButton> goUpButtons;
+    protected static List<JButton> goDownButtons;
+
     private Tour tour;
     private final int gap = 20;
     private final int colorWidth = 10;
@@ -59,6 +65,8 @@ public class TextualView extends JPanel implements Observer {
         tourIntersectionsPanels = new ArrayList<>();
         pathDetailsButtons = new ArrayList<>();
         deleteRequestButtons = new ArrayList<>();
+        goUpButtons = new ArrayList<>();
+        goDownButtons = new ArrayList<>();
         mouseListener.setTextualView(this);
         this.mouseListener = mouseListener;
         this.buttonListener = buttonListener;
@@ -123,6 +131,8 @@ public class TextualView extends JPanel implements Observer {
         tourMainPanel.setBackground(Constants.COLOR_4);
         pathDetailsButtons.clear();
         tourIntersectionsPanels.clear();
+        goDownButtons.clear();
+        goUpButtons.clear();
         Optional<ShortestPath> optionalShortestPath = tour.getListShortestPaths().stream().filter(ShortestPath::isSelected).findFirst();
         if (optionalShortestPath.isPresent()) {
             tourMainPanel.setLayout(new BorderLayout());
@@ -135,7 +145,7 @@ public class TextualView extends JPanel implements Observer {
             displayDepotPoint(tourMainPanel, tour.getDepartureTime(), true);
             for (int i=0; i<tour.getListShortestPaths().size(); i++) {
                 displayShortestPath(tourMainPanel, tour.getListShortestPaths().get(i), false);
-                displayPoint(tourMainPanel, tour.getListShortestPaths().get(i), false);
+                displayPoint(tourMainPanel, tour.getListShortestPaths().get(i), false, i);
             }
             displayDepotPoint(tourMainPanel, tour.getArrivalTime(), false);
             tourMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
@@ -163,10 +173,10 @@ public class TextualView extends JPanel implements Observer {
         if (indexShortestPath == 0) {
             displayDepotPoint(pathInformation, tour.getDepartureTime(), true);
         } else {
-            displayPoint(pathInformation, tour.getListShortestPaths().get(indexShortestPath - 1), true);
+            displayPoint(pathInformation, tour.getListShortestPaths().get(indexShortestPath - 1), true, -1);
         }
         displayShortestPath(pathInformation, shortestPath, true);
-        displayPoint(pathInformation, shortestPath, true);
+        displayPoint(pathInformation, shortestPath, true, -1);
         if (indexShortestPath == tour.getListShortestPaths().size() - 1) {
             displayDepotPoint(pathInformation, tour.getArrivalTime(), false);
         }
@@ -199,7 +209,7 @@ public class TextualView extends JPanel implements Observer {
         displayInformation(parentPanel, depotInformation, Color.black, null, false);
     }
 
-    private void displayPoint(JPanel parentPanel, ShortestPath shortestPath, boolean segmentDetails) {
+    private void displayPoint(JPanel parentPanel, ShortestPath shortestPath, boolean segmentDetails, int index) {
         Map<String, String> pointsInformation = new HashMap<>();
         if (shortestPath.getEndNodeNumber() != 0) {
             boolean endAddressIsPickup = shortestPath.getEndNodeNumber()%2 == 1;
@@ -221,6 +231,35 @@ public class TextualView extends JPanel implements Observer {
                     pointSelected = request.isDeliverySelected();
                 }
                 displayInformation(parentPanel, pointsInformation, request.getColor(), segmentDetails ? null : tourIntersectionsPanels, pointSelected && !segmentDetails);
+
+                // check if intersection is first
+                if (index != 0) {
+                    JButton goUp = new JButton(GO_UP);
+                    try {
+                        window.setStyle(goUp);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    goUp.setPreferredSize(new Dimension(goUp.getPreferredSize().width, 30));
+                    goUpButtons.add(goUp);
+                    goUp.addActionListener(buttonListener);
+                    parentPanel.add(goUp, BorderLayout.LINE_END);
+                }
+
+                // check if intersection is last
+                if (index < tour.getListShortestPaths().size() -2) {
+                    JButton goDown = new JButton(GO_DOWN);
+                    try {
+                        window.setStyle(goDown);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    goDown.setPreferredSize(new Dimension(goDown.getPreferredSize().width, 30));
+                    goDownButtons.add(goDown);
+                    goDown.addActionListener(buttonListener);
+                    parentPanel.add(goDown, BorderLayout.LINE_END);
+                }
+
 
             } catch (Exception ignored) {}
         }

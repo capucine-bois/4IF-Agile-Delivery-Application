@@ -1,12 +1,10 @@
 package controller;
 
-import model.CityMap;
-import model.Request;
-import model.ShortestPath;
-import model.Tour;
+import model.*;
 import view.Window;
 import xml.XMLDeserializer;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -62,5 +60,15 @@ public class TourComputedState extends State {
     @Override
     public void moveMouseOnIcon(Window window) {
         window.setHandCursorOnIcon();
+    }
+
+    @Override
+    public void moveIntersectionBefore(ListOfCommands l, Tour tour, int indexRequest, List<Intersection> allIntersections) {
+        l.add(new MoveRequestBeforeCommand(tour, indexRequest, allIntersections));
+    }
+
+    @Override
+    public void moveIntersectionAfter(ListOfCommands l, Tour tour, int indexRequest, List<Intersection> allIntersections) {
+        l.add(new MoveRequestAfterCommand(tour, indexRequest, allIntersections));
     }
 }

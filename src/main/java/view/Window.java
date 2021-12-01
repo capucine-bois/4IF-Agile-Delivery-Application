@@ -19,6 +19,8 @@ public class Window extends JFrame {
     protected final static String LOAD_MAP = "Load a map";
     protected static final String LOAD_REQUEST = "Load a request planning";
     protected static final String COMPUTE_TOUR = "Compute the tour";
+    protected static final String UNDO = "Undo";
+
     private ArrayList<JButton> buttons;
     private JPanel header;
     private GraphicalView graphicalView;
@@ -31,8 +33,9 @@ public class Window extends JFrame {
     private ButtonListener buttonListener;
     private MouseListener mouseListener;
     private ComponentListener componentListener;
+    private KeyboardListener keyboardListener;
 
-    private final String[] buttonTexts = new String[]{LOAD_MAP, LOAD_REQUEST, COMPUTE_TOUR};
+    private final String[] buttonTexts = new String[]{LOAD_MAP, LOAD_REQUEST, COMPUTE_TOUR, UNDO};
     private boolean[] defaultButtonStates = new boolean[]{true, false, false};
 
     /**
@@ -50,6 +53,8 @@ public class Window extends JFrame {
         graphicalView = new GraphicalView(cityMap, tour, this, mouseListener);
         textualView = new TextualView(tour, this, mouseListener, buttonListener);
         popUpView = new PopUpView(this);
+        keyboardListener = new KeyboardListener(controller);
+        addKeyListener(keyboardListener);
         this.cityMap = cityMap;
         this.tour = tour;
         createHeader();
@@ -141,8 +146,12 @@ public class Window extends JFrame {
      */
     public void resetComponentsState() {
         // buttons
-        for (int i=0; i<defaultButtonStates.length; i++) {
-            buttons.get(i).setEnabled(defaultButtonStates[i]);
+        for (int i=0; i<buttons.size(); i++) {
+            if (i < defaultButtonStates.length) {
+                buttons.get(i).setEnabled(defaultButtonStates[i]);
+            } else {
+                buttons.get(i).setEnabled(true); // by default, enable button
+            }
         }
         // city map zoom
         graphicalView.setCanZoom(true);

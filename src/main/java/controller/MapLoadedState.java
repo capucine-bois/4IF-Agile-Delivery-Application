@@ -24,6 +24,7 @@ public class MapLoadedState extends State {
     public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
         try {
             XMLDeserializer.loadRequests(tour, cityMap);
+            tour.checkIntersectionsUnreachable(cityMap.getIntersections());
             controller.setCurrentState(controller.requestsLoadedState);
             tour.notifyObservers();
             window.setEnabledRequests(true);

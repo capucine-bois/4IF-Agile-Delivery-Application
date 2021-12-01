@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 
 import controller.Controller;
 
-import javax.sound.midi.Soundbank;
 import javax.swing.*;
 
 /**
@@ -46,12 +45,35 @@ public class ButtonListener implements ActionListener {
             case Window.LOAD_MAP -> controller.loadMap();
             case Window.LOAD_REQUEST -> controller.loadRequests();
             case Window.COMPUTE_TOUR -> controller.computeTour();
+            case Window.UNDO -> controller.undo();
             case TextualView.REQUESTS_HEADER -> controller.showRequestsPanel();
             case TextualView.TOUR_HEADER -> controller.showTourPanel();
             case TextualView.GO_BACK_TO_TOUR -> controller.goBackToTour();
             case TextualView.PATH_DETAILS -> controller.leftClickOnShortestPath(TextualView.pathDetailsButtons.indexOf((JButton) e.getSource()));
             case TextualView.DELETE_REQUEST -> controller.deleteRequest(TextualView.deleteRequestButtons.indexOf((JButton) e.getSource()));
+            case TextualView.GO_UP -> controller.moveIntersectionBefore(TextualView.goUpButtons.indexOf((JButton) e.getSource())+1);
+            case TextualView.GO_DOWN -> controller.moveIntersectionAfter(TextualView.goDownButtons.indexOf((JButton) e.getSource()));
         }
+    }
+
+    /**
+     * Launch the tour computing
+     */
+    private void computeTour() {
+        SwingWorker sw = new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                controller.computeTour();
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                window.hideLoader();
+            }
+        };
+        window.showLoader();
+        sw.execute();
     }
 
 }
