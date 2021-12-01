@@ -21,6 +21,8 @@ public class Window extends JFrame {
     protected static final String COMPUTE_TOUR = "Compute the tour";
     protected static final String STOP_COMPUTATION = "Stop the computation";
     protected static final String UNDO = "Undo";
+    protected static final String ADD_REQUEST = "Add a request";
+
 
     private ArrayList<JButton> buttons;
     private JPanel header;
@@ -38,8 +40,8 @@ public class Window extends JFrame {
     private ComponentListener componentListener;
     private KeyboardListener keyboardListener;
 
-    private final String[] buttonTexts = new String[]{LOAD_MAP, LOAD_REQUEST, COMPUTE_TOUR, UNDO};
-    private boolean[] defaultButtonStates = new boolean[]{true, false, false, false};
+    private final String[] buttonTexts = new String[]{LOAD_MAP, LOAD_REQUEST, COMPUTE_TOUR, ADD_REQUEST, UNDO};
+    private boolean[] defaultButtonStates = new boolean[]{true, false, false, false, false};
 
     /**
      * Complete constructor
@@ -300,6 +302,14 @@ public class Window extends JFrame {
     }
 
     /**
+     * Change state of the "Add Request" button
+     * @param state new state
+     */
+    public void setAddRequestButtonState(boolean state) {
+        buttons.get(buttons.size()-2).setEnabled(state);
+    }
+
+    /**
      * Show computing panel when TSP computation starts.
      */
     public void showComputingPanel() {
@@ -314,4 +324,5 @@ public class Window extends JFrame {
         graphicalPanel.remove(computingPanel);
         revalidate();
     }
+
 }

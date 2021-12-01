@@ -53,13 +53,13 @@ public class Controller {
         System.out.println("state = " + state);
         this.currentState = state;
         if (state == initialState) {
-            window.setDefaultButtonStates(new boolean[]{true, false, false});
+            window.setDefaultButtonStates(new boolean[]{true, false, false,false});
         } else if (state == mapLoadedState || state == tourComputedState ||
                 state == pathDetailsComputedState || state == requestsComputedState ||
                 state == selectedIntersectionState || state == selectedRequestState){
-            window.setDefaultButtonStates(new boolean[]{true, true, false});
+            window.setDefaultButtonStates(new boolean[]{true, true, false,true});
         } else if (state == tourComputingState || state == requestsComputingState) {
-            window.setDefaultButtonStates(new boolean[]{false, false, false});
+            window.setDefaultButtonStates(new boolean[]{false, false, false,false});
         } else {
             window.setDefaultButtonStates(new boolean[]{true, true, true});
         }
@@ -74,6 +74,7 @@ public class Controller {
      */
     public void loadMap() {
         currentState.loadMap(cityMap, tour, window, this);
+        window.setAddRequestButtonState(false);
     }
 
     /**
@@ -82,6 +83,7 @@ public class Controller {
      */
     public void loadRequests() {
         currentState.loadRequests(cityMap, tour, window, this);
+        window.setAddRequestButtonState(false);
     }
 
     /**
@@ -185,6 +187,18 @@ public class Controller {
     public void deleteRequest(int indexRequest) {
         Request requestToDelete = tour.getPlanningRequests().get(indexRequest);
         listOfCommands.add(new DeleteCommand(tour, requestToDelete, indexRequest, cityMap.getIntersections()));
+        window.setUndoButtonState(true);
+        window.setAddRequestButtonState(true);
+
+    }
+
+    /**
+     * Add a request in an already computed tour.
+     *
+     */
+    public void addRequest() {
+        //TODO implement
+        //listOfCommands.add(new AddCommand(tour,requestToAdd));
         window.setUndoButtonState(true);
     }
 
