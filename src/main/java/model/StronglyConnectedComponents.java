@@ -19,7 +19,7 @@ public class StronglyConnectedComponents {
      * @param listIntersection the list of all intersections
      * @return true if there are in the same strongly connected part, false otherwise
      */
-    public ArrayList<Intersection> getAllStronglyConnectedComponents(ArrayList<Intersection> listIntersection, Intersection depot, ArrayList<Request> planning) {
+    public static ArrayList<Intersection> getAllUnreachableIntersections(ArrayList<Intersection> listIntersection, Intersection depot, ArrayList<Request> planning) {
 
         ArrayList<Intersection> intersectionsNotWithDepot = new ArrayList<>();
         ArrayList<Integer> [] listVertex = new ArrayList[listIntersection.size()];
@@ -59,7 +59,7 @@ public class StronglyConnectedComponents {
      * @param intersectionsNotWithDepot the list we fill with all intersection present in the planning but not in scc
      * @param planning the planning request
      */
-    private void checkIntersectionsWithDepot(ArrayList<Integer> scc, ArrayList<Intersection> intersectionsNotWithDepot, ArrayList<Request> planning) {
+    private static void checkIntersectionsWithDepot(ArrayList<Integer> scc, ArrayList<Intersection> intersectionsNotWithDepot, ArrayList<Request> planning) {
         for(Request req : planning) {
             if(!scc.contains((int)req.getDeliveryAddress().getId()))
                 intersectionsNotWithDepot.add(req.getDeliveryAddress());
@@ -75,7 +75,7 @@ public class StronglyConnectedComponents {
      * @param color an array with the color of the vertex
      * @return a list of dijkstra object (thus each will have his parent)
      */
-    public Integer[] foretDFSnum(ArrayList<Intersection> listIntersections, ArrayList<Integer> [] listVertex, Integer [] color) {
+    public static Integer[] foretDFSnum(ArrayList<Intersection> listIntersections, ArrayList<Integer> [] listVertex, Integer [] color) {
         Integer [] num = new Integer[listIntersections.size()];
         int index = 0;
         for(Intersection intersection : listIntersections) {
@@ -103,7 +103,7 @@ public class StronglyConnectedComponents {
      * @param cpt the number to put in num
      * @param num the array with the order of transition to black
      */
-    public int DFSrecNUM(List<Integer> [] listVertex, Integer [] color, int origin, Integer [] num, int cpt) {
+    public static int DFSrecNUM(List<Integer> [] listVertex, Integer [] color, int origin, Integer [] num, int cpt) {
         color[origin] = 1;
         for(Integer successor : listVertex[origin]) {
             if(color[successor] == 0) {
@@ -123,7 +123,7 @@ public class StronglyConnectedComponents {
      * @param listIntersection
      * @return an array of list of successor
      */
-    public List<Integer>[] getTranspose(ArrayList<Intersection> listIntersection)
+    public static List<Integer>[] getTranspose(ArrayList<Intersection> listIntersection)
     {
         int V = listIntersection.size();
         List<Integer>[] g = new List[V];
@@ -141,7 +141,7 @@ public class StronglyConnectedComponents {
      * @param vertex
      * @param color the array with color of each vertex
      */
-    public void DFSrec(List<Integer> [] graph, int vertex, Integer [] color,  Map<Integer, Integer> B) {
+    public static void DFSrec(List<Integer> [] graph, int vertex, Integer [] color,  Map<Integer, Integer> B) {
         color[vertex] = 1;
         B.replace(vertex, 1);
         for(int i=0; i<graph[vertex].size(); i++) {

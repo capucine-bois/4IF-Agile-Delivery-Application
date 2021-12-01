@@ -155,10 +155,9 @@ public class Tour extends Observable {
 
         listUsefulPoints.add(depotAddress);
 
-        StronglyConnectedComponents scc = new StronglyConnectedComponents();
 
 
-        intersectionsNotInSameSccOfDepot = scc.getAllStronglyConnectedComponents((ArrayList<Intersection>) allIntersectionsList, depotAddress, planningRequests);
+        intersectionsNotInSameSccOfDepot = StronglyConnectedComponents.getAllUnreachableIntersections((ArrayList<Intersection>) allIntersectionsList, depotAddress, planningRequests);
 
         System.out.println("temps pris par scc = " + (System.currentTimeMillis() - startTimeDijkstra));
         if(intersectionsNotInSameSccOfDepot.isEmpty()) {
