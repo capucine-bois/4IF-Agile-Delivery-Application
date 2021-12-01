@@ -213,26 +213,11 @@ public class Tour extends Observable {
             Object lock = new Object();
 
             Thread TSPThread = new Thread(() -> {
-                synchronized (lock) {
                     // Run Tour
-                    tsp.searchSolution(1000000, g, lock);
-                }
+                    tsp.searchSolution(1000000, g, this);
             });
 
-            synchronized (lock) {
-                try {
-                    TSPThread.start();
-                    while (TSPThread.isAlive()) {
-                        lock.wait();
-                        Thread.sleep(1000);
-                        updateTourInformation(listNodes, startTime, tsp);
-                        Thread.sleep(1000);
-                        lock.notify();
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+            TSPThread.start();
 
             System.out.println("finish compute");
 
@@ -240,12 +225,9 @@ public class Tour extends Observable {
 
         }
 
-
-
-
     }
 
-    private void updateTourInformation(ArrayList<Node> listNodes, long startTime, TSP tsp) {
+    public void updateTourInformation(ArrayList<Node> listNodes, long startTime, TSP tsp) {
         this.setTourLength(tsp.getSolutionCost());
         // print the cost of the solution and the TSP time
         System.out.print("Solution of cost "+this.tourLength+" found in "
@@ -258,6 +240,7 @@ public class Tour extends Observable {
         }
         System.out.println("0");
 
+        listShortestPaths.clear();
         for(int i=0; i< intersectionsOrder.length-1; i++) {
             Intersection end  = listNodes.get(intersectionsOrder[i+1]).getIntersection();
             ShortestPath shortestPathToAdd = listNodes.get(intersectionsOrder[i]).getListArcs().stream().filter(x -> x.getEndAddress()==end).findFirst().get();
