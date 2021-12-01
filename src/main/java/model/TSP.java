@@ -11,7 +11,7 @@ public interface TSP {
      * @param timeLimit
      * @param g
      */
-    public void searchSolution(int timeLimit, Graph g);
+    public void searchSolution(int timeLimit, Graph g, Tour tour);
 
     /**
      * @param i

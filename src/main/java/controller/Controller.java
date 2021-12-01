@@ -24,6 +24,8 @@ public class Controller {
     protected final InitialState initialState = new InitialState();
     protected final MapLoadedState mapLoadedState = new MapLoadedState();
     protected final RequestsLoadedState requestsLoadedState = new RequestsLoadedState();
+    protected final TourComputingState tourComputingState = new TourComputingState();
+    protected final RequestsComputingState requestsComputingState = new RequestsComputingState();
     protected final TourComputedState tourComputedState = new TourComputedState();
     protected final RequestsComputedState requestsComputedState = new RequestsComputedState();
     protected final PathDetailsComputedState pathDetailsComputedState = new PathDetailsComputedState();
@@ -56,6 +58,8 @@ public class Controller {
                 state == pathDetailsComputedState || state == requestsComputedState ||
                 state == selectedIntersectionState || state == selectedRequestState){
             window.setDefaultButtonStates(new boolean[]{true, true, false});
+        } else if (state == tourComputingState || state == requestsComputingState) {
+            window.setDefaultButtonStates(new boolean[]{false, false, false});
         } else {
             window.setDefaultButtonStates(new boolean[]{true, true, true});
         }
@@ -152,5 +156,9 @@ public class Controller {
     public void moveIntersectionAfter(int indexIntersection) {
         currentState.moveIntersectionAfter(listOfCommands, tour, indexIntersection, cityMap.getIntersections());
         window.setUndoButtonState(true);
+    }
+
+    public void stopTourComputation() {
+        currentState.stopTourComputation(tour);
     }
 }

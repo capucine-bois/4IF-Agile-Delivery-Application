@@ -59,6 +59,8 @@ public class Tour extends Observable {
      */
     private ArrayList<ShortestPath> listShortestPaths;
 
+    private boolean tourComputed;
+
     /* CONSTRUCTORS */
 
     /**
@@ -68,6 +70,7 @@ public class Tour extends Observable {
         planningRequests = new ArrayList<>();
         listShortestPaths = new ArrayList<>();
         intersectionsUnreachableFromDepot = new ArrayList<>();
+        tourComputed = false;
     }
 
     /* GETTERS */
@@ -107,6 +110,9 @@ public class Tour extends Observable {
         return speed;
     }
 
+    public boolean isTourComputed() {
+        return tourComputed;
+    }
     /* SETTERS */
 
     public void setTourLength(double tourLength) {
@@ -125,6 +131,10 @@ public class Tour extends Observable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void setTourComputed(boolean tourComputed) {
+        this.tourComputed = tourComputed;
     }
 
     /* METHODS */
@@ -210,66 +220,63 @@ public class Tour extends Observable {
      */
     public void  computeTour(List<Intersection> allIntersectionsList) {
 
-        long startTimeDijkstra = System.currentTimeMillis();
 
-        ArrayList<Node> listNodes = new ArrayList<>();
-        // get the points useful for the computing : pick-up address, delivery address, depot
-        ArrayList<Intersection> listUsefulPoints = new ArrayList<>();
-        ArrayList<Intersection> listUsefulEndPointsForDepot = new ArrayList<>();
+            long startTimeDijkstra = System.currentTimeMillis();
 
-        listUsefulPoints.add(depotAddress);
+            ArrayList<Node> listNodes = new ArrayList<>();
+            // get the points useful for the computing : pick-up address, delivery address, depot
+            ArrayList<Intersection> listUsefulPoints = new ArrayList<>();
+            ArrayList<Intersection> listUsefulEndPointsForDepot = new ArrayList<>();
 
-     for(int i=0;i<planningRequests.size();i++) {
-            Intersection pickupReq1 = planningRequests.get(i).getPickupAddress();
-            listUsefulPoints.add(pickupReq1);
-            Intersection deliveryReq1 = planningRequests.get(i).getDeliveryAddress();
-            listUsefulPoints.add(deliveryReq1);
-            // gets the ends points useful for the computing according to the start point
-            ArrayList<Intersection> listUsefulEndPointsPickUp = new ArrayList<>();
-            ArrayList<Intersection> listUsefulEndPointsDelivery = new ArrayList<>();
+            listUsefulPoints.add(depotAddress);
 
-            listUsefulEndPointsPickUp.add(deliveryReq1);
-            listUsefulEndPointsDelivery.add(depotAddress);
-            // addingpickUp to the endPoints of depot
-            listUsefulEndPointsForDepot.add(pickupReq1);
+            for (int i = 0; i < planningRequests.size(); i++) {
+                Intersection pickupReq1 = planningRequests.get(i).getPickupAddress();
+                listUsefulPoints.add(pickupReq1);
+                Intersection deliveryReq1 = planningRequests.get(i).getDeliveryAddress();
+                listUsefulPoints.add(deliveryReq1);
+                // gets the ends points useful for the computing according to the start point
+                ArrayList<Intersection> listUsefulEndPointsPickUp = new ArrayList<>();
+                ArrayList<Intersection> listUsefulEndPointsDelivery = new ArrayList<>();
 
-            for(int j=0;j<planningRequests.size();j++) {
-                Intersection pickupReq2 = planningRequests.get(j).getPickupAddress();
-                Intersection deliveryReq2 = planningRequests.get(j).getDeliveryAddress();
-                if(i!=j) {
-                    listUsefulEndPointsPickUp.add(pickupReq2);
-                    listUsefulEndPointsPickUp.add(deliveryReq2);
-                    listUsefulEndPointsDelivery.add(pickupReq2);
-                    listUsefulEndPointsDelivery.add(deliveryReq2);
+                listUsefulEndPointsPickUp.add(deliveryReq1);
+                listUsefulEndPointsDelivery.add(depotAddress);
+                // addingpickUp to the endPoints of depot
+                listUsefulEndPointsForDepot.add(pickupReq1);
+
+                for (int j = 0; j < planningRequests.size(); j++) {
+                    Intersection pickupReq2 = planningRequests.get(j).getPickupAddress();
+                    Intersection deliveryReq2 = planningRequests.get(j).getDeliveryAddress();
+                    if (i != j) {
+                        listUsefulEndPointsPickUp.add(pickupReq2);
+                        listUsefulEndPointsPickUp.add(deliveryReq2);
+                        listUsefulEndPointsDelivery.add(pickupReq2);
+                        listUsefulEndPointsDelivery.add(deliveryReq2);
+                    }
                 }
+                ArrayList<ShortestPath> shortestPathsFromPickUp = Dijkstra.compute(allIntersectionsList, listUsefulEndPointsPickUp, pickupReq1);
+                ArrayList<ShortestPath> shortestPathsFromDelivery = Dijkstra.compute(allIntersectionsList, listUsefulEndPointsDelivery, deliveryReq1);
+
+                listNodes.add(new Node(pickupReq1, shortestPathsFromPickUp, i + 1));
+                listNodes.add(new Node(deliveryReq1, shortestPathsFromDelivery, i + 2));
             }
-            ArrayList<ShortestPath> shortestPathsFromPickUp = Dijkstra.compute(allIntersectionsList,listUsefulEndPointsPickUp, pickupReq1);
-            ArrayList<ShortestPath> shortestPathsFromDelivery = Dijkstra.compute(allIntersectionsList,listUsefulEndPointsDelivery, deliveryReq1);
 
-            listNodes.add(new Node(pickupReq1,shortestPathsFromPickUp,i+1));
-            listNodes.add(new Node(deliveryReq1,shortestPathsFromDelivery,i+2));
+            listNodes.add(0, new Node(depotAddress, Dijkstra.compute(allIntersectionsList, listUsefulEndPointsForDepot, depotAddress), 0));
 
+            // print the time to compute Dijkstra
+            System.out.println("Dijkstra finished in "
+                    + (System.currentTimeMillis() - startTimeDijkstra) + "ms\n");
 
-        }
+            TSP tsp = new TSP3();
+            Graph g = new CompleteGraph(listNodes, this);
 
-        listNodes.add(0,new Node(depotAddress,Dijkstra.compute(allIntersectionsList,listUsefulEndPointsForDepot,depotAddress),0));
+            // Run Tour
+            tsp.searchSolution(1000000, g, this);
 
+    }
 
-        // check if the intersection in the planning request are in the same component of the graph
-
-
-
-        // print the time to compute Dijkstra
-        System.out.println("Dijkstra finished in "
-                +(System.currentTimeMillis() - startTimeDijkstra)+"ms\n");
-
-        // Run Tour
-        TSP tsp = new TSP3();
-        Graph g = new CompleteGraph(listNodes, this);
-        long startTime = System.currentTimeMillis();
-        tsp.searchSolution(1000000, g);
+    public void updateTourInformation(ArrayList<Node> listNodes, long startTime, TSP tsp) {
         this.setTourLength(tsp.getSolutionCost());
-
         // print the cost of the solution and the TSP time
         System.out.print("Solution of cost "+this.tourLength+" found in "
                 +(System.currentTimeMillis() - startTime)+"ms : ");
@@ -281,6 +288,7 @@ public class Tour extends Observable {
         }
         System.out.println("0");
 
+        listShortestPaths.clear();
         for(int i=0; i< intersectionsOrder.length-1; i++) {
             Intersection end  = listNodes.get(intersectionsOrder[i+1]).getIntersection();
             ShortestPath shortestPathToAdd = listNodes.get(intersectionsOrder[i]).getListArcs().stream().filter(x -> x.getEndAddress()==end).findFirst().get();
@@ -308,9 +316,9 @@ public class Tour extends Observable {
                 arrivalTime = parser.format(calendar.getTime());
             }
         }
+
         notifyObservers();
     }
-
 
 
     public double metersToSeconds(double meters) {

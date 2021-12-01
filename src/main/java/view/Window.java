@@ -19,10 +19,13 @@ public class Window extends JFrame {
     protected final static String LOAD_MAP = "Load a map";
     protected static final String LOAD_REQUEST = "Load a request planning";
     protected static final String COMPUTE_TOUR = "Compute the tour";
+    protected static final String STOP_COMPUTATION = "Stop the computation";
     protected static final String UNDO = "Undo";
 
     private ArrayList<JButton> buttons;
     private JPanel header;
+    private JPanel graphicalPanel;
+    private JPanel computingPanel;
     private GraphicalView graphicalView;
     private TextualView textualView;
     private PopUpView popUpView;
@@ -58,12 +61,36 @@ public class Window extends JFrame {
         this.cityMap = cityMap;
         this.tour = tour;
         createHeader();
+        createGraphicalView();
         int minimumWindowWidth = 800;
         int minimumWindowHeight = 550;
         setMinimumSize(new Dimension(minimumWindowWidth, minimumWindowHeight));
         setWindowSize(minimumWindowWidth, minimumWindowHeight);
         setVisible(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+    }
+
+    private void createGraphicalView() throws IOException, FontFormatException {
+        graphicalPanel = new JPanel();
+        graphicalPanel.setLayout(new BorderLayout());
+
+        computingPanel = new JPanel();
+        computingPanel.setLayout(new BorderLayout());
+        computingPanel.setBackground(Constants.COLOR_4);
+        computingPanel.setBorder(BorderFactory.createMatteBorder(10, 10, 0, 10, Constants.COLOR_1));
+
+        JLabel computationMessage = new JLabel("<html><p>Computation of best tour in progress...<br/>You can stop the computation and continue with the best tour currently found.</p></html>");
+        computationMessage.setFont(Constants.getFont("DMSans-Medium.ttf", 12));
+        computationMessage.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        computationMessage.setForeground(Constants.COLOR_3);
+        computingPanel.add(computationMessage);
+        JButton stopComputation = new JButton(STOP_COMPUTATION);
+        setStyle(stopComputation);
+        stopComputation.addActionListener(buttonListener);
+        computingPanel.add(stopComputation, BorderLayout.LINE_END);
+
+        graphicalPanel.add(graphicalView);
+        getContentPane().add(graphicalPanel);
     }
 
     /**
@@ -150,11 +177,6 @@ public class Window extends JFrame {
             if (i < defaultButtonStates.length) {
                 buttons.get(i).setEnabled(defaultButtonStates[i]);
             }
-            /*
-            else {
-                buttons.get(i).setEnabled(false); // by default, enable button
-            }
-            */
         }
         // city map zoom
         graphicalView.setCanZoom(true);
@@ -227,5 +249,15 @@ public class Window extends JFrame {
 
     public void setUndoButtonState(boolean state) {
         buttons.get(buttons.size()-1).setEnabled(state);
+    }
+
+    public void showComputingPanel() {
+        graphicalPanel.add(computingPanel, BorderLayout.PAGE_START);
+        revalidate();
+    }
+
+    public void hideComputingPanel() {
+        graphicalPanel.remove(computingPanel);
+        revalidate();
     }
 }

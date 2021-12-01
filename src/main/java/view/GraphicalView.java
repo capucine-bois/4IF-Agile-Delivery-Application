@@ -54,7 +54,6 @@ public class GraphicalView extends JPanel implements Observer {
     public GraphicalView(CityMap cityMap, Tour tour, Window w, MouseListener mouseListener) {
         setBackground(Constants.COLOR_5);
         setBorder(new CompoundBorder(BorderFactory.createLineBorder(Constants.COLOR_1, firstBorder),BorderFactory.createLineBorder(Constants.COLOR_4, secondBorder)));
-        w.getContentPane().add(this, BorderLayout.CENTER);
         cityMap.addObserver(this);
         tour.addObserver(this);
         this.cityMap = cityMap;

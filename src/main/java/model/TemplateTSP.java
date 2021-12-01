@@ -35,7 +35,7 @@ public abstract class TemplateTSP implements TSP {
      */
     private long startTime;
 
-    public void searchSolution(int timeLimit, Graph g){
+    public void searchSolution(int timeLimit, Graph g, Tour tour){
         if (timeLimit <= 0) return;
         startTime = System.currentTimeMillis();
         this.timeLimit = timeLimit;
@@ -46,7 +46,8 @@ public abstract class TemplateTSP implements TSP {
         Collection<Integer> visited = new ArrayList<>(g.getNbVertices());
         visited.add(0); // The first visited vertex is 0 which is the depot
         bestSolCost = Double.MAX_VALUE;
-        branchAndBound(0, unvisited, visited, 0);
+        branchAndBound(0, unvisited, visited, 0, tour);
+        tour.setTourComputed(true);
     }
 
     public Integer getSolution(int i){
@@ -86,16 +87,20 @@ public abstract class TemplateTSP implements TSP {
      * @param unvisited the set of vertex that have not yet been visited
      * @param visited the sequence of vertices that have been already visited (including currentVertex)
      * @param currentCost the cost of the path corresponding to <code>visited</code>
+     * @param tour
      */
     private void branchAndBound(int currentVertex, Collection<Integer> unvisited,
-                                Collection<Integer> visited, double currentCost){
-        if (System.currentTimeMillis() - startTime > timeLimit) return;
+                                Collection<Integer> visited, double currentCost, Tour tour){
+        if (tour.isTourComputed()) return;
         if (unvisited.size() == 0){
             if (g.isArc(currentVertex,0)){
                 if (currentCost+g.getCost(currentVertex,0) < bestSolCost){
                     visited.toArray(bestSol);
                     bestSolCost = currentCost+g.getCost(currentVertex,0);
                     System.out.println(Arrays.toString(bestSol));
+                    CompleteGraph completeGraph = (CompleteGraph) g;
+                    tour.updateTourInformation(completeGraph.listNodesGraph, startTime, this);
+                    tour.notifyObservers();
                 }
             }
         } else if (currentCost+bound(currentVertex,unvisited, visited, g) < bestSolCost){
@@ -105,7 +110,7 @@ public abstract class TemplateTSP implements TSP {
                 visited.add(nextVertex);
                 unvisited.remove(nextVertex);
                 branchAndBound(nextVertex, unvisited, visited,
-                        currentCost+g.getCost(currentVertex, nextVertex));
+                        currentCost+g.getCost(currentVertex, nextVertex), tour);
                 visited.remove(nextVertex);
                 unvisited.add(nextVertex);
             }

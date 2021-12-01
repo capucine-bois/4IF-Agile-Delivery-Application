@@ -44,7 +44,6 @@ public class TourComputedState extends State {
     public void leftClickOnIcon(int indexIcon, Tour tour, Controller controller) {
         ShortestPath shortestPath = tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexIcon).findFirst().get();
         leftClickOnTourIntersection(tour.getListShortestPaths().indexOf(shortestPath), tour, controller);
-        controller.setCurrentState(controller.selectedIntersectionState);
     }
 
     @Override

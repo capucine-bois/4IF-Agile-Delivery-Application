@@ -53,6 +53,7 @@ public abstract class State {
             controller.setCurrentState(controller.requestsLoadedState);
             window.showRequestsPanel();
             window.setEnabledTour(false);
+            tour.setTourComputed(false);
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
                 tour.clearLists();
@@ -61,6 +62,7 @@ public abstract class State {
                 window.showRequestsPanel();
                 window.setEnabledRequests(false);
                 window.setEnabledTour(false);
+                tour.setTourComputed(false);
             }
         } finally {
             tour.notifyObservers();
@@ -170,5 +172,7 @@ public abstract class State {
     public void moveIntersectionBefore(ListOfCommands l, Tour tour, int indexIntersection, List<Intersection> allIntersections) {};
 
     public void moveIntersectionAfter(ListOfCommands l, Tour tour, int indexIntersection, List<Intersection> allIntersections) {};
+
+    public void stopTourComputation(Tour tour) {};
 
 }
