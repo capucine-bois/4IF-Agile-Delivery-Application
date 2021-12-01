@@ -121,8 +121,6 @@ public class Tour extends Observable {
             e.printStackTrace();
         }
     }
-    public void setPlanningRequests(ArrayList<Request> listRequest) {
-    }
 
     /* METHODS */
 
@@ -160,8 +158,10 @@ public class Tour extends Observable {
         Dijkstra dijkstra = new Dijkstra();
         StronglyConnectedComponents scc = new StronglyConnectedComponents();
 
+
         intersectionsNotInSameSccOfDepot = scc.getAllStronglyConnectedComponents((ArrayList<Intersection>) allIntersectionsList, depotAddress, planningRequests);
 
+        System.out.println("temps pris par scc = " + (System.currentTimeMillis() - startTimeDijkstra));
         if(intersectionsNotInSameSccOfDepot.isEmpty()) {
             for(int i=0;i<planningRequests.size();i++) {
                 Intersection pickupReq1 = planningRequests.get(i).getPickupAddress();
@@ -203,18 +203,18 @@ public class Tour extends Observable {
 
 
 
-        // print the time to compute Dijkstra
-        System.out.println("Dijkstra finished in "
-                +(System.currentTimeMillis() - startTimeDijkstra)+"ms\n");
+            // print the time to compute Dijkstra
+            System.out.println("Dijkstra finished in "
+                    +(System.currentTimeMillis() - startTimeDijkstra)+"ms\n");
 
             // Run Tour
-            TSP tsp = new TSP1();
+            TSP tsp = new TSP3();
             Graph g = new CompleteGraph(listNodes, this);
             long startTime = System.currentTimeMillis();
-            tsp.searchSolution(20000, g);
+            tsp.searchSolution(1000000, g);
             this.setTourLength(tsp.getSolutionCost());
 
-            // print the cost of the solution
+            // print the cost of the solution and the TSP time
             System.out.print("Solution of cost "+this.tourLength+" found in "
                     +(System.currentTimeMillis() - startTime)+"ms : ");
 
@@ -252,13 +252,17 @@ public class Tour extends Observable {
                     arrivalTime = parser.format(calendar.getTime());
                 }
             }
+
+            notifyObservers();
         } else {
-            // TODO : return an error for the view
 
         }
-        notifyObservers();
+
+
+
 
     }
+
 
 
     public double metersToSeconds(double meters) {

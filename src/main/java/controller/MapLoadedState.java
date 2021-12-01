@@ -1,9 +1,13 @@
 package controller;
 
 import model.CityMap;
+import model.Intersection;
+import model.StronglyConnectedComponents;
 import model.Tour;
 import view.Window;
 import xml.XMLDeserializer;
+
+import java.util.ArrayList;
 
 /**
  * Map loaded state. State of the application when map has been loaded.
