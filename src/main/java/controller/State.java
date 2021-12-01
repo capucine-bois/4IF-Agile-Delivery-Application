@@ -57,4 +57,6 @@ public interface State {
     public default void exitMouseOnRequest(int indexRequest, Tour tour, Window window) {};
 
     public default void exitMouseOnTourIntersection(int indexShortestPath, Tour tour, Window window) {};
+
+    public default void undo(ListOfCommands l) {};
 }

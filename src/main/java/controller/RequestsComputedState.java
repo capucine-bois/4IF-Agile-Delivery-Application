@@ -99,4 +99,6 @@ public class RequestsComputedState implements State{
     public void exitMouseOnRequest(int indexRequest, Tour tour, Window window) {
         window.colorRequestPanelOnMouseExited(indexRequest);
     }
+
+    public void undo(ListOfCommands l) {l.undo();}
 }

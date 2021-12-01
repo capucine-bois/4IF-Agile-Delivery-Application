@@ -2,6 +2,7 @@ package controller;
 
 import model.Intersection;
 import model.Request;
+import model.ShortestPath;
 import model.Tour;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ public class DeleteCommand implements Command {
     private Request request;
     private int indexRequest;
     private List<Intersection> intersections;
+    private List<ShortestPath> paths;
 
     /**
      * Create the command which delete a request
@@ -28,11 +30,12 @@ public class DeleteCommand implements Command {
 
     @Override
     public void doCommand() {
-        tour.removeRequest(request, indexRequest, intersections);
+
+        paths = tour.removeRequest(request, indexRequest, intersections);
     }
 
     @Override
     public void undoCommand() {
-        tour.insertRequest(request, indexRequest);
+        tour.insertRequest(request, indexRequest, paths);
     }
 }

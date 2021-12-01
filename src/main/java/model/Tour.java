@@ -430,11 +430,92 @@ public class Tour extends Observable {
     }
 
     // TODO: implement
-    public void insertRequest(Request requestToInsert, int indexRequest) {}
+    public void insertRequest(Request requestToInsert, int indexRequest, List<ShortestPath> paths) {
 
-    public void removeRequest(Request requestToDelete, int indexRequest, List<Intersection> allIntersections) {
+        System.out.println("Tour.insertRequest");
+
+        for (ShortestPath path: listShortestPaths) {
+            System.out.println(path.getStartAddress().getId() + " -> " + path.getEndAddress().getId()); // debug
+        }
+
+        // get TSP values of deleted points
+        ArrayList<Integer> intersectionsToAdd = new ArrayList<>();
+        if (paths.size() == 3) {
+            // deleted points are following
+            intersectionsToAdd.add(paths.get(0).getEndNodeNumber());
+            intersectionsToAdd.add(paths.get(1).getEndNodeNumber());
+        } else {
+            // deleted points are not following
+            intersectionsToAdd.add(paths.get(0).getEndNodeNumber());
+            intersectionsToAdd.add(paths.get(2).getEndNodeNumber());
+        }
+
+
+        // increase TSP node values
+        for (ShortestPath path: listShortestPaths) {
+            int currentStartNode = path.getStartNodeNumber();
+            if (currentStartNode >= Collections.min(intersectionsToAdd)) {
+                path.setStartNodeNumber(currentStartNode+intersectionsToAdd.size());
+            }
+
+            int currentEndNode = path.getEndNodeNumber();
+            if (currentEndNode >= Collections.min(intersectionsToAdd)) {
+                path.setEndNodeNumber(currentEndNode+intersectionsToAdd.size());
+            }
+        }
+
+        int i = 0;
+        while (i<listShortestPaths.size()) {
+            ShortestPath path = listShortestPaths.get(i);
+            if (!paths.isEmpty() && path.getStartAddress().equals(paths.get(0).getStartAddress())) {
+                listShortestPaths.remove(i);
+                if (paths.size() == 3) {
+                    // add all paths
+                    listShortestPaths.add(i, paths.get(0));
+                    listShortestPaths.add(i+1, paths.get(1));
+                    listShortestPaths.add(i+2, paths.get(2));
+                    paths.clear();
+                } else {
+                    // add only two paths
+                    listShortestPaths.add(i, paths.get(0));
+                    listShortestPaths.add(i+1, paths.get(1));
+                    paths.remove(0);
+                    paths.remove(0);
+                }
+            } else {
+                i++;
+            }
+        }
+
+
+        // testing purpose
+        for (ShortestPath p: listShortestPaths) {
+            System.out.print(p.getEndNodeNumber() + " ");
+        }
+        System.out.println("");
+
+
+        for (ShortestPath path: listShortestPaths) {
+            System.out.println(path.getStartAddress().getId() + " -> " + path.getEndAddress().getId()); // debug
+        }
+
+
+        // insert request in planning
+        planningRequests.add(requestToInsert);
+        updateLength();
+        notifyObservers();
+
+
+    }
+
+    public ArrayList<ShortestPath> removeRequest(Request requestToDelete, int indexRequest, List<Intersection> allIntersections) {
+
+        for (ShortestPath path: listShortestPaths) {
+            System.out.println(path.getStartAddress().getId() + " -> " + path.getEndAddress().getId()); // debug
+        }
 
         ArrayList<Intersection> intersections = new ArrayList<Intersection>();
+        ArrayList<ShortestPath> deleted = new ArrayList<ShortestPath>();
 
         // getting TSP order
         ArrayList<Integer> order = new ArrayList<Integer>();
@@ -458,17 +539,21 @@ public class Tour extends Observable {
                 if (!intersectionToRemove.contains(path.getEndNodeNumber())) {
                     intersectionToRemove.add(path.getEndNodeNumber());
                 }
+                deleted.add(listShortestPaths.get(i));
                 listShortestPaths.remove(i);
             } else if (path.getStartAddress().equals(requestToDelete.getPickupAddress()) ||
                     path.getStartAddress().equals(requestToDelete.getDeliveryAddress())) {
                 if (!intersectionToRemove.contains(path.getStartNodeNumber())) {
                     intersectionToRemove.add(path.getStartNodeNumber());
                 }
+                deleted.add(listShortestPaths.get(i));
                 listShortestPaths.remove(i);
             } else {
                 i++;
             }
         }
+
+        System.out.println("ToDelete: " + intersectionToRemove);
 
         boolean skipped = false;
         boolean alreadyAdded = false;
@@ -526,13 +611,9 @@ public class Tour extends Observable {
             }
         }
 
-        /*
-        for (ShortestPath path: shortestPaths) {
-            System.out.println(path.getStartAddress().getId() + " -> " + path.getEndAddress().getId()); // debug
-        }
-        */
-
         updateLength();
         notifyObservers();
+
+        return deleted;
     }
 }

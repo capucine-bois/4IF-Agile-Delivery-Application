@@ -131,4 +131,8 @@ public class Controller {
         Request requestToDelete = tour.getPlanningRequests().get(indexRequest);
         listOfCommands.add(new DeleteCommand(tour, requestToDelete, indexRequest, cityMap.getIntersections()));
     }
+
+    public void undo() {
+        currentState.undo(listOfCommands);
+    }
 }

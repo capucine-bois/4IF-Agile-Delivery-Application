@@ -31,6 +31,7 @@ public class Window extends JFrame {
     private ButtonListener buttonListener;
     private MouseListener mouseListener;
     private ComponentListener componentListener;
+    private KeyboardListener keyboardListener;
 
     private final String[] buttonTexts = new String[]{LOAD_MAP, LOAD_REQUEST, COMPUTE_TOUR};
     private boolean[] defaultButtonStates = new boolean[]{true, false, false};
@@ -50,6 +51,8 @@ public class Window extends JFrame {
         graphicalView = new GraphicalView(cityMap, tour, this, mouseListener);
         textualView = new TextualView(tour, this, mouseListener, buttonListener);
         popUpView = new PopUpView(this);
+        keyboardListener = new KeyboardListener(controller);
+        addKeyListener(keyboardListener);
         this.cityMap = cityMap;
         this.tour = tour;
         createHeader();
