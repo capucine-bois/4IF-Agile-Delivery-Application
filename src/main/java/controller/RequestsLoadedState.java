@@ -2,7 +2,6 @@ package controller;
 
 import model.*;
 import view.Window;
-import xml.XMLDeserializer;
 
 /**
  * Request loaded state. State when the application has successfully loaded requests.
@@ -17,7 +16,6 @@ public class RequestsLoadedState extends State {
 
     @Override
     public void computeTour(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        tour.computeTour(cityMap.getIntersections());
         for (Request request : tour.getPlanningRequests()) {
             request.setPickupSelected(false);
             request.setDeliverySelected(false);
@@ -25,6 +23,7 @@ public class RequestsLoadedState extends State {
         controller.setCurrentState(controller.tourComputedState);
         window.showTourPanel();
         window.setEnabledTour(true);
+        tour.computeTour(cityMap.getIntersections());
     }
 
     @Override

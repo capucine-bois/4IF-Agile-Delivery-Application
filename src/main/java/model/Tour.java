@@ -206,53 +206,36 @@ public class Tour extends Observable {
             System.out.println("Dijkstra finished in "
                     +(System.currentTimeMillis() - startTimeDijkstra)+"ms\n");
 
-            // Run Tour
+            long startTime = System.currentTimeMillis();
             TSP tsp = new TSP3();
             Graph g = new CompleteGraph(listNodes, this);
-            long startTime = System.currentTimeMillis();
-            tsp.searchSolution(1000000, g);
-            this.setTourLength(tsp.getSolutionCost());
 
-            // print the cost of the solution and the TSP time
-            System.out.print("Solution of cost "+this.tourLength+" found in "
-                    +(System.currentTimeMillis() - startTime)+"ms : ");
+            Object lock = new Object();
 
-            // print the solution with number which correspond to the order in the planning request
-            Integer[] intersectionsOrder = tsp.getBestSol();
-            for(int i = 0; i<intersectionsOrder.length; i++) {
-                System.out.print(intersectionsOrder[i] + "  ");
-            }
-            System.out.println("0");
-
-            for(int i=0; i< intersectionsOrder.length-1; i++) {
-                Intersection end  = listNodes.get(intersectionsOrder[i+1]).getIntersection();
-                ShortestPath shortestPathToAdd = listNodes.get(intersectionsOrder[i]).getListArcs().stream().filter(x -> x.getEndAddress()==end).findFirst().get();
-                shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i]);
-                shortestPathToAdd.setEndNodeNumber(intersectionsOrder[i+1]);
-                listShortestPaths.add(shortestPathToAdd);
-                calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
-                int indexRequest = intersectionsOrder[i+1]%2 == 0 ? intersectionsOrder[i+1]/2 - 1 : intersectionsOrder[i+1]/2;
-                Request requestEndPath = planningRequests.get(indexRequest);
-                if (intersectionsOrder[i+1]%2 == 1) {
-                    requestEndPath.setPickupArrivalTime(parser.format(calendar.getTime()));
-                    calendar.add(Calendar.SECOND, requestEndPath.getPickupDuration());
-                    requestEndPath.setPickupDepartureTime(parser.format(calendar.getTime()));
-                } else {
-                    requestEndPath.setDeliveryArrivalTime(parser.format(calendar.getTime()));
-                    calendar.add(Calendar.SECOND, requestEndPath.getDeliveryDuration());
-                    requestEndPath.setDeliveryDepartureTime(parser.format(calendar.getTime()));
+            Thread TSPThread = new Thread(() -> {
+                synchronized (lock) {
+                    // Run Tour
+                    tsp.searchSolution(1000000, g, lock);
                 }
-                if(i==intersectionsOrder.length-2) {
-                    shortestPathToAdd = listNodes.get(intersectionsOrder[i+1]).getListArcs().stream().filter(x -> x.getEndAddress()==depotAddress).findFirst().get();
-                    shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i+1]);
-                    shortestPathToAdd.setEndNodeNumber(0);
-                    listShortestPaths.add(shortestPathToAdd);
-                    calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
-                    arrivalTime = parser.format(calendar.getTime());
+            });
+
+            synchronized (lock) {
+                try {
+                    TSPThread.start();
+                    while (TSPThread.isAlive()) {
+                        lock.wait();
+                        Thread.sleep(1000);
+                        updateTourInformation(listNodes, startTime, tsp);
+                        Thread.sleep(1000);
+                        lock.notify();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
 
-            notifyObservers();
+            System.out.println("finish compute");
+
         } else {
 
         }
@@ -262,6 +245,49 @@ public class Tour extends Observable {
 
     }
 
+    private void updateTourInformation(ArrayList<Node> listNodes, long startTime, TSP tsp) {
+        this.setTourLength(tsp.getSolutionCost());
+        // print the cost of the solution and the TSP time
+        System.out.print("Solution of cost "+this.tourLength+" found in "
+                +(System.currentTimeMillis() - startTime)+"ms : ");
+
+        // print the solution with number which correspond to the order in the planning request
+        Integer[] intersectionsOrder = tsp.getBestSol();
+        for(int i = 0; i<intersectionsOrder.length; i++) {
+            System.out.print(intersectionsOrder[i] + "  ");
+        }
+        System.out.println("0");
+
+        for(int i=0; i< intersectionsOrder.length-1; i++) {
+            Intersection end  = listNodes.get(intersectionsOrder[i+1]).getIntersection();
+            ShortestPath shortestPathToAdd = listNodes.get(intersectionsOrder[i]).getListArcs().stream().filter(x -> x.getEndAddress()==end).findFirst().get();
+            shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i]);
+            shortestPathToAdd.setEndNodeNumber(intersectionsOrder[i+1]);
+            listShortestPaths.add(shortestPathToAdd);
+            calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
+            int indexRequest = intersectionsOrder[i+1]%2 == 0 ? intersectionsOrder[i+1]/2 - 1 : intersectionsOrder[i+1]/2;
+            Request requestEndPath = planningRequests.get(indexRequest);
+            if (intersectionsOrder[i+1]%2 == 1) {
+                requestEndPath.setPickupArrivalTime(parser.format(calendar.getTime()));
+                calendar.add(Calendar.SECOND, requestEndPath.getPickupDuration());
+                requestEndPath.setPickupDepartureTime(parser.format(calendar.getTime()));
+            } else {
+                requestEndPath.setDeliveryArrivalTime(parser.format(calendar.getTime()));
+                calendar.add(Calendar.SECOND, requestEndPath.getDeliveryDuration());
+                requestEndPath.setDeliveryDepartureTime(parser.format(calendar.getTime()));
+            }
+            if(i==intersectionsOrder.length-2) {
+                shortestPathToAdd = listNodes.get(intersectionsOrder[i+1]).getListArcs().stream().filter(x -> x.getEndAddress()==depotAddress).findFirst().get();
+                shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i+1]);
+                shortestPathToAdd.setEndNodeNumber(0);
+                listShortestPaths.add(shortestPathToAdd);
+                calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
+                arrivalTime = parser.format(calendar.getTime());
+            }
+        }
+
+        notifyObservers();
+    }
 
 
     public double metersToSeconds(double meters) {
