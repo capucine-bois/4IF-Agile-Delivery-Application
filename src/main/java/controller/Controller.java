@@ -192,8 +192,9 @@ public class Controller {
      * Add a request in an already computed tour.
      *
      */
-    public void addRequest() {
-        //TODO implement
+    public void insertRequest() {
+        //TODO create the Request via UI
+        Request requestToAdd = null;
         float[] hsv = new float[3];
         Color initialColor = Color.pink;
         Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
@@ -204,11 +205,10 @@ public class Controller {
         Optional<Intersection> deliveryAddress = cityMap.getIntersections().stream().filter(i -> i.getId() == 1).findFirst();
         if (pickupAddress.isPresent() && deliveryAddress.isPresent()) {
             Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
-            Request request = new Request(100, 200, pickupAddress.get(), deliveryAddress.get(), requestColor);
-            listOfCommands.add(new AddCommand(tour,request, cityMap.getIntersections()));
+            requestToAdd = new Request(100, 200, pickupAddress.get(), deliveryAddress.get(), requestColor);
             window.setUndoButtonState(true);
         }
-
+        currentState.insertRequest(tour, requestToAdd, cityMap.getIntersections(), window, listOfCommands);
     }
 
     /**
