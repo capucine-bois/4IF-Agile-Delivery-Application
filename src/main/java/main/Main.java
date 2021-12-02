@@ -21,6 +21,6 @@ public class Main {
     public static void main(String[] args) throws IOException, FontFormatException, InterruptedException {
         CityMap cityMap = new CityMap();
         Tour tour = new Tour();
-        new Controller(cityMap, tour);
+        new Controller(cityMap, tour) ;
     }
 }

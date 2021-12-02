@@ -19,8 +19,14 @@ public class Window extends JFrame {
     protected final static String LOAD_MAP = "Load a map";
     protected static final String LOAD_REQUEST = "Load a request planning";
     protected static final String COMPUTE_TOUR = "Compute the tour";
+    protected static final String STOP_COMPUTATION = "Stop the computation";
+    protected static final String UNDO = "Undo";
+
+
     private ArrayList<JButton> buttons;
     private JPanel header;
+    private JPanel graphicalPanel;
+    private JPanel computingPanel;
     private GraphicalView graphicalView;
     private TextualView textualView;
     private PopUpView popUpView;
@@ -33,8 +39,8 @@ public class Window extends JFrame {
     private ComponentListener componentListener;
     private KeyboardListener keyboardListener;
 
-    private final String[] buttonTexts = new String[]{LOAD_MAP, LOAD_REQUEST, COMPUTE_TOUR};
-    private boolean[] defaultButtonStates = new boolean[]{true, false, false};
+    private final String[] buttonTexts = new String[]{LOAD_MAP, LOAD_REQUEST, COMPUTE_TOUR, UNDO};
+    private boolean[] defaultButtonStates = new boolean[]{true, false, false, false};
 
     /**
      * Complete constructor
@@ -56,12 +62,41 @@ public class Window extends JFrame {
         this.cityMap = cityMap;
         this.tour = tour;
         createHeader();
+        createGraphicalView();
         int minimumWindowWidth = 800;
         int minimumWindowHeight = 550;
         setMinimumSize(new Dimension(minimumWindowWidth, minimumWindowHeight));
         setWindowSize(minimumWindowWidth, minimumWindowHeight);
         setVisible(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+    }
+
+    /**
+     * Initiate graphical view.
+     * @throws IOException
+     * @throws FontFormatException
+     */
+    private void createGraphicalView() throws IOException, FontFormatException {
+        graphicalPanel = new JPanel();
+        graphicalPanel.setLayout(new BorderLayout());
+
+        computingPanel = new JPanel();
+        computingPanel.setLayout(new BorderLayout());
+        computingPanel.setBackground(Constants.COLOR_4);
+        computingPanel.setBorder(BorderFactory.createMatteBorder(10, 10, 0, 10, Constants.COLOR_1));
+
+        JLabel computationMessage = new JLabel("<html><p>Computation of best tour in progress...<br/>You can stop the computation and continue with the best tour currently found.</p></html>");
+        computationMessage.setFont(Constants.getFont("DMSans-Medium.ttf", 12));
+        computationMessage.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        computationMessage.setForeground(Constants.COLOR_3);
+        computingPanel.add(computationMessage);
+        JButton stopComputation = new JButton(STOP_COMPUTATION);
+        setStyle(stopComputation);
+        stopComputation.addActionListener(buttonListener);
+        computingPanel.add(stopComputation, BorderLayout.LINE_END);
+
+        graphicalPanel.add(graphicalView);
+        getContentPane().add(graphicalPanel);
     }
 
     /**
@@ -144,8 +179,10 @@ public class Window extends JFrame {
      */
     public void resetComponentsState() {
         // buttons
-        for (int i=0; i<defaultButtonStates.length; i++) {
-            buttons.get(i).setEnabled(defaultButtonStates[i]);
+        for (int i=0; i<buttons.size(); i++) {
+            if (i < defaultButtonStates.length) {
+                buttons.get(i).setEnabled(defaultButtonStates[i]);
+            }
         }
         // city map zoom
         graphicalView.setCanZoom(true);
@@ -170,49 +207,113 @@ public class Window extends JFrame {
         this.defaultButtonStates = defaultButtonStates;
     }
 
+    /**
+     * Display loader while computing.
+     */
     public void showLoader() {
         this.disableElements();
         this.popUpView.showLoader();
     }
 
+    /**
+     * Hide loading when TSP solution has been found.
+     */
     public void hideLoader() {
         this.resetComponentsState();
         this.popUpView.hideLoader();
     }
 
+    /**
+     * Show requests panel on textual view.
+     */
     public void showRequestsPanel() {
         textualView.showRequestsPanel();
     }
 
+    /**
+     * Show tour panel on textual view.
+     */
     public void showTourPanel() {
         textualView.showTourPanel();
     }
 
+    /**
+     * Disable or enable requests panels.
+     * @param enabled whether panels must be enabled or not.
+     */
     public void setEnabledRequests(boolean enabled) {
         textualView.setEnabledRequests(enabled);
     }
 
+    /**
+     * Disable or enable tour panels.
+     * @param enabled whether panels must be enabled or not.
+     */
     public void setEnabledTour(boolean enabled) {
         textualView.setEnabledTour(enabled);
     }
 
+    /**
+     * Change background color of a request when mouse enters its panel.
+     * @param indexRequest index of the panel concerned
+     */
     public void colorRequestPanelOnMouseEntered(int indexRequest) {
         textualView.colorRequestPanelOnMouseEntered(indexRequest);
     }
 
+    /**
+     * Change background color of a request when mouse leaves its panel.
+     * @param indexRequest index of the panel concerned
+     */
     public void colorRequestPanelOnMouseExited(int indexRequest) {
         textualView.colorRequestPanelOnMouseExited(indexRequest);
     }
 
-    public void colorTourIntersectionPanelOnMouseEntered(int indexShortestPath) {
-        textualView.colorTourIntersectionPanelOnMouseEntered(indexShortestPath);
+    /**
+     * Change background color of an intersection when mouse enters its panel.
+     * @param indexIntersection index of the panel concerned
+     */
+    public void colorTourIntersectionPanelOnMouseEntered(int indexIntersection) {
+        textualView.colorTourIntersectionPanelOnMouseEntered(indexIntersection);
     }
 
-    public void colorTourIntersectionPanelOnMouseExited(int indexShortestPath) {
-        textualView.colorTourIntersectionPanelOnMouseExited(indexShortestPath);
+    /**
+     * Change background color of an intersection when mouse leaves its panel.
+     * @param indexIntersection index of the panel concerned
+     */
+    public void colorTourIntersectionPanelOnMouseExited(int indexIntersection) {
+        textualView.colorTourIntersectionPanelOnMouseExited(indexIntersection);
     }
 
+    /**
+     * Change cursor to "hand cursor" when mouse is on the graphical view.
+     */
     public void setHandCursorOnIcon() {
         graphicalView.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
+
+    /**
+     * Change state of the "Undo" button
+     * @param state new state
+     */
+    public void setUndoButtonState(boolean state) {
+        buttons.get(buttons.size()-1).setEnabled(state);
+    }
+
+    /**
+     * Show computing panel when TSP computation starts.
+     */
+    public void showComputingPanel() {
+        graphicalPanel.add(computingPanel, BorderLayout.PAGE_START);
+        revalidate();
+    }
+
+    /**
+     * Hide computing panel when TSP solution has been found.
+     */
+    public void hideComputingPanel() {
+        graphicalPanel.remove(computingPanel);
+        revalidate();
+    }
+
 }

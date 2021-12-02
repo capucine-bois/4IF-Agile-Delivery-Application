@@ -54,7 +54,6 @@ public class GraphicalView extends JPanel implements Observer {
     public GraphicalView(CityMap cityMap, Tour tour, Window w, MouseListener mouseListener) {
         setBackground(Constants.COLOR_5);
         setBorder(new CompoundBorder(BorderFactory.createLineBorder(Constants.COLOR_1, firstBorder),BorderFactory.createLineBorder(Constants.COLOR_4, secondBorder)));
-        w.getContentPane().add(this, BorderLayout.CENTER);
         cityMap.addObserver(this);
         tour.addObserver(this);
         this.cityMap = cityMap;
@@ -102,6 +101,14 @@ public class GraphicalView extends JPanel implements Observer {
         }
     }
 
+    /**
+     * Compute a distance between two points
+     * @param latitude1 latitude of first point
+     * @param latitude2 latitude of second point
+     * @param longitude1 longitude of first point
+     * @param longitude2 longitude of second point
+     * @return the distance in meters
+     */
     private double computeDistanceFromCoordinates(double latitude1, double latitude2, double longitude1, double longitude2) {
         latitude1 = Math.toRadians(latitude1);
         latitude2 = Math.toRadians(latitude2);
@@ -199,6 +206,13 @@ public class GraphicalView extends JPanel implements Observer {
         }
     }
 
+    /**
+     * Display segments that match a specific origin
+     * @param intersections intersections to consider
+     * @param color color of segments
+     * @param strokeSize size of segments
+     * @param displayRoadNames whether road names must be displayed or not
+     */
     private void displaySegmentsForEachOrigin(List<Intersection> intersections, Color color, float strokeSize, boolean displayRoadNames) {
         for (Intersection origin : intersections) {
             int originCoordinateX = getCoordinateX(origin);
@@ -217,6 +231,14 @@ public class GraphicalView extends JPanel implements Observer {
         }
     }
 
+    /**
+     * Display a shortest path between two intersections (two icons)
+     * @param shortestPath the path to display
+     * @param conditionToDisplay boolean to control display
+     * @param color color of segments displayed
+     * @param strokeSize size of segments
+     * @param displayRoadNames boolean to control road name display
+     */
     private void displayShortestPaths(ShortestPath shortestPath, boolean conditionToDisplay, Color color, float strokeSize, boolean displayRoadNames) {
         if (conditionToDisplay) {
             for (Segment segment : shortestPath.getListSegments()) {
@@ -236,6 +258,14 @@ public class GraphicalView extends JPanel implements Observer {
         }
     }
 
+    /**
+     * Display arrows on shortest paths for computed tour.
+     * @param g2 graphical element
+     * @param originX x position of origin
+     * @param originY y position of origin
+     * @param destinationX x position of destination
+     * @param destinationY y position of destination
+     */
     private void displayArrow(Graphics2D g2, int originX, int originY, int destinationX, int destinationY) {
         double oppositeSide = destinationY - originY;
         double adjacentSide = destinationX - originX;
@@ -266,6 +296,16 @@ public class GraphicalView extends JPanel implements Observer {
         }
     }
 
+    /**
+     * Display road name at a specific position on the graphical view.
+     * @param g2 graphical element
+     * @param name name of the road to display
+     * @param originX x position of origin
+     * @param destinationX x position of destination
+     * @param originY y position of origin
+     * @param destinationY y position of destination
+     * @param shortestPath whether the segment is included in a shortest path (of the computed tour) or not
+     */
     private void displayRoadName(Graphics2D g2, String name, int originX, int destinationX, int originY, int destinationY, boolean shortestPath) {
         double oppositeSide = destinationY - originY;
         double adjacentSide = destinationX - originX;
@@ -294,11 +334,21 @@ public class GraphicalView extends JPanel implements Observer {
         }
     }
 
+    /**
+     * Get x position of an intersection on the graphical view.
+     * @param intersection intersection considered
+     * @return x position on graphical view
+     */
     private int getCoordinateX(Intersection intersection) {
         double coordinateLongitude = intersection.getLongitude() - minLongitude;
         return (int) ((coordinateLongitude * width) / longitudeLength) + originX;
     }
 
+    /**
+     * Get y position of an intersection on the graphical view.
+     * @param intersection intersection considered
+     * @return y position on graphical view
+     */
     private int getCoordinateY(Intersection intersection) {
         double coordinateLatitude = intersection.getLatitude() - minLatitude;
         return (int) (height) - (int) ((coordinateLatitude * height) / latitudeLength) + originY;
@@ -368,6 +418,13 @@ public class GraphicalView extends JPanel implements Observer {
         this.canZoom = canZoom;
     }
 
+    /**
+     * Zoom on map according to a specific scale.
+     * Redraw every segment.
+     * @param x x position of the center of the zoomed area
+     * @param y y position of the center of the zoomed area
+     * @param rotation rotation angle
+     */
     public void zoom(int x, int y, double rotation) {
         if (canZoom) {
             double viewWidth = g.getClipBounds().width - allBorders * 2;
@@ -391,6 +448,11 @@ public class GraphicalView extends JPanel implements Observer {
 
     }
 
+    /**
+     * Move the map.
+     * @param x new x position of the center of the zoomed area
+     * @param y new y position of the center of the zoomed area
+     */
     public void moveMap(int x, int y) {
         originX += x - previousMouseX;
         originY += y - previousMouseY;
@@ -399,11 +461,22 @@ public class GraphicalView extends JPanel implements Observer {
         repaint();
     }
 
+    /**
+     * Keep trace of previous center coordinated (for zoomed area)
+     * @param x x position of the center of the zoomed area
+     * @param y y position of the center of the zoomed area
+     */
     public void updatePrevious(int x, int y) {
         previousMouseX = x;
         previousMouseY = y;
     }
 
+    /**
+     * Find icon by looking at a given position on graphical view.
+     * @param x x position
+     * @param y y position
+     * @return index of the found icon
+     */
     public int findIcon(int x, int y) {
         int indexIcon = -1;
         for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
@@ -427,6 +500,13 @@ public class GraphicalView extends JPanel implements Observer {
         return indexIcon;
     }
 
+    /**
+     * Check if the cursor is on an icon.
+     * @param x x position of cursor
+     * @param y y position of cursor
+     * @param iconName name of the icon (filename)
+     * @return whether the cursor is on an icon or not
+     */
     private boolean checkCursorOnIcon(int x, int y, String iconName) {
         boolean cursorOnIcon = true;
         BufferedImage image = null;

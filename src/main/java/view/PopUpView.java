@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 
 /**
- * Error message on the GUI
+ * Popup message on the GUI
  */
 public class PopUpView implements ActionListener {
     private final JPanel popUpPanel;

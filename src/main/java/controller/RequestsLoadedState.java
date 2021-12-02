@@ -2,7 +2,6 @@ package controller;
 
 import model.*;
 import view.Window;
-import xml.XMLDeserializer;
 
 /**
  * Request loaded state. State when the application has successfully loaded requests.
@@ -17,14 +16,29 @@ public class RequestsLoadedState extends State {
 
     @Override
     public void computeTour(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        tour.computeTour(cityMap.getIntersections());
         for (Request request : tour.getPlanningRequests()) {
             request.setPickupSelected(false);
             request.setDeliverySelected(false);
         }
-        controller.setCurrentState(controller.tourComputedState);
+        controller.setCurrentState(controller.tourComputingState);
         window.showTourPanel();
         window.setEnabledTour(true);
+        window.showComputingPanel();
+        Thread TSPThread = new Thread(() -> {
+            // TODO: first call compute scc and dijkstra and add conditions for tourComputed to stop scc or dijkstra when stop button clicked
+            tour.computeTour(cityMap.getIntersections());
+            window.hideComputingPanel();
+            if (!tour.getListShortestPaths().isEmpty()) {
+                window.showTourPanel();
+                controller.setCurrentState(controller.tourComputedState);
+            } else {
+                window.showRequestsPanel();
+                window.setEnabledTour(false);
+                controller.setCurrentState(controller.requestsLoadedState);
+            }
+            tour.notifyObservers();
+        });
+        TSPThread.start();
     }
 
     @Override

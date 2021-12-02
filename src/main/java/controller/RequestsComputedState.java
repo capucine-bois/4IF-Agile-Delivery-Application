@@ -1,14 +1,16 @@
 package controller;
 
-import model.CityMap;
-import model.Request;
-import model.ShortestPath;
-import model.Tour;
+import model.*;
 import view.Window;
 import xml.XMLDeserializer;
 
+import java.util.List;
 import java.util.Optional;
 
+/**
+ * Computed tour state.
+ * State of the application when a tour has been computed and the textual view is displaying "Requests" tab.
+ */
 public class RequestsComputedState extends State{
 
     @Override
@@ -53,5 +55,16 @@ public class RequestsComputedState extends State{
     @Override
     public void moveMouseOnIcon(Window window) {
         window.setHandCursorOnIcon();
+    }
+
+    @Override
+    public void deleteRequest(Tour tour, Request requestToDelete, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l) {
+        l.add(new DeleteCommand(tour, requestToDelete, indexRequest, allIntersections));
+        window.setUndoButtonState(true);
+    }
+
+    @Override
+    public void insertRequest(Tour tour, Request requestToAdd, List<Intersection> allIntersections, Window window, ListOfCommands l) {
+        l.add(new AddCommand(tour, requestToAdd, allIntersections));
     }
 }

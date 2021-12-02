@@ -3,6 +3,9 @@ package controller;
 
 import java.util.LinkedList;
 
+/**
+ * Represent every command done, and that can be canceled, redone or undone.
+ */
 public class ListOfCommands {
     private LinkedList<Command> list;
     private int currentIndex;
@@ -66,5 +69,13 @@ public class ListOfCommands {
     public void reset(){
         currentIndex = -1;
         list.clear();
+    }
+
+    /**
+     * Return the number of commands in the linked list.
+     * @return size of the linked list.
+     */
+    public int size() {
+        return this.currentIndex+1;
     }
 }

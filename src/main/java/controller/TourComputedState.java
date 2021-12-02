@@ -1,16 +1,15 @@
 package controller;
 
-import model.CityMap;
-import model.Request;
-import model.ShortestPath;
-import model.Tour;
+import model.*;
 import view.Window;
 import xml.XMLDeserializer;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
- * Computed tour state. State of the application when a tour has been computed.
+ * Computed tour state.
+ * State of the application when a tour has been computed and the textual view is displaying "Tour" tab.
  */
 public class TourComputedState extends State {
 
@@ -46,7 +45,6 @@ public class TourComputedState extends State {
     public void leftClickOnIcon(int indexIcon, Tour tour, Controller controller) {
         ShortestPath shortestPath = tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexIcon).findFirst().get();
         leftClickOnTourIntersection(tour.getListShortestPaths().indexOf(shortestPath), tour, controller);
-        controller.setCurrentState(controller.selectedIntersectionState);
     }
 
     @Override
@@ -62,5 +60,23 @@ public class TourComputedState extends State {
     @Override
     public void moveMouseOnIcon(Window window) {
         window.setHandCursorOnIcon();
+    }
+
+    @Override
+    public void moveIntersectionBefore(ListOfCommands l, Tour tour, int indexRequest,
+                                       List<Intersection> allIntersections, Window window) {
+        l.add(new MoveRequestBeforeCommand(tour, indexRequest, allIntersections));
+        window.setUndoButtonState(true);
+        if (tour.isDeliveryBeforePickup())
+            window.displayErrorMessage("WARNING: A delivery address is visited before its pickup address!");
+    }
+
+    @Override
+    public void moveIntersectionAfter(ListOfCommands l, Tour tour, int indexRequest,
+                                      List<Intersection> allIntersections, Window window) {
+        l.add(new MoveRequestAfterCommand(tour, indexRequest, allIntersections));
+        window.setUndoButtonState(true);
+        if (tour.isDeliveryBeforePickup())
+            window.displayErrorMessage("WARNING: A delivery address is visited before its pickup address!");
     }
 }

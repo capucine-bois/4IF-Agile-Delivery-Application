@@ -66,6 +66,9 @@ public class CityMap extends Observable {
         return dictionaryId.get(idXML);
     }
 
+    /**
+     * Clear intersections list and dictionary hashmap.
+     */
     public void clearLists() {
         intersections.clear();
         dictionaryId.clear();

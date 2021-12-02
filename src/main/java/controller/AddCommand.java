@@ -8,11 +8,10 @@ import model.Tour;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeleteCommand implements Command {
+public class AddCommand implements Command {
 
     private Tour tour;
     private Request request;
-    private int indexRequest;
     private List<Intersection> intersections;
     private List<ShortestPath> paths;
 
@@ -21,21 +20,21 @@ public class DeleteCommand implements Command {
      * @param tour the tour to modify
      * @param request the request to delete
      */
-    public DeleteCommand(Tour tour, Request request, int indexRequest, List<Intersection> intersections) {
+    public AddCommand(Tour tour, Request request, List<Intersection> intersections) {
         this.tour = tour;
         this.request = request;
-        this.indexRequest = indexRequest;
         this.intersections = intersections;
     }
 
     @Override
     public void doCommand() {
+        paths = tour.getListShortestPaths();
+        tour.insertRequest(request,paths,intersections);
 
-        paths = tour.removeRequest(request, indexRequest, intersections);
     }
 
     @Override
     public void undoCommand() {
-        tour.putBackRequest(request, paths);
+        tour.removeRequest(request,tour.getPlanningRequests().size()-1,intersections);
     }
 }

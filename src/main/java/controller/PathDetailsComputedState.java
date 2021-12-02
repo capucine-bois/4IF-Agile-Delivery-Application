@@ -9,6 +9,9 @@ import xml.XMLDeserializer;
 
 import java.util.Optional;
 
+/**
+ * State when tour has been computed and path details are shown on the textual view.
+ */
 public class PathDetailsComputedState extends State {
 
     @Override

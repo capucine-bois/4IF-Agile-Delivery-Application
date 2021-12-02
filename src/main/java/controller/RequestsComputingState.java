@@ -2,21 +2,17 @@ package controller;
 
 import model.CityMap;
 import model.Request;
-import model.ShortestPath;
 import model.Tour;
 import view.Window;
-import xml.XMLDeserializer;
 
 /**
- * State when a request is selected.
+ * Computing tour state.
+ * State of the application when a tour is currently computing and the textual view is displaying "Requests" tab.
  */
-public class SelectedRequestState extends State {
+public class RequestsComputingState extends State {
 
     @Override
-    public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        super.loadMap(cityMap, tour, window, controller);
-        tour.notifyObservers();
-    }
+    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {}
 
     @Override
     public void showTourPanel(Tour tour, Window window, Controller controller) {
@@ -26,17 +22,12 @@ public class SelectedRequestState extends State {
         }
         window.showTourPanel();
         tour.notifyObservers();
-        controller.setCurrentState(controller.tourComputedState);
+        controller.setCurrentState(controller.tourComputingState);
     }
 
     @Override
     public void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {
         defaultLeftClickOnRequest(indexRequest, tour);
-        if (!tour.getPlanningRequests().get(indexRequest).isDeliverySelected() ||
-                !tour.getPlanningRequests().get(indexRequest).isPickupSelected()) {
-            controller.setCurrentState(controller.requestsComputedState);
-        }
-
     }
 
     @Override
@@ -52,10 +43,7 @@ public class SelectedRequestState extends State {
 
     @Override
     public void exitMouseOnRequest(int indexRequest, Tour tour, Window window) {
-        Request request = tour.getPlanningRequests().get(indexRequest);
-        if (!request.isDeliverySelected() || !request.isPickupSelected()) {
-            window.colorRequestPanelOnMouseExited(indexRequest);
-        }
+        window.colorRequestPanelOnMouseExited(indexRequest);
     }
 
     @Override
