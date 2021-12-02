@@ -447,6 +447,9 @@ public class TextualView extends JPanel implements Observer {
     private void displayRequestsInformation(JPanel parentPanel) {
         requestPanels.clear();
         for (Request request : tour.getPlanningRequests()) {
+            JPanel requestPanel = new JPanel();
+            requestPanel.setLayout(new BorderLayout());
+
             Map<String, String> requestInformation = new HashMap<>();
             String pickupCoordinates = request.getPickupAddress().getLatitude() + ", " + request.getPickupAddress().getLongitude();
             String deliveryCoordinates = request.getDeliveryAddress().getLatitude() + ", " + request.getDeliveryAddress().getLongitude();
@@ -458,7 +461,7 @@ public class TextualView extends JPanel implements Observer {
             requestInformation.put("Pickup duration", pickupDuration);
             requestInformation.put("Delivery address", deliveryCoordinates);
             requestInformation.put("Delivery duration", deliveryDuration);
-            displayInformation(parentPanel, requestInformation, request.getColor(), requestPanels, request.isPickupSelected() && request.isDeliverySelected());
+            displayInformation(requestPanel, requestInformation, request.getColor(), requestPanels, request.isPickupSelected() && request.isDeliverySelected());
 
             // if tour has been computed
             if (!tour.getListShortestPaths().isEmpty()) {
@@ -468,12 +471,12 @@ public class TextualView extends JPanel implements Observer {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                deleteRequest.setPreferredSize(new Dimension(deleteRequest.getPreferredSize().width, 30));
                 deleteRequestButtons.add(deleteRequest);
                 deleteRequest.addActionListener(buttonListener);
-                parentPanel.add(deleteRequest, BorderLayout.LINE_END);
+                requestPanel.add(deleteRequest, BorderLayout.PAGE_END);
             }
 
+            parentPanel.add(requestPanel);
             parentPanel.add(Box.createRigidArea(new Dimension(0, gap)));
 
         }
