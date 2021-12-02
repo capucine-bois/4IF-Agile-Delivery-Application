@@ -75,7 +75,6 @@ public class Controller {
      */
     public void loadMap() {
         currentState.loadMap(cityMap, tour, window, this);
-        window.setAddRequestButtonState(false);
     }
 
     /**
@@ -84,7 +83,6 @@ public class Controller {
      */
     public void loadRequests() {
         currentState.loadRequests(cityMap, tour, window, this);
-        window.setAddRequestButtonState(false);
     }
 
     /**
@@ -189,8 +187,6 @@ public class Controller {
         Request requestToDelete = tour.getPlanningRequests().get(indexRequest);
         listOfCommands.add(new DeleteCommand(tour, requestToDelete, indexRequest, cityMap.getIntersections()));
         window.setUndoButtonState(true);
-        window.setAddRequestButtonState(true);
-
     }
 
     /**
