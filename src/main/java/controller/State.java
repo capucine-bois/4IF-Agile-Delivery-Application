@@ -28,6 +28,7 @@ public abstract class State {
             window.showRequestsPanel();
             window.setEnabledRequests(false);
             window.setEnabledTour(false);
+            tour.setTourComputed(false);
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
                 cityMap.clearLists();
@@ -37,6 +38,7 @@ public abstract class State {
                 window.showRequestsPanel();
                 window.setEnabledRequests(false);
                 window.setEnabledTour(false);
+                tour.setTourComputed(false);
             }
         }
     };
