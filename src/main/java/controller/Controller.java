@@ -54,13 +54,13 @@ public class Controller {
         System.out.println("state = " + state);
         this.currentState = state;
         if (state == initialState) {
-            window.setDefaultButtonStates(new boolean[]{true, false, false,false});
+            window.setDefaultButtonStates(new boolean[]{true, false, false});
         } else if (state == mapLoadedState || state == tourComputedState ||
                 state == pathDetailsComputedState || state == requestsComputedState ||
                 state == selectedIntersectionState || state == selectedRequestState){
-            window.setDefaultButtonStates(new boolean[]{true, true, false,true});
+            window.setDefaultButtonStates(new boolean[]{true, true, false});
         } else if (state == tourComputingState || state == requestsComputingState) {
-            window.setDefaultButtonStates(new boolean[]{false, false, false,false});
+            window.setDefaultButtonStates(new boolean[]{false, false, false});
         } else {
             window.setDefaultButtonStates(new boolean[]{true, true, true});
         }
