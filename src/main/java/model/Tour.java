@@ -397,6 +397,16 @@ public class Tour extends Observable {
         ShortestPath thirdNewPath = Dijkstra.compute(allIntersections,useFulEndPointsForThirdPath, requestToAdd.getDeliveryAddress()).get(0);
 
         paths.remove(paths.size()-1);
+
+        // update TSP nodes values
+        int currentMaxNodeValue = (planningRequests.size()-1)*2;
+        firstNewPath.setStartNodeNumber(listShortestPaths.get(listShortestPaths.size()-1).getEndNodeNumber());
+        firstNewPath.setEndNodeNumber(currentMaxNodeValue+1);
+        secondNewPath.setStartNodeNumber(currentMaxNodeValue+1);
+        secondNewPath.setEndNodeNumber(currentMaxNodeValue+2);
+        thirdNewPath.setStartNodeNumber(currentMaxNodeValue+2);
+        thirdNewPath.setEndNodeNumber(0);
+
         paths.add(firstNewPath);
         paths.add(secondNewPath);
         paths.add(thirdNewPath);
