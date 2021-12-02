@@ -1,12 +1,10 @@
 package controller;
 
-import model.CityMap;
-import model.Request;
-import model.ShortestPath;
-import model.Tour;
+import model.*;
 import view.Window;
 import xml.XMLDeserializer;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -57,5 +55,11 @@ public class RequestsComputedState extends State{
     @Override
     public void moveMouseOnIcon(Window window) {
         window.setHandCursorOnIcon();
+    }
+
+    @Override
+    public void deleteRequest(Tour tour, Request requestToDelete, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l) {
+        l.add(new DeleteCommand(tour, requestToDelete, indexRequest, allIntersections));
+        window.setUndoButtonState(true);
     }
 }
