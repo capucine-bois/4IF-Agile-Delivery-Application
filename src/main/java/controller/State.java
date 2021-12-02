@@ -210,8 +210,11 @@ public abstract class State {
 
     public void exitMouseOnTourIntersection(int indexShortestPath, Tour tour, Window window) {};
 
-    public void undo(ListOfCommands l) {
+    public void undo(ListOfCommands l, Window window) {
         l.undo();
+        if (l.size() == 0) {
+            window.setUndoButtonState(false);
+        }
     }
 
     public void enterMouseOnTourIntersection(int indexShortestPath, Window window) {};
@@ -220,10 +223,12 @@ public abstract class State {
 
     public void moveMouseOnIcon(Window window) {};
 
-    public void moveIntersectionBefore(ListOfCommands l, Tour tour, int indexIntersection, List<Intersection> allIntersections) {};
+    public void moveIntersectionBefore(ListOfCommands l, Tour tour, int indexIntersection, List<Intersection> allIntersections, Window window) {};
 
-    public void moveIntersectionAfter(ListOfCommands l, Tour tour, int indexIntersection, List<Intersection> allIntersections) {};
+    public void moveIntersectionAfter(ListOfCommands l, Tour tour, int indexIntersection, List<Intersection> allIntersections, Window window) {};
 
     public void stopTourComputation(Tour tour) {};
+
+    public void deleteRequest(Tour tour, Request requestToDelete, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l) {};
 
 }

@@ -185,8 +185,7 @@ public class Controller {
      */
     public void deleteRequest(int indexRequest) {
         Request requestToDelete = tour.getPlanningRequests().get(indexRequest);
-        listOfCommands.add(new DeleteCommand(tour, requestToDelete, indexRequest, cityMap.getIntersections()));
-        window.setUndoButtonState(true);
+        currentState.deleteRequest(tour, requestToDelete, indexRequest, cityMap.getIntersections(), window, listOfCommands);
     }
 
     /**
@@ -216,10 +215,7 @@ public class Controller {
      * Undo last command.
      */
     public void undo() {
-        currentState.undo(listOfCommands);
-        if (listOfCommands.size() == 0) {
-            window.setUndoButtonState(false);
-        }
+        currentState.undo(listOfCommands, window);
     }
 
     /**
@@ -227,8 +223,7 @@ public class Controller {
      * @param indexIntersection the intersection to visit earlier
      */
     public void moveIntersectionBefore(int indexIntersection) {
-        currentState.moveIntersectionBefore(listOfCommands, tour, indexIntersection, cityMap.getIntersections());
-        window.setUndoButtonState(true);
+        currentState.moveIntersectionBefore(listOfCommands, tour, indexIntersection, cityMap.getIntersections(), window);
     }
 
     /**
@@ -236,8 +231,7 @@ public class Controller {
      * @param indexIntersection the intersection to visit later
      */
     public void moveIntersectionAfter(int indexIntersection) {
-        currentState.moveIntersectionAfter(listOfCommands, tour, indexIntersection, cityMap.getIntersections());
-        window.setUndoButtonState(true);
+        currentState.moveIntersectionAfter(listOfCommands, tour, indexIntersection, cityMap.getIntersections(), window);
     }
 
     /**
