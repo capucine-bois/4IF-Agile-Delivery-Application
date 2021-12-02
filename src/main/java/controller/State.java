@@ -111,6 +111,9 @@ public abstract class State {
      * @param tour the tour with the clicked request
      */
     protected void defaultLeftClickOnRequest(int indexRequest, Tour tour) {
+        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+            shortestPath.setSelected(false);
+        }
         for (int i = 0; i < tour.getPlanningRequests().size(); i++) {
             Request request = tour.getPlanningRequests().get(i);
             if (i != indexRequest || (request.isPickupSelected() && request.isDeliverySelected())) {
@@ -119,6 +122,14 @@ public abstract class State {
             } else {
                 request.setPickupSelected(true);
                 request.setDeliverySelected(true);
+                if (!tour.getListShortestPaths().isEmpty() && tour.isTourComputed()) {
+                    int finalI = i;
+                    int indexShortestPathFromPickup = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getStartNodeNumber() == finalI*2 + 1).findFirst().get());
+                    int indexShortestPathToDelivery = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == finalI*2 + 2).findFirst().get());
+                    for (int j = indexShortestPathFromPickup; j <= indexShortestPathToDelivery; j++) {
+                        tour.getListShortestPaths().get(j).setSelected(true);
+                    }
+                }
             }
         }
         tour.notifyObservers();

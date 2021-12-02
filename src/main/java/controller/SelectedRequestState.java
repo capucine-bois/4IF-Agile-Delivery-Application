@@ -24,6 +24,9 @@ public class SelectedRequestState extends State {
             request.setPickupSelected(false);
             request.setDeliverySelected(false);
         }
+        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+            shortestPath.setSelected(false);
+        }
         window.showTourPanel();
         tour.notifyObservers();
         controller.setCurrentState(controller.tourComputedState);

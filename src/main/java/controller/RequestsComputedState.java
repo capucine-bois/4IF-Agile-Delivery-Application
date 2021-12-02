@@ -21,10 +21,6 @@ public class RequestsComputedState extends State{
 
     @Override
     public void showTourPanel(Tour tour, Window window, Controller controller) {
-        for (Request request : tour.getPlanningRequests()) {
-            request.setPickupSelected(false);
-            request.setDeliverySelected(false);
-        }
         window.showTourPanel();
         tour.notifyObservers();
         controller.setCurrentState(controller.tourComputedState);
