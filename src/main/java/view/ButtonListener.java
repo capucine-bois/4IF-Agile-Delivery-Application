@@ -53,29 +53,9 @@ public class ButtonListener implements ActionListener {
             case TextualView.GO_BACK_TO_TOUR -> controller.goBackToTour();
             case TextualView.PATH_DETAILS -> controller.leftClickOnShortestPath(TextualView.pathDetailsButtons.indexOf(e.getSource()));
             case TextualView.DELETE_REQUEST -> controller.deleteRequest(TextualView.deleteRequestButtons.indexOf(e.getSource()));
-            case TextualView.GO_UP -> controller.moveIntersectionBefore(TextualView.goUpButtons.indexOf(e.getSource())+1);
+            case TextualView.GO_UP -> controller.moveIntersectionBefore(TextualView.goUpButtons.indexOf(e.getSource()) + 1);
             case TextualView.GO_DOWN -> controller.moveIntersectionAfter(TextualView.goDownButtons.indexOf(e.getSource()));
         }
-    }
-
-    /**
-     * Launch the tour computing
-     */
-    private void computeTour() {
-        SwingWorker sw = new SwingWorker() {
-            @Override
-            protected Object doInBackground() {
-                controller.computeTour();
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                window.hideLoader();
-            }
-        };
-        window.showLoader();
-        sw.execute();
     }
 
 }

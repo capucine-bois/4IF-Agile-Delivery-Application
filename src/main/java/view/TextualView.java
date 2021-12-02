@@ -42,8 +42,10 @@ public class TextualView extends JPanel implements Observer {
     private Window window;
     private JButton requestsHeader;
     private JButton tourHeader;
+    private JButton addRequest;
     private JButton backToTour;
     private JPanel cardLayoutPanel;
+    private JPanel requestsPanelWithAddButton;
     private JPanel requestsMainPanel;
     private JPanel tourMainPanel;
 
@@ -120,10 +122,9 @@ public class TextualView extends JPanel implements Observer {
         requestsMainPanel.removeAll();
         tourMainPanel.removeAll();
         if (!tour.getPlanningRequests().isEmpty()) {
-            addRequests();
+            displayRequests();
             if (!tour.getListShortestPaths().isEmpty()) {
-                // addShortestPaths();
-                addTourIntersections();
+                displayTourIntersections();
             }
         }
         revalidate();
@@ -145,7 +146,7 @@ public class TextualView extends JPanel implements Observer {
     /**
      * Add all the intersections that must be visited to accomplish the tour.
      */
-    private void addTourIntersections() {
+    private void displayTourIntersections() {
         tourMainPanel.setBackground(Constants.COLOR_4);
         pathDetailsButtons.clear();
         tourIntersectionsPanels.clear();
@@ -378,41 +379,43 @@ public class TextualView extends JPanel implements Observer {
      * Create panel for "Requests" tab.
      */
     private void createRequestsPanel() {
+        requestsPanelWithAddButton = new JPanel();
+        requestsPanelWithAddButton.setLayout(new BorderLayout());
         requestsMainPanel = new JPanel();
         JScrollPane scrollPane = new JScrollPane(requestsMainPanel);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(null);
-        cardLayoutPanel.add("requests", scrollPane);
+        requestsPanelWithAddButton.add(scrollPane);
+        createAddRequestButton();
+        cardLayoutPanel.add("requests", requestsPanelWithAddButton);
+    }
+
+    private void createAddRequestButton() {
+        addRequest = new JButton(ADD_REQUEST);
+        try {
+            window.setStyle(addRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        addRequest.addActionListener(buttonListener);
     }
 
     /**
      * Add all the request on the textual view, on "Requests" tab
      */
-    private void addRequests() {
+    private void displayRequests() {
+        deleteRequestButtons.clear();
+        requestsPanelWithAddButton.remove(addRequest);
         requestsMainPanel.setLayout(new BoxLayout(requestsMainPanel, BoxLayout.Y_AXIS));
         requestsMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
         requestsMainPanel.setBackground(Constants.COLOR_4);
-        deleteRequestButtons.clear();
-        //if tour has been computed
-        if (!tour.getListShortestPaths().isEmpty()) {
-            JButton addRequest = new JButton(ADD_REQUEST);
-            try {
-                window.setStyle(addRequest);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            addRequest.setPreferredSize(new Dimension(addRequest.getPreferredSize().width, 40));
-            addRequest.addActionListener(buttonListener);
-            JPanel buttonPane = new JPanel();
-            buttonPane.add(addRequest);
-            buttonPane.setBackground(Constants.COLOR_4);
-            buttonPane.add(Box.createRigidArea(new Dimension(10, 10)));
-            requestsMainPanel.add(buttonPane, BorderLayout.CENTER);
-        }
         displayDepotInformation(requestsMainPanel);
         requestsMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
         displayRequestsInformation(requestsMainPanel);
+        if (!tour.getListShortestPaths().isEmpty() && tour.isTourComputed()) {
+            requestsPanelWithAddButton.add(addRequest, BorderLayout.PAGE_END);
+        }
     }
 
     /**
