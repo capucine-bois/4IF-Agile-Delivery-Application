@@ -272,50 +272,47 @@ public class TextualView extends JPanel implements Observer {
             displayInformation(pointPanel, pointsInformation, request.getColor(), segmentDetails ? null : tourIntersectionsPanels, pointSelected && !segmentDetails);
 
             if (!segmentDetails) {
-                JPanel moveButtonsPanel = new JPanel();
-                moveButtonsPanel.setLayout(new GridLayout(3,1));
-                moveButtonsPanel.setBorder(BorderFactory.createMatteBorder(10,0,10,20,Constants.COLOR_4));
-                moveButtonsPanel.setBackground(Constants.COLOR_4);
-                // check if intersection is first
-                if (index != 0) {
-                    JButton goUp = new JButton();
-                    try {
-                        goUp.setIcon(new ImageIcon(Constants.getImage("move-up")));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    goUp.setBorder(BorderFactory.createEmptyBorder());
-                    goUp.setBackground(Constants.COLOR_2);
-                    goUpButtons.add(goUp);
-                    goUp.addActionListener(buttonListener);
-                    moveButtonsPanel.add(goUp);
-                }
-                else {
-                    moveButtonsPanel.add(new JLabel());
-                }
-
-                moveButtonsPanel.add(new JLabel());
-
-                // check if intersection is last
-                if (index < tour.getListShortestPaths().size() - 2) {
-                    JButton goDown = new JButton();
-                    try {
-                        goDown.setIcon(new ImageIcon(Constants.getImage("move-down")));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    goDown.setBorder(BorderFactory.createEmptyBorder());
-                    goDown.setBackground(Constants.COLOR_2);
-                    goDownButtons.add(goDown);
-                    goDown.addActionListener(buttonListener);
-                    moveButtonsPanel.add(goDown);
-                }
-
-                pointPanel.add(moveButtonsPanel, BorderLayout.LINE_END);
+                displayMoveButtons(index, pointPanel);
             }
 
             parentPanel.add(pointPanel);
         }
+    }
+
+    private void displayMoveButtons(int index, JPanel pointPanel) {
+        JPanel moveButtonsPanel = new JPanel();
+        moveButtonsPanel.setLayout(new GridLayout(3,1));
+        moveButtonsPanel.setBorder(BorderFactory.createMatteBorder(10,10,10,10,Constants.COLOR_4));
+        moveButtonsPanel.setBackground(Constants.COLOR_4);
+        // check if intersection is first
+        if (index != 0) {
+            displayButton(moveButtonsPanel, "move-up", goUpButtons);
+        } else {
+            moveButtonsPanel.add(new JLabel());
+        }
+
+        moveButtonsPanel.add(new JLabel());
+
+        // check if intersection is last
+        if (index < tour.getListShortestPaths().size() - 2) {
+            displayButton(moveButtonsPanel, "move-down", goDownButtons);
+        }
+
+        pointPanel.add(moveButtonsPanel, BorderLayout.LINE_END);
+    }
+
+    private void displayButton(JPanel moveButtonsPanel, String s, List<JButton> listButtons) {
+        JButton goUp = new JButton();
+        try {
+            goUp.setIcon(new ImageIcon(Constants.getImage(s)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        goUp.setBorder(BorderFactory.createEmptyBorder());
+        goUp.setBackground(Constants.COLOR_2);
+        listButtons.add(goUp);
+        goUp.addActionListener(buttonListener);
+        moveButtonsPanel.add(goUp);
     }
 
     /**
