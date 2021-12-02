@@ -47,13 +47,14 @@ public class ButtonListener implements ActionListener {
             case Window.COMPUTE_TOUR -> controller.computeTour();
             case Window.STOP_COMPUTATION -> controller.stopTourComputation();
             case Window.UNDO -> controller.undo();
+            case TextualView.ADD_REQUEST -> controller.insertRequest();
             case TextualView.REQUESTS_HEADER -> controller.showRequestsPanel();
             case TextualView.TOUR_HEADER -> controller.showTourPanel();
             case TextualView.GO_BACK_TO_TOUR -> controller.goBackToTour();
-            case TextualView.PATH_DETAILS -> controller.leftClickOnShortestPath(TextualView.pathDetailsButtons.indexOf((JButton) e.getSource()));
-            case TextualView.DELETE_REQUEST -> controller.deleteRequest(TextualView.deleteRequestButtons.indexOf((JButton) e.getSource()));
-            case TextualView.GO_UP -> controller.moveIntersectionBefore(TextualView.goUpButtons.indexOf((JButton) e.getSource())+1);
-            case TextualView.GO_DOWN -> controller.moveIntersectionAfter(TextualView.goDownButtons.indexOf((JButton) e.getSource()));
+            case TextualView.PATH_DETAILS -> controller.leftClickOnShortestPath(TextualView.pathDetailsButtons.indexOf(e.getSource()));
+            case TextualView.DELETE_REQUEST -> controller.deleteRequest(TextualView.deleteRequestButtons.indexOf(e.getSource()));
+            case TextualView.GO_UP -> controller.moveIntersectionBefore(TextualView.goUpButtons.indexOf(e.getSource())+1);
+            case TextualView.GO_DOWN -> controller.moveIntersectionAfter(TextualView.goDownButtons.indexOf(e.getSource()));
         }
     }
 
@@ -63,7 +64,7 @@ public class ButtonListener implements ActionListener {
     private void computeTour() {
         SwingWorker sw = new SwingWorker() {
             @Override
-            protected Object doInBackground() throws Exception {
+            protected Object doInBackground() {
                 controller.computeTour();
                 return null;
             }

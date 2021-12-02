@@ -22,6 +22,7 @@ public class Window extends JFrame {
     protected static final String STOP_COMPUTATION = "Stop the computation";
     protected static final String UNDO = "Undo";
 
+
     private ArrayList<JButton> buttons;
     private JPanel header;
     private JPanel graphicalPanel;
@@ -314,4 +315,5 @@ public class Window extends JFrame {
         graphicalPanel.remove(computingPanel);
         revalidate();
     }
+
 }

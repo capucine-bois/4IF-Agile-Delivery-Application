@@ -23,6 +23,7 @@ public class TextualView extends JPanel implements Observer {
     protected static final String GO_BACK_TO_TOUR = "Back to tour";
     protected static final String PATH_DETAILS = "Show path";
     protected static final String DELETE_REQUEST = "Delete request";
+    protected static final String ADD_REQUEST = "Add request";
     protected static final String GO_UP = "Go up";
     protected static final String GO_DOWN = "Go down";
 
@@ -389,10 +390,26 @@ public class TextualView extends JPanel implements Observer {
      * Add all the request on the textual view, on "Requests" tab
      */
     private void addRequests() {
-        deleteRequestButtons.clear();
         requestsMainPanel.setLayout(new BoxLayout(requestsMainPanel, BoxLayout.Y_AXIS));
         requestsMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
         requestsMainPanel.setBackground(Constants.COLOR_4);
+        deleteRequestButtons.clear();
+        //if tour has been computed
+        if (!tour.getListShortestPaths().isEmpty()) {
+            JButton addRequest = new JButton(ADD_REQUEST);
+            try {
+                window.setStyle(addRequest);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            addRequest.setPreferredSize(new Dimension(addRequest.getPreferredSize().width, 40));
+            addRequest.addActionListener(buttonListener);
+            JPanel buttonPane = new JPanel();
+            buttonPane.add(addRequest);
+            buttonPane.setBackground(Constants.COLOR_4);
+            buttonPane.add(Box.createRigidArea(new Dimension(10, 10)));
+            requestsMainPanel.add(buttonPane, BorderLayout.CENTER);
+        }
         displayDepotInformation(requestsMainPanel);
         requestsMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
         displayRequestsInformation(requestsMainPanel);
@@ -443,8 +460,6 @@ public class TextualView extends JPanel implements Observer {
                 deleteRequest.addActionListener(buttonListener);
                 parentPanel.add(deleteRequest, BorderLayout.LINE_END);
             }
-
-            parentPanel.add(Box.createRigidArea(new Dimension(0, gap)));
 
         }
     }

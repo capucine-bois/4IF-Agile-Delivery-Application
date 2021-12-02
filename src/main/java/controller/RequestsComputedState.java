@@ -62,4 +62,9 @@ public class RequestsComputedState extends State{
         l.add(new DeleteCommand(tour, requestToDelete, indexRequest, allIntersections));
         window.setUndoButtonState(true);
     }
+
+    @Override
+    public void insertRequest(Tour tour, Request requestToAdd, List<Intersection> allIntersections, Window window, ListOfCommands l) {
+        l.add(new AddCommand(tour, requestToAdd, allIntersections));
+    }
 }

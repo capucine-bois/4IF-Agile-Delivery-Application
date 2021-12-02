@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
 import model.*;
 import view.Window;
@@ -53,13 +54,13 @@ public class Controller {
         System.out.println("state = " + state);
         this.currentState = state;
         if (state == initialState) {
-            window.setDefaultButtonStates(new boolean[]{true, false, false});
+            window.setDefaultButtonStates(new boolean[]{true, false, false,false});
         } else if (state == mapLoadedState || state == tourComputedState ||
                 state == pathDetailsComputedState || state == requestsComputedState ||
                 state == selectedIntersectionState || state == selectedRequestState){
-            window.setDefaultButtonStates(new boolean[]{true, true, false});
+            window.setDefaultButtonStates(new boolean[]{true, true, false,true});
         } else if (state == tourComputingState || state == requestsComputingState) {
-            window.setDefaultButtonStates(new boolean[]{false, false, false});
+            window.setDefaultButtonStates(new boolean[]{false, false, false,false});
         } else {
             window.setDefaultButtonStates(new boolean[]{true, true, true});
         }
@@ -185,6 +186,29 @@ public class Controller {
     public void deleteRequest(int indexRequest) {
         Request requestToDelete = tour.getPlanningRequests().get(indexRequest);
         currentState.deleteRequest(tour, requestToDelete, indexRequest, cityMap.getIntersections(), window, listOfCommands);
+    }
+
+    /**
+     * Add a request in an already computed tour.
+     *
+     */
+    public void insertRequest() {
+        //TODO create the Request via UI
+        Request requestToAdd = null;
+        float[] hsv = new float[3];
+        Color initialColor = Color.pink;
+        Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
+        double goldenRatioConjugate = 0.618033988749895;
+        hsv[0] += goldenRatioConjugate;
+        hsv[0] %= 1;
+        Optional<Intersection> pickupAddress = cityMap.getIntersections().stream().filter(i -> i.getId() == 3).findFirst();
+        Optional<Intersection> deliveryAddress = cityMap.getIntersections().stream().filter(i -> i.getId() == 1).findFirst();
+        if (pickupAddress.isPresent() && deliveryAddress.isPresent()) {
+            Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
+            requestToAdd = new Request(100, 200, pickupAddress.get(), deliveryAddress.get(), requestColor);
+            window.setUndoButtonState(true);
+        }
+        currentState.insertRequest(tour, requestToAdd, cityMap.getIntersections(), window, listOfCommands);
     }
 
     /**
