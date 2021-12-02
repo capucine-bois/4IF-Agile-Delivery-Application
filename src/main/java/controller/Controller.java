@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
 import model.*;
 import view.Window;
@@ -196,10 +197,23 @@ public class Controller {
      * Add a request in an already computed tour.
      *
      */
-    public void addRequest(Request request) {
+    public void addRequest() {
         //TODO implement
-        listOfCommands.add(new AddCommand(tour,request, cityMap.getIntersections()));
-        window.setUndoButtonState(true);
+        float[] hsv = new float[3];
+        Color initialColor = Color.pink;
+        Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
+        double goldenRatioConjugate = 0.618033988749895;
+        hsv[0] += goldenRatioConjugate;
+        hsv[0] %= 1;
+        Optional<Intersection> pickupAddress = cityMap.getIntersections().stream().filter(i -> i.getId() == 3).findFirst();
+        Optional<Intersection> deliveryAddress = cityMap.getIntersections().stream().filter(i -> i.getId() == 1).findFirst();
+        if (pickupAddress.isPresent() && deliveryAddress.isPresent()) {
+            Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
+            Request request = new Request(100, 200, pickupAddress.get(), deliveryAddress.get(), requestColor);
+            listOfCommands.add(new AddCommand(tour,request, cityMap.getIntersections()));
+            window.setUndoButtonState(true);
+        }
+
     }
 
     /**

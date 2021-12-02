@@ -36,6 +36,6 @@ public class DeleteCommand implements Command {
 
     @Override
     public void undoCommand() {
-        tour.insertRequest(request, paths);
+        tour.putBackRequest(request, paths);
     }
 }

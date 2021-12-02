@@ -376,16 +376,44 @@ public class Tour extends Observable {
         }
     }
 
+
+    public void insertRequest(Request requestToAdd, List<ShortestPath> paths, List<Intersection> allIntersections){
+        System.out.println("Tour.addRequest");
+        // add request in planning Request
+        planningRequests.add(requestToAdd);
+
+        Intersection previousIntersection = paths.get(paths.size()-2).getEndAddress();
+
+        ArrayList<Intersection> useFulEndPointsForFirstPath = new ArrayList<>();
+        useFulEndPointsForFirstPath.add(requestToAdd.getPickupAddress());
+        ShortestPath firstNewPath = Dijkstra.compute(allIntersections,useFulEndPointsForFirstPath, previousIntersection).get(0);
+
+        ArrayList<Intersection> useFulEndPointsForSecondPath = new ArrayList<>();
+        useFulEndPointsForSecondPath.add(requestToAdd.getDeliveryAddress());
+        ShortestPath secondNewPath = Dijkstra.compute(allIntersections,useFulEndPointsForSecondPath, requestToAdd.getPickupAddress()).get(0);
+
+        ArrayList<Intersection> useFulEndPointsForThirdPath = new ArrayList<>();
+        useFulEndPointsForThirdPath.add(depotAddress);
+        ShortestPath thirdNewPath = Dijkstra.compute(allIntersections,useFulEndPointsForThirdPath, requestToAdd.getDeliveryAddress()).get(0);
+
+        paths.remove(paths.size()-1);
+        paths.add(firstNewPath);
+        paths.add(secondNewPath);
+        paths.add(thirdNewPath);
+        updateLength();
+        updateTimes();
+        notifyObservers();
+    }
     /**
-     * Insert a request to an already computed tour.
+     * Insert a request to an already computed tour (after deleted a request).
      * Position of intersections are stored in Request.
      * Some paths are deleted, some are created to accomplish every request including the new one.
      * @param requestToInsert request to insert
      * @param paths all the paths of the map
      */
-    public void insertRequest(Request requestToInsert, List<ShortestPath> paths) {
+    public void putBackRequest(Request requestToInsert, List<ShortestPath> paths) {
 
-        System.out.println("Tour.insertRequest");
+        System.out.println("Tour.putBackRequest");
 
         for (ShortestPath path: listShortestPaths) {
             System.out.println(path.getStartAddress().getId() + " -> " + path.getEndAddress().getId()); // debug
@@ -456,6 +484,7 @@ public class Tour extends Observable {
         // insert request in planning
         planningRequests.add(requestToInsert);
         updateLength();
+        updateTimes();
         notifyObservers();
     }
 

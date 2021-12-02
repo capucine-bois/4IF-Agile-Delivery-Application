@@ -29,7 +29,7 @@ public class AddCommand implements Command {
     @Override
     public void doCommand() {
         paths = tour.getListShortestPaths();
-        tour.insertRequest(request,paths);
+        tour.insertRequest(request,paths,intersections);
 
     }
 
