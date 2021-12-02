@@ -24,8 +24,6 @@ public class TextualView extends JPanel implements Observer {
     protected static final String PATH_DETAILS = "Show path";
     protected static final String DELETE_REQUEST = "Delete request";
     protected static final String ADD_REQUEST = "Add request";
-    protected static final String GO_UP = "Go up";
-    protected static final String GO_DOWN = "Go down";
 
     protected static List<JPanel> requestPanels;
     protected static List<JPanel> tourIntersectionsPanels;
@@ -254,57 +252,69 @@ public class TextualView extends JPanel implements Observer {
     private void displayPoint(JPanel parentPanel, ShortestPath shortestPath, boolean segmentDetails, int index) {
         Map<String, String> pointsInformation = new HashMap<>();
         if (shortestPath.getEndNodeNumber() != 0) {
-            boolean endAddressIsPickup = shortestPath.getEndNodeNumber()%2 == 1;
+            boolean endAddressIsPickup = shortestPath.getEndNodeNumber() % 2 == 1;
             pointsInformation.put("Type", endAddressIsPickup ? "Pickup" : "Delivery");
 
-            int requestIndex = endAddressIsPickup ? shortestPath.getEndNodeNumber()/2 : shortestPath.getEndNodeNumber()/2 - 1;
-            try {
-                Request request = tour.getPlanningRequests().get(requestIndex);
-                boolean pointSelected;
-                if (endAddressIsPickup) {
-                    pointsInformation.put("Arrival time", request.getPickupArrivalTime());
-                    pointsInformation.put("Process time", request.getPickupDuration()/60 + " min");
-                    pointsInformation.put("Departure time", request.getPickupDepartureTime());
-                    pointSelected = request.isPickupSelected();
-                } else {
-                    pointsInformation.put("Arrival time", request.getDeliveryArrivalTime());
-                    pointsInformation.put("Process time", request.getDeliveryDuration()/60 + " min");
-                    pointsInformation.put("Departure time", request.getDeliveryDepartureTime());
-                    pointSelected = request.isDeliverySelected();
-                }
-                displayInformation(parentPanel, pointsInformation, request.getColor(), segmentDetails ? null : tourIntersectionsPanels, pointSelected && !segmentDetails);
+            JPanel pointPanel = new JPanel();
+            pointPanel.setLayout(new BorderLayout());
+            int requestIndex = endAddressIsPickup ? shortestPath.getEndNodeNumber() / 2 : shortestPath.getEndNodeNumber() / 2 - 1;
+            Request request = tour.getPlanningRequests().get(requestIndex);
+            boolean pointSelected;
+            if (endAddressIsPickup) {
+                pointsInformation.put("Arrival time", request.getPickupArrivalTime());
+                pointsInformation.put("Process time", request.getPickupDuration() / 60 + " min");
+                pointsInformation.put("Departure time", request.getPickupDepartureTime());
+                pointSelected = request.isPickupSelected();
+            } else {
+                pointsInformation.put("Arrival time", request.getDeliveryArrivalTime());
+                pointsInformation.put("Process time", request.getDeliveryDuration() / 60 + " min");
+                pointsInformation.put("Departure time", request.getDeliveryDepartureTime());
+                pointSelected = request.isDeliverySelected();
+            }
+            displayInformation(pointPanel, pointsInformation, request.getColor(), segmentDetails ? null : tourIntersectionsPanels, pointSelected && !segmentDetails);
 
-                // check if intersection is first
-                if (index != 0) {
-                    JButton goUp = new JButton(GO_UP);
-                    try {
-                        window.setStyle(goUp);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    goUp.setPreferredSize(new Dimension(goUp.getPreferredSize().width, 30));
-                    goUpButtons.add(goUp);
-                    goUp.addActionListener(buttonListener);
-                    parentPanel.add(goUp, BorderLayout.LINE_END);
-                }
+            if (!segmentDetails) {
+                displayMoveButtons(index, pointPanel);
+            }
 
-                // check if intersection is last
-                if (index < tour.getListShortestPaths().size() -2) {
-                    JButton goDown = new JButton(GO_DOWN);
-                    try {
-                        window.setStyle(goDown);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    goDown.setPreferredSize(new Dimension(goDown.getPreferredSize().width, 30));
-                    goDownButtons.add(goDown);
-                    goDown.addActionListener(buttonListener);
-                    parentPanel.add(goDown, BorderLayout.LINE_END);
-                }
-
-
-            } catch (Exception ignored) {}
+            parentPanel.add(pointPanel);
         }
+    }
+
+    private void displayMoveButtons(int index, JPanel pointPanel) {
+        JPanel moveButtonsPanel = new JPanel();
+        moveButtonsPanel.setLayout(new GridLayout(3,1));
+        moveButtonsPanel.setBorder(BorderFactory.createMatteBorder(10,10,10,10,Constants.COLOR_4));
+        moveButtonsPanel.setBackground(Constants.COLOR_4);
+        // check if intersection is first
+        if (index != 0) {
+            displayButton(moveButtonsPanel, "move-up", goUpButtons);
+        } else {
+            moveButtonsPanel.add(new JLabel());
+        }
+
+        moveButtonsPanel.add(new JLabel());
+
+        // check if intersection is last
+        if (index < tour.getListShortestPaths().size() - 2) {
+            displayButton(moveButtonsPanel, "move-down", goDownButtons);
+        }
+
+        pointPanel.add(moveButtonsPanel, BorderLayout.LINE_END);
+    }
+
+    private void displayButton(JPanel moveButtonsPanel, String s, List<JButton> listButtons) {
+        JButton moveButton = new JButton();
+        try {
+            moveButton.setIcon(new ImageIcon(Constants.getImage(s)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        moveButton.setBorder(BorderFactory.createEmptyBorder());
+        moveButton.setBackground(Constants.COLOR_2);
+        listButtons.add(moveButton);
+        moveButton.addActionListener(buttonListener);
+        moveButtonsPanel.add(moveButton);
     }
 
     /**
@@ -463,6 +473,8 @@ public class TextualView extends JPanel implements Observer {
                 deleteRequest.addActionListener(buttonListener);
                 parentPanel.add(deleteRequest, BorderLayout.LINE_END);
             }
+
+            parentPanel.add(Box.createRigidArea(new Dimension(0, gap)));
 
         }
     }
