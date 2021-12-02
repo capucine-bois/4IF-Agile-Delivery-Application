@@ -16,15 +16,15 @@ public class TSP2 extends TSP1 {
         //Min cost for current vertex
         double minCostFromCurrent = Integer.MAX_VALUE;
         for(int i : unvisited) {
-            if(g.getCost(currentVertex, i) < minCostFromCurrent) {
+            if(g.getCost(currentVertex, i) < minCostFromCurrent /*&& g.getCost(currentVertex, i)!=-1*/) {
                 minCostFromCurrent = g.getCost(currentVertex, i);
             }
 
             //Min cost for unvisited vertex
             double minCost = g.getCost(i, 0);
             for(int j : unvisited) {
-                if( (g.getCost(i, j) < minCost) && (i!=j) ) {
-                    minCost = g.getCost(i, j);
+                if( g.getCost(i,j) < minCost && (i!=j) /*&& g.getCost(i,j)!=-1 */) {
+                    minCost = g.getCost(i,j);
                 }
             }
             evaluation = evaluation + minCost;
