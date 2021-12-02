@@ -116,6 +116,7 @@ public class TextualView extends JPanel implements Observer {
     private void displayTextualView() {
         requestsMainPanel.removeAll();
         tourMainPanel.removeAll();
+        requestsPanelWithAddButton.remove(addRequest);
         if (!tour.getPlanningRequests().isEmpty()) {
             displayRequests();
             if (!tour.getListShortestPaths().isEmpty()) {
@@ -398,6 +399,7 @@ public class TextualView extends JPanel implements Observer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        addRequest.setBackground(Constants.COLOR_12);
         addRequest.addActionListener(buttonListener);
     }
 
@@ -406,7 +408,6 @@ public class TextualView extends JPanel implements Observer {
      */
     private void displayRequests() {
         deleteRequestButtons.clear();
-        requestsPanelWithAddButton.remove(addRequest);
         requestsMainPanel.setLayout(new BoxLayout(requestsMainPanel, BoxLayout.Y_AXIS));
         requestsMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
         requestsMainPanel.setBackground(Constants.COLOR_4);
@@ -497,7 +498,7 @@ public class TextualView extends JPanel implements Observer {
         JPanel informationPanel = new JPanel();
         informationPanel.setLayout(new BorderLayout());
         displayColorPanel(color, informationPanel);
-        JPanel contentWithButtonPanel = createContentWithButtonPanel(informations, selected, tourIntersectionsPanels, segmentDetails);
+        JPanel contentWithButtonPanel = createContentWithButtonPanel(informations, selected, tourIntersectionsPanels, !segmentDetails);
         if (!segmentDetails) {
             displayMoveButtonsPanel(index, contentWithButtonPanel);
         }
