@@ -70,6 +70,11 @@ public class Tour extends Observable {
      */
     private boolean tourComputed;
 
+    /**
+     * Whether a delivery address is visited before a pickup address.
+     */
+    private boolean deliveryBeforePickup = false;
+
     /* CONSTRUCTORS */
 
     /**
@@ -113,6 +118,10 @@ public class Tour extends Observable {
 
     public SimpleDateFormat getParser() {
         return parser;
+    }
+
+    public boolean isDeliveryBeforePickup() {
+        return deliveryBeforePickup;
     }
 
     public double getSpeed() {
@@ -228,7 +237,7 @@ public class Tour extends Observable {
      * Method which calls dijkstra method, creates a graphe according to the result of dijkstra and then calls the TSP method
      * @param allIntersectionsList the list with all intersections of the map
      */
-    public void  computeTour(List<Intersection> allIntersectionsList) {
+    public void computeTour(List<Intersection> allIntersectionsList) {
 
 
             long startTimeDijkstra = System.currentTimeMillis();
@@ -630,7 +639,9 @@ public class Tour extends Observable {
         ArrayList<Intersection> intersections = new ArrayList<>();
         ArrayList<Integer> newOrder = new ArrayList<>();
 
-        // sanity check to verify it is not the first intersection to visit
+        this.deliveryBeforePickup = false;
+
+        // sanity check
         if (indexIntersection > 0 && indexIntersection < listShortestPaths.size()-1) {
 
             // get intersections for future paths
@@ -652,8 +663,6 @@ public class Tour extends Observable {
             listShortestPaths.remove(indexIntersection-1);
             listShortestPaths.remove(indexIntersection-1);
 
-
-
             for (int i=0; i<intersections.size()-1; i++) {
                 // init data for dijkstra
                 ArrayList<Intersection> endPoint = new ArrayList<>();
@@ -668,10 +677,16 @@ public class Tour extends Observable {
                 listShortestPaths.add(indexIntersection-1+i, path);
             }
 
+            // check if a delivery is before a pickup
+            for (int i=0; i<newOrder.size()-1; i++) {
+                if (newOrder.get(i+1) == newOrder.get(i)-1) {
+                    this.deliveryBeforePickup = true;
+                }
+            }
+
             updateLength();
             updateTimes();
             notifyObservers();
-
         }
     }
 
