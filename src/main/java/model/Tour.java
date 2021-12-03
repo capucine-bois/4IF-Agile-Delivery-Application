@@ -679,7 +679,7 @@ public class Tour extends Observable {
 
             // check if a delivery is before a pickup
             for (int i=0; i<newOrder.size()-1; i++) {
-                if (newOrder.get(i+1) == newOrder.get(i)-1) {
+                if (newOrder.get(i+1) == newOrder.get(i)-1 && newOrder.get(i) % 2 == 0) {
                     this.deliveryBeforePickup = true;
                 }
             }
