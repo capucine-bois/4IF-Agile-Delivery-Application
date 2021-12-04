@@ -60,8 +60,8 @@ public class DijkstraTest {
         Segment s11 = new Segment(118,"Boulevard Vivier-Merle",i5,i3);
         Segment s12 = new Segment(118,"oulevard Vivier-Pat",i3,i5);
         // Setup request
-        Request r1 = new Request(180,240,i2,i3,Color.BLACK);
-        Request r2 = new Request(90,185,i4,i5,Color.BLACK);
+        Request r1 = new Request(180,240,i2,i3);
+        Request r2 = new Request(90,185,i4,i5);
         i1.addAdjacentSegment(s2);
         i2.addAdjacentSegment(s3);
         i2.addAdjacentSegment(s9);
@@ -225,7 +225,7 @@ public class DijkstraTest {
             // Add request alone impossible to access by any segment
             Intersection aloneIntersec = new Intersection(10, 45.3112, 33.2245);
             Intersection aloneIntersec2 = new Intersection(11, 45.5112, 33.2245);
-            Request request = new Request(100, 120, aloneIntersec, aloneIntersec2, new Color(65, 65, 65));
+            Request request = new Request(100, 120, aloneIntersec, aloneIntersec2);
             listRequest.add(request);
 
             listIntersectionsDijkstra.add(aloneIntersec);

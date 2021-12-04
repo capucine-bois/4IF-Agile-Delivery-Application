@@ -6,7 +6,6 @@ import model.Tour;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -20,13 +19,16 @@ public class Window extends JFrame {
     protected static final String LOAD_REQUEST = "Load a request planning";
     protected static final String COMPUTE_TOUR = "Compute the tour";
     protected static final String STOP_COMPUTATION = "Stop the computation";
+    protected static final String CANCEL_SELECTION = "Cancel";
     protected static final String UNDO = "Undo";
 
 
     private ArrayList<JButton> buttons;
     private JPanel header;
     private JPanel graphicalPanel;
-    private JPanel computingPanel;
+    private JPanel popUpGraphicalView;
+    private JLabel popUpGraphicalViewMessage;
+    private JButton popUpGraphicalViewButton;
     private GraphicalView graphicalView;
     private TextualView textualView;
     private PopUpView popUpView;
@@ -80,23 +82,35 @@ public class Window extends JFrame {
         graphicalPanel = new JPanel();
         graphicalPanel.setLayout(new BorderLayout());
 
-        computingPanel = new JPanel();
-        computingPanel.setLayout(new BorderLayout());
-        computingPanel.setBackground(Constants.COLOR_4);
-        computingPanel.setBorder(BorderFactory.createMatteBorder(10, 10, 0, 10, Constants.COLOR_1));
+        popUpGraphicalView = new JPanel();
+        popUpGraphicalView.setLayout(new BorderLayout());
+        popUpGraphicalView.setBackground(Constants.COLOR_4);
+        popUpGraphicalView.setBorder(BorderFactory.createMatteBorder(10, 10, 0, 10, Constants.COLOR_1));
 
-        JLabel computationMessage = new JLabel("<html><p>Computation of best tour in progress...<br/>You can stop the computation and continue with the best tour currently found.</p></html>");
-        computationMessage.setFont(Constants.getFont("DMSans-Medium.ttf", 12));
-        computationMessage.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        computationMessage.setForeground(Constants.COLOR_3);
-        computingPanel.add(computationMessage);
-        JButton stopComputation = new JButton(STOP_COMPUTATION);
-        setStyle(stopComputation);
-        stopComputation.addActionListener(buttonListener);
-        computingPanel.add(stopComputation, BorderLayout.LINE_END);
+        popUpGraphicalViewMessage = new JLabel();
+        popUpGraphicalViewMessage.setFont(Constants.getFont("DMSans-Medium.ttf", 12));
+        popUpGraphicalViewMessage.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        popUpGraphicalViewMessage.setForeground(Constants.COLOR_3);
+        popUpGraphicalView.add(popUpGraphicalViewMessage);
+        popUpGraphicalViewButton = new JButton();
+        setStyle(popUpGraphicalViewButton);
+        popUpGraphicalViewButton.addActionListener(buttonListener);
+        popUpGraphicalView.add(popUpGraphicalViewButton, BorderLayout.LINE_END);
 
         graphicalPanel.add(graphicalView);
         getContentPane().add(graphicalPanel);
+    }
+
+    private void setPopUpGraphicalViewForComputing() {
+        popUpGraphicalViewMessage.setText("<html><p>Computation of best tour in progress...<br/>You can stop the computation and continue with the best tour currently found.</p></html>");
+        popUpGraphicalViewButton.setText(STOP_COMPUTATION);
+        popUpGraphicalViewButton.setPreferredSize(new Dimension(160, popUpGraphicalViewButton.getPreferredSize().height));
+    }
+
+    private void setPopUpGraphicalViewForSelection() {
+        popUpGraphicalViewMessage.setText("<html><p>Choose an address by clicking on a red point on the map.</p></html>");
+        popUpGraphicalViewButton.setText(CANCEL_SELECTION);
+        popUpGraphicalViewButton.setPreferredSize(new Dimension(80, popUpGraphicalViewButton.getPreferredSize().height));
     }
 
     /**
@@ -208,22 +222,6 @@ public class Window extends JFrame {
     }
 
     /**
-     * Display loader while computing.
-     */
-    public void showLoader() {
-        this.disableElements();
-        this.popUpView.showLoader();
-    }
-
-    /**
-     * Hide loading when TSP solution has been found.
-     */
-    public void hideLoader() {
-        this.resetComponentsState();
-        this.popUpView.hideLoader();
-    }
-
-    /**
      * Show requests panel on textual view.
      */
     public void showRequestsPanel() {
@@ -235,6 +233,10 @@ public class Window extends JFrame {
      */
     public void showTourPanel() {
         textualView.showTourPanel();
+    }
+
+    public void showAddRequestPanel() {
+        textualView.showAddRequestPanel();
     }
 
     /**
@@ -300,20 +302,29 @@ public class Window extends JFrame {
         buttons.get(buttons.size()-1).setEnabled(state);
     }
 
-    /**
-     * Show computing panel when TSP computation starts.
-     */
     public void showComputingPanel() {
-        graphicalPanel.add(computingPanel, BorderLayout.PAGE_START);
+        setPopUpGraphicalViewForComputing();
+        graphicalPanel.add(popUpGraphicalView, BorderLayout.PAGE_START);
         revalidate();
     }
 
-    /**
-     * Hide computing panel when TSP solution has been found.
-     */
     public void hideComputingPanel() {
-        graphicalPanel.remove(computingPanel);
+        graphicalPanel.remove(popUpGraphicalView);
         revalidate();
     }
 
+    public void enterSelectionMode() {
+        setPopUpGraphicalViewForSelection();
+        graphicalPanel.add(popUpGraphicalView, BorderLayout.PAGE_START);
+        revalidate();
+        graphicalView.enterSelectionMode();
+        textualView.setEnabledAddRequestButtons(false);
+    }
+
+    public void exitSelectionMode() {
+        graphicalPanel.remove(popUpGraphicalView);
+        revalidate();
+        graphicalView.exitSelectionMode();
+        textualView.setEnabledAddRequestButtons(true);
+    }
 }

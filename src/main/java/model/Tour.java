@@ -76,6 +76,8 @@ public class Tour extends Observable {
      */
     private boolean deliveryBeforePickup = false;
 
+    private Request newRequest;
+
     /* CONSTRUCTORS */
 
     /**
@@ -86,6 +88,7 @@ public class Tour extends Observable {
         listShortestPaths = new ArrayList<>();
         intersectionsUnreachableFromDepot = new ArrayList<>();
         tourComputed = false;
+        newRequest = null;
     }
 
     /* GETTERS */
@@ -132,6 +135,10 @@ public class Tour extends Observable {
     public boolean isTourComputed() {
         return tourComputed;
     }
+
+    public Request getNewRequest() {
+        return newRequest;
+    }
     /* SETTERS */
 
     public void setTourLength(double tourLength) {
@@ -156,6 +163,9 @@ public class Tour extends Observable {
         this.tourComputed = tourComputed;
     }
 
+    public void setNewRequest(Request newRequest) {
+        this.newRequest = newRequest;
+    }
     /* METHODS */
 
     /**

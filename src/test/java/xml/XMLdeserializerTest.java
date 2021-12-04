@@ -86,8 +86,8 @@ public class XMLdeserializerTest {
             this.cityMap.addIntersection(intersection);
         }
         this.listRequest =  new ArrayList<>();
-        this.listRequest.add(new Request(0,600,listIntersection.get(0),listIntersection.get(1), Color.blue));
-        this.listRequest.add(new Request(600,120,listIntersection.get(3),listIntersection.get(6), Color.red));
+        this.listRequest.add(new Request(0,600,listIntersection.get(0),listIntersection.get(1)));
+        this.listRequest.add(new Request(600,120,listIntersection.get(3),listIntersection.get(6)));
     }
 
 

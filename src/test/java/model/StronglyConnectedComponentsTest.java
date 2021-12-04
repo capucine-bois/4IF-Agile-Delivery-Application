@@ -65,8 +65,8 @@ class StronglyConnectedComponentsTest {
         Segment s11 = new Segment(118,"Boulevard Vivier-Merle",i5,i3);
         Segment s12 = new Segment(118,"oulevard Vivier-Pat",i3,i5);
         // Setup request
-        Request r1 = new Request(180,240,i2,i3, Color.BLACK);
-        Request r2 = new Request(90,185,i4,i5,Color.BLACK);
+        Request r1 = new Request(180,240,i2,i3);
+        Request r2 = new Request(90,185,i4,i5);
         i1.addAdjacentSegment(s2);
         i2.addAdjacentSegment(s3);
         i2.addAdjacentSegment(s9);
@@ -102,9 +102,9 @@ class StronglyConnectedComponentsTest {
         // i8 one way
         Segment s13 = new Segment(54,"Rue des bonbons",i1,i7);
         Segment s14 = new Segment(123,"Rue de la joie",i8,i1);
-        Request r3 = new Request(180,220,listIntersection.get(2),i8, Color.BLACK);
-        Request r4 = new Request(120,210,i7,listIntersection.get(2), Color.BLACK);
-        Request r5 = new Request(120,210,i9,listIntersection.get(2), Color.BLACK);
+        Request r3 = new Request(180,220,listIntersection.get(2),i8);
+        Request r4 = new Request(120,210,i7,listIntersection.get(2));
+        Request r5 = new Request(120,210,i9,listIntersection.get(2));
 
         i7.addAdjacentSegment(s13);
         i1.addAdjacentSegment(s14);
