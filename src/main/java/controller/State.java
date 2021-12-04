@@ -233,6 +233,12 @@ public abstract class State {
         if (l.size() == 0) {
             window.setUndoButtonState(false);
         }
+        window.setRedoButtonState(true);
+    }
+
+    public void redo(ListOfCommands l, Window window){
+        l.redo();
+        if (l.size() == 0) window.setRedoButtonState(false);
     }
 
 
@@ -259,4 +265,5 @@ public abstract class State {
     public void leftClickOnIntersection(int indexIntersection, CityMap cityMap, Tour tour, Window window, Controller controller) {}
 
     public void insertRequest(String pickupTime, String deliveryTime, CityMap cityMap, Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {}
+
 }

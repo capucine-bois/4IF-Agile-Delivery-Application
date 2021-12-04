@@ -30,8 +30,8 @@ public class DeleteCommand implements Command {
 
     @Override
     public void doCommand() {
-
-        paths = tour.removeRequest(request, indexRequest, intersections);
+        paths =
+                tour.removeRequest(request, indexRequest, intersections);
     }
 
     @Override
