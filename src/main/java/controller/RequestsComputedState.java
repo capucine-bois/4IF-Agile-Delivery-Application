@@ -64,6 +64,7 @@ public class RequestsComputedState extends State{
         tour.setNewRequest(new Request());
         window.showAddRequestPanel();
         window.setEnabledTour(false);
+        window.setDefaultButtonStates(new boolean[]{false, false, false});
         controller.setCurrentState(controller.addRequestState);
         tour.notifyObservers();
     }

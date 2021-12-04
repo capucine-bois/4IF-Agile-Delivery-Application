@@ -24,6 +24,7 @@ public class AddRequestState extends State{
         window.setEnabledTour(true);
         window.showRequestsPanel();
         tour.setNewRequest(null);
+        window.setDefaultButtonStates(new boolean[]{true, true, false});
         controller.setCurrentState(controller.requestsComputedState);
         tour.notifyObservers();
     }
@@ -39,6 +40,7 @@ public class AddRequestState extends State{
             listOfCommands.add(new AddCommand(tour, tour.getNewRequest(), cityMap.getIntersections()));
             window.showRequestsPanel();
             window.setEnabledTour(true);
+            window.setDefaultButtonStates(new boolean[]{true, true, false});
             controller.setCurrentState(controller.requestsComputedState);
         } else if (tour.getNewRequest().getPickupAddress() == null) {
             window.displayErrorMessage("No pickup address selected.");

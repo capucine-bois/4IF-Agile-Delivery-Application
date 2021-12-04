@@ -27,6 +27,7 @@ public abstract class State {
     public void defaultLoadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
         try {
             XMLDeserializer.loadMap(cityMap);
+            window.setDefaultButtonStates(new boolean[]{true, true, false});
             controller.setCurrentState(controller.mapLoadedState);
             tour.clearLists();
             window.showRequestsPanel();
@@ -38,6 +39,7 @@ public abstract class State {
                 cityMap.clearLists();
                 tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
+                window.setDefaultButtonStates(new boolean[]{true, false, false});
                 controller.setCurrentState(controller.initialState);
                 window.showRequestsPanel();
                 window.setEnabledRequests(false);
@@ -64,6 +66,7 @@ public abstract class State {
             if (!tour.getIntersectionsUnreachableFromDepot().isEmpty()) {
                 throw new ExceptionXML("An address in the planning is unreachable.");
             }
+            window.setDefaultButtonStates(new boolean[]{true, true, true});
             controller.setCurrentState(controller.requestsLoadedState);
             window.showRequestsPanel();
             window.setEnabledTour(false);
@@ -73,6 +76,7 @@ public abstract class State {
                 Request.lastColor = Color.red;
                 tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
+                window.setDefaultButtonStates(new boolean[]{true, true, false});
                 controller.setCurrentState(controller.mapLoadedState);
                 window.showRequestsPanel();
                 window.setEnabledRequests(false);

@@ -53,21 +53,7 @@ public class Controller {
      */
     public void setCurrentState(State state) {
         System.out.println("state = " + state);
-        //TODO : put all these conditions in each state so this method would only be a setter
         this.currentState = state;
-        if (state == initialState) {
-            window.setDefaultButtonStates(new boolean[]{true, false, false});
-        } else if (state == mapLoadedState || state == tourComputedState ||
-                state == pathDetailsComputedState || state == requestsComputedState ||
-                state == selectedIntersectionState || state == selectedRequestState){
-            window.setDefaultButtonStates(new boolean[]{true, true, false});
-        } else if (state == tourComputingState || state == requestsComputingState ||
-                state == addRequestState || state == pickupAddressSelectionState ||
-                state == deliveryAddressSelectionState) {
-            window.setDefaultButtonStates(new boolean[]{false, false, false});
-        } else {
-            window.setDefaultButtonStates(new boolean[]{true, true, true});
-        }
     }
 
     // Methods corresponding to user events
