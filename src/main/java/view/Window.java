@@ -237,6 +237,10 @@ public class Window extends JFrame {
         textualView.showTourPanel();
     }
 
+    public void showAddRequestPanel() {
+        textualView.showAddRequestPanel();
+    }
+
     /**
      * Disable or enable requests panels.
      * @param enabled whether panels must be enabled or not.
@@ -315,5 +319,4 @@ public class Window extends JFrame {
         graphicalPanel.remove(computingPanel);
         revalidate();
     }
-
 }

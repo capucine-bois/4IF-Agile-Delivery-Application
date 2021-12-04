@@ -39,6 +39,7 @@ public class TextualView extends JPanel implements Observer {
     private JButton requestsHeader;
     private JButton tourHeader;
     private JButton addRequest;
+    private JButton validateAddRequest;
     private JPanel cardLayoutPanel;
     private JPanel requestsPanelWithAddButton;
     private JPanel requestsMainPanel;
@@ -73,6 +74,7 @@ public class TextualView extends JPanel implements Observer {
         createCardLayout();
         createRequestsPanel();
         createTourPanel();
+        createAddRequestPanel();
     }
 
     /**
@@ -122,11 +124,6 @@ public class TextualView extends JPanel implements Observer {
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(null);
         requestsPanelWithAddButton.add(scrollPane);
-        createAddRequestButton();
-        cardLayoutPanel.add("requests", requestsPanelWithAddButton);
-    }
-
-    private void createAddRequestButton() {
         addRequest = new JButton(ADD_REQUEST);
         try {
             window.setStyle(addRequest);
@@ -135,8 +132,8 @@ public class TextualView extends JPanel implements Observer {
         }
         addRequest.setBackground(Constants.COLOR_12);
         addRequest.addActionListener(buttonListener);
+        cardLayoutPanel.add("requests", requestsPanelWithAddButton);
     }
-
     /**
      * Create panel for "Tour" tab.
      */
@@ -147,6 +144,74 @@ public class TextualView extends JPanel implements Observer {
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(null);
         cardLayoutPanel.add("tour", scrollPane);
+    }
+
+    private void createAddRequestPanel() {
+        JPanel addRequestPanel = new JPanel();
+        addRequestPanel.setLayout(new BorderLayout());
+        JScrollPane scrollPane = new JScrollPane(addRequestPanel);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBorder(null);
+        displayAddRequest(addRequestPanel);
+        cardLayoutPanel.add("addRequest", scrollPane);
+    }
+
+    private void displayAddRequest(JPanel parentPanel) {
+        JPanel pickupAndDelivery = new JPanel();
+        pickupAndDelivery.setLayout(new BoxLayout(pickupAndDelivery, BoxLayout.Y_AXIS));
+        pickupAndDelivery.setBackground(Constants.COLOR_4);
+        displayAddRequestPoint(pickupAndDelivery, "Pickup");
+        displayAddRequestPoint(pickupAndDelivery, "Delivery");
+        parentPanel.add(pickupAndDelivery);
+        validateAddRequest = new JButton(ADD_REQUEST);
+        try {
+            window.setStyle(validateAddRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        validateAddRequest.setBackground(Constants.COLOR_12);
+        validateAddRequest.addActionListener(buttonListener);
+        parentPanel.add(validateAddRequest, BorderLayout.PAGE_END);
+    }
+
+    private void displayAddRequestPoint(JPanel parentPanel, String pointType) {
+        JPanel addRequestPointPanel = new JPanel();
+        addRequestPointPanel.setLayout(new BoxLayout(addRequestPointPanel, BoxLayout.Y_AXIS));
+
+        JPanel chooseAddressPanel = new JPanel();
+        chooseAddressPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        chooseAddressPanel.setBackground(Constants.COLOR_4);
+        addLine(chooseAddressPanel, pointType, "", false, 14);
+        JButton chooseAddress = new JButton("Choose address");
+        try {
+            window.setStyle(chooseAddress);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        chooseAddressPanel.add(chooseAddress);
+        addRequestPointPanel.add(chooseAddressPanel);
+
+        JPanel addressPanel = new JPanel();
+        addressPanel.setLayout((new FlowLayout(FlowLayout.LEFT)));
+        addressPanel.setBackground(Constants.COLOR_4);
+        addLine(addressPanel, "Address", "No address selected", false, 12);
+        addRequestPointPanel.add(addressPanel);
+
+        JPanel chooseTimePanel = new JPanel();
+        chooseTimePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        chooseTimePanel.setBackground(Constants.COLOR_4);
+        addLine(chooseTimePanel, "Time", "", false, 12);
+        JSpinner timeField = new JSpinner();
+        timeField.setPreferredSize(new Dimension(100, 30));
+        chooseTimePanel.add(timeField);
+        addRequestPointPanel.add(chooseTimePanel);
+
+        addRequestPointPanel.setMaximumSize(new Dimension(getMaximumSize().width, 126));
+
+        parentPanel.add(Box.createRigidArea(new Dimension(0, gap)));
+        parentPanel.add(addRequestPointPanel);
+        parentPanel.add(Box.createRigidArea(new Dimension(0, gap)));
     }
 
     /**
@@ -171,6 +236,7 @@ public class TextualView extends JPanel implements Observer {
      */
     private void displayRequests() {
         deleteRequestButtons.clear();
+        requestPanels.clear();
         requestsMainPanel.setLayout(new BoxLayout(requestsMainPanel, BoxLayout.Y_AXIS));
         requestsMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
         requestsMainPanel.setBackground(Constants.COLOR_4);
@@ -199,7 +265,6 @@ public class TextualView extends JPanel implements Observer {
      * @param parentPanel parent panel
      */
     private void displayRequestsInformation(JPanel parentPanel) {
-        requestPanels.clear();
         for (Request request : tour.getPlanningRequests()) {
             Map<String, String> requestInformation = new HashMap<>();
             String pickupCoordinates = request.getPickupAddress().getLatitude() + ", " + request.getPickupAddress().getLongitude();
@@ -618,6 +683,10 @@ public class TextualView extends JPanel implements Observer {
     public void showTourPanel() {
         changeButton(requestsHeader, tourHeader);
         cardLayout.show(cardLayoutPanel, "tour");
+    }
+
+    public void showAddRequestPanel() {
+        cardLayout.show(cardLayoutPanel, "addRequest");
     }
 
     /**
