@@ -234,62 +234,86 @@ public class Tour extends Observable {
     }
 
     /**
-     * Method which calls dijkstra method, creates a graphe according to the result of dijkstra and then calls the TSP method
+     * Method which calls dijkstra method, creates a graph according to the result of dijkstra and then calls the TSP method
      * @param allIntersectionsList the list with all intersections of the map
      */
     public void computeTour(List<Intersection> allIntersectionsList) {
-            long startTimeDijkstra = System.currentTimeMillis();
+        ArrayList<Node> listNodes = new ArrayList<>();
 
-            ArrayList<Node> listNodes = new ArrayList<>();
-            // get the points useful for the computing : pick-up address, delivery address, depot
-            ArrayList<Intersection> listUsefulPoints = new ArrayList<>();
-            ArrayList<Intersection> listUsefulEndPointsForDepot = new ArrayList<>();
+        processDijkstraToComputeTour(allIntersectionsList, listNodes);
+        TSP tsp = new TSP3();
+        Graph g = new CompleteGraph(listNodes, this);
 
-            listUsefulPoints.add(depotAddress);
+        // Run Tour
+        tsp.searchSolution(1000000, g, this);
 
-            for (int i = 0; i < planningRequests.size(); i++) {
-                Intersection pickupReq1 = planningRequests.get(i).getPickupAddress();
-                listUsefulPoints.add(pickupReq1);
-                Intersection deliveryReq1 = planningRequests.get(i).getDeliveryAddress();
-                listUsefulPoints.add(deliveryReq1);
-                // gets the ends points useful for the computing according to the start point
-                ArrayList<Intersection> listUsefulEndPointsPickUp = new ArrayList<>();
-                ArrayList<Intersection> listUsefulEndPointsDelivery = new ArrayList<>();
+    }
 
-                listUsefulEndPointsPickUp.add(deliveryReq1);
-                listUsefulEndPointsDelivery.add(depotAddress);
-                // addingpickUp to the endPoints of depot
-                listUsefulEndPointsForDepot.add(pickupReq1);
+    /**
+     * Identify all useful points and runs Dijkstra in order compute the tour.
+     * @param allIntersectionsList
+     * @param listNodes
+     */
+    private void processDijkstraToComputeTour(List<Intersection> allIntersectionsList, ArrayList<Node> listNodes) {
+        long startTimeDijkstra = System.currentTimeMillis();
+        // get the points useful for the computing : pick-up address, delivery address, depot
+        ArrayList<Intersection> listUsefulPoints = new ArrayList<>();
+        ArrayList<Intersection> listUsefulEndPointsForDepot = new ArrayList<>();
 
-                for (int j = 0; j < planningRequests.size(); j++) {
-                    Intersection pickupReq2 = planningRequests.get(j).getPickupAddress();
-                    Intersection deliveryReq2 = planningRequests.get(j).getDeliveryAddress();
-                    if (i != j) {
-                        listUsefulEndPointsPickUp.add(pickupReq2);
-                        listUsefulEndPointsPickUp.add(deliveryReq2);
-                        listUsefulEndPointsDelivery.add(pickupReq2);
-                        listUsefulEndPointsDelivery.add(deliveryReq2);
-                    }
-                }
-                ArrayList<ShortestPath> shortestPathsFromPickUp = Dijkstra.compute(allIntersectionsList, listUsefulEndPointsPickUp, pickupReq1);
-                ArrayList<ShortestPath> shortestPathsFromDelivery = Dijkstra.compute(allIntersectionsList, listUsefulEndPointsDelivery, deliveryReq1);
+        listUsefulPoints.add(depotAddress);
 
-                listNodes.add(new Node(pickupReq1, shortestPathsFromPickUp, i + 1));
-                listNodes.add(new Node(deliveryReq1, shortestPathsFromDelivery, i + 2));
+        for (int i = 0; i < planningRequests.size(); i++) {
+            Intersection pickupReq1 = planningRequests.get(i).getPickupAddress();
+            listUsefulPoints.add(pickupReq1);
+            Intersection deliveryReq1 = planningRequests.get(i).getDeliveryAddress();
+            listUsefulPoints.add(deliveryReq1);
+            // gets the ends points useful for the computing according to the start point
+            ArrayList<Intersection> listUsefulEndPointsPickUp = new ArrayList<>();
+            ArrayList<Intersection> listUsefulEndPointsDelivery = new ArrayList<>();
+
+            // get all useful end points
+            identifyUsefulEndPoints(listUsefulEndPointsForDepot, i, pickupReq1, deliveryReq1, listUsefulEndPointsPickUp, listUsefulEndPointsDelivery);
+
+            // execute Dijkstra
+            ArrayList<ShortestPath> shortestPathsFromPickUp = Dijkstra.compute(allIntersectionsList, listUsefulEndPointsPickUp, pickupReq1);
+            ArrayList<ShortestPath> shortestPathsFromDelivery = Dijkstra.compute(allIntersectionsList, listUsefulEndPointsDelivery, deliveryReq1);
+
+            listNodes.add(new Node(pickupReq1, shortestPathsFromPickUp, i + 1));
+            listNodes.add(new Node(deliveryReq1, shortestPathsFromDelivery, i + 2));
+        }
+
+        listNodes.add(0, new Node(depotAddress, Dijkstra.compute(allIntersectionsList, listUsefulEndPointsForDepot, depotAddress), 0));
+
+        // print the time to compute Dijkstra
+        System.out.println("Dijkstra finished in "
+                + (System.currentTimeMillis() - startTimeDijkstra) + "ms\n");
+    }
+
+
+    /**
+     * get all useful end points for the intersections of the current request (at index i)
+     * @param listUsefulEndPointsForDepot
+     * @param i current index in main loop
+     * @param pickupReq1
+     * @param deliveryReq1
+     * @param listUsefulEndPointsPickUp
+     * @param listUsefulEndPointsDelivery
+     */
+    private void identifyUsefulEndPoints(ArrayList<Intersection> listUsefulEndPointsForDepot, int i, Intersection pickupReq1, Intersection deliveryReq1, ArrayList<Intersection> listUsefulEndPointsPickUp, ArrayList<Intersection> listUsefulEndPointsDelivery) {
+        listUsefulEndPointsPickUp.add(deliveryReq1);
+        listUsefulEndPointsDelivery.add(depotAddress);
+        listUsefulEndPointsForDepot.add(pickupReq1);
+
+        for (int j = 0; j < planningRequests.size(); j++) {
+            Intersection pickupReq2 = planningRequests.get(j).getPickupAddress();
+            Intersection deliveryReq2 = planningRequests.get(j).getDeliveryAddress();
+            if (i != j) {
+                listUsefulEndPointsPickUp.add(pickupReq2);
+                listUsefulEndPointsPickUp.add(deliveryReq2);
+                listUsefulEndPointsDelivery.add(pickupReq2);
+                listUsefulEndPointsDelivery.add(deliveryReq2);
             }
-
-            listNodes.add(0, new Node(depotAddress, Dijkstra.compute(allIntersectionsList, listUsefulEndPointsForDepot, depotAddress), 0));
-
-            // print the time to compute Dijkstra
-            System.out.println("Dijkstra finished in "
-                    + (System.currentTimeMillis() - startTimeDijkstra) + "ms\n");
-
-            TSP tsp = new TSP3();
-            Graph g = new CompleteGraph(listNodes, this);
-
-            // Run Tour
-            tsp.searchSolution(1000000, g, this);
-
+        }
     }
 
     /**
