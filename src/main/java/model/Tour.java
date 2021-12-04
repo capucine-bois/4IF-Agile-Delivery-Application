@@ -172,7 +172,7 @@ public class Tour extends Observable {
         for (ShortestPath path: listShortestPaths) {
 
             calendar.add(Calendar.SECOND, (int) metersToSeconds(path.getPathLength()));
-            String arrivageTime = parser.format(calendar.getTime());
+            String arrivalTime = parser.format(calendar.getTime());
 
             System.out.println("EndNode: " + path.getEndNodeNumber());
 
@@ -181,12 +181,13 @@ public class Tour extends Observable {
                 boolean endAddressIsPickup = path.getEndNodeNumber()%2 == 1;
                 int indexRequest = endAddressIsPickup ? path.getEndNodeNumber()/2 : path.getEndNodeNumber()/2 - 1;
 
+                Request currentRrequest = planningRequests.get(indexRequest);
                 if (endAddressIsPickup) {
                     // pickup
-                    processDuration = planningRequests.get(indexRequest).getPickupDuration();
+                    processDuration = currentRrequest.getPickupDuration();
                 } else {
                     // delivery
-                    processDuration = planningRequests.get(indexRequest).getDeliveryDuration();
+                    processDuration = currentRrequest.getDeliveryDuration();
                 }
 
                 calendar.add(Calendar.SECOND, processDuration);
@@ -194,16 +195,16 @@ public class Tour extends Observable {
 
                 if (endAddressIsPickup) {
                     // pickup
-                    planningRequests.get(indexRequest).setPickupArrivalTime(arrivageTime);
-                    planningRequests.get(indexRequest).setPickupDepartureTime(departureTime);
+                    currentRrequest.setPickupArrivalTime(arrivalTime);
+                    currentRrequest.setPickupDepartureTime(departureTime);
                 } else {
                     // delivery
-                    planningRequests.get(indexRequest).setDeliveryArrivalTime(arrivageTime);
-                    planningRequests.get(indexRequest).setDeliveryDepartureTime(departureTime);
+                    currentRrequest.setDeliveryArrivalTime(arrivalTime);
+                    currentRrequest.setDeliveryDepartureTime(departureTime);
                 }
             } else {
                 System.out.println("Depot!");
-                arrivalTime = arrivageTime;
+                this.arrivalTime = arrivalTime;
             }
 
         }
@@ -414,7 +415,7 @@ public class Tour extends Observable {
      * he can do it with the arrows in the textualView)
      * @param requestToAdd request to add
      * @param paths all the paths of the map
-     * @param allIntersections all the intersectins of the map
+     * @param allIntersections all the intersections of the map
      */
     public void insertRequest(Request requestToAdd, List<ShortestPath> paths, List<Intersection> allIntersections){
         System.out.println("Tour.addRequest");
@@ -520,7 +521,7 @@ public class Tour extends Observable {
 
     /**
      * Update the order of by decreasing the nodes numbers in the list of
-     * shortests paths of the tour after adding an intersection
+     * shortest paths of the tour after adding an intersection
      * @param intersectionsToAdd
      */
     private void increaseNodeNumbers(ArrayList<Integer> intersectionsToAdd) {
@@ -577,7 +578,7 @@ public class Tour extends Observable {
 
     /**
      * Update the order of by decreasing the nodes numbers in the list of
-     * shortests paths of the tour after removing an intersection
+     * shortest paths of the tour after removing an intersection
      * @param intersectionToRemove
      */
     private void decreaseNodeNumbers(ArrayList<Integer> intersectionToRemove) {
@@ -656,22 +657,24 @@ public class Tour extends Observable {
      */
     private ArrayList<Integer> removePathsFromAndTowardPoint(Request requestToDelete, ArrayList<ShortestPath> deleted) {
         int i = 0;
+        Intersection pickupAddress = requestToDelete.getPickupAddress();
+        Intersection deliveryAddress = requestToDelete.getDeliveryAddress();
         ArrayList<Integer> intersectionToRemove = new ArrayList<>();
         while (i<listShortestPaths.size()) {
             ShortestPath path = listShortestPaths.get(i);
-            if (path.getEndAddress().equals(requestToDelete.getPickupAddress()) ||
-                    path.getEndAddress().equals(requestToDelete.getDeliveryAddress())) {
+            if (path.getEndAddress().equals(pickupAddress) ||
+                    path.getEndAddress().equals(deliveryAddress)) {
                 if (!intersectionToRemove.contains(path.getEndNodeNumber())) {
                     intersectionToRemove.add(path.getEndNodeNumber());
                 }
-                deleted.add(listShortestPaths.get(i));
+                deleted.add(path);
                 listShortestPaths.remove(i);
-            } else if (path.getStartAddress().equals(requestToDelete.getPickupAddress()) ||
-                    path.getStartAddress().equals(requestToDelete.getDeliveryAddress())) {
+            } else if (path.getStartAddress().equals(pickupAddress) ||
+                    path.getStartAddress().equals(deliveryAddress)) {
                 if (!intersectionToRemove.contains(path.getStartNodeNumber())) {
                     intersectionToRemove.add(path.getStartNodeNumber());
                 }
-                deleted.add(listShortestPaths.get(i));
+                deleted.add(path);
                 listShortestPaths.remove(i);
             } else {
                 i++;
