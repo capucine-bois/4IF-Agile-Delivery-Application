@@ -27,7 +27,7 @@ public class MapLoadedState extends State {
             XMLDeserializer.loadRequests(tour, cityMap);
             tour.checkIntersectionsUnreachable(cityMap.getIntersections());
             if (!tour.getIntersectionsUnreachableFromDepot().isEmpty()) {
-                throw new ExceptionXML("An address is unreachable.");
+                throw new ExceptionXML("An address in the planning is unreachable.");
             }
             controller.setCurrentState(controller.requestsLoadedState);
             tour.notifyObservers();
