@@ -24,9 +24,6 @@ public class TourComputingState extends State {
     }
 
     @Override
-    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {}
-
-    @Override
     public void leftClickOnTourIntersection(int indexShortestPath, Tour tour, Controller controller) {
         defaultLeftClickOnTourIntersection(indexShortestPath, tour);
     }

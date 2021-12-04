@@ -52,8 +52,9 @@ public abstract class State {
      * @param window the window where to show map and popup messages
      * @param controller application controller
      */
-    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        // TODO : put this method with default as other methods so we don't need to define it empty when we don't want to use it
+    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {}
+
+    protected void defaultLoadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
         try {
             Request.lastColor = Color.red;
             XMLDeserializer.loadRequests(tour, cityMap);

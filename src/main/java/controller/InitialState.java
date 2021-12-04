@@ -20,8 +20,4 @@ public class InitialState extends State {
         super.loadMap(cityMap, tour, window, controller);
         cityMap.notifyObservers();
     }
-
-    @Override
-    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {}
-
 }

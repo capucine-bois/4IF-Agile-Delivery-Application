@@ -20,6 +20,11 @@ public class RequestsComputedState extends State{
     }
 
     @Override
+    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
+        defaultLoadRequests(cityMap, tour, window, controller);
+    }
+
+    @Override
     public void showTourPanel(Tour tour, Window window, Controller controller) {
         window.showTourPanel();
         tour.notifyObservers();
