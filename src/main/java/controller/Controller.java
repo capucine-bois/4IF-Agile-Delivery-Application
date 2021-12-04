@@ -2,6 +2,8 @@ package controller;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import model.*;
 import view.Window;
@@ -194,8 +196,8 @@ public class Controller {
      * Add a request in an already computed tour.
      *
      */
-    public void insertRequest() {
-        currentState.insertRequest(tour, window, this);
+    public void addRequest() {
+        currentState.addRequest(tour, window, this);
     }
 
     /**
@@ -238,5 +240,9 @@ public class Controller {
 
     public void leftClickOnIntersection(int indexIntersection) {
         currentState.leftClickOnIntersection(indexIntersection, cityMap, tour, window, this);
+    }
+
+    public void insertRequest(String pickupTime, String deliveryTime) {
+        currentState.insertRequest(pickupTime, deliveryTime, cityMap, tour, window, listOfCommands, this);
     }
 }

@@ -25,6 +25,7 @@ public class TextualView extends JPanel implements Observer {
     protected static final String DELETE_REQUEST = "Delete request";
     protected static final String ADD_REQUEST = "Add request";
     protected static final String CANCEL_ADD_REQUEST = "Cancel";
+    protected static final String CONTINUE_ADD_REQUEST = "Continue";
     protected static final String CHOOSE_ADDRESS = "Choose address";
 
     protected static List<JPanel> requestPanels;
@@ -34,6 +35,7 @@ public class TextualView extends JPanel implements Observer {
     protected static List<JButton> goUpButtons;
     protected static List<JButton> goDownButtons;
     protected static List<JButton> chooseAddressButtons;
+    protected static List<JSpinner> timeFields;
 
     private Tour tour;
     private final int gap = 20;
@@ -72,6 +74,7 @@ public class TextualView extends JPanel implements Observer {
         goUpButtons = new ArrayList<>();
         goDownButtons = new ArrayList<>();
         chooseAddressButtons = new ArrayList<>();
+        timeFields = new ArrayList<>();
         addRequestButtons = new ArrayList<>();
         mouseListener.setTextualView(this);
         this.mouseListener = mouseListener;
@@ -436,6 +439,7 @@ public class TextualView extends JPanel implements Observer {
 
     private void displayAddRequest() {
         chooseAddressButtons.clear();
+        timeFields.clear();
         addRequestContentPanel = new JPanel();
         addRequestContentPanel.setLayout(new BorderLayout());
         JPanel pickupAndDelivery = new JPanel();
@@ -461,7 +465,7 @@ public class TextualView extends JPanel implements Observer {
         cancelAddRequest.addActionListener(buttonListener);
         addRequestButtons.add(cancelAddRequest);
         buttonsAddRequestPanel.add(cancelAddRequest);
-        JButton validateAddRequest = new JButton(ADD_REQUEST);
+        JButton validateAddRequest = new JButton(CONTINUE_ADD_REQUEST);
         try {
             window.setStyle(validateAddRequest);
         } catch (Exception e) {
@@ -511,9 +515,10 @@ public class TextualView extends JPanel implements Observer {
         JPanel chooseTimePanel = new JPanel();
         chooseTimePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         chooseTimePanel.setBackground(Constants.COLOR_4);
-        addLine(chooseTimePanel, "Time", "", false, 12);
+        addLine(chooseTimePanel, "Process time (minutes)", "", false, 12);
         JSpinner timeField = new JSpinner();
-        timeField.setPreferredSize(new Dimension(100, 30));
+        timeField.setPreferredSize(new Dimension(60, 30));
+        timeFields.add(timeField);
         chooseTimePanel.add(timeField);
         addRequestPointPanel.add(chooseTimePanel);
 

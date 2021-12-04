@@ -250,11 +250,13 @@ public abstract class State {
 
     public void deleteRequest(Tour tour, Request requestToDelete, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l) {}
 
-    public void insertRequest(Tour tour, Window window, Controller controller) {}
+    public void addRequest(Tour tour, Window window, Controller controller) {}
 
     public void chooseAddress(int indexButton, Tour tour, Window window, Controller controller) {}
 
     public void cancel(Tour tour, Window window, Controller controller) {}
 
     public void leftClickOnIntersection(int indexIntersection, CityMap cityMap, Tour tour, Window window, Controller controller) {}
+
+    public void insertRequest(String pickupTime, String deliveryTime, CityMap cityMap, Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {}
 }
