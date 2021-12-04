@@ -238,8 +238,6 @@ public class Tour extends Observable {
      * @param allIntersectionsList the list with all intersections of the map
      */
     public void computeTour(List<Intersection> allIntersectionsList) {
-
-
             long startTimeDijkstra = System.currentTimeMillis();
 
             ArrayList<Node> listNodes = new ArrayList<>();
@@ -385,7 +383,15 @@ public class Tour extends Observable {
         }
     }
 
-
+    /**
+     * Insert a request to an already computed tour (after deleted a request).
+     * Dijkstra is called 3 times to recompute the path
+     * The request is inserted at the end of the tour (if the user wants to change the order
+     * he can do it with the arrows in the textualView)
+     * @param requestToAdd request to add
+     * @param paths all the paths of the map
+     * @param allIntersections all the intersectins of the map
+     */
     public void insertRequest(Request requestToAdd, List<ShortestPath> paths, List<Intersection> allIntersections){
         System.out.println("Tour.addRequest");
         // add request in planning Request
@@ -423,6 +429,7 @@ public class Tour extends Observable {
         updateTimes();
         notifyObservers();
     }
+
     /**
      * Insert a request to an already computed tour (after deleted a request).
      * Position of intersections are stored in Request.
@@ -458,6 +465,10 @@ public class Tour extends Observable {
         notifyObservers();
     }
 
+    /**
+     * Update the list of shortest paths of the tour when undoing "delete a request"
+     * @param paths
+     */
     private void processPutBackRequest(List<ShortestPath> paths) {
         int i = 0;
         while (i<listShortestPaths.size()) {
@@ -483,6 +494,11 @@ public class Tour extends Observable {
         }
     }
 
+    /**
+     * Update the order of by decreasing the nodes numbers in the list of
+     * shortests paths of the tour after adding an intersection
+     * @param intersectionsToAdd
+     */
     private void increaseNodeNumbers(ArrayList<Integer> intersectionsToAdd) {
         for (ShortestPath path: listShortestPaths) {
             int currentStartNode = path.getStartNodeNumber();
@@ -503,7 +519,7 @@ public class Tour extends Observable {
      * @param requestToDelete the request to delete
      * @param indexRequest index of the request to remove in the planning
      * @param allIntersections all the intersections of the map
-     * @return
+     * @return deleted paths
      */
     public ArrayList<ShortestPath> removeRequest(Request requestToDelete, int indexRequest, List<Intersection> allIntersections) {
         System.out.println("Tour.removeRequest");
@@ -535,6 +551,11 @@ public class Tour extends Observable {
         return deleted;
     }
 
+    /**
+     * Update the order of by decreasing the nodes numbers in the list of
+     * shortests paths of the tour after removing an intersection
+     * @param intersectionToRemove
+     */
     private void decreaseNodeNumbers(ArrayList<Integer> intersectionToRemove) {
         for (ShortestPath path: listShortestPaths) {
             int currentStartNode = path.getStartNodeNumber();
@@ -549,6 +570,13 @@ public class Tour extends Observable {
         }
     }
 
+    /**
+     * Main process when removing a request in the textual view.
+     * @param allIntersections all intersections of the map
+     * @param intersections new list of intersections created
+     * @param order
+     * @param intersectionToRemove
+     */
     private void removeIntersectionAndRecomputePath(List<Intersection> allIntersections, ArrayList<Intersection> intersections, ArrayList<Integer> order, ArrayList<Integer> intersectionToRemove) {
         int i;
         boolean skipped = false;
@@ -594,6 +622,14 @@ public class Tour extends Observable {
         }
     }
 
+    /**
+     * Remove all paths of the tour that involve the deliveryAddress or the
+     * pickupAddress of the request the user wants to delete. It also retrieves the
+     * numbers of the intersection(s) to skip.
+     * @param requestToDelete
+     * @param deleted shortest paths deleted by the process of removeRequest
+     * @return intersection(s) to remove
+     */
     private ArrayList<Integer> removePathsFromAndTowardPoint(Request requestToDelete, ArrayList<ShortestPath> deleted) {
         int i = 0;
         ArrayList<Integer> intersectionToRemove = new ArrayList<>();
@@ -623,8 +659,8 @@ public class Tour extends Observable {
     /**
      * Change order of the tour to visit an intersection earlier.
      * Some paths are deleted, some are created to accomplish every request with the new order.
-     * @param indexIntersection
-     * @param allIntersections
+     * @param indexIntersection current position of the Intersection in the Tour
+     * @param allIntersections all intersections of the map
      */
     public void moveIntersectionBefore(int indexIntersection, List<Intersection> allIntersections) {
         System.out.println("Tour.moveIntersectionBefore");
@@ -639,7 +675,7 @@ public class Tour extends Observable {
         // sanity check
         if (indexIntersection > 0 && indexIntersection < listShortestPaths.size()-1) {
 
-            getIntersectionsForFuturePaths(indexIntersection, intersections, newOrder);
+            getIntersectionsAndOrderForFuturePaths(indexIntersection, intersections, newOrder);
 
             // remove paths from tour
             deletedPaths.add(listShortestPaths.get(indexIntersection-1));
@@ -665,6 +701,15 @@ public class Tour extends Observable {
         }
     }
 
+    /**
+     * Process the new path when moving an intersection in the textual view
+     * If the moved intersection is in the middle of two intersections, Dijkstra
+     * will be called three times.
+     * @param indexIntersection current position of the Intersection in the Tour
+     * @param allIntersections all intersections of the map
+     * @param intersections new list of intersections created
+     * @param newOrder  new order created
+     */
     private void recomputePathAfterMovingIntersection(int indexIntersection, List<Intersection> allIntersections, ArrayList<Intersection> intersections, ArrayList<Integer> newOrder) {
         for (int i = 0; i< intersections.size()-1; i++) {
             // init data for dijkstra
@@ -681,7 +726,14 @@ public class Tour extends Observable {
         }
     }
 
-    private void getIntersectionsForFuturePaths(int indexIntersection, ArrayList<Intersection> intersections, ArrayList<Integer> newOrder) {
+    /**
+     * Create the new list of intersections and the new order to recompute the path
+     * after moving a request in the textual view
+     * @param indexIntersection current position of the Intersection in the Tour
+     * @param intersections new intersections for future paths
+     * @param newOrder new Order for future paths
+     */
+    private void getIntersectionsAndOrderForFuturePaths(int indexIntersection, ArrayList<Intersection> intersections, ArrayList<Integer> newOrder) {
         intersections.add(listShortestPaths.get(indexIntersection -1).getStartAddress());
         intersections.add(listShortestPaths.get(indexIntersection +1).getStartAddress());
         intersections.add(listShortestPaths.get(indexIntersection).getStartAddress());
