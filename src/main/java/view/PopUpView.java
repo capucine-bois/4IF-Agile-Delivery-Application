@@ -2,28 +2,36 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 
 /**
  * Popup message on the GUI
  */
-public class PopUpView implements ActionListener {
-    private final JPanel popUpPanel;
-    private final JLabel message;
-    private final JButton button;
-    private final Window window;
+public class PopUpView {
+
+    protected final static String CLOSE = "Close";
+
+    private JPanel popUpPanel;
+    private JLabel message;
+    private JButton button;
+    private Window window;
+
+    private ButtonListener buttonListener;
 
     /**
      * Constructor
      * @param window the window
+     * @param mouseListener
      * @throws IOException raised if font file can't be found
      * @throws FontFormatException raised if font can't be loaded
      */
-    public PopUpView(Window window) throws IOException, FontFormatException {
+    public PopUpView(Window window, MouseListener mouseListener, ButtonListener buttonListener) throws IOException, FontFormatException {
+        this.window = window;
+        this.buttonListener = buttonListener;
+        buttonListener.setPopUpView(this);
         popUpPanel = (JPanel) window.getGlassPane();
         popUpPanel.setLayout(new BorderLayout());
+        popUpPanel.addMouseListener(mouseListener);
 
         JPanel backgroundPopUp = new JPanel();
         backgroundPopUp.setLayout(new GridBagLayout());
@@ -36,6 +44,11 @@ public class PopUpView implements ActionListener {
         popUp.setBackground(Constants.COLOR_1);
         backgroundPopUp.add(popUp, new GridBagConstraints());
 
+        createMessagePanel(popUp);
+        createButtonPanel(popUp);
+    }
+
+    private void createMessagePanel(JPanel parentPanel) throws IOException, FontFormatException {
         JPanel messagePanel = new JPanel();
         messagePanel.setLayout(new GridBagLayout());
         message = new JLabel();
@@ -43,30 +56,18 @@ public class PopUpView implements ActionListener {
         message.setFont(Constants.getFont("DMSans-Medium.ttf", 14));
         message.setForeground(Constants.COLOR_3);
         messagePanel.add(message, new GridBagConstraints());
-        popUp.add(messagePanel, BorderLayout.CENTER);
+        parentPanel.add(messagePanel, BorderLayout.CENTER);
+    }
 
+    private void createButtonPanel(JPanel parentPanel) throws IOException, FontFormatException {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
-        button = new JButton("Close");
-        button.addActionListener(this);
+        button = new JButton(CLOSE);
+        button.addActionListener(buttonListener);
         window.setStyle(button);
         buttonPanel.add(button, new GridBagConstraints());
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
-        popUp.add(buttonPanel, BorderLayout.PAGE_END);
-
-        this.window = window;
-    }
-
-    /**
-     * Hides error when button is pressed.
-     * @param e event information
-     */
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == button) {
-            window.resetComponentsState();
-            popUpPanel.setVisible(false);
-        }
+        parentPanel.add(buttonPanel, BorderLayout.PAGE_END);
     }
 
     /**
@@ -78,5 +79,13 @@ public class PopUpView implements ActionListener {
         message.setText("<html><p style='text-align: center;'>" + messageContent + "</p></html>");
         message.setHorizontalAlignment(SwingConstants.CENTER);
         popUpPanel.setVisible(true);
+    }
+
+    public boolean isHidden() {
+        return !popUpPanel.isVisible();
+    }
+
+    public void setVisible(boolean visible) {
+        popUpPanel.setVisible(visible);
     }
 }

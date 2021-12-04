@@ -68,7 +68,6 @@ public class Controller {
         } else {
             window.setDefaultButtonStates(new boolean[]{true, true, true});
         }
-        window.resetComponentsState();
     }
 
     // Methods corresponding to user events

@@ -58,7 +58,7 @@ public class Window extends JFrame {
         componentListener = new ComponentListener(this, graphicalView);
         graphicalView = new GraphicalView(cityMap, tour, this, mouseListener);
         textualView = new TextualView(tour, this, mouseListener, buttonListener);
-        popUpView = new PopUpView(this);
+        popUpView = new PopUpView(this, mouseListener, buttonListener);
         keyboardListener = new KeyboardListener(controller);
         addKeyListener(keyboardListener);
         this.cityMap = cityMap;
@@ -184,7 +184,6 @@ public class Window extends JFrame {
      * @param message error message
      */
     public void displayErrorMessage(String message) {
-        disableElements();
         popUpView.showError(message);
     }
 
@@ -203,22 +202,12 @@ public class Window extends JFrame {
     }
 
     /**
-     * Disable buttons and graphical view
-     */
-    public void disableElements() {
-        // disable buttons
-        for (JButton b : buttons) {
-            b.setEnabled(false);
-        }
-        graphicalView.setCanZoom(false);
-    }
-
-    /**
      * Setter for defaultButtonStates attribute.
      * @param defaultButtonStates wanted value for defaultButtonStates attribute.
      */
     public void setDefaultButtonStates(boolean[] defaultButtonStates) {
         this.defaultButtonStates = defaultButtonStates;
+        resetComponentsState();
     }
 
     /**
@@ -285,13 +274,6 @@ public class Window extends JFrame {
      */
     public void colorTourIntersectionPanelOnMouseExited(int indexIntersection) {
         textualView.colorTourIntersectionPanelOnMouseExited(indexIntersection);
-    }
-
-    /**
-     * Change cursor to "hand cursor" when mouse is on the graphical view.
-     */
-    public void setHandCursorOnIcon() {
-        graphicalView.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
     /**
