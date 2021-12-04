@@ -228,11 +228,6 @@ public class XMLDeserializer {
         // Hashmap to detect duplicate
         HashMap<Long,ArrayList<Long>> listRequest = new HashMap<>();
 
-        float[] hsv = new float[3];
-        Color initialColor = Color.red;
-        Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
-        double goldenRatioConjugate = 0.618033988749895;
-
         NodeList nodeRequest = document.getElementsByTagName("request");
         for (int x = 0, size = nodeRequest.getLength(); x < size; x++) {
             long pickupAddressId = Long.parseLong(nodeRequest.item(x).getAttributes().getNamedItem("pickupAddress").getNodeValue());
@@ -248,11 +243,8 @@ public class XMLDeserializer {
                 Optional<Intersection> pickupAddress = cityMap.getIntersections().stream().filter(i -> i.getId() == newPickupAddressId).findFirst();
                 Optional<Intersection> deliveryAddress = cityMap.getIntersections().stream().filter(i -> i.getId() == newDeliveryAddressId).findFirst();
                 if (pickupAddress.isPresent() && deliveryAddress.isPresent()) {
-                    Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
-                    Request request = new Request(pickupDuration, deliveryDuration, pickupAddress.get(), deliveryAddress.get(), requestColor);
+                    Request request = new Request(pickupDuration, deliveryDuration, pickupAddress.get(), deliveryAddress.get());
                     tour.addRequest(request);
-                    hsv[0] += goldenRatioConjugate;
-                    hsv[0] %= 1;
                 } else {
                     throw new ExceptionXML("One of the pickup or delivery address is not an intersection of the city map.");
                 }

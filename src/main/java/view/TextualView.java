@@ -24,6 +24,7 @@ public class TextualView extends JPanel implements Observer {
     protected static final String PATH_DETAILS = "Show path";
     protected static final String DELETE_REQUEST = "Delete request";
     protected static final String ADD_REQUEST = "Add request";
+    protected static final String CANCEL_ADD_REQUEST = "Cancel";
 
     protected static List<JPanel> requestPanels;
     protected static List<JPanel> tourIntersectionsPanels;
@@ -39,7 +40,6 @@ public class TextualView extends JPanel implements Observer {
     private JButton requestsHeader;
     private JButton tourHeader;
     private JButton addRequest;
-    private JButton validateAddRequest;
     private JPanel cardLayoutPanel;
     private JPanel requestsPanelWithAddButton;
     private JPanel requestsMainPanel;
@@ -164,7 +164,18 @@ public class TextualView extends JPanel implements Observer {
         displayAddRequestPoint(pickupAndDelivery, "Pickup");
         displayAddRequestPoint(pickupAndDelivery, "Delivery");
         parentPanel.add(pickupAndDelivery);
-        validateAddRequest = new JButton(ADD_REQUEST);
+        JPanel buttonsAddRequest = new JPanel();
+        buttonsAddRequest.setLayout(new GridLayout(1,2));
+        JButton cancelAddRequest = new JButton(CANCEL_ADD_REQUEST);
+        try {
+            window.setStyle(cancelAddRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        cancelAddRequest.setBackground(Constants.COLOR_2);
+        cancelAddRequest.addActionListener(buttonListener);
+        buttonsAddRequest.add(cancelAddRequest);
+        JButton validateAddRequest = new JButton(ADD_REQUEST);
         try {
             window.setStyle(validateAddRequest);
         } catch (Exception e) {
@@ -172,7 +183,8 @@ public class TextualView extends JPanel implements Observer {
         }
         validateAddRequest.setBackground(Constants.COLOR_12);
         validateAddRequest.addActionListener(buttonListener);
-        parentPanel.add(validateAddRequest, BorderLayout.PAGE_END);
+        buttonsAddRequest.add(validateAddRequest);
+        parentPanel.add(buttonsAddRequest, BorderLayout.PAGE_END);
     }
 
     private void displayAddRequestPoint(JPanel parentPanel, String pointType) {

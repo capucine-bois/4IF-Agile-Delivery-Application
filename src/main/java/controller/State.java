@@ -51,6 +51,7 @@ public abstract class State {
      * @param controller application controller
      */
     public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
+        // TODO : put this method with default as other methods so we don't need to define it empty when we don't want to use it
         try {
             XMLDeserializer.loadRequests(tour, cityMap);
             controller.setCurrentState(controller.requestsLoadedState);
@@ -245,6 +246,9 @@ public abstract class State {
 
     public void deleteRequest(Tour tour, Request requestToDelete, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l) {}
 
-    public void insertRequest(Tour tour, Request requestToAdd, List<Intersection> allIntersections, Window window, ListOfCommands l) {}
+    public void insertRequest(Window window, Controller controller) {}
 
+    public void chooseAddress(Tour tour, Window window) {}
+
+    public void cancelAddRequest(Window window, Controller controller) {}
 }

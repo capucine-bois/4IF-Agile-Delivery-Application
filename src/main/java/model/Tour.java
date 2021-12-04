@@ -75,6 +75,8 @@ public class Tour extends Observable {
      */
     private boolean deliveryBeforePickup = false;
 
+    private Request newRequest;
+
     /* CONSTRUCTORS */
 
     /**
@@ -130,6 +132,10 @@ public class Tour extends Observable {
 
     public boolean isTourComputed() {
         return tourComputed;
+    }
+
+    public Request getNewRequest() {
+        return newRequest;
     }
     /* SETTERS */
 

@@ -32,6 +32,7 @@ public class Controller {
     protected final PathDetailsComputedState pathDetailsComputedState = new PathDetailsComputedState();
     protected final SelectedIntersectionState selectedIntersectionState = new SelectedIntersectionState();
     protected final SelectedRequestState selectedRequestState = new SelectedRequestState();
+    protected final AddRequestState addRequestState = new AddRequestState();
 
 
     /** Constructor taking already filled cityMap and tour structures
@@ -52,6 +53,7 @@ public class Controller {
      */
     public void setCurrentState(State state) {
         System.out.println("state = " + state);
+        //TODO : put all these conditions in each state so this method would only be a setter
         this.currentState = state;
         if (state == initialState) {
             window.setDefaultButtonStates(new boolean[]{true, false, false});
@@ -59,7 +61,8 @@ public class Controller {
                 state == pathDetailsComputedState || state == requestsComputedState ||
                 state == selectedIntersectionState || state == selectedRequestState){
             window.setDefaultButtonStates(new boolean[]{true, true, false});
-        } else if (state == tourComputingState || state == requestsComputingState) {
+        } else if (state == tourComputingState || state == requestsComputingState ||
+                state == addRequestState) {
             window.setDefaultButtonStates(new boolean[]{false, false, false});
         } else {
             window.setDefaultButtonStates(new boolean[]{true, true, true});
@@ -193,22 +196,7 @@ public class Controller {
      *
      */
     public void insertRequest() {
-        //TODO create the Request via UI
-        Request requestToAdd = null;
-        float[] hsv = new float[3];
-        Color initialColor = Color.pink;
-        Color.RGBtoHSB(initialColor.getRed(), initialColor.getGreen(), initialColor.getBlue(), hsv);
-        double goldenRatioConjugate = 0.618033988749895;
-        hsv[0] += goldenRatioConjugate;
-        hsv[0] %= 1;
-        Optional<Intersection> pickupAddress = cityMap.getIntersections().stream().filter(i -> i.getId() == 3).findFirst();
-        Optional<Intersection> deliveryAddress = cityMap.getIntersections().stream().filter(i -> i.getId() == 1).findFirst();
-        if (pickupAddress.isPresent() && deliveryAddress.isPresent()) {
-            Color requestColor = Color.getHSBColor(hsv[0], hsv[1], hsv[2]);
-            requestToAdd = new Request(100, 200, pickupAddress.get(), deliveryAddress.get(), requestColor);
-            window.setUndoButtonState(true);
-        }
-        currentState.insertRequest(tour, requestToAdd, cityMap.getIntersections(), window, listOfCommands);
+        currentState.insertRequest(window, this);
     }
 
     /**
@@ -239,5 +227,13 @@ public class Controller {
      */
     public void stopTourComputation() {
         currentState.stopTourComputation(tour);
+    }
+
+    public void chooseAddress() {
+        currentState.chooseAddress(tour, window);
+    }
+
+    public void cancelAddRequest() {
+        currentState.cancelAddRequest(window, this);
     }
 }
