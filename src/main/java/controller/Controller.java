@@ -177,13 +177,6 @@ public class Controller {
     }
 
     /**
-     * Set specific cursor when user's mouse hovers an icon on the graphical view.
-     */
-    public void moveMouseOnIcon() {
-        currentState.moveMouseOnIcon(window);
-    }
-
-    /**
      * Delete a request in an already computed tour.
      * @param indexRequest index of the request to delete
      */

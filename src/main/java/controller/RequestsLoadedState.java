@@ -68,9 +68,4 @@ public class RequestsLoadedState extends State {
             window.colorRequestPanelOnMouseExited(indexRequest);
         }
     }
-
-    @Override
-    public void moveMouseOnIcon(Window window) {
-        window.setHandCursorOnIcon();
-    }
 }

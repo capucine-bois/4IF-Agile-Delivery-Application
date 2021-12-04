@@ -247,8 +247,6 @@ public abstract class State {
 
     public void exitMouseOnRequest(int indexRequest, Tour tour, Window window) {}
 
-    public void moveMouseOnIcon(Window window) {}
-
     public void moveIntersectionBefore(ListOfCommands l, Tour tour, int indexIntersection, List<Intersection> allIntersections, Window window) {}
 
     public void moveIntersectionAfter(ListOfCommands l, Tour tour, int indexIntersection, List<Intersection> allIntersections, Window window) {}

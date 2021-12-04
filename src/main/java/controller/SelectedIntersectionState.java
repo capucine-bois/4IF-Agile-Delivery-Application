@@ -71,9 +71,4 @@ public class SelectedIntersectionState extends State {
             window.colorTourIntersectionPanelOnMouseExited(indexShortestPath);
         }
     }
-
-    @Override
-    public void moveMouseOnIcon(Window window) {
-        window.setHandCursorOnIcon();
-    }
 }

@@ -45,11 +45,6 @@ public class RequestsComputingState extends State {
     }
 
     @Override
-    public void moveMouseOnIcon(Window window) {
-        window.setHandCursorOnIcon();
-    }
-
-    @Override
     public void stopTourComputation(Tour tour) {
         tour.setTourComputed(true);
     }

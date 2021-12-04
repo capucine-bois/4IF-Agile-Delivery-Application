@@ -54,11 +54,6 @@ public class RequestsComputedState extends State{
     }
 
     @Override
-    public void moveMouseOnIcon(Window window) {
-        window.setHandCursorOnIcon();
-    }
-
-    @Override
     public void deleteRequest(Tour tour, Request requestToDelete, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l) {
         l.add(new DeleteCommand(tour, requestToDelete, indexRequest, allIntersections));
         window.setUndoButtonState(true);
