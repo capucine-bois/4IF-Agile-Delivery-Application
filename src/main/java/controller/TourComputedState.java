@@ -20,6 +20,11 @@ public class TourComputedState extends State {
     }
 
     @Override
+    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
+        defaultLoadRequests(cityMap, tour, window, controller);
+    }
+
+    @Override
     public void showRequestsPanel(Tour tour, Window window, Controller controller) {
         for (Request request : tour.getPlanningRequests()) {
             request.setPickupSelected(false);

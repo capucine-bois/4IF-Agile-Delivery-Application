@@ -1,13 +1,11 @@
 package controller;
 
-import model.CityMap;
-import model.Intersection;
-import model.StronglyConnectedComponents;
-import model.Tour;
+import model.*;
 import view.Window;
 import xml.ExceptionXML;
 import xml.XMLDeserializer;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 /**
@@ -24,6 +22,7 @@ public class MapLoadedState extends State {
     @Override
     public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
         try {
+            Request.lastColor = Color.red;
             XMLDeserializer.loadRequests(tour, cityMap);
             tour.checkIntersectionsUnreachable(cityMap.getIntersections());
             if (!tour.getIntersectionsUnreachableFromDepot().isEmpty()) {

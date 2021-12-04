@@ -13,9 +13,6 @@ import view.Window;
 public class RequestsComputingState extends State {
 
     @Override
-    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {}
-
-    @Override
     public void showTourPanel(Tour tour, Window window, Controller controller) {
         for (Request request : tour.getPlanningRequests()) {
             request.setPickupSelected(false);

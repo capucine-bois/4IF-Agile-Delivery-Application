@@ -10,9 +10,6 @@ import java.util.regex.Pattern;
 public class AddRequestState extends State{
 
     @Override
-    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {}
-
-    @Override
     public void chooseAddress(int indexButton, Tour tour, Window window, Controller controller) {
         window.enterSelectionMode();
         if (indexButton == 0) {
