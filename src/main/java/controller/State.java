@@ -2,6 +2,7 @@ package controller;
 
 import model.*;
 import view.Window;
+import xml.ExceptionXML;
 import xml.XMLDeserializer;
 
 import java.awt.*;
@@ -59,6 +60,10 @@ public abstract class State {
         try {
             Request.lastColor = Color.red;
             XMLDeserializer.loadRequests(tour, cityMap);
+            tour.checkIntersectionsUnreachable(cityMap.getIntersections());
+            if (!tour.getIntersectionsUnreachableFromDepot().isEmpty()) {
+                throw new ExceptionXML("An address in the planning is unreachable.");
+            }
             controller.setCurrentState(controller.requestsLoadedState);
             window.showRequestsPanel();
             window.setEnabledTour(false);
