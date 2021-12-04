@@ -5,6 +5,7 @@ import model.Intersection;
 import model.StronglyConnectedComponents;
 import model.Tour;
 import view.Window;
+import xml.ExceptionXML;
 import xml.XMLDeserializer;
 
 import java.util.ArrayList;
@@ -25,6 +26,9 @@ public class MapLoadedState extends State {
         try {
             XMLDeserializer.loadRequests(tour, cityMap);
             tour.checkIntersectionsUnreachable(cityMap.getIntersections());
+            if (!tour.getIntersectionsUnreachableFromDepot().isEmpty()) {
+                throw new ExceptionXML("An address is unreachable.");
+            }
             controller.setCurrentState(controller.requestsLoadedState);
             tour.notifyObservers();
             window.setEnabledRequests(true);

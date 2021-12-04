@@ -1,6 +1,7 @@
 package model;
 
 import observer.Observable;
+import xml.ExceptionXML;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -224,6 +225,7 @@ public class Tour extends Observable {
     public void clearLists() {
         planningRequests.clear();
         listShortestPaths.clear();
+        intersectionsUnreachableFromDepot.clear();
     }
 
     /**
