@@ -111,6 +111,45 @@ public class TextualView extends JPanel implements Observer {
     }
 
     /**
+     * Create panel for "Requests" tab.
+     */
+    private void createRequestsPanel() {
+        requestsPanelWithAddButton = new JPanel();
+        requestsPanelWithAddButton.setLayout(new BorderLayout());
+        requestsMainPanel = new JPanel();
+        JScrollPane scrollPane = new JScrollPane(requestsMainPanel);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBorder(null);
+        requestsPanelWithAddButton.add(scrollPane);
+        createAddRequestButton();
+        cardLayoutPanel.add("requests", requestsPanelWithAddButton);
+    }
+
+    private void createAddRequestButton() {
+        addRequest = new JButton(ADD_REQUEST);
+        try {
+            window.setStyle(addRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        addRequest.setBackground(Constants.COLOR_12);
+        addRequest.addActionListener(buttonListener);
+    }
+
+    /**
+     * Create panel for "Tour" tab.
+     */
+    private void createTourPanel() {
+        tourMainPanel = new JPanel();
+        JScrollPane scrollPane = new JScrollPane(tourMainPanel);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBorder(null);
+        cardLayoutPanel.add("tour", scrollPane);
+    }
+
+    /**
      * Add all the elements on the textual view.
      */
     private void displayTextualView() {
@@ -128,15 +167,54 @@ public class TextualView extends JPanel implements Observer {
     }
 
     /**
-     * Create panel for "Tour" tab.
+     * Add all the request on the textual view, on "Requests" tab
      */
-    private void createTourPanel() {
-        tourMainPanel = new JPanel();
-        JScrollPane scrollPane = new JScrollPane(tourMainPanel);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setBorder(null);
-        cardLayoutPanel.add("tour", scrollPane);
+    private void displayRequests() {
+        deleteRequestButtons.clear();
+        requestsMainPanel.setLayout(new BoxLayout(requestsMainPanel, BoxLayout.Y_AXIS));
+        requestsMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
+        requestsMainPanel.setBackground(Constants.COLOR_4);
+        displayDepotInformation(requestsMainPanel);
+        requestsMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
+        displayRequestsInformation(requestsMainPanel);
+        if (!tour.getListShortestPaths().isEmpty() && tour.isTourComputed()) {
+            requestsPanelWithAddButton.add(addRequest, BorderLayout.PAGE_END);
+        }
+    }
+
+    /**
+     * Display details of depot intersection on textual view, on "Tour" tab.
+     * @param parentPanel parent panel
+     */
+    private void displayDepotInformation(JPanel parentPanel) {
+        Map<String, String> depotInformation = new HashMap<>();
+        String depotCoordinates = tour.getDepotAddress().getLatitude() + ", " + tour.getDepotAddress().getLongitude();
+        depotInformation.put("Depot address", depotCoordinates);
+        depotInformation.put("Departure time", tour.getDepartureTime());
+        displayDepotPanel(parentPanel, depotInformation);
+    }
+
+    /**
+     * Display information of all the requests on the textual view, on "Requests" tab
+     * @param parentPanel parent panel
+     */
+    private void displayRequestsInformation(JPanel parentPanel) {
+        requestPanels.clear();
+        for (Request request : tour.getPlanningRequests()) {
+            Map<String, String> requestInformation = new HashMap<>();
+            String pickupCoordinates = request.getPickupAddress().getLatitude() + ", " + request.getPickupAddress().getLongitude();
+            String deliveryCoordinates = request.getDeliveryAddress().getLatitude() + ", " + request.getDeliveryAddress().getLongitude();
+            String pickupDuration = request.getPickupDuration() / 60 + " min " + request.getPickupDuration() % 60 + " s";
+            if (request.getPickupDuration() % 60 == 0) pickupDuration = pickupDuration.substring(0, pickupDuration.lastIndexOf("0"));
+            String deliveryDuration = request.getDeliveryDuration() / 60 + " min " + request.getDeliveryDuration() % 60 + " s";
+            if (request.getDeliveryDuration() % 60 == 0) deliveryDuration = deliveryDuration.substring(0, deliveryDuration.lastIndexOf("0"));
+            requestInformation.put("Pickup address", pickupCoordinates);
+            requestInformation.put("Pickup duration", pickupDuration);
+            requestInformation.put("Delivery address", deliveryCoordinates);
+            requestInformation.put("Delivery duration", deliveryDuration);
+            displayRequestPanel(parentPanel, requestInformation, request.getColor(), request.isPickupSelected() && request.isDeliverySelected());
+            parentPanel.add(Box.createRigidArea(new Dimension(0, gap)));
+        }
     }
 
     /**
@@ -165,6 +243,22 @@ public class TextualView extends JPanel implements Observer {
             displayDepotPoint(tourMainPanel, tour.getArrivalTime(), false);
             tourMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
         }
+    }
+
+    /**
+     * Display header for "Tour" tab when the tour is computed.
+     * Show speed, length, starting and ending time.
+     */
+    private void displayTourGlobalInformation() {
+        JPanel tourFirstPanel = new JPanel();
+        tourFirstPanel.setLayout(new BoxLayout(tourFirstPanel, BoxLayout.Y_AXIS));
+        addLine(tourFirstPanel, "Total length", String.format("%.1f", tour.getTourLength() / (double) 1000) + " km", false, 14);
+        addLine(tourFirstPanel, "Speed", String.format("%.1f", tour.getSpeed()) + " km/h", false, 14);
+        addLine(tourFirstPanel, "Starting at", tour.getDepartureTime(), false, 14);
+        addLine(tourFirstPanel, "Ending at", tour.getArrivalTime(), false, 14);
+        tourFirstPanel.setMaximumSize(new Dimension(getPreferredSize().width, 96 + gap));
+        tourMainPanel.add(tourFirstPanel);
+        tourMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
     }
 
     /**
@@ -204,22 +298,6 @@ public class TextualView extends JPanel implements Observer {
         segmentsHeader.add(pathInformation);
 
         parentPanel.add(segmentsHeader, BorderLayout.PAGE_START);
-    }
-
-    /**
-     * Display header for "Tour" tab when the tour is computed.
-     * Show speed, length, starting and ending time.
-     */
-    private void displayTourGlobalInformation() {
-        JPanel tourFirstPanel = new JPanel();
-        tourFirstPanel.setLayout(new BoxLayout(tourFirstPanel, BoxLayout.Y_AXIS));
-        addLine(tourFirstPanel, "Total length", String.format("%.1f", tour.getTourLength() / (double) 1000) + " km", false, 14);
-        addLine(tourFirstPanel, "Speed", String.format("%.1f", tour.getSpeed()) + " km/h", false, 14);
-        addLine(tourFirstPanel, "Starting at", tour.getDepartureTime(), false, 14);
-        addLine(tourFirstPanel, "Ending at", tour.getArrivalTime(), false, 14);
-        tourFirstPanel.setMaximumSize(new Dimension(getPreferredSize().width, 96 + gap));
-        tourMainPanel.add(tourFirstPanel);
-        tourMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
     }
 
     /**
@@ -269,42 +347,6 @@ public class TextualView extends JPanel implements Observer {
             }
             displayTourIntersectionPanel(parentPanel, pointsInformation, request.getColor(), pointSelected && !segmentDetails, segmentDetails, index);
         }
-    }
-
-    private void displayMoveButtonsPanel(int index, JPanel pointPanel) {
-        JPanel moveButtonsPanel = new JPanel();
-        moveButtonsPanel.setLayout(new GridLayout(3,1));
-        moveButtonsPanel.setBorder(BorderFactory.createMatteBorder(10,10,10,10,Constants.COLOR_4));
-        moveButtonsPanel.setBackground(Constants.COLOR_4);
-        // check if intersection is first
-        if (index != 0) {
-            displayMoveButton(moveButtonsPanel, "move-up", goUpButtons);
-        } else {
-            moveButtonsPanel.add(new JLabel());
-        }
-
-        moveButtonsPanel.add(new JLabel());
-
-        // check if intersection is last
-        if (index < tour.getListShortestPaths().size() - 2) {
-            displayMoveButton(moveButtonsPanel, "move-down", goDownButtons);
-        }
-
-        pointPanel.add(moveButtonsPanel, BorderLayout.LINE_END);
-    }
-
-    private void displayMoveButton(JPanel moveButtonsPanel, String s, List<JButton> listButtons) {
-        JButton moveButton = new JButton();
-        try {
-            moveButton.setIcon(new ImageIcon(Constants.getImage(s)));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        moveButton.setBorder(BorderFactory.createEmptyBorder());
-        moveButton.setBackground(Constants.COLOR_2);
-        listButtons.add(moveButton);
-        moveButton.addActionListener(buttonListener);
-        moveButtonsPanel.add(moveButton);
     }
 
     /**
@@ -376,84 +418,6 @@ public class TextualView extends JPanel implements Observer {
         parentPanel.add(segmentsPanel);
     }
 
-    /**
-     * Create panel for "Requests" tab.
-     */
-    private void createRequestsPanel() {
-        requestsPanelWithAddButton = new JPanel();
-        requestsPanelWithAddButton.setLayout(new BorderLayout());
-        requestsMainPanel = new JPanel();
-        JScrollPane scrollPane = new JScrollPane(requestsMainPanel);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setBorder(null);
-        requestsPanelWithAddButton.add(scrollPane);
-        createAddRequestButton();
-        cardLayoutPanel.add("requests", requestsPanelWithAddButton);
-    }
-
-    private void createAddRequestButton() {
-        addRequest = new JButton(ADD_REQUEST);
-        try {
-            window.setStyle(addRequest);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        addRequest.setBackground(Constants.COLOR_12);
-        addRequest.addActionListener(buttonListener);
-    }
-
-    /**
-     * Add all the request on the textual view, on "Requests" tab
-     */
-    private void displayRequests() {
-        deleteRequestButtons.clear();
-        requestsMainPanel.setLayout(new BoxLayout(requestsMainPanel, BoxLayout.Y_AXIS));
-        requestsMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
-        requestsMainPanel.setBackground(Constants.COLOR_4);
-        displayDepotInformation(requestsMainPanel);
-        requestsMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
-        displayRequestsInformation(requestsMainPanel);
-        if (!tour.getListShortestPaths().isEmpty() && tour.isTourComputed()) {
-            requestsPanelWithAddButton.add(addRequest, BorderLayout.PAGE_END);
-        }
-    }
-
-    /**
-     * Display details of depot intersection on textual view, on "Tour" tab.
-     * @param parentPanel parent panel
-     */
-    private void displayDepotInformation(JPanel parentPanel) {
-        Map<String, String> depotInformation = new HashMap<>();
-        String depotCoordinates = tour.getDepotAddress().getLatitude() + ", " + tour.getDepotAddress().getLongitude();
-        depotInformation.put("Depot address", depotCoordinates);
-        depotInformation.put("Departure time", tour.getDepartureTime());
-        displayDepotPanel(parentPanel, depotInformation);
-    }
-
-    /**
-     * Display information of all the requests on the textual view, on "Requests" tab
-     * @param parentPanel parent panel
-     */
-    private void displayRequestsInformation(JPanel parentPanel) {
-        requestPanels.clear();
-        for (Request request : tour.getPlanningRequests()) {
-            Map<String, String> requestInformation = new HashMap<>();
-            String pickupCoordinates = request.getPickupAddress().getLatitude() + ", " + request.getPickupAddress().getLongitude();
-            String deliveryCoordinates = request.getDeliveryAddress().getLatitude() + ", " + request.getDeliveryAddress().getLongitude();
-            String pickupDuration = request.getPickupDuration() / 60 + " min " + request.getPickupDuration() % 60 + " s";
-            if (request.getPickupDuration() % 60 == 0) pickupDuration = pickupDuration.substring(0, pickupDuration.lastIndexOf("0"));
-            String deliveryDuration = request.getDeliveryDuration() / 60 + " min " + request.getDeliveryDuration() % 60 + " s";
-            if (request.getDeliveryDuration() % 60 == 0) deliveryDuration = deliveryDuration.substring(0, deliveryDuration.lastIndexOf("0"));
-            requestInformation.put("Pickup address", pickupCoordinates);
-            requestInformation.put("Pickup duration", pickupDuration);
-            requestInformation.put("Delivery address", deliveryCoordinates);
-            requestInformation.put("Delivery duration", deliveryDuration);
-            displayRequestPanel(parentPanel, requestInformation, request.getColor(), request.isPickupSelected() && request.isDeliverySelected());
-            parentPanel.add(Box.createRigidArea(new Dimension(0, gap)));
-        }
-    }
-
     private void displayDepotPanel(JPanel parentPanel, Map<String, String> informations) {
         JPanel informationPanel = new JPanel();
         informationPanel.setLayout(new BorderLayout());
@@ -507,14 +471,6 @@ public class TextualView extends JPanel implements Observer {
         parentPanel.add(informationPanel);
     }
 
-    private void displayColorPanel(Color color, JPanel informationPanel) {
-        JLabel colorInformation = new JLabel();
-        colorInformation.setBackground(color);
-        colorInformation.setOpaque(true);
-        colorInformation.setPreferredSize(new Dimension(10, informationPanel.getPreferredSize().height));
-        informationPanel.add(colorInformation, BorderLayout.LINE_START);
-    }
-
     private JPanel createContentWithButtonPanel(Map<String, String> informations, boolean selected, List<JPanel> listPanels, boolean showCursor) {
         JPanel contentWithButtonPanel = new JPanel();
         contentWithButtonPanel.setLayout(new BorderLayout());
@@ -535,6 +491,50 @@ public class TextualView extends JPanel implements Observer {
             addLine(contentPanel, information.getKey(), information.getValue(), selected, 12);
         }
         return contentPanel;
+    }
+
+    private void displayMoveButtonsPanel(int index, JPanel pointPanel) {
+        JPanel moveButtonsPanel = new JPanel();
+        moveButtonsPanel.setLayout(new GridLayout(3,1));
+        moveButtonsPanel.setBorder(BorderFactory.createMatteBorder(10,10,10,10,Constants.COLOR_4));
+        moveButtonsPanel.setBackground(Constants.COLOR_4);
+        // check if intersection is first
+        if (index != 0) {
+            displayMoveButton(moveButtonsPanel, "move-up", goUpButtons);
+        } else {
+            moveButtonsPanel.add(new JLabel());
+        }
+
+        moveButtonsPanel.add(new JLabel());
+
+        // check if intersection is last
+        if (index < tour.getListShortestPaths().size() - 2) {
+            displayMoveButton(moveButtonsPanel, "move-down", goDownButtons);
+        }
+
+        pointPanel.add(moveButtonsPanel, BorderLayout.LINE_END);
+    }
+
+    private void displayMoveButton(JPanel moveButtonsPanel, String s, List<JButton> listButtons) {
+        JButton moveButton = new JButton();
+        try {
+            moveButton.setIcon(new ImageIcon(Constants.getImage(s)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        moveButton.setBorder(BorderFactory.createEmptyBorder());
+        moveButton.setBackground(Constants.COLOR_2);
+        listButtons.add(moveButton);
+        moveButton.addActionListener(buttonListener);
+        moveButtonsPanel.add(moveButton);
+    }
+
+    private void displayColorPanel(Color color, JPanel informationPanel) {
+        JLabel colorInformation = new JLabel();
+        colorInformation.setBackground(color);
+        colorInformation.setOpaque(true);
+        colorInformation.setPreferredSize(new Dimension(10, informationPanel.getPreferredSize().height));
+        informationPanel.add(colorInformation, BorderLayout.LINE_START);
     }
 
     /**
