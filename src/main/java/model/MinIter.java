@@ -10,14 +10,9 @@ public class MinIter implements Iterator<Integer> {
     /* ATTRIBUTES */
 
     /**
-     * The vertex a vertex can reach
+     * The vertices a vertex can reach, ordered by ascending cost
      */
-    private Integer[] candidates;
-
-    /**
-     * The number of vertex to visit remaining
-     */
-    private int nbCandidates;
+    private PriorityQueue<Integer> candidates;
 
     /**
      * Create an iterator to traverse the set of vertices in <code>unvisited</code>
@@ -28,44 +23,25 @@ public class MinIter implements Iterator<Integer> {
      * @param g the graph containing all the costs
      */
     public MinIter(Collection<Integer> unvisited, int currentVertex, Graph g){
-        this.candidates = new Integer[unvisited.size()];
+        this.candidates = new PriorityQueue<>(Comparator.comparingDouble(vertex -> g.getCost(currentVertex, vertex)));
         for (Integer s : unvisited){
             // if we found a delivery Address and the pick-up linked is in the unvisited nodes,
             // we don't add the delivery address to the candidates
             if (g.isArc(currentVertex, s) && !(s % 2 == 0 && unvisited.contains(s - 1))) {
-                candidates[nbCandidates++] = s;
+                candidates.add(s);
             }
         }
-
-        //System.out.println("Candidates unsorted : \n" + Arrays.toString(candidates));
-        //Arrays.sort(this.candidates, Comparator.comparingDouble(o -> -g.getCost(currentVertex, o)));
-
-        Arrays.sort(candidates, (o1, o2) -> {
-            if (o1 == null && o2 == null) {
-                return 0;
-            }
-            if (o1 == null) {
-                return 1;
-            }
-            if (o2 == null) {
-                return -1;
-            }
-            // Reverse order
-            return (int)(g.getCost(currentVertex, o2) - g.getCost(currentVertex, o1));
-        });
-        //System.out.println("Candidates sorted : \n" + Arrays.toString(candidates));
 
     }
 
     @Override
     public boolean hasNext() {
-        return nbCandidates > 0;
+        return candidates.size() > 0;
     }
 
     @Override
     public Integer next() {
-        nbCandidates--;
-        return candidates[nbCandidates];
+        return candidates.poll();
     }
 
     @Override
