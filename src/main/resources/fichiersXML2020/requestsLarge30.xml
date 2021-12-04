@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<planningRequest>
+<depot address="25327124" departureTime="8:0:0"/>
+<request pickupAddress="26464256" deliveryAddress="239603465" pickupDuration="0" deliveryDuration="600"/>
+<request pickupAddress="25319255" deliveryAddress="1370403192" pickupDuration="600" deliveryDuration="120"/>
+<request pickupAddress="984553611" deliveryAddress="1368674802" pickupDuration="60" deliveryDuration="480"/>
+<request pickupAddress="1678996781" deliveryAddress="26084216" pickupDuration="420" deliveryDuration="600"/>
+<request pickupAddress="1301805013" deliveryAddress="25310896" pickupDuration="420" deliveryDuration="240"/>
+<request pickupAddress="59654812" deliveryAddress="25316399" pickupDuration="120" deliveryDuration="60"/>
+<request pickupAddress="130144280" deliveryAddress="25499154" pickupDuration="240" deliveryDuration="120"/>
+<request pickupAddress="26035105" deliveryAddress="25624158" pickupDuration="480" deliveryDuration="300"/>
+<request pickupAddress="1362204817" deliveryAddress="843129906" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="16050062" deliveryAddress="1433928351" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="25321433" deliveryAddress="24485922" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="1042749162" deliveryAddress="26014245" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="382011402" deliveryAddress="194609787" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="25319194" deliveryAddress="692874655" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="25319195" deliveryAddress="26575615" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="25319193" deliveryAddress="1395793338" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="25319190" deliveryAddress="1395793339" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="55447037" deliveryAddress="26575616" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="55447039" deliveryAddress="1395793336" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="2606641710" deliveryAddress="1395793341" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="55447034" deliveryAddress="25321456" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="1433928362" deliveryAddress="25152142" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="55447040" deliveryAddress="26576932" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="55447041" deliveryAddress="4295013309" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="55447043" deliveryAddress="25321447" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="21703587" deliveryAddress="4295013306" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="95836805" deliveryAddress="692874633" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="21703589" deliveryAddress="475003534" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="25321469" deliveryAddress="55435089" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="3095792647" deliveryAddress="26053894" pickupDuration="180" deliveryDuration="540"/>
+<request pickupAddress="3095792653" deliveryAddress="270298921" pickupDuration="180" deliveryDuration="540"/>
+</planningRequest>
