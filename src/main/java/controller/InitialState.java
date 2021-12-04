@@ -17,7 +17,7 @@ public class InitialState extends State {
 
     @Override
     public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        super.loadMap(cityMap, tour, window, controller);
+        defaultLoadMap(cityMap, tour, window, controller);
         cityMap.notifyObservers();
     }
 }
