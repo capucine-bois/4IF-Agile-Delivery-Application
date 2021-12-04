@@ -61,9 +61,9 @@ public class RequestsComputedState extends State{
 
     @Override
     public void insertRequest(Tour tour, Window window, Controller controller) {
+        tour.setNewRequest(new Request());
         window.showAddRequestPanel();
         window.setEnabledTour(false);
-        tour.setNewRequest(new Request());
         controller.setCurrentState(controller.addRequestState);
         tour.notifyObservers();
     }

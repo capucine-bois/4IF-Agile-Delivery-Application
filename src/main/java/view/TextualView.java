@@ -33,6 +33,7 @@ public class TextualView extends JPanel implements Observer {
     protected static List<JButton> deleteRequestButtons;
     protected static List<JButton> goUpButtons;
     protected static List<JButton> goDownButtons;
+    protected static List<JButton> chooseAddressButtons;
 
     private Tour tour;
     private final int gap = 20;
@@ -46,6 +47,8 @@ public class TextualView extends JPanel implements Observer {
     private JPanel requestsPanelWithAddButton;
     private JPanel requestsMainPanel;
     private JPanel tourMainPanel;
+    private JPanel addRequestPanel;
+    private JPanel addRequestContentPanel;
 
     // Listeners
     private MouseListener mouseListener;
@@ -68,6 +71,7 @@ public class TextualView extends JPanel implements Observer {
         deleteRequestButtons = new ArrayList<>();
         goUpButtons = new ArrayList<>();
         goDownButtons = new ArrayList<>();
+        chooseAddressButtons = new ArrayList<>();
         addRequestButtons = new ArrayList<>();
         mouseListener.setTextualView(this);
         this.mouseListener = mouseListener;
@@ -150,87 +154,13 @@ public class TextualView extends JPanel implements Observer {
     }
 
     private void createAddRequestPanel() {
-        JPanel addRequestPanel = new JPanel();
+        addRequestPanel = new JPanel();
         addRequestPanel.setLayout(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane(addRequestPanel);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(null);
-        displayAddRequest(addRequestPanel);
         cardLayoutPanel.add("addRequest", scrollPane);
-    }
-
-    private void displayAddRequest(JPanel parentPanel) {
-        JPanel pickupAndDelivery = new JPanel();
-        pickupAndDelivery.setLayout(new BoxLayout(pickupAndDelivery, BoxLayout.Y_AXIS));
-        pickupAndDelivery.setBackground(Constants.COLOR_4);
-        displayAddRequestPoint(pickupAndDelivery, "Pickup");
-        displayAddRequestPoint(pickupAndDelivery, "Delivery");
-        parentPanel.add(pickupAndDelivery);
-        JPanel buttonsAddRequestPanel = new JPanel();
-        buttonsAddRequestPanel.setLayout(new GridLayout(1,2));
-        JButton cancelAddRequest = new JButton(CANCEL_ADD_REQUEST);
-        try {
-            window.setStyle(cancelAddRequest);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        cancelAddRequest.setBackground(Constants.COLOR_2);
-        cancelAddRequest.addActionListener(buttonListener);
-        addRequestButtons.add(cancelAddRequest);
-        buttonsAddRequestPanel.add(cancelAddRequest);
-        JButton validateAddRequest = new JButton(ADD_REQUEST);
-        try {
-            window.setStyle(validateAddRequest);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        validateAddRequest.setBackground(Constants.COLOR_12);
-        validateAddRequest.addActionListener(buttonListener);
-        addRequestButtons.add(validateAddRequest);
-        buttonsAddRequestPanel.add(validateAddRequest);
-        parentPanel.add(buttonsAddRequestPanel, BorderLayout.PAGE_END);
-    }
-
-    private void displayAddRequestPoint(JPanel parentPanel, String pointType) {
-        JPanel addRequestPointPanel = new JPanel();
-        addRequestPointPanel.setLayout(new BoxLayout(addRequestPointPanel, BoxLayout.Y_AXIS));
-
-        JPanel chooseAddressPanel = new JPanel();
-        chooseAddressPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        chooseAddressPanel.setBackground(Constants.COLOR_4);
-        addLine(chooseAddressPanel, pointType, "", false, 14);
-        JButton chooseAddress = new JButton(CHOOSE_ADDRESS);
-        try {
-            window.setStyle(chooseAddress);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        chooseAddress.addActionListener(buttonListener);
-        chooseAddressPanel.add(chooseAddress);
-        addRequestButtons.add(chooseAddress);
-        addRequestPointPanel.add(chooseAddressPanel);
-
-        JPanel addressPanel = new JPanel();
-        addressPanel.setLayout((new FlowLayout(FlowLayout.LEFT)));
-        addressPanel.setBackground(Constants.COLOR_4);
-        addLine(addressPanel, "Address", "No address selected", false, 12);
-        addRequestPointPanel.add(addressPanel);
-
-        JPanel chooseTimePanel = new JPanel();
-        chooseTimePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        chooseTimePanel.setBackground(Constants.COLOR_4);
-        addLine(chooseTimePanel, "Time", "", false, 12);
-        JSpinner timeField = new JSpinner();
-        timeField.setPreferredSize(new Dimension(100, 30));
-        chooseTimePanel.add(timeField);
-        addRequestPointPanel.add(chooseTimePanel);
-
-        addRequestPointPanel.setMaximumSize(new Dimension(getMaximumSize().width, 126));
-
-        parentPanel.add(Box.createRigidArea(new Dimension(0, gap)));
-        parentPanel.add(addRequestPointPanel);
-        parentPanel.add(Box.createRigidArea(new Dimension(0, gap)));
     }
 
     /**
@@ -240,10 +170,12 @@ public class TextualView extends JPanel implements Observer {
         requestsMainPanel.removeAll();
         tourMainPanel.removeAll();
         requestsPanelWithAddButton.remove(addRequest);
+        addRequestPanel.removeAll();
         if (!tour.getPlanningRequests().isEmpty()) {
             displayRequests();
             if (!tour.getListShortestPaths().isEmpty()) {
                 displayTourIntersections();
+                displayAddRequest();
             }
         }
         revalidate();
@@ -500,6 +432,96 @@ public class TextualView extends JPanel implements Observer {
         }
         segmentsPanel.add(Box.createRigidArea(new Dimension(0, gap)));
         parentPanel.add(segmentsPanel);
+    }
+
+    private void displayAddRequest() {
+        chooseAddressButtons.clear();
+        addRequestContentPanel = new JPanel();
+        addRequestContentPanel.setLayout(new BorderLayout());
+        JPanel pickupAndDelivery = new JPanel();
+        pickupAndDelivery.setLayout(new BoxLayout(pickupAndDelivery, BoxLayout.Y_AXIS));
+        pickupAndDelivery.setBackground(Constants.COLOR_4);
+        displayAddRequestPoint(pickupAndDelivery, "Pickup");
+        displayAddRequestPoint(pickupAndDelivery, "Delivery");
+        addRequestContentPanel.add(pickupAndDelivery);
+        if (tour.getNewRequest() != null) {
+            displayColorPanel(tour.getNewRequest().getColor(), addRequestContentPanel);
+        }
+        addRequestPanel.add(addRequestContentPanel);
+
+        JPanel buttonsAddRequestPanel = new JPanel();
+        buttonsAddRequestPanel.setLayout(new GridLayout(1,2));
+        JButton cancelAddRequest = new JButton(CANCEL_ADD_REQUEST);
+        try {
+            window.setStyle(cancelAddRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        cancelAddRequest.setBackground(Constants.COLOR_2);
+        cancelAddRequest.addActionListener(buttonListener);
+        addRequestButtons.add(cancelAddRequest);
+        buttonsAddRequestPanel.add(cancelAddRequest);
+        JButton validateAddRequest = new JButton(ADD_REQUEST);
+        try {
+            window.setStyle(validateAddRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        validateAddRequest.setBackground(Constants.COLOR_12);
+        validateAddRequest.addActionListener(buttonListener);
+        addRequestButtons.add(validateAddRequest);
+        buttonsAddRequestPanel.add(validateAddRequest);
+        addRequestPanel.add(buttonsAddRequestPanel, BorderLayout.PAGE_END);
+    }
+
+    private void displayAddRequestPoint(JPanel parentPanel, String pointType) {
+        JPanel addRequestPointPanel = new JPanel();
+        addRequestPointPanel.setLayout(new BoxLayout(addRequestPointPanel, BoxLayout.Y_AXIS));
+
+        JPanel chooseAddressPanel = new JPanel();
+        chooseAddressPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        chooseAddressPanel.setBackground(Constants.COLOR_4);
+        addLine(chooseAddressPanel, pointType, "", false, 14);
+        JButton chooseAddress = new JButton(CHOOSE_ADDRESS);
+        try {
+            window.setStyle(chooseAddress);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        chooseAddress.addActionListener(buttonListener);
+        chooseAddressPanel.add(chooseAddress);
+        chooseAddressButtons.add(chooseAddress);
+        addRequestButtons.add(chooseAddress);
+        addRequestPointPanel.add(chooseAddressPanel);
+
+        JPanel addressPanel = new JPanel();
+        addressPanel.setLayout((new FlowLayout(FlowLayout.LEFT)));
+        addressPanel.setBackground(Constants.COLOR_4);
+        String addressText = "No address selected";
+        if (tour.getNewRequest() != null) {
+            if (pointType.equals("Pickup") && tour.getNewRequest().getPickupAddress() != null) {
+                addressText = tour.getNewRequest().getPickupAddress().getLatitude() + ", " + tour.getNewRequest().getPickupAddress().getLongitude();
+            } else if (pointType.equals("Delivery") && tour.getNewRequest().getDeliveryAddress() != null) {
+                addressText = tour.getNewRequest().getDeliveryAddress().getLatitude() + ", " + tour.getNewRequest().getDeliveryAddress().getLongitude();
+            }
+        }
+        addLine(addressPanel, "Address", addressText, false, 12);
+        addRequestPointPanel.add(addressPanel);
+
+        JPanel chooseTimePanel = new JPanel();
+        chooseTimePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        chooseTimePanel.setBackground(Constants.COLOR_4);
+        addLine(chooseTimePanel, "Time", "", false, 12);
+        JSpinner timeField = new JSpinner();
+        timeField.setPreferredSize(new Dimension(100, 30));
+        chooseTimePanel.add(timeField);
+        addRequestPointPanel.add(chooseTimePanel);
+
+        addRequestPointPanel.setMaximumSize(new Dimension(getMaximumSize().width, 126));
+
+        parentPanel.add(Box.createRigidArea(new Dimension(0, gap)));
+        parentPanel.add(addRequestPointPanel);
+        parentPanel.add(Box.createRigidArea(new Dimension(0, gap)));
     }
 
     private void displayDepotPanel(JPanel parentPanel, Map<String, String> informations) {

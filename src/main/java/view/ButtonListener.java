@@ -54,7 +54,10 @@ public class ButtonListener implements ActionListener {
             case TextualView.PATH_DETAILS -> controller.leftClickOnShortestPath(TextualView.pathDetailsButtons.indexOf((JButton) e.getSource()));
             case TextualView.DELETE_REQUEST -> controller.deleteRequest(TextualView.deleteRequestButtons.indexOf((JButton) e.getSource()));
             case TextualView.CANCEL_ADD_REQUEST -> controller.cancel();
-            case TextualView.CHOOSE_ADDRESS -> controller.chooseAddress();
+            case TextualView.CHOOSE_ADDRESS -> {
+                System.out.println(TextualView.chooseAddressButtons.size());
+                controller.chooseAddress(TextualView.chooseAddressButtons.indexOf((JButton) e.getSource()));
+            }
             case "" -> {
                 if (TextualView.goUpButtons.contains((JButton) e.getSource())) {
                     controller.moveIntersectionBefore(TextualView.goUpButtons.indexOf((JButton) e.getSource())+1);

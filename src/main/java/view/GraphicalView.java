@@ -43,6 +43,7 @@ public class GraphicalView extends JPanel implements Observer {
     private double height;
     private double proportion;
     private boolean selectionMode;
+    private int radiusForSelection;
 
     // listeners
     private MouseListener mouseListener;
@@ -204,6 +205,22 @@ public class GraphicalView extends JPanel implements Observer {
                         drawIcon(Constants.COLOR_4, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon");
                     }
                 }
+
+                if (tour.getNewRequest() != null) {
+                    if (tour.getNewRequest().getPickupAddress() != null) {
+                        Intersection pickupAddress = tour.getNewRequest().getPickupAddress();
+                        int pickupCoordinateX = getCoordinateX(pickupAddress);
+                        int pickupCoordinateY = getCoordinateY(pickupAddress);
+                        drawIcon(tour.getNewRequest().getColor(), pickupCoordinateX, pickupCoordinateY, "pickup-icon");
+                    }
+                    if (tour.getNewRequest().getDeliveryAddress() != null) {
+                        Intersection deliveryAddress = tour.getNewRequest().getDeliveryAddress();
+                        int deliveryCoordinateX = getCoordinateX(deliveryAddress);
+                        int deliveryCoordinateY = getCoordinateY(deliveryAddress);
+                        drawIcon(tour.getNewRequest().getColor(), deliveryCoordinateX, deliveryCoordinateY, "delivery-icon");
+                    }
+                }
+
                 int depotCoordinateX = getCoordinateX(tour.getDepotAddress());
                 int depotCoordinateY = getCoordinateY(tour.getDepotAddress());
                 drawIcon(null, depotCoordinateX, depotCoordinateY, "depot-icon");
@@ -218,8 +235,8 @@ public class GraphicalView extends JPanel implements Observer {
             int originCoordinateX = getCoordinateX(origin);
             int originCoordinateY = getCoordinateY(origin);
             g.setColor(Color.red);
-            int radius = (int) (scale + 2);
-            g.fillOval(originCoordinateX -  radius/2, originCoordinateY - radius/2, radius, radius);
+            radiusForSelection = (int) ((scale + 2)/2);
+            g.fillOval(originCoordinateX -  radiusForSelection, originCoordinateY - radiusForSelection, radiusForSelection * 2, radiusForSelection * 2);
         }
     }
 
@@ -551,5 +568,21 @@ public class GraphicalView extends JPanel implements Observer {
     public void exitSelectionMode() {
         selectionMode = false;
         repaint();
+    }
+
+    public boolean isSelectionMode() {
+        return selectionMode;
+    }
+
+    public int findIntersection(int x, int y) {
+        int indexIntersection = -1;
+        for (int i = 0; i < cityMap.getIntersections().size(); i++) {
+            int coordinateX = getCoordinateX(cityMap.getIntersections().get(i));
+            int coordinateY = getCoordinateY(cityMap.getIntersections().get(i));
+            if (Math.pow(coordinateX - x, 2) + Math.pow(coordinateY - y, 2) < Math.pow(radiusForSelection, 2)) {
+                indexIntersection = i;
+            }
+        }
+        return indexIntersection;
     }
 }

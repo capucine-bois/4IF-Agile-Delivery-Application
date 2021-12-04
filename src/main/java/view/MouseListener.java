@@ -37,8 +37,13 @@ public class MouseListener extends MouseAdapter {
             } else if (TextualView.tourIntersectionsPanels.contains((JPanel) e.getSource())) {
                 controller.leftClickOnTourIntersection(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
             } else if (graphicalView.contains(e.getX(), e.getY())) {
-               int indexIcon = graphicalView.findIcon(e.getX(), e.getY());
-               if (indexIcon != -1) controller.leftClickOnIcon(indexIcon);
+                if (!graphicalView.isSelectionMode()) {
+                    int indexIcon = graphicalView.findIcon(e.getX(), e.getY());
+                    if (indexIcon != -1) controller.leftClickOnIcon(indexIcon);
+                } else {
+                    int indexIntersection = graphicalView.findIntersection(e.getX(), e.getY());
+                    if (indexIntersection != -1) controller.leftClickOnIntersection(indexIntersection);
+                }
             }
         }
     }
@@ -65,8 +70,14 @@ public class MouseListener extends MouseAdapter {
     public void mouseMoved(MouseEvent e) {
         graphicalView.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         if (graphicalView.contains(e.getX(), e.getY())) {
-            int indexIcon = graphicalView.findIcon(e.getX(), e.getY());
-            if (indexIcon != -1) controller.moveMouseOnIcon();
+            if (!graphicalView.isSelectionMode()) {
+                int indexIcon = graphicalView.findIcon(e.getX(), e.getY());
+                if (indexIcon != -1) controller.moveMouseOnIcon();
+            } else {
+                int indexIntersection = graphicalView.findIntersection(e.getX(), e.getY());
+                if (indexIntersection != -1) graphicalView.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                //TODO : decide if we go to controller for this mouse hover and adapt other case
+            }
         }
     }
 

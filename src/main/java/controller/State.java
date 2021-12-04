@@ -4,6 +4,7 @@ import model.*;
 import view.Window;
 import xml.XMLDeserializer;
 
+import java.awt.*;
 import java.util.List;
 
 /**
@@ -54,6 +55,7 @@ public abstract class State {
     public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
         // TODO : put this method with default as other methods so we don't need to define it empty when we don't want to use it
         try {
+            Request.lastColor = Color.red;
             XMLDeserializer.loadRequests(tour, cityMap);
             controller.setCurrentState(controller.requestsLoadedState);
             window.showRequestsPanel();
@@ -61,6 +63,7 @@ public abstract class State {
             tour.setTourComputed(false);
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
+                Request.lastColor = Color.red;
                 tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
                 controller.setCurrentState(controller.mapLoadedState);
@@ -249,7 +252,9 @@ public abstract class State {
 
     public void insertRequest(Tour tour, Window window, Controller controller) {}
 
-    public void chooseAddress(Tour tour, Window window, Controller controller) {}
+    public void chooseAddress(int indexButton, Tour tour, Window window, Controller controller) {}
 
     public void cancel(Tour tour, Window window, Controller controller) {}
+
+    public void leftClickOnIntersection(int indexIntersection, CityMap cityMap, Tour tour, Window window, Controller controller) {}
 }

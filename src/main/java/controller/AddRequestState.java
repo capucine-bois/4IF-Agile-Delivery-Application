@@ -10,9 +10,14 @@ public class AddRequestState extends State{
     public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {}
 
     @Override
-    public void chooseAddress(Tour tour, Window window, Controller controller) {
+    public void chooseAddress(int indexButton, Tour tour, Window window, Controller controller) {
+        System.out.println(indexButton);
         window.enterSelectionMode();
-        controller.setCurrentState(controller.selectionIntersectionState);
+        if (indexButton == 0) {
+            controller.setCurrentState(controller.pickupAddressSelectionState);
+        } else {
+            controller.setCurrentState(controller.deliveryAddressSelectionState);
+        }
     }
 
     @Override

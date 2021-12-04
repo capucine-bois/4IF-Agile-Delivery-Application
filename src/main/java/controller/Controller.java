@@ -2,10 +2,6 @@ package controller;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
 
 import model.*;
 import view.Window;
@@ -33,7 +29,8 @@ public class Controller {
     protected final SelectedIntersectionState selectedIntersectionState = new SelectedIntersectionState();
     protected final SelectedRequestState selectedRequestState = new SelectedRequestState();
     protected final AddRequestState addRequestState = new AddRequestState();
-    protected final SelectionIntersectionState selectionIntersectionState = new SelectionIntersectionState();
+    protected final PickupAddressSelectionState pickupAddressSelectionState = new PickupAddressSelectionState();
+    protected final DeliveryAddressSelectionState deliveryAddressSelectionState = new DeliveryAddressSelectionState();
 
 
     /** Constructor taking already filled cityMap and tour structures
@@ -63,7 +60,8 @@ public class Controller {
                 state == selectedIntersectionState || state == selectedRequestState){
             window.setDefaultButtonStates(new boolean[]{true, true, false});
         } else if (state == tourComputingState || state == requestsComputingState ||
-                state == addRequestState || state == selectionIntersectionState) {
+                state == addRequestState || state == pickupAddressSelectionState ||
+                state == deliveryAddressSelectionState) {
             window.setDefaultButtonStates(new boolean[]{false, false, false});
         } else {
             window.setDefaultButtonStates(new boolean[]{true, true, true});
@@ -230,11 +228,15 @@ public class Controller {
         currentState.stopTourComputation(tour);
     }
 
-    public void chooseAddress() {
-        currentState.chooseAddress(tour, window, this);
+    public void chooseAddress(int indexButton) {
+        currentState.chooseAddress(indexButton, tour, window, this);
     }
 
     public void cancel() {
         currentState.cancel(tour, window, this);
+    }
+
+    public void leftClickOnIntersection(int indexIntersection) {
+        currentState.leftClickOnIntersection(indexIntersection, cityMap, tour, window, this);
     }
 }
