@@ -42,6 +42,7 @@ public class GraphicalView extends JPanel implements Observer {
     private double width;
     private double height;
     private double proportion;
+    private boolean selectionMode;
 
     // listeners
     private MouseListener mouseListener;
@@ -70,6 +71,7 @@ public class GraphicalView extends JPanel implements Observer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        selectionMode = false;
     }
 
     /**
@@ -166,44 +168,58 @@ public class GraphicalView extends JPanel implements Observer {
         displaySegmentsForEachOrigin(intersections, Constants.COLOR_6, (float) (scale + 2), false);
         displaySegmentsForEachOrigin(intersections, Constants.COLOR_7, (float) scale, true);
 
-        boolean oneShortestPathSelected = tour.getListShortestPaths().stream().anyMatch(ShortestPath::isSelected);
-        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            displayShortestPaths(shortestPath, oneShortestPathSelected && !shortestPath.isSelected(), Constants.COLOR_11, (float) (scale + 4), false);
-        }
-        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            displayShortestPaths(shortestPath, oneShortestPathSelected && !shortestPath.isSelected(), Constants.COLOR_12, (float) scale, true);
-        }
-        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            displayShortestPaths(shortestPath, !oneShortestPathSelected || shortestPath.isSelected(), Constants.COLOR_8, (float) (scale + 4), false);
-        }
-        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
-            displayShortestPaths(shortestPath, !oneShortestPathSelected || shortestPath.isSelected(), Constants.COLOR_9, (float) (scale), true);
-        }
-
-        if (!tour.getPlanningRequests().isEmpty()) {
-            boolean oneRequestPointSelected = tour.getPlanningRequests().stream().anyMatch(req -> req.isDeliverySelected() || req.isPickupSelected());
-            for (Request request : tour.getPlanningRequests()) {
-
-                Intersection pickupAddress = request.getPickupAddress();
-                int pickupCoordinateX = getCoordinateX(pickupAddress);
-                int pickupCoordinateY = getCoordinateY(pickupAddress);
-                Intersection deliveryAddress = request.getDeliveryAddress();
-                int deliveryCoordinateX = getCoordinateX(deliveryAddress);
-                int deliveryCoordinateY = getCoordinateY(deliveryAddress);
-                if (!oneRequestPointSelected || request.isPickupSelected()) {
-                    drawIcon(request.getColor(), pickupCoordinateX, pickupCoordinateY, "pickup-icon");
-                } else {
-                    drawIcon(Constants.COLOR_4, pickupCoordinateX, pickupCoordinateY, "pickup-icon");
-                }
-                if (!oneRequestPointSelected || request.isDeliverySelected()) {
-                    drawIcon(request.getColor(), deliveryCoordinateX, deliveryCoordinateY, "delivery-icon");
-                } else {
-                    drawIcon(Constants.COLOR_4, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon");
-                }
+        if (!selectionMode) {
+            boolean oneShortestPathSelected = tour.getListShortestPaths().stream().anyMatch(ShortestPath::isSelected);
+            for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+                displayShortestPaths(shortestPath, oneShortestPathSelected && !shortestPath.isSelected(), Constants.COLOR_11, (float) (scale + 4), false);
             }
-            int depotCoordinateX = getCoordinateX(tour.getDepotAddress());
-            int depotCoordinateY = getCoordinateY(tour.getDepotAddress());
-            drawIcon(null, depotCoordinateX, depotCoordinateY, "depot-icon");
+            for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+                displayShortestPaths(shortestPath, oneShortestPathSelected && !shortestPath.isSelected(), Constants.COLOR_12, (float) scale, true);
+            }
+            for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+                displayShortestPaths(shortestPath, !oneShortestPathSelected || shortestPath.isSelected(), Constants.COLOR_8, (float) (scale + 4), false);
+            }
+            for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+                displayShortestPaths(shortestPath, !oneShortestPathSelected || shortestPath.isSelected(), Constants.COLOR_9, (float) (scale), true);
+            }
+
+            if (!tour.getPlanningRequests().isEmpty()) {
+                boolean oneRequestPointSelected = tour.getPlanningRequests().stream().anyMatch(req -> req.isDeliverySelected() || req.isPickupSelected());
+                for (Request request : tour.getPlanningRequests()) {
+
+                    Intersection pickupAddress = request.getPickupAddress();
+                    int pickupCoordinateX = getCoordinateX(pickupAddress);
+                    int pickupCoordinateY = getCoordinateY(pickupAddress);
+                    Intersection deliveryAddress = request.getDeliveryAddress();
+                    int deliveryCoordinateX = getCoordinateX(deliveryAddress);
+                    int deliveryCoordinateY = getCoordinateY(deliveryAddress);
+                    if (!oneRequestPointSelected || request.isPickupSelected()) {
+                        drawIcon(request.getColor(), pickupCoordinateX, pickupCoordinateY, "pickup-icon");
+                    } else {
+                        drawIcon(Constants.COLOR_4, pickupCoordinateX, pickupCoordinateY, "pickup-icon");
+                    }
+                    if (!oneRequestPointSelected || request.isDeliverySelected()) {
+                        drawIcon(request.getColor(), deliveryCoordinateX, deliveryCoordinateY, "delivery-icon");
+                    } else {
+                        drawIcon(Constants.COLOR_4, deliveryCoordinateX, deliveryCoordinateY, "delivery-icon");
+                    }
+                }
+                int depotCoordinateX = getCoordinateX(tour.getDepotAddress());
+                int depotCoordinateY = getCoordinateY(tour.getDepotAddress());
+                drawIcon(null, depotCoordinateX, depotCoordinateY, "depot-icon");
+            }
+        } else {
+            displayAllIntersections(intersections);
+        }
+    }
+
+    private void displayAllIntersections(List<Intersection> intersections) {
+        for (Intersection origin : intersections) {
+            int originCoordinateX = getCoordinateX(origin);
+            int originCoordinateY = getCoordinateY(origin);
+            g.setColor(Color.red);
+            int radius = (int) (scale + 2);
+            g.fillOval(originCoordinateX -  radius/2, originCoordinateY - radius/2, radius, radius);
         }
     }
 
@@ -525,5 +541,15 @@ public class GraphicalView extends JPanel implements Observer {
             e.printStackTrace();
         }
         return cursorOnIcon;
+    }
+
+    public void enterSelectionMode() {
+        selectionMode = true;
+        repaint();
+    }
+
+    public void exitSelectionMode() {
+        selectionMode = false;
+        repaint();
     }
 }

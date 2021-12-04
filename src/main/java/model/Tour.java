@@ -87,6 +87,7 @@ public class Tour extends Observable {
         listShortestPaths = new ArrayList<>();
         intersectionsUnreachableFromDepot = new ArrayList<>();
         tourComputed = false;
+        newRequest = null;
     }
 
     /* GETTERS */
@@ -161,6 +162,9 @@ public class Tour extends Observable {
         this.tourComputed = tourComputed;
     }
 
+    public void setNewRequest(Request newRequest) {
+        this.newRequest = newRequest;
+    }
     /* METHODS */
 
     /**

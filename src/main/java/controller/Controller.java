@@ -33,6 +33,7 @@ public class Controller {
     protected final SelectedIntersectionState selectedIntersectionState = new SelectedIntersectionState();
     protected final SelectedRequestState selectedRequestState = new SelectedRequestState();
     protected final AddRequestState addRequestState = new AddRequestState();
+    protected final SelectionIntersectionState selectionIntersectionState = new SelectionIntersectionState();
 
 
     /** Constructor taking already filled cityMap and tour structures
@@ -62,7 +63,7 @@ public class Controller {
                 state == selectedIntersectionState || state == selectedRequestState){
             window.setDefaultButtonStates(new boolean[]{true, true, false});
         } else if (state == tourComputingState || state == requestsComputingState ||
-                state == addRequestState) {
+                state == addRequestState || state == selectionIntersectionState) {
             window.setDefaultButtonStates(new boolean[]{false, false, false});
         } else {
             window.setDefaultButtonStates(new boolean[]{true, true, true});
@@ -196,7 +197,7 @@ public class Controller {
      *
      */
     public void insertRequest() {
-        currentState.insertRequest(window, this);
+        currentState.insertRequest(tour, window, this);
     }
 
     /**
@@ -230,10 +231,10 @@ public class Controller {
     }
 
     public void chooseAddress() {
-        currentState.chooseAddress(tour, window);
+        currentState.chooseAddress(tour, window, this);
     }
 
-    public void cancelAddRequest() {
-        currentState.cancelAddRequest(window, this);
+    public void cancel() {
+        currentState.cancel(tour, window, this);
     }
 }

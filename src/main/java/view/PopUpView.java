@@ -79,21 +79,4 @@ public class PopUpView implements ActionListener {
         message.setHorizontalAlignment(SwingConstants.CENTER);
         popUpPanel.setVisible(true);
     }
-
-    /**
-     * Shows loader
-     */
-    public void showLoader() {
-        message.setText("<html><p style='text-align: center;'>Loading...</p></html>");
-        message.setHorizontalAlignment(SwingConstants.CENTER);
-        button.setVisible(false);
-        popUpPanel.setVisible(true);
-    }
-
-    /**
-     * Hides loader
-     */
-    public void hideLoader() {
-        popUpPanel.setVisible(false);
-    }
 }

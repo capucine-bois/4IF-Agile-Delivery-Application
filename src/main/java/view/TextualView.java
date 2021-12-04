@@ -25,6 +25,7 @@ public class TextualView extends JPanel implements Observer {
     protected static final String DELETE_REQUEST = "Delete request";
     protected static final String ADD_REQUEST = "Add request";
     protected static final String CANCEL_ADD_REQUEST = "Cancel";
+    protected static final String CHOOSE_ADDRESS = "Choose address";
 
     protected static List<JPanel> requestPanels;
     protected static List<JPanel> tourIntersectionsPanels;
@@ -40,6 +41,7 @@ public class TextualView extends JPanel implements Observer {
     private JButton requestsHeader;
     private JButton tourHeader;
     private JButton addRequest;
+    private List<JButton> addRequestButtons;
     private JPanel cardLayoutPanel;
     private JPanel requestsPanelWithAddButton;
     private JPanel requestsMainPanel;
@@ -66,6 +68,7 @@ public class TextualView extends JPanel implements Observer {
         deleteRequestButtons = new ArrayList<>();
         goUpButtons = new ArrayList<>();
         goDownButtons = new ArrayList<>();
+        addRequestButtons = new ArrayList<>();
         mouseListener.setTextualView(this);
         this.mouseListener = mouseListener;
         this.buttonListener = buttonListener;
@@ -164,8 +167,8 @@ public class TextualView extends JPanel implements Observer {
         displayAddRequestPoint(pickupAndDelivery, "Pickup");
         displayAddRequestPoint(pickupAndDelivery, "Delivery");
         parentPanel.add(pickupAndDelivery);
-        JPanel buttonsAddRequest = new JPanel();
-        buttonsAddRequest.setLayout(new GridLayout(1,2));
+        JPanel buttonsAddRequestPanel = new JPanel();
+        buttonsAddRequestPanel.setLayout(new GridLayout(1,2));
         JButton cancelAddRequest = new JButton(CANCEL_ADD_REQUEST);
         try {
             window.setStyle(cancelAddRequest);
@@ -174,7 +177,8 @@ public class TextualView extends JPanel implements Observer {
         }
         cancelAddRequest.setBackground(Constants.COLOR_2);
         cancelAddRequest.addActionListener(buttonListener);
-        buttonsAddRequest.add(cancelAddRequest);
+        addRequestButtons.add(cancelAddRequest);
+        buttonsAddRequestPanel.add(cancelAddRequest);
         JButton validateAddRequest = new JButton(ADD_REQUEST);
         try {
             window.setStyle(validateAddRequest);
@@ -183,8 +187,9 @@ public class TextualView extends JPanel implements Observer {
         }
         validateAddRequest.setBackground(Constants.COLOR_12);
         validateAddRequest.addActionListener(buttonListener);
-        buttonsAddRequest.add(validateAddRequest);
-        parentPanel.add(buttonsAddRequest, BorderLayout.PAGE_END);
+        addRequestButtons.add(validateAddRequest);
+        buttonsAddRequestPanel.add(validateAddRequest);
+        parentPanel.add(buttonsAddRequestPanel, BorderLayout.PAGE_END);
     }
 
     private void displayAddRequestPoint(JPanel parentPanel, String pointType) {
@@ -195,13 +200,15 @@ public class TextualView extends JPanel implements Observer {
         chooseAddressPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         chooseAddressPanel.setBackground(Constants.COLOR_4);
         addLine(chooseAddressPanel, pointType, "", false, 14);
-        JButton chooseAddress = new JButton("Choose address");
+        JButton chooseAddress = new JButton(CHOOSE_ADDRESS);
         try {
             window.setStyle(chooseAddress);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        chooseAddress.addActionListener(buttonListener);
         chooseAddressPanel.add(chooseAddress);
+        addRequestButtons.add(chooseAddress);
         addRequestPointPanel.add(chooseAddressPanel);
 
         JPanel addressPanel = new JPanel();
@@ -776,6 +783,12 @@ public class TextualView extends JPanel implements Observer {
             JPanel childPanel = (JPanel) childComponent;
             childPanel.setBackground(Constants.COLOR_4);
             childPanel.setBorder(BorderFactory.createMatteBorder(0, 10, 0, 0, Constants.COLOR_4));
+        }
+    }
+
+    public void setEnabledAddRequestButtons(boolean enabled) {
+        for (JButton button : addRequestButtons) {
+            button.setEnabled(enabled);
         }
     }
 }
