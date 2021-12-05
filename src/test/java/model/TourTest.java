@@ -135,15 +135,9 @@ class TourTest {
             assertEquals(listShortestPaths.get(4).getEndAddress().getId(), 0,"End of the tour isn't equal to start ");
         }
 
-        /**
-         * Method to test:
-         * computeTour()
-         *
-         * What it does:
-         * Compute shortest path for a wrong tour
-         */
+
         @Test
-        @DisplayName("Test on computeTour - Empty tour")
+        @DisplayName("Empty tour")
         void computeEmptyTour() {
             Intersection aloneIntersec = new Intersection(0,45.3112,33.2245);
             Tour tour = new Tour();
@@ -162,6 +156,65 @@ class TourTest {
             assertEquals(tourLength,0,"Path length must be 0");
             assertTrue(listShortestPaths.isEmpty(),"List of shortest must be empty");
         }
+    }
+
+
+    /**
+     * Method to test:
+     * moveIntersectionBefore()
+     *
+     * What it does:
+     * Move up an intersection of the tour
+     */
+    @Nested
+    @DisplayName("Test on moveIntersectionBefore")
+    class moveIntersectionBefore {
+        @Test
+        @DisplayName("Normal scenario")
+        void moveBefore(){
+
+        }
+        @Test
+        @DisplayName("Move before on the first intersection")
+        void moveBeforeFirst(){
+
+        }
+
+        @Test
+        @DisplayName("Move delivery before pickup same request")
+        void moveBeforeDelivery(){
+
+        }
+
+    }
+
+    /**
+     * Method to test:
+     * moveIntersectionAfter()
+     *
+     * What it does:
+     * Move down an intersection of the tour
+     */
+    @Nested
+    @DisplayName("Test on moveIntersectionAfter")
+    class moveIntersectionAfter {
+        @Test
+        @DisplayName("Normal scenario")
+        void moveAfter(){
+
+        }
+        @Test
+        @DisplayName("Move after on the last request")
+        void moveAfterLastIntersection(){
+
+        }
+
+        @Test
+        @DisplayName("Move pickup after delivery same request")
+        void moveAfterPickup(){
+
+        }
+
     }
 
 
