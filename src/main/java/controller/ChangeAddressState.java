@@ -11,6 +11,7 @@ public class ChangeAddressState extends State {
     @Override
     public void cancel(Tour tour, Window window, Controller controller) {
         window.exitSelectionMode();
+        window.setDefaultButtonStates(new boolean[]{true, true, false});
         controller.setCurrentState(controller.selectedIntersectionState);
     }
 
@@ -26,6 +27,7 @@ public class ChangeAddressState extends State {
         } else {
             listOfCommands.add(new ChangeAddressCommand(tour, indexRequest * 2 + 2, requestToUpdate.getDeliveryAddress(), newAddress, cityMap.getIntersections()));
         }
+        window.setUndoButtonState(true);
         window.setDefaultButtonStates(new boolean[]{true, true, false});
         controller.setCurrentState(controller.selectedIntersectionState);
     }

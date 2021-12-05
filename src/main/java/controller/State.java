@@ -281,4 +281,7 @@ public abstract class State {
 
     public void changeAddress(Window window, Controller controller) {}
 
+    public void changeTime(Window window, Controller controller) {}
+
+    public void saveTime(String time, Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {}
 }

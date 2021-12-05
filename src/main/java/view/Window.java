@@ -317,4 +317,12 @@ public class Window extends JFrame {
         textualView.setEnabledAddRequestButtons(true);
     }
 
+    public void enterChangeTimeMode() {
+        textualView.setChangeTimeMode(true);
+    }
+
+    public void exitChangeTimeMode() {
+        textualView.setChangeTimeMode(false);
+    }
+
 }
