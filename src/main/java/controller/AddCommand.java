@@ -26,8 +26,8 @@ public class AddCommand implements Command {
         this.request = request;
         this.intersections = intersections;
         this.indexRequest = tour.getPlanningRequests().size();
-        this.indexShortestPathToPickup = tour.getListShortestPaths().size() - 2;
-        this.indexShortestPathToDelivery = tour.getPlanningRequests().size() - 1;
+        this.indexShortestPathToPickup = tour.getListShortestPaths().size() - 1;
+        this.indexShortestPathToDelivery = tour.getListShortestPaths().size();
 
     }
 
