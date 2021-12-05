@@ -51,6 +51,7 @@ public class TextualView extends JPanel implements Observer {
     private JButton tourHeader;
     private JButton addRequest;
     private final List<JButton> addRequestButtons;
+    private final List<JButton> backgroundTourPanelButtons;
     private JPanel cardLayoutPanel;
     private JPanel requestsPanelWithAddButton;
     private JPanel requestsMainPanel;
@@ -82,6 +83,7 @@ public class TextualView extends JPanel implements Observer {
         chooseAddressButtons = new ArrayList<>();
         timeFields = new ArrayList<>();
         addRequestButtons = new ArrayList<>();
+        backgroundTourPanelButtons = new ArrayList<>();
         mouseListener.setTextualView(this);
         this.mouseListener = mouseListener;
         this.buttonListener = buttonListener;
@@ -425,6 +427,7 @@ public class TextualView extends JPanel implements Observer {
             }
             pathDetail.setPreferredSize(new Dimension(pathDetail.getPreferredSize().width, 30));
             pathDetailsButtons.add(pathDetail);
+            backgroundTourPanelButtons.add(pathDetail);
             pathDetail.addActionListener(buttonListener);
             pathPanel.add(pathDetail, BorderLayout.LINE_END);
         }
@@ -664,6 +667,7 @@ public class TextualView extends JPanel implements Observer {
         if (selected) moveButton.setBackground(Constants.COLOR_12);
         else moveButton.setBackground(Constants.COLOR_2);
         listButtons.add(moveButton);
+        backgroundTourPanelButtons.add(moveButton);
         moveButton.addActionListener(buttonListener);
         moveButtonsPanel.add(moveButton);
     }
@@ -704,9 +708,11 @@ public class TextualView extends JPanel implements Observer {
 
         JButton changeTimeButton = displayColoredButton(CHANGE_TIME, Constants.COLOR_12);
         updateButtonsPanel.add(changeTimeButton);
+        backgroundTourPanelButtons.add(changeTimeButton);
 
         JButton changeAddressButton = displayColoredButton(CHANGE_ADDRESS, Constants.COLOR_12);
         updateButtonsPanel.add(changeAddressButton);
+        backgroundTourPanelButtons.add(changeAddressButton);
 
         parentPanel.add(updateButtonsPanel, BorderLayout.PAGE_END);
     }
@@ -900,10 +906,23 @@ public class TextualView extends JPanel implements Observer {
         for (JButton button : addRequestButtons) {
             button.setEnabled(enabled);
         }
+        for (JButton button : backgroundTourPanelButtons) {
+            button.setEnabled(enabled);
+        }
+        setEnabledHeaderButtons(enabled);
     }
 
     public void setChangeTimeMode(boolean changeTimeMode) {
         this.changeTimeMode = changeTimeMode;
         displayTextualView();
+        for (JButton button : backgroundTourPanelButtons) {
+            button.setEnabled(!changeTimeMode);
+        }
+        setEnabledHeaderButtons(!changeTimeMode);
+    }
+
+    private void setEnabledHeaderButtons(boolean enable) {
+        requestsHeader.setEnabled(enable);
+        tourHeader.setEnabled(enable);
     }
 }
