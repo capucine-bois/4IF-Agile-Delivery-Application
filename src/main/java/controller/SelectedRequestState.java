@@ -1,11 +1,10 @@
 package controller;
 
-import model.CityMap;
-import model.Request;
-import model.ShortestPath;
-import model.Tour;
+import model.*;
 import view.Window;
 import xml.XMLDeserializer;
+
+import java.util.List;
 
 /**
  * State when a request is selected.
@@ -51,6 +50,17 @@ public class SelectedRequestState extends State {
     public void leftClickOnIcon(int indexIcon, Tour tour, Controller controller) {
         int indexRequest = indexIcon%2 == 0 ? indexIcon/2 - 1 : indexIcon/2;
         leftClickOnRequest(indexRequest, tour, controller);
+    }
+
+    @Override
+    public void deleteRequest(Tour tour, Request requestToDelete, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l, Controller controller) {
+        int indexShortestPathToPickup = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 1).findFirst().get());
+        int indexShortestPathToDelivery = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 2).findFirst().get());
+        l.add(new ReverseCommand(new AddCommand(tour, requestToDelete, allIntersections,indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery)));
+        window.setUndoButtonState(true);
+        if (requestToDelete.isPickupSelected() && requestToDelete.isDeliverySelected()) {
+            controller.setCurrentState(controller.requestsComputedState);
+        }
     }
 
     @Override
