@@ -457,24 +457,10 @@ public class TextualView extends JPanel implements Observer {
 
         JPanel buttonsAddRequestPanel = new JPanel();
         buttonsAddRequestPanel.setLayout(new GridLayout(1,2));
-        JButton cancelAddRequest = new JButton(CANCEL_ADD_REQUEST);
-        try {
-            window.setStyle(cancelAddRequest);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        cancelAddRequest.setBackground(Constants.COLOR_2);
-        cancelAddRequest.addActionListener(buttonListener);
+        JButton cancelAddRequest = displayDarkButton(CANCEL_ADD_REQUEST, Constants.COLOR_2);
         addRequestButtons.add(cancelAddRequest);
         buttonsAddRequestPanel.add(cancelAddRequest);
-        JButton validateAddRequest = new JButton(CONTINUE_ADD_REQUEST);
-        try {
-            window.setStyle(validateAddRequest);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        validateAddRequest.setBackground(Constants.COLOR_12);
-        validateAddRequest.addActionListener(buttonListener);
+        JButton validateAddRequest = displayDarkButton(CONTINUE_ADD_REQUEST, Constants.COLOR_12);
         addRequestButtons.add(validateAddRequest);
         buttonsAddRequestPanel.add(validateAddRequest);
         addRequestPanel.add(buttonsAddRequestPanel, BorderLayout.PAGE_END);
@@ -657,27 +643,28 @@ public class TextualView extends JPanel implements Observer {
         updateButtonsPanel.setLayout(new GridLayout(1,2, 5, 0));
         updateButtonsPanel.setBackground(Constants.COLOR_2);
 
-        JButton changeTimeButton = new JButton(CHANGE_TIME);
-        try {
-            window.setStyle(changeTimeButton);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        changeTimeButton.setBackground(Constants.COLOR_12);
-        changeTimeButton.addActionListener(buttonListener);
-        updateButtonsPanel.add(changeTimeButton);
+        displayUpdateButton(updateButtonsPanel, CHANGE_TIME);
 
-        JButton changeAddressButton = new JButton(CHANGE_ADDRESS);
-        try {
-            window.setStyle(changeAddressButton);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        changeAddressButton.setBackground(Constants.COLOR_12);
-        changeAddressButton.addActionListener(buttonListener);
-        updateButtonsPanel.add(changeAddressButton);
+        displayUpdateButton(updateButtonsPanel, CHANGE_ADDRESS);
 
         pointPanel.add(updateButtonsPanel, BorderLayout.PAGE_END);
+    }
+
+    private void displayUpdateButton(JPanel parentPanel, String buttonName) {
+        JButton button = displayDarkButton(buttonName, Constants.COLOR_12);
+        parentPanel.add(button);
+    }
+
+    private JButton displayDarkButton(String buttonName, Color color12) {
+        JButton button = new JButton(buttonName);
+        try {
+            window.setStyle(button);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        button.setBackground(color12);
+        button.addActionListener(buttonListener);
+        return button;
     }
 
     private void displayColorPanel(Color color, JPanel informationPanel) {
