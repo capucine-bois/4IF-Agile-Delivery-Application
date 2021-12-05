@@ -25,12 +25,13 @@ public abstract class State {
      */
     public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {}
 
-    public void defaultLoadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
+    public void defaultLoadMap(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
         try {
             XMLDeserializer.loadMap(cityMap);
             window.setDefaultButtonStates(new boolean[]{true, true, false});
             controller.setCurrentState(controller.mapLoadedState);
             tour.clearLists();
+            listOfCommands.reset();
             window.showRequestsPanel();
             window.setEnabledRequests(false);
             window.setEnabledTour(false);
@@ -39,6 +40,7 @@ public abstract class State {
             if(!e.getMessage().equals("Cancel opening file")) {
                 cityMap.clearLists();
                 tour.clearLists();
+                listOfCommands.reset();
                 window.displayErrorMessage(e.getMessage());
                 window.setDefaultButtonStates(new boolean[]{true, false, false});
                 controller.setCurrentState(controller.initialState);
@@ -60,7 +62,7 @@ public abstract class State {
      */
     public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {}
 
-    protected void defaultLoadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
+    protected void defaultLoadRequests(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
         try {
             Request.lastColor = Color.red;
             XMLDeserializer.loadRequests(tour, cityMap);
@@ -70,6 +72,7 @@ public abstract class State {
             }
             window.setDefaultButtonStates(new boolean[]{true, true, true});
             controller.setCurrentState(controller.requestsLoadedState);
+            listOfCommands.reset();
             window.showRequestsPanel();
             window.setEnabledTour(false);
             tour.setTourComputed(false);
@@ -78,6 +81,7 @@ public abstract class State {
             if(!e.getMessage().equals("Cancel opening file")) {
                 Request.lastColor = Color.red;
                 tour.clearLists();
+                listOfCommands.reset();
                 window.displayErrorMessage(e.getMessage());
                 window.setDefaultButtonStates(new boolean[]{true, true, false});
                 controller.setCurrentState(controller.mapLoadedState);

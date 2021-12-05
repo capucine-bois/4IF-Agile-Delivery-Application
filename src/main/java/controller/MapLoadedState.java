@@ -15,7 +15,7 @@ public class MapLoadedState extends State {
     @Override
     public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
         listOfCommands.reset();
-        defaultLoadMap(cityMap, tour, window, controller);
+        defaultLoadMap(cityMap, tour, window, controller, listOfCommands);
         cityMap.notifyObservers();
     }
 

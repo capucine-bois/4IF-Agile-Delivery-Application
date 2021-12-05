@@ -11,14 +11,14 @@ public class RequestsLoadedState extends State {
     @Override
     public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
         listOfCommands.reset();
-        defaultLoadMap(cityMap, tour, window, controller);
+        defaultLoadMap(cityMap, tour, window, controller, listOfCommands);
         tour.notifyObservers();
     }
 
     @Override
     public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
         listOfCommands.reset();
-        defaultLoadRequests(cityMap, tour, window, controller);
+        defaultLoadRequests(cityMap, tour, window, controller, listOfCommands);
     }
 
     @Override
