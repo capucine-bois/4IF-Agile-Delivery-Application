@@ -312,54 +312,90 @@ class TourTest {
     @Nested
     @DisplayName("Test on moveIntersectionBefore")
     class moveIntersectionBefore {
+
+        @BeforeEach
+        public void setList() {
+            listIntersection = (ArrayList<Intersection>) cityMap.getIntersections();
+            ArrayList<Segment> emptyListSegment = new ArrayList<>();
+            // create the previous list of shortest path (before adding a request)
+            tour.addShortestPaths(new ShortestPath(143,emptyListSegment, listIntersection.get(0), listIntersection.get(3)));
+            tour.addShortestPaths(new ShortestPath(16,emptyListSegment, listIntersection.get(3), listIntersection.get(1)));
+            tour.addShortestPaths(new ShortestPath(86,emptyListSegment, listIntersection.get(1), listIntersection.get(4)));
+            tour.addShortestPaths(new ShortestPath(118,emptyListSegment, listIntersection.get(4), listIntersection.get(2)));
+            tour.addShortestPaths(new ShortestPath(202,emptyListSegment, listIntersection.get(2), listIntersection.get(0)));
+            listRequest = tour.getPlanningRequests();
+        }
+
         @Test
         @DisplayName("Normal scenario")
         void moveBefore(){
+
+
+
+            // Method to test
+            tour.moveIntersectionBefore(1,listIntersection);
+
+            // Check answer (swap 1 and 3)
+            ArrayList<ShortestPath> newListShortestPath = tour.getListShortestPaths();
+            assertEquals(0,newListShortestPath.get(0).getStartAddress().getId(),"Start must be intersection 0");
+            assertEquals(1,newListShortestPath.get(0).getEndAddress().getId());
+            // Check new length (i1 -> i6 -> i4)
+            assertEquals(152.0,newListShortestPath.get(0).getPathLength(),"Wrong path found");
+
+            assertEquals(1,newListShortestPath.get(1).getStartAddress().getId());
+            assertEquals(3,newListShortestPath.get(1).getEndAddress().getId());
+            // Check new length (i2 -> i4)
+            assertEquals(16.0,newListShortestPath.get(1).getPathLength(),"Wrong path found");
+
+            assertEquals(3,newListShortestPath.get(2).getStartAddress().getId());
+            assertEquals(4,newListShortestPath.get(2).getEndAddress().getId());
+            assertEquals(4,newListShortestPath.get(3).getStartAddress().getId());
+            assertEquals(2,newListShortestPath.get(3).getEndAddress().getId());
+            assertEquals(2,newListShortestPath.get(4).getStartAddress().getId());
+            assertEquals(0,newListShortestPath.get(4).getEndAddress().getId(),"End must be intersection 0");
 
         }
         @Test
         @DisplayName("Move before on the first intersection")
         void moveBeforeFirst(){
+            // Method to test
+            tour.moveIntersectionBefore(0,listIntersection);
 
+            // Check answer (must remain identical)
+            ArrayList<ShortestPath> newListShortestPath = tour.getListShortestPaths();
+            assertEquals(0,newListShortestPath.get(0).getStartAddress().getId(),"Start must be intersection 0");
+            assertEquals(3,newListShortestPath.get(0).getEndAddress().getId());
+            assertEquals(3,newListShortestPath.get(1).getStartAddress().getId());
+            assertEquals(1,newListShortestPath.get(1).getEndAddress().getId());
+            assertEquals(1,newListShortestPath.get(2).getStartAddress().getId());
+            assertEquals(4,newListShortestPath.get(2).getEndAddress().getId());
+            assertEquals(4,newListShortestPath.get(3).getStartAddress().getId());
+            assertEquals(2,newListShortestPath.get(3).getEndAddress().getId());
+            assertEquals(2,newListShortestPath.get(4).getStartAddress().getId());
+            assertEquals(0,newListShortestPath.get(4).getEndAddress().getId(),"End must be intersection 0");
         }
 
         @Test
-        @DisplayName("Move delivery before pickup same request")
+        @DisplayName("Move delivery before last intersection")
         void moveBeforeDelivery(){
+            // Method to test
+            tour.moveIntersectionBefore(5,listIntersection);
 
+            // Check answer (must remain identical)
+            ArrayList<ShortestPath> newListShortestPath = tour.getListShortestPaths();
+            assertEquals(0,newListShortestPath.get(0).getStartAddress().getId(),"Start must be intersection 0");
+            assertEquals(3,newListShortestPath.get(0).getEndAddress().getId());
+            assertEquals(3,newListShortestPath.get(1).getStartAddress().getId());
+            assertEquals(1,newListShortestPath.get(1).getEndAddress().getId());
+            assertEquals(1,newListShortestPath.get(2).getStartAddress().getId());
+            assertEquals(4,newListShortestPath.get(2).getEndAddress().getId());
+            assertEquals(4,newListShortestPath.get(3).getStartAddress().getId());
+            assertEquals(2,newListShortestPath.get(3).getEndAddress().getId());
+            assertEquals(2,newListShortestPath.get(4).getStartAddress().getId());
+            assertEquals(0,newListShortestPath.get(4).getEndAddress().getId(),"End must be intersection 0");
         }
 
     }
-
-    /**
-     * Method to test:
-     * moveIntersectionAfter()
-     *
-     * What it does:
-     * Move down an intersection of the tour
-     */
-    @Nested
-    @DisplayName("Test on moveIntersectionAfter")
-    class moveIntersectionAfter {
-        @Test
-        @DisplayName("Normal scenario")
-        void moveAfter(){
-
-        }
-        @Test
-        @DisplayName("Move after on the last request")
-        void moveAfterLastIntersection(){
-
-        }
-
-        @Test
-        @DisplayName("Move pickup after delivery same request")
-        void moveAfterPickup(){
-
-        }
-
-    }
-
 
 
 }
