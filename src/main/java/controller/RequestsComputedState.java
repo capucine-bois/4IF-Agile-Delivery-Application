@@ -69,5 +69,6 @@ public class RequestsComputedState extends State{
         window.setDefaultButtonStates(new boolean[]{false, false, false});
         controller.setCurrentState(controller.addRequestState);
         tour.notifyObservers();
+        System.out.println("RequestsComputedState.addRequest");
     }
 }

@@ -42,6 +42,7 @@ public class AddRequestState extends State{
             window.setEnabledTour(true);
             tour.setNewRequest(null);
             window.setDefaultButtonStates(new boolean[]{true, true, false});
+            window.setUndoButtonState(true);
             controller.setCurrentState(controller.requestsComputedState);
             tour.notifyObservers();
         } else if (tour.getNewRequest().getPickupAddress() == null) {
