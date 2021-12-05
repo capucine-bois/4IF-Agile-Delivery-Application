@@ -594,11 +594,16 @@ public class Tour extends Observable {
             recomputePathAfterMovingIntersection(indexIntersection, allIntersections, intersections, newOrder);
 
             // check if a delivery is before a pickup
+            /*
             for (int i=0; i<newOrder.size()-1; i++) {
                 if (newOrder.get(i + 1) == newOrder.get(i) - 1 && newOrder.get(i) % 2 == 0) {
                     this.deliveryBeforePickup = true;
                     break;
                 }
+            }
+             */
+            if (newOrder.get(2) == newOrder.get(1) - 1 && newOrder.get(1) % 2 == 0) {
+                this.deliveryBeforePickup = true;
             }
 
             updateLength();
