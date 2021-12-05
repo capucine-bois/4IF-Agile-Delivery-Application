@@ -2,7 +2,6 @@ package controller;
 
 import model.*;
 import view.Window;
-import xml.XMLDeserializer;
 
 import java.util.List;
 
@@ -12,13 +11,13 @@ import java.util.List;
 public class SelectedIntersectionState extends State {
 
     @Override
-    public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
+    public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
         defaultLoadMap(cityMap, tour, window, controller);
         tour.notifyObservers();
     }
 
     @Override
-    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
+    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
         defaultLoadRequests(cityMap, tour, window, controller);
     }
 

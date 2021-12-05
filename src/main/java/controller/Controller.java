@@ -63,7 +63,7 @@ public class Controller {
      * The behavior depends on the current state.
      */
     public void loadMap() {
-        currentState.loadMap(cityMap, tour, window, this);
+        currentState.loadMap(cityMap, tour, window, this, listOfCommands);
     }
 
     /**
@@ -71,7 +71,7 @@ public class Controller {
      * The behavior depends on the current state.
      */
     public void loadRequests() {
-        currentState.loadRequests(cityMap, tour, window, this);
+        currentState.loadRequests(cityMap, tour, window, this, listOfCommands);
     }
 
     /**
@@ -166,8 +166,7 @@ public class Controller {
      * @param indexRequest index of the request to delete
      */
     public void deleteRequest(int indexRequest) {
-        Request requestToDelete = tour.getPlanningRequests().get(indexRequest);
-        currentState.deleteRequest(tour, requestToDelete, indexRequest, cityMap.getIntersections(), window, listOfCommands, this);
+        currentState.deleteRequest(tour, indexRequest, cityMap.getIntersections(), window, listOfCommands, this);
     }
 
     /**
