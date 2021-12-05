@@ -4,6 +4,8 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -37,24 +39,23 @@ public class TextualView extends JPanel implements Observer {
     protected static List<JButton> chooseAddressButtons;
     protected static List<JSpinner> timeFields;
 
-    private Tour tour;
+    private final Tour tour;
     private final int gap = 20;
     private CardLayout cardLayout;
-    private Window window;
+    private final Window window;
     private JButton requestsHeader;
     private JButton tourHeader;
     private JButton addRequest;
-    private List<JButton> addRequestButtons;
+    private final List<JButton> addRequestButtons;
     private JPanel cardLayoutPanel;
     private JPanel requestsPanelWithAddButton;
     private JPanel requestsMainPanel;
     private JPanel tourMainPanel;
     private JPanel addRequestPanel;
-    private JPanel addRequestContentPanel;
 
     // Listeners
-    private MouseListener mouseListener;
-    private ButtonListener buttonListener;
+    private final MouseListener mouseListener;
+    private final ButtonListener buttonListener;
 
     /**
      * Create a textual view in window
@@ -269,15 +270,36 @@ public class TextualView extends JPanel implements Observer {
      * Show speed, length, starting and ending time.
      */
     private void displayTourGlobalInformation() {
+        String duration = getDuration();
+
         JPanel tourFirstPanel = new JPanel();
         tourFirstPanel.setLayout(new BoxLayout(tourFirstPanel, BoxLayout.Y_AXIS));
         addLine(tourFirstPanel, "Total length", String.format("%.1f", tour.getTourLength() / (double) 1000) + " km", false, 14);
         addLine(tourFirstPanel, "Speed", String.format("%.1f", tour.getSpeed()) + " km/h", false, 14);
         addLine(tourFirstPanel, "Starting at", tour.getDepartureTime(), false, 14);
         addLine(tourFirstPanel, "Ending at", tour.getArrivalTime(), false, 14);
-        tourFirstPanel.setMaximumSize(new Dimension(getPreferredSize().width, 96 + gap));
+        addLine(tourFirstPanel, "Total duration", duration, false, 14);
+
+        tourFirstPanel.setMaximumSize(new Dimension(getPreferredSize().width, 130 + gap));
         tourMainPanel.add(tourFirstPanel);
         tourMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
+    }
+
+    private String getDuration() {
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+        Date date1 = null;
+        Date date2 = null;
+        try {
+            date2 = format.parse(tour.getArrivalTime()+":00");
+            date1 = format.parse(tour.getDepartureTime()+":00");
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        int totalDuration = (int) (date2.getTime() - date1.getTime())/60000;
+        int hours = totalDuration / 60; //since both are ints, you get an int
+        int minutes = totalDuration % 60;
+        return hours +":"+ minutes;
     }
 
     /**
@@ -440,7 +462,7 @@ public class TextualView extends JPanel implements Observer {
     private void displayAddRequest() {
         chooseAddressButtons.clear();
         timeFields.clear();
-        addRequestContentPanel = new JPanel();
+        JPanel addRequestContentPanel = new JPanel();
         addRequestContentPanel.setLayout(new BorderLayout());
         JPanel pickupAndDelivery = new JPanel();
         pickupAndDelivery.setLayout(new BoxLayout(pickupAndDelivery, BoxLayout.Y_AXIS));
