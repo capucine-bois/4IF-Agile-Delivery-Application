@@ -29,6 +29,8 @@ public class TextualView extends JPanel implements Observer {
     protected static final String CANCEL_ADD_REQUEST = "Cancel";
     protected static final String CONTINUE_ADD_REQUEST = "Continue";
     protected static final String CHOOSE_ADDRESS = "Choose address";
+    protected static final String CHANGE_TIME = "Change time";
+    protected static final String CHANGE_ADDRESS = "Change address";
 
     protected static List<JPanel> requestPanels;
     protected static List<JPanel> tourIntersectionsPanels;
@@ -411,7 +413,7 @@ public class TextualView extends JPanel implements Observer {
 
         addLine(pathPanel,"Length", String.format("%.1f",shortestPath.getPathLength() / (double) 1000) + " km", false, 12);
 
-        if (!segmentDetails) {
+        if (!segmentDetails && tour.isTourComputed()) {
             JButton pathDetail = new JButton(PATH_DETAILS);
             try {
                 window.setStyle(pathDetail);
@@ -477,24 +479,10 @@ public class TextualView extends JPanel implements Observer {
 
         JPanel buttonsAddRequestPanel = new JPanel();
         buttonsAddRequestPanel.setLayout(new GridLayout(1,2));
-        JButton cancelAddRequest = new JButton(CANCEL_ADD_REQUEST);
-        try {
-            window.setStyle(cancelAddRequest);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        cancelAddRequest.setBackground(Constants.COLOR_2);
-        cancelAddRequest.addActionListener(buttonListener);
+        JButton cancelAddRequest = displayDarkButton(CANCEL_ADD_REQUEST, Constants.COLOR_2);
         addRequestButtons.add(cancelAddRequest);
         buttonsAddRequestPanel.add(cancelAddRequest);
-        JButton validateAddRequest = new JButton(CONTINUE_ADD_REQUEST);
-        try {
-            window.setStyle(validateAddRequest);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        validateAddRequest.setBackground(Constants.COLOR_12);
-        validateAddRequest.addActionListener(buttonListener);
+        JButton validateAddRequest = displayDarkButton(CONTINUE_ADD_REQUEST, Constants.COLOR_12);
         addRequestButtons.add(validateAddRequest);
         buttonsAddRequestPanel.add(validateAddRequest);
         addRequestPanel.add(buttonsAddRequestPanel, BorderLayout.PAGE_END);
@@ -572,20 +560,21 @@ public class TextualView extends JPanel implements Observer {
         int maxHeight = informations.size()*21 + gap;
         if (!tour.getListShortestPaths().isEmpty() && tour.isTourComputed()) {
             maxHeight += 40;
-            displayDeleteButton(contentWithButtonPanel);
+            displayDeleteButton(contentWithButtonPanel, selected);
         }
         informationPanel.add(contentWithButtonPanel);
         informationPanel.setMaximumSize(new Dimension(getPreferredSize().width, maxHeight));
         parentPanel.add(informationPanel);
     }
 
-    private void displayDeleteButton(JPanel contentWithButtonPanel) {
+    private void displayDeleteButton(JPanel contentWithButtonPanel, boolean selected) {
         JButton deleteRequest = new JButton(DELETE_REQUEST);
         try {
             window.setStyle(deleteRequest);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (selected) deleteRequest.setBackground(Constants.COLOR_12);
         deleteRequestButtons.add(deleteRequest);
         deleteRequest.addActionListener(buttonListener);
         contentWithButtonPanel.add(deleteRequest, BorderLayout.PAGE_END);
@@ -596,11 +585,16 @@ public class TextualView extends JPanel implements Observer {
         informationPanel.setLayout(new BorderLayout());
         displayColorPanel(color, informationPanel);
         JPanel contentWithButtonPanel = createContentWithButtonPanel(informations, selected, tourIntersectionsPanels, !segmentDetails);
-        if (!segmentDetails) {
-            displayMoveButtonsPanel(index, contentWithButtonPanel);
+        int maxHeight = informations.size()*21 + gap;
+        if (!segmentDetails && tour.isTourComputed()) {
+            displayMoveButtonsPanel(index, contentWithButtonPanel, selected);
+            if (selected) {
+                displayUpdateButtonsPanel(contentWithButtonPanel);
+                maxHeight += 40;
+            }
         }
         informationPanel.add(contentWithButtonPanel);
-        informationPanel.setMaximumSize(new Dimension(getPreferredSize().width, informations.size()*21 + gap));
+        informationPanel.setMaximumSize(new Dimension(getPreferredSize().width, maxHeight));
         parentPanel.add(informationPanel);
     }
 
@@ -626,40 +620,73 @@ public class TextualView extends JPanel implements Observer {
         return contentPanel;
     }
 
-    private void displayMoveButtonsPanel(int index, JPanel pointPanel) {
+    private void displayMoveButtonsPanel(int index, JPanel pointPanel, boolean selected) {
         JPanel moveButtonsPanel = new JPanel();
-        moveButtonsPanel.setLayout(new GridLayout(3,1));
-        moveButtonsPanel.setBorder(BorderFactory.createMatteBorder(10,10,10,10,Constants.COLOR_4));
-        moveButtonsPanel.setBackground(Constants.COLOR_4);
+        moveButtonsPanel.setLayout(new GridLayout(2,1, 0, 20));
+        if (selected) {
+            moveButtonsPanel.setBorder(BorderFactory.createMatteBorder(10, 10, 10, 10, Constants.COLOR_2));
+            moveButtonsPanel.setBackground(Constants.COLOR_2);
+        } else {
+            moveButtonsPanel.setBorder(BorderFactory.createMatteBorder(10, 10, 10, 10, Constants.COLOR_4));
+            moveButtonsPanel.setBackground(Constants.COLOR_4);
+        }
         // check if intersection is first
         if (index != 0) {
-            displayMoveButton(moveButtonsPanel, "move-up", goUpButtons);
+            displayMoveButton(moveButtonsPanel, "move-up", goUpButtons, selected);
         } else {
             moveButtonsPanel.add(new JLabel());
         }
 
-        moveButtonsPanel.add(new JLabel());
-
         // check if intersection is last
         if (index < tour.getListShortestPaths().size() - 2) {
-            displayMoveButton(moveButtonsPanel, "move-down", goDownButtons);
+            displayMoveButton(moveButtonsPanel, "move-down", goDownButtons, selected);
         }
 
         pointPanel.add(moveButtonsPanel, BorderLayout.LINE_END);
     }
 
-    private void displayMoveButton(JPanel moveButtonsPanel, String s, List<JButton> listButtons) {
+    private void displayMoveButton(JPanel moveButtonsPanel, String iconName, List<JButton> listButtons, boolean selected) {
         JButton moveButton = new JButton();
         try {
-            moveButton.setIcon(new ImageIcon(Constants.getImage(s)));
+            moveButton.setIcon(new ImageIcon(Constants.getImage(iconName)));
         } catch (Exception e) {
             e.printStackTrace();
         }
         moveButton.setBorder(BorderFactory.createEmptyBorder());
-        moveButton.setBackground(Constants.COLOR_2);
+        if (selected) moveButton.setBackground(Constants.COLOR_12);
+        else moveButton.setBackground(Constants.COLOR_2);
         listButtons.add(moveButton);
         moveButton.addActionListener(buttonListener);
         moveButtonsPanel.add(moveButton);
+    }
+
+    private void displayUpdateButtonsPanel(JPanel pointPanel) {
+        JPanel updateButtonsPanel = new JPanel();
+        updateButtonsPanel.setLayout(new GridLayout(1,2, 5, 0));
+        updateButtonsPanel.setBackground(Constants.COLOR_2);
+
+        displayUpdateButton(updateButtonsPanel, CHANGE_TIME);
+
+        displayUpdateButton(updateButtonsPanel, CHANGE_ADDRESS);
+
+        pointPanel.add(updateButtonsPanel, BorderLayout.PAGE_END);
+    }
+
+    private void displayUpdateButton(JPanel parentPanel, String buttonName) {
+        JButton button = displayDarkButton(buttonName, Constants.COLOR_12);
+        parentPanel.add(button);
+    }
+
+    private JButton displayDarkButton(String buttonName, Color color12) {
+        JButton button = new JButton(buttonName);
+        try {
+            window.setStyle(button);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        button.setBackground(color12);
+        button.addActionListener(buttonListener);
+        return button;
     }
 
     private void displayColorPanel(Color color, JPanel informationPanel) {

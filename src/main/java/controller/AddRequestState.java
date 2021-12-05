@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 public class AddRequestState extends State{
 
     @Override
-    public void chooseAddress(int indexButton, Tour tour, Window window, Controller controller) {
+    public void chooseAddress(int indexButton, Window window, Controller controller) {
         window.enterSelectionMode();
         if (indexButton == 0) {
             controller.setCurrentState(controller.pickupAddressSelectionState);
