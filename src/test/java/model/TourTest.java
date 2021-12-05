@@ -125,10 +125,7 @@ class TourTest {
             ArrayList<ShortestPath> listShortestPaths = tour.getListShortestPaths();
             double tourLength = tour.getTourLength();
 
-
-            for(ShortestPath sh : listShortestPaths) {
-                System.out.println("on va de " + sh.getStartAddress().getId() + " à " + sh.getEndAddress().getId() + " taille est " + sh.getPathLength());
-            }
+            
             // Check answer
             assertEquals(tourLength,565,"Length of the best path isn't find ");
             assertEquals(listShortestPaths.get(0).getStartAddress().getId(), 0,"Start point isn't right");
@@ -201,8 +198,6 @@ class TourTest {
             listIntersection.get(0).addAdjacentSegment(s15);
             listIntersection.get(5).addAdjacentSegment(s16);
             Request r3 = new Request(180,240,i7,listIntersection.get(5));
-            tour.addRequest(r3);
-
 
             long lastPointBeforeDepot = tour.getListShortestPaths().get(tour.getListShortestPaths().size()-1).getStartAddress().getId();
 
@@ -219,12 +214,12 @@ class TourTest {
             // Check answer
             assertEquals(7, size,  "The number of shortest paths isn't right");
             assertEquals(575, tour.getTourLength(),  "The total length isn't right.");
-            assertEquals(lastPointBeforeDepot, listShortestPaths.get(size-3).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(i7.getId(), listShortestPaths.get(size-3).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(i7.getId(), listShortestPaths.get(size-2).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(5, listShortestPaths.get(size-2).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(5,listShortestPaths.get(size-1).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(0,listShortestPaths.get(size-1).getEndAddress().getId(), "The request is not in the right place");
+            assertEquals(lastPointBeforeDepot, listShortestPaths.get(size-3).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(i7.getId(), listShortestPaths.get(size-3).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(i7.getId(), listShortestPaths.get(size-2).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(5, listShortestPaths.get(size-2).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(5,listShortestPaths.get(size-1).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(0,listShortestPaths.get(size-1).getEndAddress().getId(), "The order of shortest paths isn't right");
 
         }
 
@@ -256,12 +251,12 @@ class TourTest {
             // Check answer
             assertEquals(7, size, "The number of shortest paths isn't right");
             assertEquals(565, tour.getTourLength(),  "The total length isn't right.");
-            assertEquals(lastPointBeforeDepot, listShortestPaths.get(size-3).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(i5.getId(),listShortestPaths.get(size-3).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(i5.getId(), listShortestPaths.get(size-2).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(0, listShortestPaths.get(size-2).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(0, listShortestPaths.get(size-1).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(0, listShortestPaths.get(size-1).getEndAddress().getId(), "The request is not in the right place");
+            assertEquals(lastPointBeforeDepot, listShortestPaths.get(size-3).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(i5.getId(),listShortestPaths.get(size-3).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(i5.getId(), listShortestPaths.get(size-2).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(0, listShortestPaths.get(size-2).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(0, listShortestPaths.get(size-1).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(0, listShortestPaths.get(size-1).getEndAddress().getId(), "The order of shortest paths isn't right");
         }
 
 
@@ -291,12 +286,12 @@ class TourTest {
             // Check answer
             assertEquals(7,size,  "The number of shortest paths isn't right");
             assertEquals(565, tour.getTourLength(),  "The total length isn't right.");
-            assertEquals(lastPointBeforeDepot,listShortestPaths.get(size-3).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(i5.getId(), listShortestPaths.get(size-3).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(i5.getId(), listShortestPaths.get(size-2).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(i5.getId(), listShortestPaths.get(size-2).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(i5.getId(), listShortestPaths.get(size-1).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(0, listShortestPaths.get(size-1).getEndAddress().getId(), "The request is not in the right place");
+            assertEquals(lastPointBeforeDepot,listShortestPaths.get(size-3).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(i5.getId(), listShortestPaths.get(size-3).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(i5.getId(), listShortestPaths.get(size-2).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(i5.getId(), listShortestPaths.get(size-2).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(i5.getId(), listShortestPaths.get(size-1).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(0, listShortestPaths.get(size-1).getEndAddress().getId(), "The order of shortest paths isn't right");
         }
 
         @Test
@@ -321,8 +316,6 @@ class TourTest {
 
             // Result
             ArrayList<ShortestPath> listShortestPaths = tour.getListShortestPaths();
-            double tourLength = tour.getTourLength();
-
 
             for(ShortestPath sh : listShortestPaths) {
                 System.out.println("start from : " + sh.getStartAddress().getId() + " to : " + sh.getEndAddress().getId() + ". The length of the path is : " + sh.getPathLength());
@@ -332,20 +325,20 @@ class TourTest {
             // Check answer
             assertEquals(7,size,  "The number of shortest paths isn't right");
             assertEquals(704, tour.getTourLength(),  "The total length isn't right.");
-            assertEquals(0,listShortestPaths.get(0).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(3, listShortestPaths.get(0).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(3, listShortestPaths.get(1).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(6, listShortestPaths.get(1).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(6, listShortestPaths.get(2).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(1, listShortestPaths.get(2).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(1, listShortestPaths.get(3).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(5, listShortestPaths.get(3).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(5, listShortestPaths.get(4).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(4, listShortestPaths.get(4).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(4, listShortestPaths.get(5).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(2, listShortestPaths.get(5).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(2, listShortestPaths.get(6).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(0, listShortestPaths.get(6).getEndAddress().getId(), "The request is not in the right place");
+            assertEquals(0,listShortestPaths.get(0).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(3, listShortestPaths.get(0).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(3, listShortestPaths.get(1).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(6, listShortestPaths.get(1).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(6, listShortestPaths.get(2).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(1, listShortestPaths.get(2).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(1, listShortestPaths.get(3).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(5, listShortestPaths.get(3).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(5, listShortestPaths.get(4).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(4, listShortestPaths.get(4).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(4, listShortestPaths.get(5).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(2, listShortestPaths.get(5).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(2, listShortestPaths.get(6).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(0, listShortestPaths.get(6).getEndAddress().getId(), "The order of shortest paths isn't right");
         }
 
 
@@ -371,8 +364,6 @@ class TourTest {
 
             // Result
             ArrayList<ShortestPath> listShortestPaths = tour.getListShortestPaths();
-            double tourLength = tour.getTourLength();
-
 
             for(ShortestPath sh : listShortestPaths) {
                 System.out.println("start from : " + sh.getStartAddress().getId() + " to : " + sh.getEndAddress().getId() + ". The length of the path is : " + sh.getPathLength());
@@ -382,20 +373,20 @@ class TourTest {
             // Check answer
             assertEquals(7,size,  "The number of shortest paths isn't right");
             assertEquals(570, tour.getTourLength(),  "The total length isn't right.");
-            assertEquals(0,listShortestPaths.get(0).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(6, listShortestPaths.get(0).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(6, listShortestPaths.get(1).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(5, listShortestPaths.get(1).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(5, listShortestPaths.get(2).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(3, listShortestPaths.get(2).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(3, listShortestPaths.get(3).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(1, listShortestPaths.get(3).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(1, listShortestPaths.get(4).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(4, listShortestPaths.get(4).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(4, listShortestPaths.get(5).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(2, listShortestPaths.get(5).getEndAddress().getId(), "The request is not in the right place");
-            assertEquals(2, listShortestPaths.get(6).getStartAddress().getId(), "The request is not in the right place");
-            assertEquals(0, listShortestPaths.get(6).getEndAddress().getId(), "The request is not in the right place");
+            assertEquals(0,listShortestPaths.get(0).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(6, listShortestPaths.get(0).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(6, listShortestPaths.get(1).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(5, listShortestPaths.get(1).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(5, listShortestPaths.get(2).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(3, listShortestPaths.get(2).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(3, listShortestPaths.get(3).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(1, listShortestPaths.get(3).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(1, listShortestPaths.get(4).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(4, listShortestPaths.get(4).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(4, listShortestPaths.get(5).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(2, listShortestPaths.get(5).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(2, listShortestPaths.get(6).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(0, listShortestPaths.get(6).getEndAddress().getId(), "The order of shortest paths isn't right");
         }
 
 
@@ -497,6 +488,60 @@ class TourTest {
             assertEquals(0,newListShortestPath.get(4).getEndAddress().getId(),"End must be intersection 0");
         }
 
+    }
+
+
+    /**
+     * Method to test:
+     * removeRequest()
+     *
+     * What it does:
+     * Remove the request from the tour
+     */
+    @Nested
+    @DisplayName("Test on removeRequest")
+    class removeRequest {
+
+        @BeforeEach
+        public void setList() {
+            listIntersection = (ArrayList<Intersection>) cityMap.getIntersections();
+            ArrayList<Segment> emptyListSegment = new ArrayList<>();
+            // create the previous list of shortest path (before adding a request)
+            tour.addShortestPaths(new ShortestPath(143, emptyListSegment, listIntersection.get(0), listIntersection.get(3)));
+            tour.addShortestPaths(new ShortestPath(16, emptyListSegment, listIntersection.get(3), listIntersection.get(1)));
+            tour.addShortestPaths(new ShortestPath(86, emptyListSegment, listIntersection.get(1), listIntersection.get(4)));
+            tour.addShortestPaths(new ShortestPath(118, emptyListSegment, listIntersection.get(4), listIntersection.get(2)));
+            tour.addShortestPaths(new ShortestPath(202, emptyListSegment, listIntersection.get(2), listIntersection.get(0)));
+            listRequest = tour.getPlanningRequests();
+        }
+
+        @Test
+        @DisplayName("Normal scenario")
+        void removeRequest() {
+
+
+            // Method to test
+            tour.removeRequest(0,1,3,listIntersection);
+
+            // Result
+            ArrayList<ShortestPath> listShortestPaths = tour.getListShortestPaths();
+
+            for(ShortestPath sh : listShortestPaths) {
+                System.out.println("start from : " + sh.getStartAddress().getId() + " to : " + sh.getEndAddress().getId() + ". The length of the path is : " + sh.getPathLength());
+            }
+
+            int size = listShortestPaths.size();
+            // Check answer
+            assertEquals(3,size,  "The number of shortest paths isn't right");
+            assertEquals(304, tour.getTourLength(),  "The total length isn't right.");
+            assertEquals(0,listShortestPaths.get(0).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(3, listShortestPaths.get(0).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(3, listShortestPaths.get(1).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(4, listShortestPaths.get(1).getEndAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(4, listShortestPaths.get(2).getStartAddress().getId(), "The order of shortest paths isn't right");
+            assertEquals(0, listShortestPaths.get(2).getEndAddress().getId(), "The order of shortest paths isn't right");
+
+        }
     }
 
 
