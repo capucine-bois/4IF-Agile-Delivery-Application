@@ -191,13 +191,13 @@ public class Tour extends Observable {
                 boolean endAddressIsPickup = path.getEndNodeNumber()%2 == 1;
                 int indexRequest = endAddressIsPickup ? path.getEndNodeNumber()/2 : path.getEndNodeNumber()/2 - 1;
 
-                Request currentRrequest = planningRequests.get(indexRequest);
+                Request currentRequest = planningRequests.get(indexRequest);
                 if (endAddressIsPickup) {
                     // pickup
-                    processDuration = currentRrequest.getPickupDuration();
+                    processDuration = currentRequest.getPickupDuration();
                 } else {
                     // delivery
-                    processDuration = currentRrequest.getDeliveryDuration();
+                    processDuration = currentRequest.getDeliveryDuration();
                 }
 
                 calendar.add(Calendar.SECOND, processDuration);
@@ -205,12 +205,12 @@ public class Tour extends Observable {
 
                 if (endAddressIsPickup) {
                     // pickup
-                    currentRrequest.setPickupArrivalTime(arrivalTime);
-                    currentRrequest.setPickupDepartureTime(departureTime);
+                    currentRequest.setPickupArrivalTime(arrivalTime);
+                    currentRequest.setPickupDepartureTime(departureTime);
                 } else {
                     // delivery
-                    currentRrequest.setDeliveryArrivalTime(arrivalTime);
-                    currentRrequest.setDeliveryDepartureTime(departureTime);
+                    currentRequest.setDeliveryArrivalTime(arrivalTime);
+                    currentRequest.setDeliveryDepartureTime(departureTime);
                 }
             } else {
                 System.out.println("Depot!");
@@ -513,10 +513,11 @@ public class Tour extends Observable {
      */
     public void removeRequest(int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery, List<Intersection> allIntersections) {
         System.out.println("Tour.removeRequest");
+        System.out.println("before");
 
         // remove request
         planningRequests.remove(indexRequest);
-
+        System.out.println("hee");
         for (int i = 0; i < listShortestPaths.size() - 1; i++) {
             if (i != indexShortestPathToPickup + 1 && i != indexShortestPathToDelivery + 1) {
                 ShortestPath currentShortestPath = listShortestPaths.get(i);
