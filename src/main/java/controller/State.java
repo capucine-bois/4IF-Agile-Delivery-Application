@@ -268,7 +268,7 @@ public abstract class State {
 
     public void stopTourComputation(Tour tour) {}
 
-    public void deleteRequest(Tour tour, Request requestToDelete, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l) {}
+    public void deleteRequest(Tour tour, Request requestToDelete, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l, Controller controller) {}
 
     public void addRequest(Tour tour, Window window, Controller controller) {}
 

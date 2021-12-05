@@ -167,7 +167,7 @@ public class Controller {
      */
     public void deleteRequest(int indexRequest) {
         Request requestToDelete = tour.getPlanningRequests().get(indexRequest);
-        currentState.deleteRequest(tour, requestToDelete, indexRequest, cityMap.getIntersections(), window, listOfCommands);
+        currentState.deleteRequest(tour, requestToDelete, indexRequest, cityMap.getIntersections(), window, listOfCommands, this);
     }
 
     /**
