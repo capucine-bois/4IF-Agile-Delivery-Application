@@ -14,16 +14,18 @@ public class AddCommand implements Command {
     private Request request;
     private List<Intersection> intersections;
     private List<ShortestPath> paths;
+    private int indexRequest;
 
     /**
      * Create the command which delete a request
      * @param tour the tour to modify
      * @param request the request to delete
      */
-    public AddCommand(Tour tour, Request request, List<Intersection> intersections) {
+    public AddCommand(Tour tour, Request request, List<Intersection> intersections, int indexRequest) {
         this.tour = tour;
         this.request = request;
         this.intersections = intersections;
+        this.indexRequest = indexRequest;
     }
 
     @Override
@@ -35,6 +37,6 @@ public class AddCommand implements Command {
 
     @Override
     public void undoCommand() {
-        tour.removeRequest(request,tour.getPlanningRequests().size()-1,intersections);
+        tour.removeRequest(request,indexRequest,intersections);
     }
 }

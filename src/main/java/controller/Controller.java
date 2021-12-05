@@ -252,4 +252,8 @@ public class Controller {
     public void insertRequest(String pickupTime, String deliveryTime) {
         currentState.insertRequest(pickupTime, deliveryTime, cityMap, tour, window, listOfCommands, this);
     }
+
+    public ListOfCommands getListOfCommands() {
+        return listOfCommands;
+    }
 }

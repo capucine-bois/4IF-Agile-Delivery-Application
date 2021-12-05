@@ -32,6 +32,7 @@ public abstract class State {
             window.setEnabledRequests(false);
             window.setEnabledTour(false);
             tour.setTourComputed(false);
+            controller.getListOfCommands().reset();
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
                 cityMap.clearLists();
@@ -63,6 +64,7 @@ public abstract class State {
             window.showRequestsPanel();
             window.setEnabledTour(false);
             tour.setTourComputed(false);
+            controller.getListOfCommands().reset();
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
                 Request.lastColor = Color.red;

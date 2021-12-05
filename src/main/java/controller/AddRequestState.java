@@ -36,7 +36,7 @@ public class AddRequestState extends State{
         if (pickupTimeOK && deliveryTimeOK && tour.getNewRequest().getPickupAddress() != null && tour.getNewRequest().getDeliveryAddress() != null) {
             tour.getNewRequest().setPickupDuration(Integer.parseInt(pickupTime) * 60);
             tour.getNewRequest().setDeliveryDuration(Integer.parseInt(deliveryTime) * 60);
-            listOfCommands.add(new AddCommand(tour, tour.getNewRequest(), cityMap.getIntersections()));
+            listOfCommands.add(new AddCommand(tour, tour.getNewRequest(), cityMap.getIntersections(), tour.getPlanningRequests().size()-1));
             window.showRequestsPanel();
             window.setEnabledTour(true);
             controller.setCurrentState(controller.requestsComputedState);
