@@ -25,20 +25,22 @@ public class RequestsLoadedState extends State {
             request.setPickupSelected(false);
             request.setDeliverySelected(false);
         }
+        window.setDefaultButtonStates(new boolean[]{false, false, false});
         controller.setCurrentState(controller.tourComputingState);
         window.showTourPanel();
         window.setEnabledTour(true);
         window.showComputingPanel();
         Thread TSPThread = new Thread(() -> {
-            // TODO: first call compute scc and dijkstra and add conditions for tourComputed to stop scc or dijkstra when stop button clicked
             tour.computeTour(cityMap.getIntersections());
             window.hideComputingPanel();
             if (!tour.getListShortestPaths().isEmpty()) {
                 window.showTourPanel();
+                window.setDefaultButtonStates(new boolean[]{true, true, false});
                 controller.setCurrentState(controller.tourComputedState);
             } else {
                 window.showRequestsPanel();
                 window.setEnabledTour(false);
+                window.setDefaultButtonStates(new boolean[]{true, true, true});
                 controller.setCurrentState(controller.requestsLoadedState);
             }
             tour.notifyObservers();
@@ -68,10 +70,5 @@ public class RequestsLoadedState extends State {
         if (!request.isDeliverySelected() || !request.isPickupSelected()) {
             window.colorRequestPanelOnMouseExited(indexRequest);
         }
-    }
-
-    @Override
-    public void moveMouseOnIcon(Window window) {
-        window.setHandCursorOnIcon();
     }
 }

@@ -63,11 +63,6 @@ public class TourComputedState extends State {
     }
 
     @Override
-    public void moveMouseOnIcon(Window window) {
-        window.setHandCursorOnIcon();
-    }
-
-    @Override
     public void moveIntersectionBefore(ListOfCommands l, Tour tour, int indexRequest,
                                        List<Intersection> allIntersections, Window window) {
         l.add(new MoveRequestBeforeCommand(tour, indexRequest, allIntersections));

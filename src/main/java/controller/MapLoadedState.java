@@ -28,6 +28,7 @@ public class MapLoadedState extends State {
             if (!tour.getIntersectionsUnreachableFromDepot().isEmpty()) {
                 throw new ExceptionXML("An address in the planning is unreachable.");
             }
+            window.setDefaultButtonStates(new boolean[]{true, true, true});
             controller.setCurrentState(controller.requestsLoadedState);
             tour.notifyObservers();
             window.setEnabledRequests(true);

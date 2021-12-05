@@ -54,11 +54,6 @@ public class RequestsComputedState extends State{
     }
 
     @Override
-    public void moveMouseOnIcon(Window window) {
-        window.setHandCursorOnIcon();
-    }
-
-    @Override
     public void deleteRequest(Tour tour, Request requestToDelete, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l) {
         l.add(new ReverseCommand(new AddCommand(tour, requestToDelete, allIntersections, indexRequest)));
         window.setUndoButtonState(true);
@@ -69,6 +64,7 @@ public class RequestsComputedState extends State{
         tour.setNewRequest(new Request());
         window.showAddRequestPanel();
         window.setEnabledTour(false);
+        window.setDefaultButtonStates(new boolean[]{false, false, false});
         controller.setCurrentState(controller.addRequestState);
         tour.notifyObservers();
     }

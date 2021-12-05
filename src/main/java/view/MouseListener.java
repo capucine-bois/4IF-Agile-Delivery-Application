@@ -72,11 +72,10 @@ public class MouseListener extends MouseAdapter {
         if (graphicalView.contains(e.getX(), e.getY())) {
             if (!graphicalView.isSelectionMode()) {
                 int indexIcon = graphicalView.findIcon(e.getX(), e.getY());
-                if (indexIcon != -1) controller.moveMouseOnIcon();
+                if (indexIcon != -1) graphicalView.setCursor(new Cursor(Cursor.HAND_CURSOR));
             } else {
                 int indexIntersection = graphicalView.findIntersection(e.getX(), e.getY());
                 if (indexIntersection != -1) graphicalView.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                //TODO : decide if we go to controller for this mouse hover and adapt other case
             }
         }
     }

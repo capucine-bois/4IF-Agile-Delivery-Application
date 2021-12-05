@@ -2,6 +2,7 @@ package controller;
 
 import model.*;
 import view.Window;
+import xml.ExceptionXML;
 import xml.XMLDeserializer;
 
 import java.awt.*;
@@ -26,6 +27,7 @@ public abstract class State {
     public void defaultLoadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
         try {
             XMLDeserializer.loadMap(cityMap);
+            window.setDefaultButtonStates(new boolean[]{true, true, false});
             controller.setCurrentState(controller.mapLoadedState);
             tour.clearLists();
             window.showRequestsPanel();
@@ -38,6 +40,7 @@ public abstract class State {
                 cityMap.clearLists();
                 tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
+                window.setDefaultButtonStates(new boolean[]{true, false, false});
                 controller.setCurrentState(controller.initialState);
                 window.showRequestsPanel();
                 window.setEnabledRequests(false);
@@ -60,6 +63,11 @@ public abstract class State {
         try {
             Request.lastColor = Color.red;
             XMLDeserializer.loadRequests(tour, cityMap);
+            tour.checkIntersectionsUnreachable(cityMap.getIntersections());
+            if (!tour.getIntersectionsUnreachableFromDepot().isEmpty()) {
+                throw new ExceptionXML("An address in the planning is unreachable.");
+            }
+            window.setDefaultButtonStates(new boolean[]{true, true, true});
             controller.setCurrentState(controller.requestsLoadedState);
             window.showRequestsPanel();
             window.setEnabledTour(false);
@@ -70,6 +78,7 @@ public abstract class State {
                 Request.lastColor = Color.red;
                 tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
+                window.setDefaultButtonStates(new boolean[]{true, true, false});
                 controller.setCurrentState(controller.mapLoadedState);
                 window.showRequestsPanel();
                 window.setEnabledRequests(false);
@@ -249,8 +258,6 @@ public abstract class State {
     public void enterMouseOnTourIntersection(int indexShortestPath, Window window) {}
 
     public void exitMouseOnRequest(int indexRequest, Tour tour, Window window) {}
-
-    public void moveMouseOnIcon(Window window) {}
 
     public void moveIntersectionBefore(ListOfCommands l, Tour tour, int indexIntersection, List<Intersection> allIntersections, Window window) {}
 
