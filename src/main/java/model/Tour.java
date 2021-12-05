@@ -265,8 +265,8 @@ public class Tour extends Observable {
 
     /**
      * Identify all useful points and runs Dijkstra in order compute the tour.
-     * @param allIntersectionsList
-     * @param listNodes
+     * @param allIntersectionsList All intersections of the tour
+     * @param listNodes All nodes of the tour
      */
     private void processDijkstraToComputeTour(List<Intersection> allIntersectionsList, ArrayList<Node> listNodes) {
         long startTimeDijkstra = System.currentTimeMillis();
@@ -502,6 +502,7 @@ public class Tour extends Observable {
         currentShortestPath.setListSegments(newShortestPath.getListSegments());
         currentShortestPath.setStartNodeNumber(nodeNumberBefore);
         currentShortestPath.setStartAddress(newShortestPath.getStartAddress());
+        currentShortestPath.setPathLength(newShortestPath.getPathLength());
     }
 
     /**
@@ -558,6 +559,7 @@ public class Tour extends Observable {
         currentShortestPath.setListSegments(newShortestPath.getListSegments());
         currentShortestPath.setEndNodeNumber(nextShortestPath.getEndNodeNumber());
         currentShortestPath.setEndAddress(nextShortestPath.getEndAddress());
+        currentShortestPath.setPathLength(newShortestPath.getPathLength());
     }
 
     /**
