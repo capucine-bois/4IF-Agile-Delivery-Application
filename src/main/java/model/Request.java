@@ -92,6 +92,8 @@ public class Request {
     public Request() {
         this.pickupDuration = 0;
         this.deliveryDuration = 0;
+        this.pickupSelected = false;
+        this.deliverySelected = false;
         this.color = lastColor;
         getNextColor();
     }

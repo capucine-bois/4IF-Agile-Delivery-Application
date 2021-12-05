@@ -40,8 +40,10 @@ public class AddRequestState extends State{
             listOfCommands.add(new AddCommand(tour, tour.getNewRequest(), cityMap.getIntersections()));
             window.showRequestsPanel();
             window.setEnabledTour(true);
+            tour.setNewRequest(null);
             window.setDefaultButtonStates(new boolean[]{true, true, false});
             controller.setCurrentState(controller.requestsComputedState);
+            tour.notifyObservers();
         } else if (tour.getNewRequest().getPickupAddress() == null) {
             window.displayErrorMessage("No pickup address selected.");
         } else if (tour.getNewRequest().getDeliveryAddress() == null) {
