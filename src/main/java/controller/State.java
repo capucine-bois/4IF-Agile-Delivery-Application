@@ -243,7 +243,7 @@ public abstract class State {
 
     public void undo(ListOfCommands l, Window window) {
         l.undo();
-        if (l.size() == 0) {
+        if (l.size() == 0 || l.getCurrentIndex() < 0) {
             window.setUndoButtonState(false);
         }
         window.setRedoButtonState(true);
@@ -251,7 +251,10 @@ public abstract class State {
 
     public void redo(ListOfCommands l, Window window){
         l.redo();
-        if (l.size() == 0) window.setRedoButtonState(false);
+
+        if (l.size() == 0 || l.getCurrentIndex() >= l.size()-1) {
+            window.setRedoButtonState(false);
+        }
     }
 
 

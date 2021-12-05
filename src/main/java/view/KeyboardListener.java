@@ -26,7 +26,7 @@ public class KeyboardListener extends KeyAdapter {
             controller.undo();
 
         if (e.getKeyCode() == 90 && e.isControlDown() && e.isShiftDown())
-            controller.undo();
+            controller.redo();
 
     }
 
