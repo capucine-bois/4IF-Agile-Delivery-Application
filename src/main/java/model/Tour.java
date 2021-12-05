@@ -421,59 +421,12 @@ public class Tour extends Observable {
 
     /**
      * Insert a request to an already computed tour (after deleted a request).
-     * Dijkstra is called 3 times to recompute the path
-     * The request is inserted at the end of the tour (if the user wants to change the order
-     * he can do it with the arrows in the textualView)
-     * @param requestToAdd request to add
-     * @param paths all the paths of the map
-     * @param allIntersections all the intersections of the map
-     */
-    public void insertRequest(Request requestToAdd, List<ShortestPath> paths, List<Intersection> allIntersections){
-        System.out.println("Tour.addRequest");
-        // add request in planning Request
-        planningRequests.add(requestToAdd);
-
-        Intersection previousIntersection = paths.get(paths.size()-2).getEndAddress();
-
-        ArrayList<Intersection> useFulEndPointsForFirstPath = new ArrayList<>();
-        useFulEndPointsForFirstPath.add(requestToAdd.getPickupAddress());
-        ShortestPath firstNewPath = Dijkstra.compute(allIntersections,useFulEndPointsForFirstPath, previousIntersection).get(0);
-
-        ArrayList<Intersection> useFulEndPointsForSecondPath = new ArrayList<>();
-        useFulEndPointsForSecondPath.add(requestToAdd.getDeliveryAddress());
-        ShortestPath secondNewPath = Dijkstra.compute(allIntersections,useFulEndPointsForSecondPath, requestToAdd.getPickupAddress()).get(0);
-
-        ArrayList<Intersection> useFulEndPointsForThirdPath = new ArrayList<>();
-        useFulEndPointsForThirdPath.add(depotAddress);
-        ShortestPath thirdNewPath = Dijkstra.compute(allIntersections,useFulEndPointsForThirdPath, requestToAdd.getDeliveryAddress()).get(0);
-
-        paths.remove(paths.size()-1);
-
-        // update TSP nodes values
-        int currentMaxNodeValue = (planningRequests.size()-1)*2;
-        firstNewPath.setStartNodeNumber(listShortestPaths.get(listShortestPaths.size()-1).getEndNodeNumber());
-        firstNewPath.setEndNodeNumber(currentMaxNodeValue+1);
-        secondNewPath.setStartNodeNumber(currentMaxNodeValue+1);
-        secondNewPath.setEndNodeNumber(currentMaxNodeValue+2);
-        thirdNewPath.setStartNodeNumber(currentMaxNodeValue+2);
-        thirdNewPath.setEndNodeNumber(0);
-
-        paths.add(firstNewPath);
-        paths.add(secondNewPath);
-        paths.add(thirdNewPath);
-        updateLength();
-        updateTimes();
-        notifyObservers();
-    }
-
-    /**
-     * Insert a request to an already computed tour (after deleted a request).
      * Position of intersections are stored in Request.
      * Some paths are deleted, some are created to accomplish every request including the new one.
      * @param indexRequest
      * @param requestToInsert request to insert
      */
-    public void putBackRequest(int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery, Request requestToInsert, List<Intersection> allIntersections) {
+    public void insertRequest(int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery, Request requestToInsert, List<Intersection> allIntersections) {
         System.out.println("Tour.putBackRequest");
 
         // add request

@@ -12,7 +12,9 @@ public class AddCommand implements Command {
     private Tour tour;
     private Request request;
     private List<Intersection> intersections;
-    private List<ShortestPath> paths;
+    private int indexRequest;
+    private int indexShortestPathToPickup;
+    private int indexShortestPathToDelivery;
 
     /**
      * Create the command which delete a request
@@ -23,17 +25,19 @@ public class AddCommand implements Command {
         this.tour = tour;
         this.request = request;
         this.intersections = intersections;
+        this.indexRequest = tour.getPlanningRequests().size();
+        this.indexShortestPathToPickup = tour.getListShortestPaths().size() - 2;
+        this.indexShortestPathToDelivery = tour.getPlanningRequests().size() - 1;
+
     }
 
     @Override
     public void doCommand() {
-        paths = tour.getListShortestPaths();
-        tour.insertRequest(request,paths,intersections);
-
+        tour.insertRequest(indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery, request, intersections);
     }
 
     @Override
     public void undoCommand() {
-        tour.removeRequest(tour.getPlanningRequests().size()-1, tour.getListShortestPaths().size() - 2, tour.getPlanningRequests().size() - 1, intersections);
+        tour.removeRequest(indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery, intersections);
     }
 }

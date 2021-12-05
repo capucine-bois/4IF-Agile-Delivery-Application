@@ -11,8 +11,8 @@ public class DeleteCommand implements Command {
 
     private Tour tour;
     private Request request;
-    private int indexRequest;
     private List<Intersection> intersections;
+    private int indexRequest;
     private int indexShortestPathToPickup;
     private int indexShortestPathToDelivery;
 
@@ -24,8 +24,8 @@ public class DeleteCommand implements Command {
     public DeleteCommand(Tour tour, Request request, int indexRequest, List<Intersection> intersections) {
         this.tour = tour;
         this.request = request;
-        this.indexRequest = indexRequest;
         this.intersections = intersections;
+        this.indexRequest = indexRequest;
         this.indexShortestPathToPickup = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 1).findFirst().get());
         this.indexShortestPathToDelivery = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 2).findFirst().get());
     }
@@ -37,6 +37,6 @@ public class DeleteCommand implements Command {
 
     @Override
     public void undoCommand() {
-        tour.putBackRequest(indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery, request, intersections);
+        tour.insertRequest(indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery, request, intersections);
     }
 }
