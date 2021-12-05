@@ -1,7 +1,6 @@
 package model;
 
 import observer.Observable;
-import xml.ExceptionXML;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -192,13 +191,13 @@ public class Tour extends Observable {
                 boolean endAddressIsPickup = path.getEndNodeNumber()%2 == 1;
                 int indexRequest = endAddressIsPickup ? path.getEndNodeNumber()/2 : path.getEndNodeNumber()/2 - 1;
 
-                Request currentRrequest = planningRequests.get(indexRequest);
+                Request currentRequest = planningRequests.get(indexRequest);
                 if (endAddressIsPickup) {
                     // pickup
-                    processDuration = currentRrequest.getPickupDuration();
+                    processDuration = currentRequest.getPickupDuration();
                 } else {
                     // delivery
-                    processDuration = currentRrequest.getDeliveryDuration();
+                    processDuration = currentRequest.getDeliveryDuration();
                 }
 
                 calendar.add(Calendar.SECOND, processDuration);
@@ -206,12 +205,12 @@ public class Tour extends Observable {
 
                 if (endAddressIsPickup) {
                     // pickup
-                    currentRrequest.setPickupArrivalTime(arrivalTime);
-                    currentRrequest.setPickupDepartureTime(departureTime);
+                    currentRequest.setPickupArrivalTime(arrivalTime);
+                    currentRequest.setPickupDepartureTime(departureTime);
                 } else {
                     // delivery
-                    currentRrequest.setDeliveryArrivalTime(arrivalTime);
-                    currentRrequest.setDeliveryDepartureTime(departureTime);
+                    currentRequest.setDeliveryArrivalTime(arrivalTime);
+                    currentRequest.setDeliveryDepartureTime(departureTime);
                 }
             } else {
                 System.out.println("Depot!");
@@ -422,277 +421,141 @@ public class Tour extends Observable {
 
     /**
      * Insert a request to an already computed tour (after deleted a request).
-     * Dijkstra is called 3 times to recompute the path
-     * The request is inserted at the end of the tour (if the user wants to change the order
-     * he can do it with the arrows in the textualView)
-     * @param requestToAdd request to add
-     * @param paths all the paths of the map
-     * @param allIntersections all the intersections of the map
-     */
-    public void insertRequest(Request requestToAdd, List<ShortestPath> paths, List<Intersection> allIntersections){
-        System.out.println("Tour.addRequest");
-        // add request in planning Request
-        planningRequests.add(requestToAdd);
-
-        Intersection previousIntersection = paths.get(paths.size()-2).getEndAddress();
-
-        ArrayList<Intersection> useFulEndPointsForFirstPath = new ArrayList<>();
-        useFulEndPointsForFirstPath.add(requestToAdd.getPickupAddress());
-        ShortestPath firstNewPath = Dijkstra.compute(allIntersections,useFulEndPointsForFirstPath, previousIntersection).get(0);
-
-        ArrayList<Intersection> useFulEndPointsForSecondPath = new ArrayList<>();
-        useFulEndPointsForSecondPath.add(requestToAdd.getDeliveryAddress());
-        ShortestPath secondNewPath = Dijkstra.compute(allIntersections,useFulEndPointsForSecondPath, requestToAdd.getPickupAddress()).get(0);
-
-        ArrayList<Intersection> useFulEndPointsForThirdPath = new ArrayList<>();
-        useFulEndPointsForThirdPath.add(depotAddress);
-        ShortestPath thirdNewPath = Dijkstra.compute(allIntersections,useFulEndPointsForThirdPath, requestToAdd.getDeliveryAddress()).get(0);
-
-        paths.remove(paths.size()-1);
-
-        // update TSP nodes values
-        int currentMaxNodeValue = (planningRequests.size()-1)*2;
-        firstNewPath.setStartNodeNumber(listShortestPaths.get(listShortestPaths.size()-1).getEndNodeNumber());
-        firstNewPath.setEndNodeNumber(currentMaxNodeValue+1);
-        secondNewPath.setStartNodeNumber(currentMaxNodeValue+1);
-        secondNewPath.setEndNodeNumber(currentMaxNodeValue+2);
-        thirdNewPath.setStartNodeNumber(currentMaxNodeValue+2);
-        thirdNewPath.setEndNodeNumber(0);
-
-        paths.add(firstNewPath);
-        paths.add(secondNewPath);
-        paths.add(thirdNewPath);
-        updateLength();
-        updateTimes();
-        notifyObservers();
-    }
-
-    /**
-     * Insert a request to an already computed tour (after deleted a request).
      * Position of intersections are stored in Request.
      * Some paths are deleted, some are created to accomplish every request including the new one.
+     * @param indexRequest
      * @param requestToInsert request to insert
-     * @param paths all the paths of the map
      */
-    public void putBackRequest(Request requestToInsert, List<ShortestPath> paths) {
-
+    public void insertRequest(int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery, Request requestToInsert, List<Intersection> allIntersections) {
         System.out.println("Tour.putBackRequest");
 
-        // get TSP values of deleted points
-        ArrayList<Integer> intersectionsToAdd = new ArrayList<>();
-        if (paths.size() == 3) {
-            // deleted points are following
-            intersectionsToAdd.add(paths.get(0).getEndNodeNumber());
-            intersectionsToAdd.add(paths.get(1).getEndNodeNumber());
+        // add request
+        planningRequests.add(indexRequest, requestToInsert);
+        Intersection pickupAddress = requestToInsert.getPickupAddress();
+        Intersection deliveryAddress = requestToInsert.getDeliveryAddress();
+
+        int indexShortestPathToPickupToUpdate = indexShortestPathToPickup;
+        int indexShortestPathToDeliveryToUpdate = indexShortestPathToDelivery;
+        if (indexShortestPathToPickup < indexShortestPathToDelivery) {
+            indexShortestPathToDeliveryToUpdate = indexShortestPathToDelivery - 1;
         } else {
-            // deleted points are not following
-            intersectionsToAdd.add(paths.get(0).getEndNodeNumber());
-            intersectionsToAdd.add(paths.get(2).getEndNodeNumber());
+            indexShortestPathToPickupToUpdate = indexShortestPathToPickup - 1;
         }
 
-        // increase TSP node values
-        increaseNodeNumbers(intersectionsToAdd);
+        Intersection addressBeforePickup = listShortestPaths.get(indexShortestPathToPickupToUpdate).getStartAddress();
+        int nodeNumberBeforePickup = listShortestPaths.get(indexShortestPathToPickupToUpdate).getStartNodeNumber();
+        nodeNumberBeforePickup = nodeNumberBeforePickup > indexRequest * 2 ? nodeNumberBeforePickup + 2 : nodeNumberBeforePickup;
+        Intersection addressBeforeDelivery = listShortestPaths.get(indexShortestPathToDeliveryToUpdate).getStartAddress();
+        int nodeNumberBeforeDelivery = listShortestPaths.get(indexShortestPathToDeliveryToUpdate).getStartNodeNumber();
+        nodeNumberBeforeDelivery = nodeNumberBeforeDelivery > indexRequest * 2 ? nodeNumberBeforeDelivery + 2 : nodeNumberBeforeDelivery;
 
-        processPutBackRequest(paths);
+        for (int i = 0; i < listShortestPaths.size(); i++) {
+            ShortestPath currentShortestPath = listShortestPaths.get(i);
+            if (i == indexShortestPathToPickupToUpdate || i == indexShortestPathToDeliveryToUpdate) {
+                if (indexShortestPathToDeliveryToUpdate == indexShortestPathToPickupToUpdate) {
+                    setCurrentShortestPathAdd(allIntersections, currentShortestPath, indexShortestPathToPickup < indexShortestPathToDelivery ? deliveryAddress : pickupAddress, indexShortestPathToPickup < indexShortestPathToDelivery ? indexRequest * 2 + 2 : indexRequest * 2 + 1);
+                } else {
+                    setCurrentShortestPathAdd(allIntersections, currentShortestPath, i == indexShortestPathToPickupToUpdate ? pickupAddress : deliveryAddress, i == indexShortestPathToPickupToUpdate ? indexRequest * 2 + 1 : indexRequest * 2 + 2);
+                }
+            } else if (currentShortestPath.getStartNodeNumber() > indexRequest * 2) {
+                currentShortestPath.setStartNodeNumber(currentShortestPath.getStartNodeNumber() + 2);
+            }
+            if (currentShortestPath.getEndNodeNumber() > indexRequest * 2) {
+                currentShortestPath.setEndNodeNumber(currentShortestPath.getEndNodeNumber() + 2);
+            }
+        }
 
-        // insert request in planning
-        planningRequests.add(requestToInsert);
+        if (Math.abs(indexShortestPathToDelivery - indexShortestPathToPickup) == 1) {
+            if (indexShortestPathToPickup < indexShortestPathToDelivery) {
+                addShortestPath(indexShortestPathToPickup, allIntersections, pickupAddress, deliveryAddress, indexRequest * 2 + 1, indexRequest * 2 + 2);
+                addShortestPath(indexShortestPathToPickup, allIntersections, addressBeforePickup, pickupAddress, nodeNumberBeforePickup, indexRequest * 2 + 1);
+            } else {
+                addShortestPath(indexShortestPathToDelivery, allIntersections, deliveryAddress, pickupAddress, indexRequest * 2 + 2, indexRequest * 2 + 1);
+                addShortestPath(indexShortestPathToDelivery, allIntersections, addressBeforeDelivery, deliveryAddress, nodeNumberBeforeDelivery, indexRequest * 2 + 2);
+            }
+        } else {
+            if (indexShortestPathToPickup < indexShortestPathToDelivery) {
+                addShortestPath(indexShortestPathToPickup, allIntersections, addressBeforePickup, pickupAddress, nodeNumberBeforePickup, indexRequest * 2 + 1);
+                addShortestPath(indexShortestPathToDelivery, allIntersections, addressBeforeDelivery, deliveryAddress, nodeNumberBeforeDelivery, indexRequest * 2 + 2);
+            } else {
+                addShortestPath(indexShortestPathToDelivery, allIntersections, addressBeforeDelivery, deliveryAddress, nodeNumberBeforeDelivery, indexRequest * 2 + 2);
+                addShortestPath(indexShortestPathToPickup, allIntersections, addressBeforePickup, pickupAddress, nodeNumberBeforePickup, indexRequest * 2 + 1);
+            }
+        }
+
         updateLength();
         updateTimes();
         notifyObservers();
     }
 
-    /**
-     * Update the list of shortest paths of the tour when undoing "delete a request"
-     * @param paths
-     */
-    private void processPutBackRequest(List<ShortestPath> paths) {
-        int i = 0;
-        while (i<listShortestPaths.size()) {
-            ShortestPath path = listShortestPaths.get(i);
-            if (!paths.isEmpty() && path.getStartAddress().equals(paths.get(0).getStartAddress())) {
-                listShortestPaths.remove(i);
-                if (paths.size() == 3) {
-                    // add all paths
-                    listShortestPaths.add(i, paths.get(0));
-                    listShortestPaths.add(i+1, paths.get(1));
-                    listShortestPaths.add(i+2, paths.get(2));
-                    paths.clear();
-                } else {
-                    // add only two paths
-                    listShortestPaths.add(i, paths.get(0));
-                    listShortestPaths.add(i+1, paths.get(1));
-                    paths.remove(0);
-                    paths.remove(0);
-                }
-            } else {
-                i++;
-            }
-        }
+    private void addShortestPath(int indexToAdd, List<Intersection> allIntersections, Intersection startAddress, Intersection endAddress, int startNodeNumber, int endNodeNumber) {
+        ShortestPath shortestPathToDelivery = Dijkstra.compute(allIntersections, new ArrayList<>(List.of(endAddress)), startAddress).get(0);
+        shortestPathToDelivery.setStartNodeNumber(startNodeNumber);
+        shortestPathToDelivery.setEndNodeNumber(endNodeNumber);
+        listShortestPaths.add(indexToAdd, shortestPathToDelivery);
     }
 
-    /**
-     * Update the order of by decreasing the nodes numbers in the list of
-     * shortest paths of the tour after adding an intersection
-     * @param intersectionsToAdd
-     */
-    private void increaseNodeNumbers(ArrayList<Integer> intersectionsToAdd) {
-        for (ShortestPath path: listShortestPaths) {
-            int currentStartNode = path.getStartNodeNumber();
-            if (currentStartNode >= Collections.min(intersectionsToAdd)) {
-                path.setStartNodeNumber(currentStartNode+ intersectionsToAdd.size());
-            }
-
-            int currentEndNode = path.getEndNodeNumber();
-            if (currentEndNode >= Collections.min(intersectionsToAdd)) {
-                path.setEndNodeNumber(currentEndNode+ intersectionsToAdd.size());
-            }
-        }
+    private void setCurrentShortestPathAdd(List<Intersection> allIntersections, ShortestPath currentShortestPath, Intersection endAddressBefore, int nodeNumberBefore) {
+        ShortestPath newShortestPath = Dijkstra.compute(allIntersections, new ArrayList<>(List.of(currentShortestPath.getEndAddress())), endAddressBefore).get(0);
+        currentShortestPath.setListSegments(newShortestPath.getListSegments());
+        currentShortestPath.setStartNodeNumber(nodeNumberBefore);
+        currentShortestPath.setStartAddress(newShortestPath.getStartAddress());
     }
 
     /**
      * Remove a request in an already computed tour.
      * Some paths are deleted, some are created to accomplish every request without the deleted one.
-     * @param requestToDelete the request to delete
      * @param indexRequest index of the request to remove in the planning
+     * @param indexShortestPathToPickup
+     * @param indexShortestPathToDelivery
      * @param allIntersections all the intersections of the map
      * @return deleted paths
      */
-    public ArrayList<ShortestPath> removeRequest(Request requestToDelete, int indexRequest, List<Intersection> allIntersections) {
+    public void removeRequest(int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery, List<Intersection> allIntersections) {
         System.out.println("Tour.removeRequest");
-        ArrayList<Intersection> intersections = new ArrayList<>();
-        ArrayList<ShortestPath> deleted = new ArrayList<>();
-
-        // getting TSP order
-        ArrayList<Integer> order = new ArrayList<>();
-        order.add(0);
-        intersections.add(getDepotAddress());
-        for (ShortestPath path: listShortestPaths) {
-            order.add(path.getEndNodeNumber());
-            intersections.add(path.getEndAddress());
-        }
+        System.out.println("before");
 
         // remove request
         planningRequests.remove(indexRequest);
+        System.out.println("hee");
+        for (int i = 0; i < listShortestPaths.size() - 1; i++) {
+            if (i != indexShortestPathToPickup + 1 && i != indexShortestPathToDelivery + 1) {
+                ShortestPath currentShortestPath = listShortestPaths.get(i);
+                if (i == indexShortestPathToPickup || i == indexShortestPathToDelivery) {
+                    ShortestPath nextShortestPath;
+                    if (Math.abs(indexShortestPathToDelivery - indexShortestPathToPickup) == 1) {
+                        nextShortestPath = listShortestPaths.get(i + 2);
+                    } else {
+                        nextShortestPath = listShortestPaths.get(i + 1);
+                    }
+                    setCurrentShortestPathDelete(allIntersections, currentShortestPath, nextShortestPath);
+                }
+                if (currentShortestPath.getStartNodeNumber() > indexRequest * 2) {
+                    currentShortestPath.setStartNodeNumber(currentShortestPath.getStartNodeNumber() - 2);
+                }
+                if (currentShortestPath.getEndNodeNumber() > indexRequest * 2) {
+                    currentShortestPath.setEndNodeNumber(currentShortestPath.getEndNodeNumber() - 2);
+                }
+            }
+        }
 
-        // remove paths starting or ending by a point of the request to delete
-        ArrayList<Integer> intersectionToRemove = removePathsFromAndTowardPoint(requestToDelete, deleted);
-
-        removeIntersectionAndRecomputePath(allIntersections, intersections, order, intersectionToRemove);
-        decreaseNodeNumbers(intersectionToRemove);
+        listShortestPaths.remove(indexShortestPathToPickup + 1);
+        if (indexShortestPathToPickup < indexShortestPathToDelivery) {
+            listShortestPaths.remove(indexShortestPathToDelivery);
+        } else {
+            listShortestPaths.remove(indexShortestPathToDelivery + 1);
+        }
 
         updateLength();
         updateTimes();
         notifyObservers();
-
-        return deleted;
     }
 
-    /**
-     * Update the order of by decreasing the nodes numbers in the list of
-     * shortest paths of the tour after removing an intersection
-     * @param intersectionToRemove
-     */
-    private void decreaseNodeNumbers(ArrayList<Integer> intersectionToRemove) {
-        for (ShortestPath path: listShortestPaths) {
-            int currentStartNode = path.getStartNodeNumber();
-            if (currentStartNode > Collections.min(intersectionToRemove)) {
-                path.setStartNodeNumber(currentStartNode- intersectionToRemove.size());
-            }
-
-            int currentEndNode = path.getEndNodeNumber();
-            if (currentEndNode > Collections.min(intersectionToRemove)) {
-                path.setEndNodeNumber(currentEndNode- intersectionToRemove.size());
-            }
-        }
-    }
-
-    /**
-     * Main process when removing a request in the textual view.
-     * @param allIntersections all intersections of the map
-     * @param intersections new list of intersections created
-     * @param order
-     * @param intersectionToRemove
-     */
-    private void removeIntersectionAndRecomputePath(List<Intersection> allIntersections, ArrayList<Intersection> intersections, ArrayList<Integer> order, ArrayList<Integer> intersectionToRemove) {
-        int i;
-        boolean skipped = false;
-        boolean alreadyAdded = false;
-        i = 1;
-        while (i< order.size()-1 && !skipped) {
-            if (intersectionToRemove.contains(order.get(i))) {
-
-                // check if points removed are following
-                if (intersectionToRemove.contains(order.get(i+1))) {
-                    skipped = true;
-                }
-
-                // find intersections of new path
-                int startNode = order.get(i-1);
-                int endNode;
-                Intersection previousIntersection = intersections.get(i-1);
-                Intersection nextIntersection;
-                if (skipped) {
-                    endNode = order.get(i+2);
-                    nextIntersection = intersections.get(i+2);
-                } else {
-                    endNode = order.get(i+1);
-                    nextIntersection = intersections.get(i+1);
-                }
-
-                // create path and insert
-                ArrayList<Intersection> endPoints = new ArrayList<>();
-                endPoints.add(nextIntersection);
-                ShortestPath newPath = Dijkstra.compute(allIntersections,
-                        endPoints, previousIntersection).get(0);
-                newPath.setStartNodeNumber(startNode);
-                newPath.setEndNodeNumber(endNode);
-                if (alreadyAdded) {
-                    listShortestPaths.add(i-2, newPath);
-                } else {
-                    listShortestPaths.add(i-1, newPath);
-                }
-                alreadyAdded = true;
-
-            }
-            i++;
-        }
-    }
-
-    /**
-     * Remove all paths of the tour that involve the deliveryAddress or the
-     * pickupAddress of the request the user wants to delete. It also retrieves the
-     * numbers of the intersection(s) to skip.
-     * @param requestToDelete
-     * @param deleted shortest paths deleted by the process of removeRequest
-     * @return intersection(s) to remove
-     */
-    private ArrayList<Integer> removePathsFromAndTowardPoint(Request requestToDelete, ArrayList<ShortestPath> deleted) {
-        int i = 0;
-        Intersection pickupAddress = requestToDelete.getPickupAddress();
-        Intersection deliveryAddress = requestToDelete.getDeliveryAddress();
-        ArrayList<Integer> intersectionToRemove = new ArrayList<>();
-        while (i<listShortestPaths.size()) {
-            ShortestPath path = listShortestPaths.get(i);
-            if (path.getEndAddress().equals(pickupAddress) ||
-                    path.getEndAddress().equals(deliveryAddress)) {
-                if (!intersectionToRemove.contains(path.getEndNodeNumber())) {
-                    intersectionToRemove.add(path.getEndNodeNumber());
-                }
-                deleted.add(path);
-                listShortestPaths.remove(i);
-            } else if (path.getStartAddress().equals(pickupAddress) ||
-                    path.getStartAddress().equals(deliveryAddress)) {
-                if (!intersectionToRemove.contains(path.getStartNodeNumber())) {
-                    intersectionToRemove.add(path.getStartNodeNumber());
-                }
-                deleted.add(path);
-                listShortestPaths.remove(i);
-            } else {
-                i++;
-            }
-        }
-        return intersectionToRemove;
+    private void setCurrentShortestPathDelete(List<Intersection> allIntersections, ShortestPath currentShortestPath, ShortestPath nextShortestPath) {
+        ShortestPath newShortestPath = Dijkstra.compute(allIntersections, new ArrayList<>(List.of(nextShortestPath.getEndAddress())), currentShortestPath.getStartAddress()).get(0);
+        currentShortestPath.setListSegments(newShortestPath.getListSegments());
+        currentShortestPath.setEndNodeNumber(nextShortestPath.getEndNodeNumber());
+        currentShortestPath.setEndAddress(nextShortestPath.getEndAddress());
     }
 
     /**

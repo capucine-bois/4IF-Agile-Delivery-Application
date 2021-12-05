@@ -186,6 +186,13 @@ public class Controller {
     }
 
     /**
+     * Redo last command.
+     */
+    public void redo() {
+        currentState.redo(listOfCommands, window);
+    }
+
+    /**
      * For a computed tour, change order by visiting an intersection (pickup or delivery address) earlier.
      * @param indexIntersection the intersection to visit earlier
      */
@@ -222,5 +229,9 @@ public class Controller {
 
     public void insertRequest(String pickupTime, String deliveryTime) {
         currentState.insertRequest(pickupTime, deliveryTime, cityMap, tour, window, listOfCommands, this);
+    }
+
+    public ListOfCommands getListOfCommands() {
+        return listOfCommands;
     }
 }
