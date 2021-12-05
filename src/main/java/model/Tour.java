@@ -64,7 +64,7 @@ public class Tour extends Observable {
     /**
      * A list of shortest path which is used to print the best path. Sorted ascending for optimization.
      */
-    private final ArrayList<ShortestPath> listShortestPaths;
+    private ArrayList<ShortestPath> listShortestPaths;
 
     /**
      * Boolean indicating if the tour has already been computed.
@@ -148,6 +148,8 @@ public class Tour extends Observable {
     public void setDepotAddress(Intersection depotAddress) {
         this.depotAddress = depotAddress;
     }
+
+    public void addShortestPaths(ShortestPath path) {this.listShortestPaths.add(path);}
 
     public void setDepartureTime(String departureTime) {
         this.calendar = Calendar.getInstance();
@@ -425,46 +427,82 @@ public class Tour extends Observable {
      * Dijkstra is called 3 times to recompute the path
      * The request is inserted at the end of the tour (if the user wants to change the order
      * he can do it with the arrows in the textualView)
-     * @param requestToAdd request to add
-     * @param paths all the paths of the map
      * @param allIntersections all the intersections of the map
      */
-    public void insertRequest(Request requestToAdd, List<ShortestPath> paths, List<Intersection> allIntersections){
-        System.out.println("Tour.addRequest");
-        // add request in planning Request
-        planningRequests.add(requestToAdd);
+    public void insertRequest(int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery, Request requestToInsert, List<Intersection> allIntersections) {
+        System.out.println("Tour.putBackRequest");
 
-        Intersection previousIntersection = paths.get(paths.size()-2).getEndAddress();
+        // add request
+        planningRequests.add(indexRequest, requestToInsert);
+        Intersection pickupAddress = requestToInsert.getPickupAddress();
+        Intersection deliveryAddress = requestToInsert.getDeliveryAddress();
 
-        ArrayList<Intersection> useFulEndPointsForFirstPath = new ArrayList<>();
-        useFulEndPointsForFirstPath.add(requestToAdd.getPickupAddress());
-        ShortestPath firstNewPath = Dijkstra.compute(allIntersections,useFulEndPointsForFirstPath, previousIntersection).get(0);
+        int indexShortestPathToPickupToUpdate = indexShortestPathToPickup;
+        int indexShortestPathToDeliveryToUpdate = indexShortestPathToDelivery;
+        if (indexShortestPathToPickup < indexShortestPathToDelivery) {
+            indexShortestPathToDeliveryToUpdate = indexShortestPathToDelivery - 1;
+        } else {
+            indexShortestPathToPickupToUpdate = indexShortestPathToPickup - 1;
+        }
 
-        ArrayList<Intersection> useFulEndPointsForSecondPath = new ArrayList<>();
-        useFulEndPointsForSecondPath.add(requestToAdd.getDeliveryAddress());
-        ShortestPath secondNewPath = Dijkstra.compute(allIntersections,useFulEndPointsForSecondPath, requestToAdd.getPickupAddress()).get(0);
+        Intersection addressBeforePickup = listShortestPaths.get(indexShortestPathToPickupToUpdate).getStartAddress();
+        int nodeNumberBeforePickup = listShortestPaths.get(indexShortestPathToPickupToUpdate).getStartNodeNumber();
+        nodeNumberBeforePickup = nodeNumberBeforePickup > indexRequest * 2 ? nodeNumberBeforePickup + 2 : nodeNumberBeforePickup;
+        Intersection addressBeforeDelivery = listShortestPaths.get(indexShortestPathToDeliveryToUpdate).getStartAddress();
+        int nodeNumberBeforeDelivery = listShortestPaths.get(indexShortestPathToDeliveryToUpdate).getStartNodeNumber();
+        nodeNumberBeforeDelivery = nodeNumberBeforeDelivery > indexRequest * 2 ? nodeNumberBeforeDelivery + 2 : nodeNumberBeforeDelivery;
 
-        ArrayList<Intersection> useFulEndPointsForThirdPath = new ArrayList<>();
-        useFulEndPointsForThirdPath.add(depotAddress);
-        ShortestPath thirdNewPath = Dijkstra.compute(allIntersections,useFulEndPointsForThirdPath, requestToAdd.getDeliveryAddress()).get(0);
+        for (int i = 0; i < listShortestPaths.size(); i++) {
+            ShortestPath currentShortestPath = listShortestPaths.get(i);
+            if (i == indexShortestPathToPickupToUpdate || i == indexShortestPathToDeliveryToUpdate) {
+                if (indexShortestPathToDeliveryToUpdate == indexShortestPathToPickupToUpdate) {
+                    setCurrentShortestPathAdd(allIntersections, currentShortestPath, indexShortestPathToPickup < indexShortestPathToDelivery ? deliveryAddress : pickupAddress, indexShortestPathToPickup < indexShortestPathToDelivery ? indexRequest * 2 + 2 : indexRequest * 2 + 1);
+                } else {
+                    setCurrentShortestPathAdd(allIntersections, currentShortestPath, i == indexShortestPathToPickupToUpdate ? pickupAddress : deliveryAddress, i == indexShortestPathToPickupToUpdate ? indexRequest * 2 + 1 : indexRequest * 2 + 2);
+                }
+            } else if (currentShortestPath.getStartNodeNumber() > indexRequest * 2) {
+                currentShortestPath.setStartNodeNumber(currentShortestPath.getStartNodeNumber() + 2);
+            }
+            if (currentShortestPath.getEndNodeNumber() > indexRequest * 2) {
+                currentShortestPath.setEndNodeNumber(currentShortestPath.getEndNodeNumber() + 2);
+            }
+        }
 
-        paths.remove(paths.size()-1);
+        if (Math.abs(indexShortestPathToDelivery - indexShortestPathToPickup) == 1) {
+            if (indexShortestPathToPickup < indexShortestPathToDelivery) {
+                addShortestPath(indexShortestPathToPickup, allIntersections, pickupAddress, deliveryAddress, indexRequest * 2 + 1, indexRequest * 2 + 2);
+                addShortestPath(indexShortestPathToPickup, allIntersections, addressBeforePickup, pickupAddress, nodeNumberBeforePickup, indexRequest * 2 + 1);
+            } else {
+                addShortestPath(indexShortestPathToDelivery, allIntersections, deliveryAddress, pickupAddress, indexRequest * 2 + 2, indexRequest * 2 + 1);
+                addShortestPath(indexShortestPathToDelivery, allIntersections, addressBeforeDelivery, deliveryAddress, nodeNumberBeforeDelivery, indexRequest * 2 + 2);
+            }
+        } else {
+            if (indexShortestPathToPickup < indexShortestPathToDelivery) {
+                addShortestPath(indexShortestPathToPickup, allIntersections, addressBeforePickup, pickupAddress, nodeNumberBeforePickup, indexRequest * 2 + 1);
+                addShortestPath(indexShortestPathToDelivery, allIntersections, addressBeforeDelivery, deliveryAddress, nodeNumberBeforeDelivery, indexRequest * 2 + 2);
+            } else {
+                addShortestPath(indexShortestPathToDelivery, allIntersections, addressBeforeDelivery, deliveryAddress, nodeNumberBeforeDelivery, indexRequest * 2 + 2);
+                addShortestPath(indexShortestPathToPickup, allIntersections, addressBeforePickup, pickupAddress, nodeNumberBeforePickup, indexRequest * 2 + 1);
+            }
+        }
 
-        // update TSP nodes values
-        int currentMaxNodeValue = (planningRequests.size()-1)*2;
-        firstNewPath.setStartNodeNumber(listShortestPaths.get(listShortestPaths.size()-1).getEndNodeNumber());
-        firstNewPath.setEndNodeNumber(currentMaxNodeValue+1);
-        secondNewPath.setStartNodeNumber(currentMaxNodeValue+1);
-        secondNewPath.setEndNodeNumber(currentMaxNodeValue+2);
-        thirdNewPath.setStartNodeNumber(currentMaxNodeValue+2);
-        thirdNewPath.setEndNodeNumber(0);
-
-        paths.add(firstNewPath);
-        paths.add(secondNewPath);
-        paths.add(thirdNewPath);
         updateLength();
         updateTimes();
         notifyObservers();
+    }
+
+    private void addShortestPath(int indexToAdd, List<Intersection> allIntersections, Intersection startAddress, Intersection endAddress, int startNodeNumber, int endNodeNumber) {
+        ShortestPath shortestPathToDelivery = Dijkstra.compute(allIntersections, new ArrayList<>(List.of(endAddress)), startAddress).get(0);
+        shortestPathToDelivery.setStartNodeNumber(startNodeNumber);
+        shortestPathToDelivery.setEndNodeNumber(endNodeNumber);
+        listShortestPaths.add(indexToAdd, shortestPathToDelivery);
+    }
+
+    private void setCurrentShortestPathAdd(List<Intersection> allIntersections, ShortestPath currentShortestPath, Intersection endAddressBefore, int nodeNumberBefore) {
+        ShortestPath newShortestPath = Dijkstra.compute(allIntersections, new ArrayList<>(List.of(currentShortestPath.getEndAddress())), endAddressBefore).get(0);
+        currentShortestPath.setListSegments(newShortestPath.getListSegments());
+        currentShortestPath.setStartNodeNumber(nodeNumberBefore);
+        currentShortestPath.setStartAddress(newShortestPath.getStartAddress());
     }
 
     /**
