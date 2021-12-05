@@ -22,12 +22,12 @@ public class CompleteGraph implements Graph {
     int nbVertices;
 
     /**
-     * The cost of a travel between two nodes in each sense. -1 if the travel isn't possible
+     * The cost of a travel between two nodes in each direction. -1 if the travel isn't possible
      */
     double[][] cost;
 
     /**
-     * The tour object to verify if the path are posible
+     * The tour object to verify if the path are possible
      */
     private Tour tour;
 
