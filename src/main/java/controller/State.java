@@ -246,7 +246,6 @@ public abstract class State {
         }
     }
 
-
     public void enterMouseOnTourIntersection(int indexShortestPath, Window window) {}
 
     public void exitMouseOnRequest(int indexRequest, Tour tour, Window window) {}
@@ -261,11 +260,13 @@ public abstract class State {
 
     public void addRequest(Tour tour, Window window, Controller controller) {}
 
-    public void chooseAddress(int indexButton, Tour tour, Window window, Controller controller) {}
+    public void chooseAddress(int indexButton, Window window, Controller controller) {}
 
     public void cancel(Tour tour, Window window, Controller controller) {}
 
-    public void leftClickOnIntersection(int indexIntersection, CityMap cityMap, Tour tour, Window window, Controller controller) {}
+    public void leftClickOnIntersection(int indexIntersection, CityMap cityMap, Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {}
 
     public void insertRequest(String pickupTime, String deliveryTime, CityMap cityMap, Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {}
+
+    public void changeAddress(Window window, Controller controller) {}
 }

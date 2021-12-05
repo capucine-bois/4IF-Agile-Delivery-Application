@@ -33,7 +33,7 @@ public class Controller {
     protected final AddRequestState addRequestState = new AddRequestState();
     protected final PickupAddressSelectionState pickupAddressSelectionState = new PickupAddressSelectionState();
     protected final DeliveryAddressSelectionState deliveryAddressSelectionState = new DeliveryAddressSelectionState();
-
+    protected final ChangeAddressState changeAddressState = new ChangeAddressState();
 
     /** Constructor taking already filled cityMap and tour structures
      * @param cityMap filled cityMap structure
@@ -209,7 +209,7 @@ public class Controller {
     }
 
     public void chooseAddress(int indexButton) {
-        currentState.chooseAddress(indexButton, tour, window, this);
+        currentState.chooseAddress(indexButton, window, this);
     }
 
     public void cancel() {
@@ -217,10 +217,14 @@ public class Controller {
     }
 
     public void leftClickOnIntersection(int indexIntersection) {
-        currentState.leftClickOnIntersection(indexIntersection, cityMap, tour, window, this);
+        currentState.leftClickOnIntersection(indexIntersection, cityMap, tour, window, listOfCommands, this);
     }
 
     public void insertRequest(String pickupTime, String deliveryTime) {
         currentState.insertRequest(pickupTime, deliveryTime, cityMap, tour, window, listOfCommands, this);
+    }
+
+    public void changeAddress() {
+        currentState.changeAddress(window, this);
     }
 }

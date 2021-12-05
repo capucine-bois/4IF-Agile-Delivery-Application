@@ -61,6 +61,7 @@ public class ButtonListener implements ActionListener {
             case TextualView.DELETE_REQUEST -> controller.deleteRequest(TextualView.deleteRequestButtons.indexOf((JButton) e.getSource()));
             case TextualView.CANCEL_ADD_REQUEST -> controller.cancel();
             case TextualView.CHOOSE_ADDRESS -> controller.chooseAddress(TextualView.chooseAddressButtons.indexOf((JButton) e.getSource()));
+            case TextualView.CHANGE_ADDRESS -> controller.changeAddress();
             case TextualView.CONTINUE_ADD_REQUEST -> {
                 String pickupTime = ((JSpinner.DefaultEditor) TextualView.timeFields.get(0).getEditor()).getTextField().getText();
                 String deliveryTime = ((JSpinner.DefaultEditor) TextualView.timeFields.get(1).getEditor()).getTextField().getText();

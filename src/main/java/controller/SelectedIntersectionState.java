@@ -71,4 +71,11 @@ public class SelectedIntersectionState extends State {
             window.colorTourIntersectionPanelOnMouseExited(indexShortestPath);
         }
     }
+
+    @Override
+    public void changeAddress(Window window, Controller controller) {
+        window.enterSelectionMode();
+        window.setDefaultButtonStates(new boolean[]{false, false, false});
+        controller.setCurrentState(controller.changeAddressState);
+    }
 }
