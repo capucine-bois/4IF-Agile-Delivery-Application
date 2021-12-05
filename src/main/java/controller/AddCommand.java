@@ -5,7 +5,6 @@ import model.Request;
 import model.ShortestPath;
 import model.Tour;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class AddCommand implements Command {
@@ -35,6 +34,6 @@ public class AddCommand implements Command {
 
     @Override
     public void undoCommand() {
-        tour.removeRequest(request,tour.getPlanningRequests().size()-1,intersections);
+        tour.removeRequest(tour.getPlanningRequests().size()-1, tour.getListShortestPaths().size() - 2, tour.getPlanningRequests().size() - 1, intersections);
     }
 }

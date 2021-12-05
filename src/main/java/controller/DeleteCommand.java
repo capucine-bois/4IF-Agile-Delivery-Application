@@ -5,7 +5,6 @@ import model.Request;
 import model.ShortestPath;
 import model.Tour;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DeleteCommand implements Command {
@@ -14,7 +13,8 @@ public class DeleteCommand implements Command {
     private Request request;
     private int indexRequest;
     private List<Intersection> intersections;
-    private List<ShortestPath> paths;
+    private int indexShortestPathToPickup;
+    private int indexShortestPathToDelivery;
 
     /**
      * Create the command which delete a request
@@ -26,16 +26,17 @@ public class DeleteCommand implements Command {
         this.request = request;
         this.indexRequest = indexRequest;
         this.intersections = intersections;
+        this.indexShortestPathToPickup = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 1).findFirst().get());
+        this.indexShortestPathToDelivery = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 2).findFirst().get());
     }
 
     @Override
     public void doCommand() {
-
-        paths = tour.removeRequest(request, indexRequest, intersections);
+        tour.removeRequest(indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery, intersections);
     }
 
     @Override
     public void undoCommand() {
-        tour.putBackRequest(request, paths);
+        tour.putBackRequest(indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery, request, intersections);
     }
 }
