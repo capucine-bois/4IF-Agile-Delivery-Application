@@ -148,6 +148,8 @@ public class Tour extends Observable {
         this.depotAddress = depotAddress;
     }
 
+    public void addShortestPaths(ShortestPath path) {this.listShortestPaths.add(path);}
+
     public void setDepartureTime(String departureTime) {
         this.calendar = Calendar.getInstance();
         try {
