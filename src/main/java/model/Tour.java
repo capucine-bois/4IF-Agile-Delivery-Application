@@ -674,4 +674,15 @@ public class Tour extends Observable {
         updateTimes();
         notifyObservers();
     }
+
+    public void changeProcessTime(int indexNode, int newTime) {
+        if (indexNode % 2 == 0) {
+            planningRequests.get(indexNode/2 - 1).setDeliveryDuration(newTime);
+        } else {
+            planningRequests.get(indexNode/2).setPickupDuration(newTime);
+        }
+
+        updateTimes();
+        notifyObservers();
+    }
 }

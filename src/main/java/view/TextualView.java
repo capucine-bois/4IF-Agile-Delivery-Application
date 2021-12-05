@@ -26,11 +26,12 @@ public class TextualView extends JPanel implements Observer {
     protected static final String PATH_DETAILS = "Show path";
     protected static final String DELETE_REQUEST = "Delete request";
     protected static final String ADD_REQUEST = "Add request";
-    protected static final String CANCEL_ADD_REQUEST = "Cancel";
+    protected static final String CANCEL = "Cancel";
     protected static final String CONTINUE_ADD_REQUEST = "Continue";
     protected static final String CHOOSE_ADDRESS = "Choose address";
     protected static final String CHANGE_TIME = "Change time";
     protected static final String CHANGE_ADDRESS = "Change address";
+    protected static final String SAVE_TIME = "Save";
 
     protected static List<JPanel> requestPanels;
     protected static List<JPanel> tourIntersectionsPanels;
@@ -40,6 +41,7 @@ public class TextualView extends JPanel implements Observer {
     protected static List<JButton> goDownButtons;
     protected static List<JButton> chooseAddressButtons;
     protected static List<JSpinner> timeFields;
+    protected static JSpinner changeTimeField;
 
     private final Tour tour;
     private final int gap = 20;
@@ -54,6 +56,7 @@ public class TextualView extends JPanel implements Observer {
     private JPanel requestsMainPanel;
     private JPanel tourMainPanel;
     private JPanel addRequestPanel;
+    private boolean changeTimeMode;
 
     // Listeners
     private final MouseListener mouseListener;
@@ -479,10 +482,10 @@ public class TextualView extends JPanel implements Observer {
 
         JPanel buttonsAddRequestPanel = new JPanel();
         buttonsAddRequestPanel.setLayout(new GridLayout(1,2));
-        JButton cancelAddRequest = displayDarkButton(CANCEL_ADD_REQUEST, Constants.COLOR_2);
+        JButton cancelAddRequest = displayColoredButton(CANCEL, Constants.COLOR_2);
         addRequestButtons.add(cancelAddRequest);
         buttonsAddRequestPanel.add(cancelAddRequest);
-        JButton validateAddRequest = displayDarkButton(CONTINUE_ADD_REQUEST, Constants.COLOR_12);
+        JButton validateAddRequest = displayColoredButton(CONTINUE_ADD_REQUEST, Constants.COLOR_12);
         addRequestButtons.add(validateAddRequest);
         buttonsAddRequestPanel.add(validateAddRequest);
         addRequestPanel.add(buttonsAddRequestPanel, BorderLayout.PAGE_END);
@@ -589,7 +592,12 @@ public class TextualView extends JPanel implements Observer {
         if (!segmentDetails && tour.isTourComputed()) {
             displayMoveButtonsPanel(index, contentWithButtonPanel, selected);
             if (selected) {
-                displayUpdateButtonsPanel(contentWithButtonPanel);
+                if (changeTimeMode) {
+                    displayChangeTimePanel(contentWithButtonPanel);
+                    maxHeight += 40;
+                } else {
+                    displayUpdateButtonsPanel(contentWithButtonPanel);
+                }
                 maxHeight += 40;
             }
         }
@@ -660,31 +668,57 @@ public class TextualView extends JPanel implements Observer {
         moveButtonsPanel.add(moveButton);
     }
 
-    private void displayUpdateButtonsPanel(JPanel pointPanel) {
+    private void displayChangeTimePanel(JPanel parentPanel) {
+        JPanel changeTimePanel = new JPanel();
+        changeTimePanel.setLayout(new GridLayout(2,1));
+        changeTimePanel.setBackground(Constants.COLOR_2);
+
+        JPanel chooseTimePanel = new JPanel();
+        chooseTimePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        chooseTimePanel.setBackground(Constants.COLOR_2);
+        addLine(chooseTimePanel, "New process time (minutes)", "", true, 12);
+        changeTimeField = new JSpinner();
+        changeTimeField.setPreferredSize(new Dimension(40, 30));
+        chooseTimePanel.add(changeTimeField);
+        changeTimePanel.add(chooseTimePanel);
+
+        JPanel changeTimeButtons = new JPanel();
+        changeTimeButtons.setLayout(new GridLayout(1,2));
+        changeTimeButtons.setBackground(Constants.COLOR_2);
+
+        JButton cancelButton = displayColoredButton(CANCEL, Constants.COLOR_2);
+        changeTimeButtons.add(cancelButton);
+
+        JButton continueButton = displayColoredButton(SAVE_TIME, Constants.COLOR_12);
+        changeTimeButtons.add(continueButton);
+
+        changeTimePanel.add(changeTimeButtons);
+
+        parentPanel.add(changeTimePanel, BorderLayout.PAGE_END);
+    }
+
+    private void displayUpdateButtonsPanel(JPanel parentPanel) {
         JPanel updateButtonsPanel = new JPanel();
         updateButtonsPanel.setLayout(new GridLayout(1,2, 5, 0));
         updateButtonsPanel.setBackground(Constants.COLOR_2);
 
-        displayUpdateButton(updateButtonsPanel, CHANGE_TIME);
+        JButton changeTimeButton = displayColoredButton(CHANGE_TIME, Constants.COLOR_12);
+        updateButtonsPanel.add(changeTimeButton);
 
-        displayUpdateButton(updateButtonsPanel, CHANGE_ADDRESS);
+        JButton changeAddressButton = displayColoredButton(CHANGE_ADDRESS, Constants.COLOR_12);
+        updateButtonsPanel.add(changeAddressButton);
 
-        pointPanel.add(updateButtonsPanel, BorderLayout.PAGE_END);
+        parentPanel.add(updateButtonsPanel, BorderLayout.PAGE_END);
     }
 
-    private void displayUpdateButton(JPanel parentPanel, String buttonName) {
-        JButton button = displayDarkButton(buttonName, Constants.COLOR_12);
-        parentPanel.add(button);
-    }
-
-    private JButton displayDarkButton(String buttonName, Color color12) {
+    private JButton displayColoredButton(String buttonName, Color color) {
         JButton button = new JButton(buttonName);
         try {
             window.setStyle(button);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        button.setBackground(color12);
+        button.setBackground(color);
         button.addActionListener(buttonListener);
         return button;
     }
@@ -866,5 +900,10 @@ public class TextualView extends JPanel implements Observer {
         for (JButton button : addRequestButtons) {
             button.setEnabled(enabled);
         }
+    }
+
+    public void setChangeTimeMode(boolean changeTimeMode) {
+        this.changeTimeMode = changeTimeMode;
+        displayTextualView();
     }
 }

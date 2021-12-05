@@ -34,6 +34,7 @@ public class Controller {
     protected final PickupAddressSelectionState pickupAddressSelectionState = new PickupAddressSelectionState();
     protected final DeliveryAddressSelectionState deliveryAddressSelectionState = new DeliveryAddressSelectionState();
     protected final ChangeAddressState changeAddressState = new ChangeAddressState();
+    protected final ChangeProcessTimeState changeProcessTimeState = new ChangeProcessTimeState();
 
     /** Constructor taking already filled cityMap and tour structures
      * @param cityMap filled cityMap structure
@@ -237,5 +238,13 @@ public class Controller {
 
     public void changeAddress() {
         currentState.changeAddress(window, this);
+    }
+
+    public void changeTime() {
+        currentState.changeTime(window, this);
+    }
+
+    public void saveTime(String time) {
+        currentState.saveTime(time, tour, window, listOfCommands, this);
     }
 }

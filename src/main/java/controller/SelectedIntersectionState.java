@@ -95,4 +95,11 @@ public class SelectedIntersectionState extends State {
         window.setDefaultButtonStates(new boolean[]{false, false, false});
         controller.setCurrentState(controller.changeAddressState);
     }
+
+    @Override
+    public void changeTime(Window window, Controller controller) {
+        window.enterChangeTimeMode();
+        window.setDefaultButtonStates(new boolean[]{false, false, false});
+        controller.setCurrentState(controller.changeProcessTimeState);
+    }
 }
