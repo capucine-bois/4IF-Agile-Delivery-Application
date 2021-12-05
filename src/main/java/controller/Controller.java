@@ -167,7 +167,7 @@ public class Controller {
      */
     public void deleteRequest(int indexRequest) {
         Request requestToDelete = tour.getPlanningRequests().get(indexRequest);
-        currentState.deleteRequest(tour, requestToDelete, indexRequest, cityMap.getIntersections(), window, listOfCommands);
+        currentState.deleteRequest(tour, requestToDelete, indexRequest, cityMap.getIntersections(), window, listOfCommands, this);
     }
 
     /**
@@ -183,6 +183,13 @@ public class Controller {
      */
     public void undo() {
         currentState.undo(listOfCommands, window);
+    }
+
+    /**
+     * Redo last command.
+     */
+    public void redo() {
+        currentState.redo(listOfCommands, window);
     }
 
     /**
@@ -222,5 +229,9 @@ public class Controller {
 
     public void insertRequest(String pickupTime, String deliveryTime) {
         currentState.insertRequest(pickupTime, deliveryTime, cityMap, tour, window, listOfCommands, this);
+    }
+
+    public ListOfCommands getListOfCommands() {
+        return listOfCommands;
     }
 }

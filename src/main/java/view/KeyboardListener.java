@@ -13,7 +13,7 @@ public class KeyboardListener extends KeyAdapter {
     /**
      * Application controller.
      */
-    private Controller controller;
+    private final Controller controller;
 
     public KeyboardListener(Controller controller){
         this.controller = controller;
@@ -22,8 +22,12 @@ public class KeyboardListener extends KeyAdapter {
     @Override
     public void keyPressed(KeyEvent e) {
         // Method called by the keyboard listener each time a key is pressed
-        if (e.getKeyChar() == 'u')
+        if (e.getKeyCode() == 90 && e.isControlDown())
             controller.undo();
+
+        if (e.getKeyCode() == 90 && e.isControlDown() && e.isShiftDown())
+            controller.redo();
+
     }
 
 }

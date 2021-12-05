@@ -54,8 +54,10 @@ public class RequestsComputedState extends State{
     }
 
     @Override
-    public void deleteRequest(Tour tour, Request requestToDelete, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l) {
-        l.add(new DeleteCommand(tour, requestToDelete, indexRequest, allIntersections));
+    public void deleteRequest(Tour tour, Request requestToDelete, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l, Controller controller) {
+        int indexShortestPathToPickup = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 1).findFirst().get());
+        int indexShortestPathToDelivery = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 2).findFirst().get());
+        l.add(new ReverseCommand(new AddCommand(tour, requestToDelete, allIntersections,indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery)));
         window.setUndoButtonState(true);
     }
 

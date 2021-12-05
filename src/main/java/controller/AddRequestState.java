@@ -37,11 +37,13 @@ public class AddRequestState extends State{
         if (pickupTimeOK && deliveryTimeOK && tour.getNewRequest().getPickupAddress() != null && tour.getNewRequest().getDeliveryAddress() != null) {
             tour.getNewRequest().setPickupDuration(Integer.parseInt(pickupTime) * 60);
             tour.getNewRequest().setDeliveryDuration(Integer.parseInt(deliveryTime) * 60);
-            listOfCommands.add(new AddCommand(tour, tour.getNewRequest(), cityMap.getIntersections()));
+            listOfCommands.add(new AddCommand(tour, tour.getNewRequest(), cityMap.getIntersections(),tour.getPlanningRequests().size(), tour.getListShortestPaths().size()-1, tour.getListShortestPaths().size()));
             window.showRequestsPanel();
             window.setEnabledTour(true);
+            tour.setNewRequest(null);
             window.setDefaultButtonStates(new boolean[]{true, true, false});
             controller.setCurrentState(controller.requestsComputedState);
+            tour.notifyObservers();
         } else if (tour.getNewRequest().getPickupAddress() == null) {
             window.displayErrorMessage("No pickup address selected.");
         } else if (tour.getNewRequest().getDeliveryAddress() == null) {

@@ -34,6 +34,7 @@ public abstract class State {
             window.setEnabledRequests(false);
             window.setEnabledTour(false);
             tour.setTourComputed(false);
+            controller.getListOfCommands().reset();
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
                 cityMap.clearLists();
@@ -71,6 +72,7 @@ public abstract class State {
             window.showRequestsPanel();
             window.setEnabledTour(false);
             tour.setTourComputed(false);
+            controller.getListOfCommands().reset();
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
                 Request.lastColor = Color.red;
@@ -241,8 +243,17 @@ public abstract class State {
 
     public void undo(ListOfCommands l, Window window) {
         l.undo();
-        if (l.size() == 0) {
+        if (l.size() == 0 || l.getCurrentIndex() < 0) {
             window.setUndoButtonState(false);
+        }
+        window.setRedoButtonState(true);
+    }
+
+    public void redo(ListOfCommands l, Window window){
+        l.redo();
+
+        if (l.size() == 0 || l.getCurrentIndex() >= l.size()-1) {
+            window.setRedoButtonState(false);
         }
     }
 
@@ -257,7 +268,7 @@ public abstract class State {
 
     public void stopTourComputation(Tour tour) {}
 
-    public void deleteRequest(Tour tour, Request requestToDelete, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l) {}
+    public void deleteRequest(Tour tour, Request requestToDelete, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l, Controller controller) {}
 
     public void addRequest(Tour tour, Window window, Controller controller) {}
 
@@ -268,4 +279,5 @@ public abstract class State {
     public void leftClickOnIntersection(int indexIntersection, CityMap cityMap, Tour tour, Window window, Controller controller) {}
 
     public void insertRequest(String pickupTime, String deliveryTime, CityMap cityMap, Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {}
+
 }

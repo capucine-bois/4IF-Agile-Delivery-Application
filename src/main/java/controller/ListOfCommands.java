@@ -8,6 +8,7 @@ import java.util.LinkedList;
  */
 public class ListOfCommands {
     private LinkedList<Command> list;
+
     private int currentIndex;
 
     public ListOfCommands(){
@@ -71,11 +72,12 @@ public class ListOfCommands {
         list.clear();
     }
 
-    /**
-     * Return the number of commands in the linked list.
-     * @return size of the linked list.
-     */
-    public int size() {
-        return this.currentIndex+1;
+
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
+
+    public int size(){
+        return list.size();
     }
 }
