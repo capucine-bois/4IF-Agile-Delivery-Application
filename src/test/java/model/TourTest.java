@@ -101,6 +101,7 @@ class TourTest {
     }
 
 
+
     /**
      * Method to test:
      * computeTour()
@@ -108,129 +109,61 @@ class TourTest {
      * What it does:
      * Compute shortest path for the whole Tour
      */
-    @Test
+    @Nested
     @DisplayName("Test on computeTour")
-    void computeTour() {
-        listIntersection = (ArrayList<Intersection>) cityMap.getIntersections();
+    class computeTour {
+        @Test
+        @DisplayName("Normal scenario")
+        void computeTourNormal() {
+            listIntersection = (ArrayList<Intersection>) cityMap.getIntersections();
 
-        // Method to test
-        tour.computeTour(listIntersection);
+            // Method to test
+            tour.computeTour(listIntersection);
 
-        // Result
-        ArrayList<ShortestPath> listShortestPaths = tour.getListShortestPaths();
-        double tourLength = tour.getTourLength();
+            // Result
+            ArrayList<ShortestPath> listShortestPaths = tour.getListShortestPaths();
+            double tourLength = tour.getTourLength();
 
 
-        // Check answer
-        assertEquals(tourLength,565,"Length of the best path isn't find ");
-        assertEquals(listShortestPaths.get(0).getStartAddress().getId(), 0,"Start point isn't right");
-        assertEquals(listShortestPaths.get(1).getStartAddress().getId(), 3,"Not the best order of request");
-        assertEquals(listShortestPaths.get(2).getStartAddress().getId(), 1,"Not the best order of request");
-        assertEquals(listShortestPaths.get(3).getStartAddress().getId(), 4,"Not the best order of request");
-        assertEquals(listShortestPaths.get(4).getStartAddress().getId(), 2,"Not the best order of request");
-        assertEquals(listShortestPaths.get(4).getEndAddress().getId(), 0,"End of the tour isn't equal to start ");
+            // Check answer
+            assertEquals(tourLength,565,"Length of the best path isn't find ");
+            assertEquals(listShortestPaths.get(0).getStartAddress().getId(), 0,"Start point isn't right");
+            assertEquals(listShortestPaths.get(1).getStartAddress().getId(), 3,"Not the best order of request");
+            assertEquals(listShortestPaths.get(2).getStartAddress().getId(), 1,"Not the best order of request");
+            assertEquals(listShortestPaths.get(3).getStartAddress().getId(), 4,"Not the best order of request");
+            assertEquals(listShortestPaths.get(4).getStartAddress().getId(), 2,"Not the best order of request");
+            assertEquals(listShortestPaths.get(4).getEndAddress().getId(), 0,"End of the tour isn't equal to start ");
+        }
+
+        /**
+         * Method to test:
+         * computeTour()
+         *
+         * What it does:
+         * Compute shortest path for a wrong tour
+         */
+        @Test
+        @DisplayName("Test on computeTour - Empty tour")
+        void computeEmptyTour() {
+            Intersection aloneIntersec = new Intersection(0,45.3112,33.2245);
+            Tour tour = new Tour();
+            tour.setDepotAddress(aloneIntersec);
+            listIntersection = (ArrayList<Intersection>) cityMap.getIntersections();
+
+
+            // Method to test
+            tour.computeTour(listIntersection);
+
+            // Result
+            ArrayList<ShortestPath> listShortestPaths = tour.getListShortestPaths();
+            double tourLength = tour.getTourLength();
+
+            // Check answer
+            assertEquals(tourLength,0,"Path length must be 0");
+            assertTrue(listShortestPaths.isEmpty(),"List of shortest must be empty");
+        }
     }
 
-    /**
-     * Method to test:
-     * computeTour()
-     *
-     * What it does:
-     * Compute shortest path for a wrong tour (one way road, no other road)
-     */
-    @Test
-    @DisplayName("Test on computeTour - Impossible tour (one way road)")
-    void computeTourImpossible() {
-        listIntersection = (ArrayList<Intersection>) cityMap.getIntersections();
-
-        // Add request alone accessable only in one way
-        Intersection aloneIntersec = new Intersection(10,45.3112,33.2245);
-        Intersection aloneIntersec2 = new Intersection(11,45.5112,33.2245);
-        Request request =  new Request(100,120, aloneIntersec,aloneIntersec2);
-        listRequest = tour.getPlanningRequests();
-        listRequest.add(request);
-
-        // Add segment to access new points (one way)
-        Segment segmentOneWay = new Segment(140,"Rue sens unique",aloneIntersec, listIntersection.get(1));
-        Segment segmentOneWay2 = new Segment(10,"Rue sens unique 2",aloneIntersec2,aloneIntersec);
-        listIntersection.get(1).addAdjacentSegment(segmentOneWay);
-        aloneIntersec.addAdjacentSegment(segmentOneWay2);
 
 
-        // Method to test
-        tour.computeTour(listIntersection);
-
-        // Result
-        ArrayList<ShortestPath> listShortestPaths = tour.getListShortestPaths();
-        double tourLength = tour.getTourLength();
-
-
-        // Check answer
-
-    }
-
-    /**
-     * Method to test:
-     * computeTour()
-     *
-     * What it does:
-     * Compute shortest path for a wrong tour
-     */
-    @Test
-    @DisplayName("Test on computeTour - Empty tour")
-    void computeEmptyTour() {
-
-        // Add one request only
-        Intersection aloneIntersec = new Intersection(1,45.3112,33.2245);
-        listIntersection.add(aloneIntersec);
-
-
-        // Method to test
-        tour.computeTour(listIntersection);
-
-        // Result
-        ArrayList<ShortestPath> listShortestPaths = tour.getListShortestPaths();
-        double tourLength = tour.getTourLength();
-
-
-        // Check answer
-    }
-
-    /**
-     * Method to test:
-     * computeTour()
-     *
-     * What it does:
-     * Compute shortest path for a wrong tour (delivery unreachable)
-     */
-    @Test
-    @DisplayName("Test on computeTour - Impossible tour (no segment to access intersection)")
-    void computeTourImpossibleNoRoad() {
-        listIntersection = (ArrayList<Intersection>) cityMap.getIntersections();
-
-        // Add request
-        Intersection aloneIntersec = new Intersection(10,45.3112,33.2245);
-        Intersection aloneIntersec2 = new Intersection(11,45.5112,33.2245);
-        Request request =  new Request(100,120, aloneIntersec,aloneIntersec2);
-        listRequest = tour.getPlanningRequests();
-        listRequest.add(request);
-
-        // Add segment to access pick-up point (but not the delivery point)
-        Segment segment = new Segment(140,"Rue Richard",aloneIntersec, listIntersection.get(1));
-        Segment segment2 = new Segment(140,"Rue Richard",listIntersection.get(1), aloneIntersec);
-        listIntersection.get(1).addAdjacentSegment(segment);
-        aloneIntersec.addAdjacentSegment(segment2);
-
-
-        // Method to test
-        tour.computeTour(listIntersection);
-
-        // Result
-        ArrayList<ShortestPath> listShortestPaths = tour.getListShortestPaths();
-        double tourLength = tour.getTourLength();
-
-
-        // Check answer
-
-    }
 }

@@ -206,13 +206,13 @@ public class XMLdeserializerTest {
             List<Intersection> listIntersections2 = new ArrayList<>(cityMap.getIntersections());
             // Check if keys are all good
             for(int i = 0; i < listIntersection.size(); i++) {
-                assertTrue(listIntersection.get(i).equals(listIntersections2.get(i)));
+                assertEquals(listIntersection.get(i), listIntersections2.get(i));
             }
         }
 
         @Test
         @DisplayName("Duplicate intersection")
-        void parseXMLIntersectionsDuplicateTest() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
+        void parseXMLIntersectionsDuplicateTest() throws ParserConfigurationException, IOException, SAXException {
             File file = new File("src/test/resources/testMapDuplicateIntersection.xml");
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -231,7 +231,7 @@ public class XMLdeserializerTest {
 
         @Test
         @DisplayName("Duplicate intersection coordinate")
-        void parseXMLIntersectionsDuplicateCoordinateTest() throws ParserConfigurationException, IOException, SAXException, ExceptionXML {
+        void parseXMLIntersectionsDuplicateCoordinateTest() throws ParserConfigurationException, IOException, SAXException {
             File file = new File("src/test/resources/testMapDuplicateIntersectionCoordinate.xml");
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -271,8 +271,8 @@ public class XMLdeserializerTest {
 
             try{
                 XMLDeserializer.deserializeRequests(tour,cityMap, document);
-                assertEquals(tour.getDepotAddress(), listIntersection.get(5), "Bad depot adress");
-                assertEquals("08:00",tour.getDepartureTime(),"Bad departure adress");
+                assertEquals(tour.getDepotAddress(), listIntersection.get(5), "Bad depot address");
+                assertEquals("08:00",tour.getDepartureTime(),"Bad departure address");
             }catch(Exception exception) {
                 fail("Exception find!");
             }
@@ -320,7 +320,7 @@ public class XMLdeserializerTest {
                 for (int j = 0; j < listRequestOutput.size(); j++) {
                     Request requestA = listRequestOutput.get(j);
                     Request requestB = listRequest.get(j);
-                    assertTrue(requestA.equals(requestB), "Request aren't the same");
+                    assertEquals(requestA, requestB, "Request aren't the same");
                 }
             }catch(Exception exception) {
                 fail("Exception find!");
