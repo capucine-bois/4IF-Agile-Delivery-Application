@@ -559,12 +559,10 @@ public class Tour extends Observable {
     /**
      * Change order of the tour to visit an intersection earlier.
      * Some paths are deleted, some are created to accomplish every request with the new order.
-     * @param indexIntersection current position of the Intersection in the Tour
+     * @param indexShortestPath current position of the shortest path in the Tour
      * @param allIntersections all intersections of the map
      */
-    public void moveIntersectionBefore(int indexIntersection, List<Intersection> allIntersections) {
-        System.out.println("Tour.moveIntersectionBefore");
-        System.out.println("indexIntersection = " + indexIntersection);
+    public void moveIntersectionBefore(int indexShortestPath, List<Intersection> allIntersections) {
 
         ArrayList<ShortestPath> deletedPaths = new ArrayList<>();
         ArrayList<Intersection> intersections = new ArrayList<>();
@@ -573,29 +571,21 @@ public class Tour extends Observable {
         this.deliveryBeforePickup = false;
 
         // sanity check
-        if (indexIntersection > 0 && indexIntersection < listShortestPaths.size()-1) {
+        if (indexShortestPath > 0 && indexShortestPath < listShortestPaths.size()-1) {
 
-            getIntersectionsAndOrderForFuturePaths(indexIntersection, intersections, newOrder);
+            getIntersectionsAndOrderForFuturePaths(indexShortestPath, intersections, newOrder);
 
             // remove paths from tour
-            deletedPaths.add(listShortestPaths.get(indexIntersection-1));
-            deletedPaths.add(listShortestPaths.get(indexIntersection));
-            deletedPaths.add(listShortestPaths.get(indexIntersection+1));
-            listShortestPaths.remove(indexIntersection-1);
-            listShortestPaths.remove(indexIntersection-1);
-            listShortestPaths.remove(indexIntersection-1);
+            deletedPaths.add(listShortestPaths.get(indexShortestPath-1));
+            deletedPaths.add(listShortestPaths.get(indexShortestPath));
+            deletedPaths.add(listShortestPaths.get(indexShortestPath+1));
+            listShortestPaths.remove(indexShortestPath-1);
+            listShortestPaths.remove(indexShortestPath-1);
+            listShortestPaths.remove(indexShortestPath-1);
 
-            recomputePathAfterMovingIntersection(indexIntersection, allIntersections, intersections, newOrder);
+            recomputePathAfterMovingIntersection(indexShortestPath, allIntersections, intersections, newOrder);
 
             // check if a delivery is before a pickup
-            /*
-            for (int i=0; i<newOrder.size()-1; i++) {
-                if (newOrder.get(i + 1) == newOrder.get(i) - 1 && newOrder.get(i) % 2 == 0) {
-                    this.deliveryBeforePickup = true;
-                    break;
-                }
-            }
-             */
             if (newOrder.get(2) == newOrder.get(1) - 1 && newOrder.get(1) % 2 == 0) {
                 this.deliveryBeforePickup = true;
             }
