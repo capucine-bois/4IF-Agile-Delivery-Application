@@ -2,10 +2,8 @@ package controller;
 
 import model.*;
 import view.Window;
-import xml.XMLDeserializer;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Computed tour state.
@@ -14,14 +12,14 @@ import java.util.Optional;
 public class RequestsComputedState extends State{
 
     @Override
-    public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        defaultLoadMap(cityMap, tour, window, controller);
+    public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
+        defaultLoadMap(cityMap, tour, window, controller, listOfCommands);
         tour.notifyObservers();
     }
 
     @Override
-    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        defaultLoadRequests(cityMap, tour, window, controller);
+    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
+        defaultLoadRequests(cityMap, tour, window, controller, listOfCommands);
     }
 
     @Override
@@ -54,11 +52,15 @@ public class RequestsComputedState extends State{
     }
 
     @Override
-    public void deleteRequest(Tour tour, Request requestToDelete, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l, Controller controller) {
+    public void deleteRequest(Tour tour, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l, Controller controller) {
+        Request requestToDelete = tour.getPlanningRequests().get(indexRequest);
         int indexShortestPathToPickup = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 1).findFirst().get());
         int indexShortestPathToDelivery = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 2).findFirst().get());
         l.add(new ReverseCommand(new AddCommand(tour, requestToDelete, allIntersections,indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery)));
         window.setUndoButtonState(true);
+        if (tour.getPlanningRequests().isEmpty()) {
+            controller.setCurrentState(controller.mapLoadedState);
+        }
     }
 
     @Override
@@ -69,6 +71,5 @@ public class RequestsComputedState extends State{
         window.setDefaultButtonStates(new boolean[]{false, false, false});
         controller.setCurrentState(controller.addRequestState);
         tour.notifyObservers();
-        System.out.println("RequestsComputedState.addRequest");
     }
 }

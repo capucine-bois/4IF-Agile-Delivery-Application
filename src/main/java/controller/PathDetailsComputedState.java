@@ -5,9 +5,6 @@ import model.Request;
 import model.ShortestPath;
 import model.Tour;
 import view.Window;
-import xml.XMLDeserializer;
-
-import java.util.Optional;
 
 /**
  * State when tour has been computed and path details are shown on the textual view.
@@ -15,14 +12,14 @@ import java.util.Optional;
 public class PathDetailsComputedState extends State {
 
     @Override
-    public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        defaultLoadMap(cityMap, tour, window, controller);
+    public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
+        defaultLoadMap(cityMap, tour, window, controller, listOfCommands);
         tour.notifyObservers();
     }
 
     @Override
-    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        defaultLoadRequests(cityMap, tour, window, controller);
+    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
+        defaultLoadRequests(cityMap, tour, window, controller, listOfCommands);
     }
 
     @Override
