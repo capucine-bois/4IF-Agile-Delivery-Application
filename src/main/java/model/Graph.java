@@ -9,8 +9,8 @@ public interface Graph {
 
     /**
      * Check if the intersections in parameter make a possible path
-     * @param i
-     * @param j
+     * @param i origin intersection
+     * @param j end intersection
      * @return boolean
      */
     boolean isArc(int i, int j);

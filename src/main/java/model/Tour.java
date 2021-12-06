@@ -13,6 +13,7 @@ import java.util.*;
  * which is the sum of the length of its paths and a departure's time.
  * As it extends Observable, an instance can notify observer when their attributes change.
  */
+@SuppressWarnings("ALL")
 public class Tour extends Observable {
 
     /* ATTRIBUTES */
@@ -302,12 +303,9 @@ public class Tour extends Observable {
 
     /**
      * get all useful end points for the intersections of the current request (at index i)
-     * @param listUsefulEndPointsForDepot
      * @param i current index in main loop
      * @param pickupReq1
      * @param deliveryReq1
-     * @param listUsefulEndPointsPickUp
-     * @param listUsefulEndPointsDelivery
      */
     private void identifyUsefulEndPoints(ArrayList<Intersection> listUsefulEndPointsForDepot, int i, Intersection pickupReq1, Intersection deliveryReq1, ArrayList<Intersection> listUsefulEndPointsPickUp, ArrayList<Intersection> listUsefulEndPointsDelivery) {
         listUsefulEndPointsPickUp.add(deliveryReq1);
@@ -328,9 +326,9 @@ public class Tour extends Observable {
 
     /**
      *
-     * @param listNodes
-     * @param startTime
-     * @param tsp
+     * @param listNodes the list with all nodes in the tour
+     * @param startTime the start time of the tour
+     * @param tsp the TSP used to compute the tour
      */
     public void updateTourInformation(ArrayList<Node> listNodes, long startTime, TSP tsp) {
         this.setTourLength(tsp.getSolutionCost());
@@ -421,7 +419,7 @@ public class Tour extends Observable {
      * Insert a request to an already computed tour (after deleted a request).
      * Position of intersections are stored in Request.
      * Some paths are deleted, some are created to accomplish every request including the new one.
-     * @param indexRequest
+     * @param indexRequest the index
      * @param requestToInsert request to insert
      */
     public void insertRequest(int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery, Request requestToInsert, List<Intersection> allIntersections) {
@@ -508,7 +506,6 @@ public class Tour extends Observable {
      * @param indexShortestPathToPickup
      * @param indexShortestPathToDelivery
      * @param allIntersections all the intersections of the map
-     * @return deleted paths
      */
     public void removeRequest(int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery, List<Intersection> allIntersections) {
         System.out.println("Tour.removeRequest");

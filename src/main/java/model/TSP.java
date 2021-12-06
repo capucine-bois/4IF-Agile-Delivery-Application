@@ -8,8 +8,8 @@ public interface TSP {
      * Search for the shortest cost hamiltonian circuit in <code>g</code> within <code>timeLimit</code> milliseconds
      * (returns the best found tour whenever the time limit is reached)
      * Warning: The computed tour always start from vertex 0
-     * @param timeLimit
-     * @param g
+     * @param timeLimit the max computation time
+     * @param g the graph with all the costs
      */
     void searchSolution(int timeLimit, Graph g, Tour tour);
 

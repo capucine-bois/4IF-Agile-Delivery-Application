@@ -12,6 +12,7 @@ import java.util.ArrayList;
 /**
  * GUI for the application.
  */
+@SuppressWarnings("JavaDoc")
 public class Window extends JFrame {
 
     // Titles of window buttons
@@ -30,7 +31,7 @@ public class Window extends JFrame {
     private JPanel popUpGraphicalView;
     private JLabel popUpGraphicalViewMessage;
     private JButton popUpGraphicalViewButton;
-    private GraphicalView graphicalView;
+    private final GraphicalView graphicalView;
     private final TextualView textualView;
     private final PopUpView popUpView;
 

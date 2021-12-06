@@ -55,8 +55,8 @@ public abstract class TemplateTSP implements TSP {
 
     /**
      * Method that must be defined in TemplateTSP subclasses
-     * @param currentVertex
-     * @param unvisited
+     * @param currentVertex the vertex from which the evaluation begin
+     * @param unvisited the unvisited vertices
      * @return a lower bound of the cost of paths in <code>g</code> starting from <code>currentVertex</code>, visiting
      * every vertex in <code>unvisited</code> exactly once, and returning to vertex <code>0</code>.
      */
@@ -64,9 +64,9 @@ public abstract class TemplateTSP implements TSP {
 
     /**
      * Method that must be defined in TemplateTSP subclasses
-     * @param currentVertex
-     * @param unvisited
-     * @param g
+     * @param currentVertex the current vertex in TSP
+     * @param unvisited the unvisited vertices
+     * @param g the graph with all the costs
      * @return an iterator for visiting all vertices in <code>unvisited</code> which are successors of <code>currentVertex</code>
      */
     protected abstract Iterator<Integer> iterator(Integer currentVertex, Collection<Integer> unvisited, Graph g);
@@ -77,7 +77,7 @@ public abstract class TemplateTSP implements TSP {
      * @param unvisited the set of vertex that have not yet been visited
      * @param visited the sequence of vertices that have been already visited (including currentVertex)
      * @param currentCost the cost of the path corresponding to <code>visited</code>
-     * @param tour
+     * @param tour the last computed tour
      */
     private void branchAndBound(int currentVertex, Collection<Integer> unvisited,
                                 Collection<Integer> visited, double currentCost, Tour tour){

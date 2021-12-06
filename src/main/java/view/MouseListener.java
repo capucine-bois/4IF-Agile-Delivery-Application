@@ -15,6 +15,7 @@ public class MouseListener extends MouseAdapter {
 
     private final Controller controller;
     private GraphicalView graphicalView;
+    private TextualView textualView;
 
     public MouseListener(Controller controller) {
         this.controller = controller;
@@ -105,5 +106,9 @@ public class MouseListener extends MouseAdapter {
             graphicalView.updatePrevious(e.getX(), e.getY());
             graphicalView.setCursor(new Cursor(Cursor.MOVE_CURSOR));
         }
+    }
+
+    public void setTextualView(TextualView textualView) {
+        this.textualView=textualView;
     }
 }

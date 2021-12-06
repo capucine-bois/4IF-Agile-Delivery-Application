@@ -21,7 +21,7 @@ public class PopUpView {
     /**
      * Constructor
      * @param window the window
-     * @param mouseListener
+     * @param mouseListener the mouse listener
      * @throws IOException raised if font file can't be found
      * @throws FontFormatException raised if font can't be loaded
      */
