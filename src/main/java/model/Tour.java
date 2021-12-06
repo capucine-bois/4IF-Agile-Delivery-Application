@@ -164,7 +164,6 @@ public class Tour extends Observable {
      * Update ending time of tour.
      */
     public void updateTimes() {
-
         // reset calendar
         try {
             this.calendar.setTime(parser.parse(departureTime));
@@ -206,9 +205,7 @@ public class Tour extends Observable {
             } else {
                 this.arrivalTime = arrivalTime;
             }
-
         }
-
     }
 
     /**
@@ -252,8 +249,6 @@ public class Tour extends Observable {
 
         // Run Tour
         tsp.searchSolution(1000000, g, this);
-
-        updateTimes();
     }
 
     /**
@@ -346,28 +341,15 @@ public class Tour extends Observable {
             shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i]);
             shortestPathToAdd.setEndNodeNumber(intersectionsOrder[i+1]);
             listShortestPaths.add(shortestPathToAdd);
-            calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
-            int indexRequest = intersectionsOrder[i+1]%2 == 0 ? intersectionsOrder[i+1]/2 - 1 : intersectionsOrder[i+1]/2;
-            Request requestEndPath = planningRequests.get(indexRequest);
-            if (intersectionsOrder[i+1]%2 == 1) {
-                requestEndPath.setPickupArrivalTime(parser.format(calendar.getTime()));
-                calendar.add(Calendar.SECOND, requestEndPath.getPickupDuration());
-                requestEndPath.setPickupDepartureTime(parser.format(calendar.getTime()));
-            } else {
-                requestEndPath.setDeliveryArrivalTime(parser.format(calendar.getTime()));
-                calendar.add(Calendar.SECOND, requestEndPath.getDeliveryDuration());
-                requestEndPath.setDeliveryDepartureTime(parser.format(calendar.getTime()));
-            }
             if(i==intersectionsOrder.length-2) {
                 shortestPathToAdd = listNodes.get(intersectionsOrder[i+1]).getListArcs().stream().filter(x -> x.getEndAddress()==depotAddress).findFirst().get();
                 shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i+1]);
                 shortestPathToAdd.setEndNodeNumber(0);
                 listShortestPaths.add(shortestPathToAdd);
-                calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
-                arrivalTime = parser.format(calendar.getTime());
             }
         }
 
+        updateTimes();
         notifyObservers();
     }
 
