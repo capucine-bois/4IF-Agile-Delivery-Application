@@ -260,6 +260,8 @@ public abstract class State {
         if (l.size() == 0 || l.getCurrentIndex() >= l.size()-1) {
             window.setRedoButtonState(false);
         }
+
+        window.setUndoButtonState(true);
     }
 
     public void enterMouseOnTourIntersection(int indexShortestPath, Window window) {}
