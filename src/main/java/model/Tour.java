@@ -128,10 +128,6 @@ public class Tour extends Observable {
         return intersectionsUnreachableFromDepot;
     }
 
-    public SimpleDateFormat getParser() {
-        return parser;
-    }
-
     public boolean isDeliveryBeforePickup() {
         return deliveryBeforePickup;
     }
@@ -195,8 +191,6 @@ public class Tour extends Observable {
             calendar.add(Calendar.SECOND, (int) metersToSeconds(path.getPathLength()));
             String arrivalTime = parser.format(calendar.getTime());
 
-            System.out.println("EndNode: " + path.getEndNodeNumber());
-
             int processDuration;
             if (path.getEndNodeNumber() != 0) {
                 boolean endAddressIsPickup = path.getEndNodeNumber()%2 == 1;
@@ -224,7 +218,6 @@ public class Tour extends Observable {
                     currentRequest.setDeliveryDepartureTime(departureTime);
                 }
             } else {
-                System.out.println("Depot!");
                 this.arrivalTime = arrivalTime;
             }
 
@@ -558,11 +551,9 @@ public class Tour extends Observable {
      */
     public void removeRequest(int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery, List<Intersection> allIntersections) {
         System.out.println("Tour.removeRequest");
-        System.out.println("before");
 
         // remove request
         planningRequests.remove(indexRequest);
-        System.out.println("hee");
         for (int i = 0; i < listShortestPaths.size() - 1; i++) {
             if (i != indexShortestPathToPickup + 1 && i != indexShortestPathToDelivery + 1) {
                 ShortestPath currentShortestPath = listShortestPaths.get(i);
@@ -612,7 +603,6 @@ public class Tour extends Observable {
      */
     public void moveIntersectionBefore(int indexIntersection, List<Intersection> allIntersections) {
         System.out.println("Tour.moveIntersectionBefore");
-        System.out.println("indexIntersection = " + indexIntersection);
 
         ArrayList<ShortestPath> deletedPaths = new ArrayList<>();
         ArrayList<Intersection> intersections = new ArrayList<>();
