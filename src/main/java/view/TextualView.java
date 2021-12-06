@@ -4,8 +4,6 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -277,38 +275,17 @@ public class TextualView extends JPanel implements Observer {
      * Show speed, length, starting and ending time.
      */
     private void displayTourGlobalInformation() {
-        String duration = getDuration();
-
         JPanel tourFirstPanel = new JPanel();
         tourFirstPanel.setLayout(new BoxLayout(tourFirstPanel, BoxLayout.Y_AXIS));
         addLine(tourFirstPanel, "Total length", String.format("%.1f", tour.getTourLength() / (double) 1000) + " km", false, 14);
         addLine(tourFirstPanel, "Speed", String.format("%.1f", tour.getSpeed()) + " km/h", false, 14);
         addLine(tourFirstPanel, "Starting at", tour.getDepartureTime(), false, 14);
         addLine(tourFirstPanel, "Ending at", tour.getArrivalTime(), false, 14);
-        addLine(tourFirstPanel, "Total duration", duration, false, 14);
+        addLine(tourFirstPanel, "Total duration", tour.getTotalDuration(), false, 14);
 
         tourFirstPanel.setMaximumSize(new Dimension(getPreferredSize().width, 130 + gap));
         tourMainPanel.add(tourFirstPanel);
         tourMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
-    }
-
-    private String getDuration() {
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-        Date date1 = null;
-        Date date2 = null;
-        try {
-            date2 = format.parse(tour.getArrivalTime()+":00");
-            date1 = format.parse(tour.getDepartureTime()+":00");
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        assert date2 != null;
-        assert date1 != null;
-        int totalDuration = (int) (date2.getTime() - date1.getTime())/60000;
-        int hours = totalDuration / 60; //since both are ints, you get an int
-        int minutes = totalDuration % 60;
-        return hours +":"+ minutes;
     }
 
     /**

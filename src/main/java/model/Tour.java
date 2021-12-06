@@ -41,6 +41,11 @@ public class Tour extends Observable {
     private String arrivalTime;
 
     /**
+     * Total duration of the tour
+     */
+    private String totalDuration;
+
+    /**
      * Parser used to convert a Calendar object into a string (to show date and time).
      */
     private final SimpleDateFormat parser = new SimpleDateFormat("HH:mm");
@@ -99,6 +104,10 @@ public class Tour extends Observable {
 
     public String getArrivalTime() {
         return arrivalTime;
+    }
+
+    public String getTotalDuration() {
+        return totalDuration;
     }
 
     public ArrayList<Request> getPlanningRequests() {
@@ -205,7 +214,41 @@ public class Tour extends Observable {
             } else {
                 this.arrivalTime = arrivalTime;
             }
+
         }
+        this.totalDuration = calculateTotalDuration();
+
+    }
+
+    private String calculateTotalDuration() {
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+        try {
+            cal1.setTime(sdf.parse(departureTime+":00"));
+            cal2.setTime(sdf.parse(arrivalTime+":00"));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        int hours, minutes;
+        int currentHoursDeparture = cal1.get(Calendar.HOUR_OF_DAY) + 1;
+        int currentHoursArrival = cal2.get(Calendar.HOUR_OF_DAY);
+        int currentMinutesDeparture = 60 - cal1.get(Calendar.MINUTE);
+        int currentMinutesArrival = cal2.get(Calendar.MINUTE);
+
+
+        if(currentHoursArrival<currentHoursDeparture){
+            hours = 24 - currentHoursDeparture + currentHoursArrival;
+        }else{
+            hours = currentHoursArrival - currentHoursDeparture;
+        }
+
+        minutes = currentMinutesDeparture+currentMinutesArrival;
+        if (minutes>=60){
+            hours ++;
+            minutes = minutes - 60;
+        }
+       return hours + ":" + minutes;
     }
 
     /**
@@ -346,10 +389,12 @@ public class Tour extends Observable {
                 shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i+1]);
                 shortestPathToAdd.setEndNodeNumber(0);
                 listShortestPaths.add(shortestPathToAdd);
+                calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
+                arrivalTime = parser.format(calendar.getTime());
+                totalDuration = calculateTotalDuration();
             }
         }
 
-        updateTimes();
         notifyObservers();
     }
 
@@ -397,7 +442,7 @@ public class Tour extends Observable {
      * Insert a request to an already computed tour (after deleted a request).
      * Position of intersections are stored in Request.
      * Some paths are deleted, some are created to accomplish every request including the new one.
-     * @param indexRequest the index
+     * @param indexRequest
      * @param requestToInsert request to insert
      */
     public void insertRequest(int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery, Request requestToInsert, List<Intersection> allIntersections) {
