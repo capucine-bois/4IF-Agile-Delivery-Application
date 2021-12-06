@@ -164,6 +164,7 @@ public class Tour extends Observable {
      * Update ending time of tour.
      */
     public void updateTimes() {
+
         // reset calendar
         try {
             this.calendar.setTime(parser.parse(departureTime));
@@ -252,6 +253,7 @@ public class Tour extends Observable {
         // Run Tour
         tsp.searchSolution(1000000, g, this);
 
+        updateTimes();
     }
 
     /**
