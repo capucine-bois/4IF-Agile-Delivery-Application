@@ -220,7 +220,12 @@ public class Tour extends Observable {
 
     }
 
+    /**
+     * Calculate the totalDuration of the tour
+     * @return totalDuration of the tour in format : HH:mm
+     */
     private String calculateTotalDuration() {
+        String totalDuration;
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         Calendar cal1 = Calendar.getInstance();
         Calendar cal2 = Calendar.getInstance();
@@ -231,24 +236,37 @@ public class Tour extends Observable {
             e.printStackTrace();
         }
         int hours, minutes;
-        int currentHoursDeparture = cal1.get(Calendar.HOUR_OF_DAY) + 1;
+        int currentHoursDeparture = cal1.get(Calendar.HOUR_OF_DAY);
         int currentHoursArrival = cal2.get(Calendar.HOUR_OF_DAY);
-        int currentMinutesDeparture = 60 - cal1.get(Calendar.MINUTE);
+        int currentMinutesDeparture = cal1.get(Calendar.MINUTE);
         int currentMinutesArrival = cal2.get(Calendar.MINUTE);
 
 
         if(currentHoursArrival<currentHoursDeparture){
-            hours = 24 - currentHoursDeparture + currentHoursArrival;
+            hours = 24 - currentHoursDeparture + currentHoursArrival - 1;
         }else{
-            hours = currentHoursArrival - currentHoursDeparture;
+            hours = currentHoursArrival - currentHoursDeparture -1;
         }
 
-        minutes = currentMinutesDeparture+currentMinutesArrival;
+        minutes = (60-currentMinutesDeparture)+currentMinutesArrival;
         if (minutes>=60){
             hours ++;
             minutes = minutes - 60;
         }
-       return hours + ":" + minutes;
+
+        if(minutes<10){
+            if(hours<10){
+                totalDuration = "0"+hours+":0"+minutes;
+            }else {
+                totalDuration = hours + ":0" + minutes;
+            }
+        }else if(hours<10){
+            totalDuration = "0"+hours+":"+minutes;
+        }else{
+            totalDuration = hours+":"+minutes;
+        }
+
+       return totalDuration;
     }
 
     /**
