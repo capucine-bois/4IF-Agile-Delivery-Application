@@ -176,8 +176,6 @@ public class Tour extends Observable {
             calendar.add(Calendar.SECOND, (int) metersToSeconds(path.getPathLength()));
             String arrivalTime = parser.format(calendar.getTime());
 
-            System.out.println("EndNode: " + path.getEndNodeNumber());
-
             int processDuration;
             if (path.getEndNodeNumber() != 0) {
                 boolean endAddressIsPickup = path.getEndNodeNumber()%2 == 1;
@@ -205,7 +203,6 @@ public class Tour extends Observable {
                     currentRequest.setDeliveryDepartureTime(departureTime);
                 }
             } else {
-                System.out.println("Depot!");
                 this.arrivalTime = arrivalTime;
             }
 

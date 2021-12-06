@@ -72,7 +72,7 @@ class TourTest {
         Segment s12 = new Segment(118,"oulevard Vivier-Pat",i3,i5);
         // Setup request
         Request r1 = new Request(180,240,i2,i3);
-        Request r2 = new Request(95,185,i4,i5);
+        Request r2 = new Request(90,185,i4,i5);
         i1.addAdjacentSegment(s2);
         i2.addAdjacentSegment(s3);
         i2.addAdjacentSegment(s9);
