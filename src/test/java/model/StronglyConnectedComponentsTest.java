@@ -248,7 +248,7 @@ class StronglyConnectedComponentsTest {
         assertEquals(2, colorMap.get(2), "2 not black");
         assertEquals(2, colorMap.get(1), "1 not black");
         assertEquals(2, colorMap.get(3), "3 not black");
-        assertEquals(2, colorMap.get(6), "6 black");
+        assertEquals(2, colorMap.get(6), "6 not black");
         assertEquals(0, colorMap.get(7), "7 black");
         assertEquals(0, colorMap.get(8), "8 black");
     }
