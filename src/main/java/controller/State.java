@@ -6,6 +6,7 @@ import xml.ExceptionXML;
 import xml.XMLDeserializer;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -66,12 +67,17 @@ public abstract class State {
         try {
             Request.lastColor = Color.red;
             XMLDeserializer.loadRequests(tour, cityMap);
-            tour.checkIntersectionsUnreachable(cityMap.getIntersections());
-            if (!tour.getIntersectionsUnreachableFromDepot().isEmpty()) {
-                throw new ExceptionXML("An address in the planning is unreachable.");
+            if (!tour.checkIntersectionsUnreachable(cityMap.getIntersections())) {
+                window.displayErrorMessage("An address in the planning is unreachable.");
+                Request.lastColor = Color.red;
+                tour.clearLists();
+                window.setDefaultButtonStates(new boolean[]{true, true, false});
+                controller.setCurrentState(controller.mapLoadedState);
+                window.setEnabledRequests(false);
+            } else {
+                window.setDefaultButtonStates(new boolean[]{true, true, true});
+                controller.setCurrentState(controller.requestsLoadedState);
             }
-            window.setDefaultButtonStates(new boolean[]{true, true, true});
-            controller.setCurrentState(controller.requestsLoadedState);
             listOfCommands.reset();
             window.showRequestsPanel();
             window.setEnabledTour(false);

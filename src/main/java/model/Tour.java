@@ -41,11 +41,6 @@ public class Tour extends Observable {
     private String arrivalTime;
 
     /**
-     * A list which is empty if all request of the planning request are in the same scc of the depot. Otherwise it contains all intersections not in the same scc of the depot
-     */
-    private ArrayList<Intersection> intersectionsUnreachableFromDepot;
-
-    /**
      * Parser used to convert a Calendar object into a string (to show date and time).
      */
     private final SimpleDateFormat parser = new SimpleDateFormat("HH:mm");
@@ -85,7 +80,6 @@ public class Tour extends Observable {
     public Tour() {
         planningRequests = new ArrayList<>();
         listShortestPaths = new ArrayList<>();
-        intersectionsUnreachableFromDepot = new ArrayList<>();
         tourComputed = false;
         newRequest = null;
     }
@@ -113,10 +107,6 @@ public class Tour extends Observable {
 
     public ArrayList<ShortestPath> getListShortestPaths() {
         return listShortestPaths;
-    }
-
-    public ArrayList<Intersection> getIntersectionsUnreachableFromDepot() {
-        return intersectionsUnreachableFromDepot;
     }
 
     public SimpleDateFormat getParser() {
@@ -237,14 +227,18 @@ public class Tour extends Observable {
     public void clearLists() {
         planningRequests.clear();
         listShortestPaths.clear();
-        intersectionsUnreachableFromDepot.clear();
     }
 
     /**
      * Fill the list of intersections which are not in the same strongly connected components than depot
      */
-    public void checkIntersectionsUnreachable(List<Intersection> allIntersectionsList) {
-        intersectionsUnreachableFromDepot = StronglyConnectedComponents.getAllUnreachableIntersections((ArrayList<Intersection>) allIntersectionsList,depotAddress, planningRequests);
+    public boolean checkIntersectionsUnreachable(List<Intersection> allIntersectionsList) {
+        ArrayList<Intersection> intersectionsToTest = new ArrayList<>();
+        for(Request req : planningRequests) {
+            intersectionsToTest.add(req.getPickupAddress());
+            intersectionsToTest.add(req.getDeliveryAddress());
+        }
+        return (StronglyConnectedComponents.getAllUnreachableIntersections((ArrayList<Intersection>) allIntersectionsList,depotAddress, intersectionsToTest).isEmpty());
     }
 
     /**
