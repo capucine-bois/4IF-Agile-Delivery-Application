@@ -77,6 +77,7 @@ public class SelectedIntersectionState extends State {
         window.setUndoButtonState(true);
         if (tour.isDeliveryBeforePickup())
             window.displayErrorMessage("WARNING: A delivery address is visited before its pickup address!");
+        window.setRedoButtonState(false);
     }
 
     @Override
@@ -86,6 +87,7 @@ public class SelectedIntersectionState extends State {
         window.setUndoButtonState(true);
         if (tour.isDeliveryBeforePickup())
             window.displayErrorMessage("WARNING: A delivery address is visited before its pickup address!");
+        window.setRedoButtonState(false);
     }
 
     @Override
@@ -93,6 +95,7 @@ public class SelectedIntersectionState extends State {
         window.enterSelectionMode();
         window.setDefaultButtonStates(new boolean[]{false, false, false});
         controller.setCurrentState(controller.changeAddressState);
+        window.setRedoButtonState(false);
     }
 
     @Override
@@ -100,5 +103,6 @@ public class SelectedIntersectionState extends State {
         window.enterChangeTimeMode();
         window.setDefaultButtonStates(new boolean[]{false, false, false});
         controller.setCurrentState(controller.changeProcessTimeState);
+        window.setRedoButtonState(false);
     }
 }

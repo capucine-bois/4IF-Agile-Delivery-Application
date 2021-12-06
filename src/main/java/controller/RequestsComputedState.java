@@ -61,6 +61,7 @@ public class RequestsComputedState extends State{
         if (tour.getPlanningRequests().isEmpty()) {
             controller.setCurrentState(controller.mapLoadedState);
         }
+        window.setRedoButtonState(false);
     }
 
     @Override

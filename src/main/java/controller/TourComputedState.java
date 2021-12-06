@@ -67,6 +67,8 @@ public class TourComputedState extends State {
         window.setUndoButtonState(true);
         if (tour.isDeliveryBeforePickup())
             window.displayErrorMessage("WARNING: A delivery address is visited before its pickup address!");
+        window.setRedoButtonState(false);
+
     }
 
     @Override
@@ -76,5 +78,7 @@ public class TourComputedState extends State {
         window.setUndoButtonState(true);
         if (tour.isDeliveryBeforePickup())
             window.displayErrorMessage("WARNING: A delivery address is visited before its pickup address!");
+        window.setRedoButtonState(false);
+
     }
 }

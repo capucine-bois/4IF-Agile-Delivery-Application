@@ -36,6 +36,8 @@ public abstract class State {
             window.showRequestsPanel();
             window.setEnabledRequests(false);
             window.setEnabledTour(false);
+            window.setRedoButtonState(false);
+            window.setUndoButtonState(false);
             tour.setTourComputed(false);
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
@@ -81,6 +83,8 @@ public abstract class State {
             listOfCommands.reset();
             window.showRequestsPanel();
             window.setEnabledTour(false);
+            window.setRedoButtonState(false);
+            window.setUndoButtonState(false);
             tour.setTourComputed(false);
             controller.getListOfCommands().reset();
         } catch (Exception e) {
