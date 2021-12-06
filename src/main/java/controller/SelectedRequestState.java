@@ -75,4 +75,14 @@ public class SelectedRequestState extends State {
             window.colorRequestPanelOnMouseExited(indexRequest);
         }
     }
+
+    @Override
+    public void addRequest(Tour tour, Window window, Controller controller) {
+        tour.setNewRequest(new Request());
+        window.showAddRequestPanel();
+        window.setEnabledTour(false);
+        window.setDefaultButtonStates(new boolean[]{false, false, false});
+        controller.setCurrentState(controller.addRequestState);
+        tour.notifyObservers();
+    }
 }
