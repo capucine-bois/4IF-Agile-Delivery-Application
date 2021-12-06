@@ -293,29 +293,38 @@ public class TextualView extends JPanel implements Observer {
     }
 
     private String getDuration() {
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-        Date date1 = null;
-        Date date2 = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
         try {
-            date2 = format.parse(tour.getArrivalTime()+":00");
-            date1 = format.parse(tour.getDepartureTime()+":00");
-
+            cal1.setTime(sdf.parse(tour.getArrivalTime()+":00"));
+            cal2.setTime(sdf.parse(tour.getDepartureTime()+":00"));// all done
         } catch (ParseException e) {
             e.printStackTrace();
         }
         int hours = 0;
-        int currentHour1 = (int) (date1.getTime()/3600000);
-        int currentHour2 = (int) (date2.getTime()/3600000);
-        if(date2.getTime()<date1.getTime()){
+        int minutes = 0;
+        int currentHours1 = cal1.get(Calendar.HOUR);
+        int currentHours2 = cal2.get(Calendar.HOUR);
+
+        int currentMinutes1 = 60 - cal1.get(Calendar.MINUTE);
+        int currentMinutes2 = cal2.get(Calendar.MINUTE);
 
 
-            hours = 23 - currentHour1 + currentHour2;
-
-        }else {
-            hours = currentHour2-currentHour1;
+        if(currentHours2<currentHours1){
+            hours = 23 - currentHours1 + currentHours2;
+        }else{
+            hours = currentHours2 + currentHours1;
         }
 
-        return hours +":";
+        minutes = currentMinutes1+currentMinutes2;
+        if (minutes>=60){
+            hours ++;
+            minutes = minutes %60;
+        }
+
+        return hours +":" + minutes;
+
     }
 
     /**
