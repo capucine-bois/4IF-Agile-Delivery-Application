@@ -4,6 +4,7 @@ import observer.Observable;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.*;
 
 /**
@@ -174,7 +175,9 @@ public class Tour extends Observable {
      */
     public void updateTimes() {
         // reset calendar
+        Calendar departureCalendar = Calendar.getInstance();
         try {
+            departureCalendar.setTime(parser.parse(departureTime));
             this.calendar.setTime(parser.parse(departureTime));
         } catch (ParseException e) {
             e.printStackTrace();
@@ -216,57 +219,13 @@ public class Tour extends Observable {
             }
 
         }
-        this.totalDuration = calculateTotalDuration();
+        long days = Duration.between(departureCalendar.toInstant(), calendar.toInstant()).toDays();
+        long hours = Duration.between(departureCalendar.toInstant(), calendar.toInstant()).toHours() % 24;
+        long minutes = Duration.between(departureCalendar.toInstant(), calendar.toInstant()).toMinutes() % 60;
 
-    }
-
-    /**
-     * Calculate the totalDuration of the tour
-     * @return totalDuration of the tour in format : HH:mm
-     */
-    private String calculateTotalDuration() {
-        String totalDuration;
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-        Calendar cal1 = Calendar.getInstance();
-        Calendar cal2 = Calendar.getInstance();
-        try {
-            cal1.setTime(sdf.parse(departureTime+":00"));
-            cal2.setTime(sdf.parse(arrivalTime+":00"));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        int hours, minutes;
-        int currentHoursDeparture = cal1.get(Calendar.HOUR_OF_DAY);
-        int currentHoursArrival = cal2.get(Calendar.HOUR_OF_DAY);
-        int currentMinutesDeparture = cal1.get(Calendar.MINUTE);
-        int currentMinutesArrival = cal2.get(Calendar.MINUTE);
-
-
-        if(currentHoursArrival<currentHoursDeparture){
-            hours = 24 - currentHoursDeparture + currentHoursArrival - 1;
-        }else{
-            hours = currentHoursArrival - currentHoursDeparture -1;
-        }
-
-        minutes = (60-currentMinutesDeparture)+currentMinutesArrival;
-        if (minutes>=60){
-            hours ++;
-            minutes = minutes - 60;
-        }
-
-        if(minutes<10){
-            if(hours<10){
-                totalDuration = "0"+hours+":0"+minutes;
-            }else {
-                totalDuration = hours + ":0" + minutes;
-            }
-        }else if(hours<10){
-            totalDuration = "0"+hours+":"+minutes;
-        }else{
-            totalDuration = hours+":"+minutes;
-        }
-
-       return totalDuration;
+        totalDuration = minutes + " min";
+        if (hours > 0) totalDuration =  hours + " h " + totalDuration;
+        if (days > 0) totalDuration = days + " d " + totalDuration;
     }
 
     /**
@@ -407,12 +366,10 @@ public class Tour extends Observable {
                 shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i+1]);
                 shortestPathToAdd.setEndNodeNumber(0);
                 listShortestPaths.add(shortestPathToAdd);
-                calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
-                arrivalTime = parser.format(calendar.getTime());
-                totalDuration = calculateTotalDuration();
             }
         }
 
+        updateTimes();
         notifyObservers();
     }
 
