@@ -11,7 +11,6 @@ include:
 ## On redéfinit les jobs des features de GitLab pour forcer le workflow
 code_quality:
   when: manual
-  extends: code_quality
   rules:
     - if: '$CODE_QUALITY_DISABLED'
       when: never
