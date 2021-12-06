@@ -9,14 +9,16 @@ import view.Window;
 public class RequestsLoadedState extends State {
 
     @Override
-    public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        defaultLoadMap(cityMap, tour, window, controller);
+    public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
+        listOfCommands.reset();
+        defaultLoadMap(cityMap, tour, window, controller, listOfCommands);
         tour.notifyObservers();
     }
 
     @Override
-    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
-        defaultLoadRequests(cityMap, tour, window, controller);
+    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
+        listOfCommands.reset();
+        defaultLoadRequests(cityMap, tour, window, controller, listOfCommands);
     }
 
     @Override
