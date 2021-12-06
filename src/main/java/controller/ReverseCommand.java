@@ -2,7 +2,7 @@ package controller;
 
 public class ReverseCommand implements Command {
 
-    private Command cmd;
+    private final Command cmd;
 
     /**
      * Creates the reverse command of cmd.

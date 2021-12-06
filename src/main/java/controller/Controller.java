@@ -12,10 +12,10 @@ import view.Window;
 public class Controller {
 
     private State currentState;
-    private Window window;
-    private CityMap cityMap;
-    private Tour tour;
-    private ListOfCommands listOfCommands;
+    private final Window window;
+    private final CityMap cityMap;
+    private final Tour tour;
+    private final ListOfCommands listOfCommands;
 
     // Instances associated with each possible state of the controller
     protected final InitialState initialState = new InitialState();

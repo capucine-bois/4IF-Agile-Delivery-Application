@@ -18,7 +18,7 @@ public class ButtonListener implements ActionListener {
     /**
      * The application controller
      */
-    private Controller controller;
+    private final Controller controller;
 
     private PopUpView popUpView;
 
@@ -26,10 +26,10 @@ public class ButtonListener implements ActionListener {
      * Complete controller taking application controller in parameter.
      * @param controller application controller
      */
-    public ButtonListener(Controller controller, Window window){
+    public ButtonListener(Controller controller){
         this.controller = controller;
-        /**
-         * The window
+        /*
+          The window
          */
     }
 

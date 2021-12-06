@@ -7,7 +7,7 @@ import java.util.LinkedList;
  * Represent every command done, and that can be canceled, redone or undone.
  */
 public class ListOfCommands {
-    private LinkedList<Command> list;
+    private final LinkedList<Command> list;
 
     private int currentIndex;
 
@@ -36,18 +36,6 @@ public class ListOfCommands {
     public void undo(){
         if (currentIndex >= 0){
             Command cde = list.get(currentIndex);
-            currentIndex--;
-            cde.undoCommand();
-        }
-    }
-
-    /**
-     * Permanently remove the last added command (this command cannot be reinserted again with redo)
-     */
-    public void cancel(){
-        if (currentIndex >= 0){
-            Command cde = list.get(currentIndex);
-            list.remove(currentIndex);
             currentIndex--;
             cde.undoCommand();
         }

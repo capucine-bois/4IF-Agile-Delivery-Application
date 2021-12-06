@@ -58,7 +58,7 @@ public class XMLDeserializer {
      * Create a Document instance for file parameter.
      * @param file the file
      * @return the document
-     * @throws Exception raised if the file can't be parsed and converted into a XML Document instance.
+     * @throws Exception raised if the file can't be parsed and converted into an XML Document instance.
      */
     public static Document extractDocument(File file) throws Exception {
         Document docParsed;

@@ -41,7 +41,7 @@ public class Tour extends Observable {
     private String arrivalTime;
 
     /**
-     * A list which is empty if all request of the planning request are in the same scc of the depot. Otherwise it contains all intersections not in the same scc of the depot
+     * A list which is empty if all request of the planning request are in the same scc of the depot. Otherwise, it contains all intersections not in the same scc of the depot
      */
     private ArrayList<Intersection> intersectionsUnreachableFromDepot;
 
@@ -117,10 +117,6 @@ public class Tour extends Observable {
 
     public ArrayList<Intersection> getIntersectionsUnreachableFromDepot() {
         return intersectionsUnreachableFromDepot;
-    }
-
-    public SimpleDateFormat getParser() {
-        return parser;
     }
 
     public boolean isDeliveryBeforePickup() {
@@ -241,7 +237,7 @@ public class Tour extends Observable {
     }
 
     /**
-     * Fill the list of intersections which are not in the same strongly connected components than depot
+     * Fill the list with intersections which are not in the same strongly connected components than depot
      */
     public void checkIntersectionsUnreachable(List<Intersection> allIntersectionsList) {
         intersectionsUnreachableFromDepot = StronglyConnectedComponents.getAllUnreachableIntersections((ArrayList<Intersection>) allIntersectionsList,depotAddress, planningRequests);
@@ -256,7 +252,7 @@ public class Tour extends Observable {
 
         processDijkstraToComputeTour(allIntersectionsList, listNodes);
         TSP tsp = new TSP3();
-        Graph g = new CompleteGraph(listNodes, this);
+        Graph g = new CompleteGraph(listNodes);
 
         // Run Tour
         tsp.searchSolution(1000000, g, this);

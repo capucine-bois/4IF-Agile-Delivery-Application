@@ -12,7 +12,7 @@ public class Dijkstra {
         /* ATTRIBUTES */
 
         /**
-         * The calculed distance to access the intersection from the origin(most of the time temporary)
+         * The calculated distance to access the intersection from the origin(most of the time temporary)
          */
         double distance;
 
@@ -55,7 +55,7 @@ public class Dijkstra {
      * @param listIntersections the list with all intersections
      * @param listUsefulEndPoints the intersections which can be reached by the origin Intersection (for example a delivery address cannot reach his pick-up address)
      * @param origin the intersection from which we search the shortest paths
-     * @return listShortestPathFromOrigin, the list of shortest paths from the origin to the intersection in the list of useful end points
+     * @return listShortestPathFromOrigin, the list of the shortest paths from the origin to the intersection in the list of useful end points
      */
     public static ArrayList<ShortestPath> compute(List<Intersection> listIntersections, ArrayList<Intersection> listUsefulEndPoints, Intersection origin) {
 

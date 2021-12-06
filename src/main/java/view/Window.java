@@ -31,11 +31,11 @@ public class Window extends JFrame {
     private JLabel popUpGraphicalViewMessage;
     private JButton popUpGraphicalViewButton;
     private GraphicalView graphicalView;
-    private TextualView textualView;
-    private PopUpView popUpView;
+    private final TextualView textualView;
+    private final PopUpView popUpView;
 
     // Listeners
-    private ButtonListener buttonListener;
+    private final ButtonListener buttonListener;
 
     private final String[] buttonTexts = new String[]{LOAD_MAP, LOAD_REQUEST, COMPUTE_TOUR, UNDO, REDO};
     private boolean[] defaultButtonStates = new boolean[]{true, false, false, false, false};
@@ -50,9 +50,9 @@ public class Window extends JFrame {
      */
     public Window(CityMap cityMap, Tour tour, Controller controller) throws IOException, FontFormatException {
         MouseListener mouseListener = new MouseListener(controller);
-        buttonListener = new ButtonListener(controller, this);
+        buttonListener = new ButtonListener(controller);
         ComponentListener componentListener = new ComponentListener(this, graphicalView);
-        graphicalView = new GraphicalView(cityMap, tour, this, mouseListener);
+        graphicalView = new GraphicalView(cityMap, tour, mouseListener);
         textualView = new TextualView(tour, this, mouseListener, buttonListener);
         popUpView = new PopUpView(this, mouseListener, buttonListener);
         KeyboardListener keyboardListener = new KeyboardListener(controller);

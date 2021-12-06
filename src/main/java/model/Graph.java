@@ -15,11 +15,4 @@ public interface Graph {
      */
     boolean isArc(int i, int j);
 
-    /**
-     * Return the destinations of a Node in order
-     * @param currentVertex
-     * @return
-     */
-    Integer[] getDestinationsInOrder(int currentVertex);
-
 }

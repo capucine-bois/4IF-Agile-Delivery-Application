@@ -12,7 +12,7 @@ public class ShortestPath implements Comparable<ShortestPath> {
     /* ATTRIBUTES */
 
     /**
-     * The length of the shortes path
+     * The length of the shorts path
      */
     private double pathLength;
 

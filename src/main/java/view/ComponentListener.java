@@ -5,8 +5,8 @@ import java.awt.event.ComponentEvent;
 
 public class ComponentListener extends ComponentAdapter {
 
-    private Window window;
-    private GraphicalView graphicalView;
+    private final Window window;
+    private final GraphicalView graphicalView;
 
     public ComponentListener(Window window, GraphicalView graphicalView) {
         this.window = window;

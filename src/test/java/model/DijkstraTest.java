@@ -103,8 +103,9 @@ public class DijkstraTest {
      * dijkstra()
      *
      * What it does:
-     * Compute shortests paths from one origin intersection
+     * Compute shortest paths from one origin intersection
      */
+    @SuppressWarnings("GrazieInspection")
     @Nested
     @DisplayName("Test on dijkstra")
     class dijkstraTest {

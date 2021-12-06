@@ -4,10 +4,10 @@ import model.Tour;
 
 public class ChangeProcessTimeCommand implements Command {
 
-    private Tour tour;
-    private int indexNode;
-    private int oldTime;
-    private int newTime;
+    private final Tour tour;
+    private final int indexNode;
+    private final int oldTime;
+    private final int newTime;
 
     public ChangeProcessTimeCommand(Tour tour, int indexNode, int oldTime, int newTime) {
         this.tour = tour;

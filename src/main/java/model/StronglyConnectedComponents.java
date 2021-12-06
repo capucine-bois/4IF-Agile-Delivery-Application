@@ -8,9 +8,6 @@ import java.util.stream.Collectors;
  */
 public class StronglyConnectedComponents {
 
-    public StronglyConnectedComponents () {
-    }
-
     /**
      * Check if the intersections present in the planning are reachable
      * @param listIntersection the list of all intersections

@@ -13,7 +13,6 @@ class TourTest {
     ArrayList<Intersection> listIntersection = new ArrayList<>();
     Tour tour = new Tour();
     CityMap cityMap = new CityMap();
-    ArrayList<ShortestPath> paths = new ArrayList<>();
     ArrayList<Request> listRequest;
     static Instant startedAt;
 

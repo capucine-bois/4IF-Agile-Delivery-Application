@@ -785,10 +785,10 @@ public class TextualView extends JPanel implements Observer {
     /**
      * Method called by observable instances when the textual view must be updated.
      * @param o observable instance which send the notification
-     * @param arg notification data
+     *
      */
     @Override
-    public void update(Observable o, Object arg) {
+    public void update(Observable o) {
         if (o.equals(tour)) {
             displayTextualView();
         }

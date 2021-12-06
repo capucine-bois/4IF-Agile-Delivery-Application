@@ -13,7 +13,7 @@ import java.awt.event.MouseWheelEvent;
  */
 public class MouseListener extends MouseAdapter {
 
-    private Controller controller;
+    private final Controller controller;
     private GraphicalView graphicalView;
 
     public MouseListener(Controller controller) {

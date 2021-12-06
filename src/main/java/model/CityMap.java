@@ -17,8 +17,8 @@ public class CityMap extends Observable {
     /**
      * List of all intersections.
      */
-    private List<Intersection> intersections;
-    private HashMap<Long,Long> dictionaryId;
+    private final List<Intersection> intersections;
+    private final HashMap<Long,Long> dictionaryId;
 
     /* CONSTRUCTORS */
 
@@ -43,7 +43,7 @@ public class CityMap extends Observable {
     /**
      * Add an entry to hashmap of id .
      * @param idXML id of the original XML
-     * @param id id choosen by the application
+     * @param id id chosen by the application
      */
     public void addDictionaryId(Long idXML, Long id) {
         dictionaryId.put(idXML,id);

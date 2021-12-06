@@ -33,8 +33,8 @@ public abstract class TemplateTSP implements TSP {
     public void searchSolution(int timeLimit, Graph g, Tour tour){
         if (timeLimit <= 0) return;
         startTime = System.currentTimeMillis();
-        /**
-         * The time limit before which we want a solution
+        /*
+          The time limit before which we want a solution
          */
         this.g = g;
         bestSol = new Integer[g.getNbVertices()];
@@ -45,13 +45,6 @@ public abstract class TemplateTSP implements TSP {
         bestSolCost = Double.MAX_VALUE;
         branchAndBound(0, unvisited, visited, 0, tour);
         tour.setTourComputed(true);
-    }
-
-    public Integer getSolution(int i){
-         if (g != null && i>=0 && i<g.getNbVertices())
-            return bestSol[i];
-
-        return -1;
     }
 
     public double getSolutionCost(){
@@ -65,9 +58,9 @@ public abstract class TemplateTSP implements TSP {
      * @param currentVertex
      * @param unvisited
      * @return a lower bound of the cost of paths in <code>g</code> starting from <code>currentVertex</code>, visiting
-     * every vertex in <code>unvisited</code> exactly once, and returning back to vertex <code>0</code>.
+     * every vertex in <code>unvisited</code> exactly once, and returning to vertex <code>0</code>.
      */
-    protected abstract double bound(Integer currentVertex, Collection<Integer> unvisited, Collection<Integer> visited, Graph g);
+    protected abstract double bound(Integer currentVertex, Collection<Integer> unvisited, Graph g);
 
     /**
      * Method that must be defined in TemplateTSP subclasses
@@ -100,7 +93,7 @@ public abstract class TemplateTSP implements TSP {
                     tour.notifyObservers();
                 }
             }
-        } else if (currentCost+bound(currentVertex,unvisited, visited, g) < bestSolCost){
+        } else if (currentCost+bound(currentVertex,unvisited, g) < bestSolCost){
             Iterator<Integer> it = iterator(currentVertex, unvisited, g);
             while (it.hasNext()){
                 Integer nextVertex = it.next();

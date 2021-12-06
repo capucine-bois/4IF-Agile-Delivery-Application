@@ -8,12 +8,12 @@ import java.util.List;
 
 public class AddCommand implements Command {
 
-    private Tour tour;
-    private Request request;
-    private List<Intersection> intersections;
-    private int indexRequest;
-    private int indexShortestPathToPickup;
-    private int indexShortestPathToDelivery;
+    private final Tour tour;
+    private final Request request;
+    private final List<Intersection> intersections;
+    private final int indexRequest;
+    private final int indexShortestPathToPickup;
+    private final int indexShortestPathToDelivery;
 
     /**
      * Create the command which delete a request

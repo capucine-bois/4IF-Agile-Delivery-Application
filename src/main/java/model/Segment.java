@@ -64,22 +64,6 @@ public class Segment {
 
     /* SETTERS */
 
-    public void setLength(double length) {
-        this.length = length;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDestination(Intersection destination) {
-        this.destination = destination;
-    }
-
-    public void setOrigin(Intersection origin) {
-        this.origin = origin;
-    }
-
     /**
      * Check if two segments have the same attributes
      * @param o the object to compare

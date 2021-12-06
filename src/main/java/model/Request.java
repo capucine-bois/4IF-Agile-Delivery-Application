@@ -12,7 +12,7 @@ public class Request {
     /* ATTRIBUTES */
 
     /**
-     * The duration it takes to pickup the package when the delivery person is at the pickup address.
+     * The duration it takes to pick up the package when the delivery person is at the pickup address.
      */
     private int pickupDuration;
 
@@ -183,10 +183,6 @@ public class Request {
 
     public void setDeliverySelected(boolean deliverySelected) {
         this.deliverySelected = deliverySelected;
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
     }
 
     /**
