@@ -183,7 +183,14 @@ public class Controller {
      * Undo last command.
      */
     public void undo() {
+        boolean previousRequestsEmpty = tour.getPlanningRequests().isEmpty();
+        State previousState = currentState;
         currentState.undo(listOfCommands, window);
+
+        // if empty request was empty, then not anymore
+        if (previousRequestsEmpty && !tour.getPlanningRequests().isEmpty() && previousState == mapLoadedState) {
+            currentState = requestsComputedState;
+        }
     }
 
     /**

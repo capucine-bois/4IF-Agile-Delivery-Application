@@ -59,6 +59,9 @@ public class RequestsComputedState extends State{
         int indexShortestPathToDelivery = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 2).findFirst().get());
         l.add(new ReverseCommand(new AddCommand(tour, requestToDelete, allIntersections,indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery)));
         window.setUndoButtonState(true);
+        if (tour.getPlanningRequests().isEmpty()) {
+            controller.setCurrentState(controller.mapLoadedState);
+        }
     }
 
     @Override
@@ -69,6 +72,5 @@ public class RequestsComputedState extends State{
         window.setDefaultButtonStates(new boolean[]{false, false, false});
         controller.setCurrentState(controller.addRequestState);
         tour.notifyObservers();
-        System.out.println("RequestsComputedState.addRequest");
     }
 }
