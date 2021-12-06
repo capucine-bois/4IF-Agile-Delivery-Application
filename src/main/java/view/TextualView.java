@@ -4,8 +4,6 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -277,52 +275,17 @@ public class TextualView extends JPanel implements Observer {
      * Show speed, length, starting and ending time.
      */
     private void displayTourGlobalInformation() {
-        String duration = getDuration();
-
         JPanel tourFirstPanel = new JPanel();
         tourFirstPanel.setLayout(new BoxLayout(tourFirstPanel, BoxLayout.Y_AXIS));
         addLine(tourFirstPanel, "Total length", String.format("%.1f", tour.getTourLength() / (double) 1000) + " km", false, 14);
         addLine(tourFirstPanel, "Speed", String.format("%.1f", tour.getSpeed()) + " km/h", false, 14);
         addLine(tourFirstPanel, "Starting at", tour.getDepartureTime(), false, 14);
         addLine(tourFirstPanel, "Ending at", tour.getArrivalTime(), false, 14);
-        addLine(tourFirstPanel, "Total duration", duration, false, 14);
+        addLine(tourFirstPanel, "Total duration", tour.getTotalDuration(), false, 14);
 
         tourFirstPanel.setMaximumSize(new Dimension(getPreferredSize().width, 130 + gap));
         tourMainPanel.add(tourFirstPanel);
         tourMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
-    }
-
-    private String getDuration() {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-        Calendar cal1 = Calendar.getInstance();
-        Calendar cal2 = Calendar.getInstance();
-        try {
-            cal1.setTime(sdf.parse(tour.getDepartureTime()+":00"));
-            cal2.setTime(sdf.parse(tour.getArrivalTime()+":00"));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        int hours, minutes;
-        int currentHoursDeparture = cal1.get(Calendar.HOUR_OF_DAY) + 1;
-        int currentHoursArrival = cal2.get(Calendar.HOUR_OF_DAY);
-        int currentMinutesDeparture = 60 - cal1.get(Calendar.MINUTE);
-        int currentMinutesArrival = cal2.get(Calendar.MINUTE);
-
-
-        if(currentHoursArrival<currentHoursDeparture){
-            hours = 24 - currentHoursDeparture + currentHoursArrival;
-        }else{
-            hours = currentHoursArrival - currentHoursDeparture;
-        }
-
-        minutes = currentMinutesDeparture+currentMinutesArrival;
-        if (minutes>=60){
-            hours ++;
-            minutes = minutes - 60;
-        }
-
-        return hours +":" + minutes;
-
     }
 
     /**

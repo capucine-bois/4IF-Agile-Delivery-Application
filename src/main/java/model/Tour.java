@@ -41,6 +41,11 @@ public class Tour extends Observable {
     private String arrivalTime;
 
     /**
+     * Total duration of the tour
+     */
+    private String totalDuration;
+
+    /**
      * A list which is empty if all request of the planning request are in the same scc of the depot. Otherwise it contains all intersections not in the same scc of the depot
      */
     private ArrayList<Intersection> intersectionsUnreachableFromDepot;
@@ -105,6 +110,10 @@ public class Tour extends Observable {
 
     public String getArrivalTime() {
         return arrivalTime;
+    }
+
+    public String getTotalDuration() {
+        return totalDuration;
     }
 
     public ArrayList<Request> getPlanningRequests() {
@@ -220,7 +229,39 @@ public class Tour extends Observable {
             }
 
         }
+        this.totalDuration = calculateTotalDuration();
 
+    }
+
+    private String calculateTotalDuration() {
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+        try {
+            cal1.setTime(sdf.parse(departureTime+":00"));
+            cal2.setTime(sdf.parse(arrivalTime+":00"));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        int hours, minutes;
+        int currentHoursDeparture = cal1.get(Calendar.HOUR_OF_DAY) + 1;
+        int currentHoursArrival = cal2.get(Calendar.HOUR_OF_DAY);
+        int currentMinutesDeparture = 60 - cal1.get(Calendar.MINUTE);
+        int currentMinutesArrival = cal2.get(Calendar.MINUTE);
+
+
+        if(currentHoursArrival<currentHoursDeparture){
+            hours = 24 - currentHoursDeparture + currentHoursArrival;
+        }else{
+            hours = currentHoursArrival - currentHoursDeparture;
+        }
+
+        minutes = currentMinutesDeparture+currentMinutesArrival;
+        if (minutes>=60){
+            hours ++;
+            minutes = minutes - 60;
+        }
+       return hours + ":" + minutes;
     }
 
     /**
@@ -375,6 +416,7 @@ public class Tour extends Observable {
                 listShortestPaths.add(shortestPathToAdd);
                 calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
                 arrivalTime = parser.format(calendar.getTime());
+                totalDuration = calculateTotalDuration();
             }
         }
 
