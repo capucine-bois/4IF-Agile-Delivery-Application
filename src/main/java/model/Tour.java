@@ -652,26 +652,29 @@ public class Tour extends Observable {
     }
 
     public void changeAddress(int indexNode, Intersection newAddress, List<Intersection> intersections) {
-        if (indexNode % 2 == 0) {
-            planningRequests.get(indexNode/2 - 1).setDeliveryAddress(newAddress);
-        } else {
-            planningRequests.get(indexNode/2).setPickupAddress(newAddress);
+        // Sanity check
+        if(indexNode > 0 && indexNode < planningRequests.size()*2) {
+            if (indexNode % 2 == 0) {
+                planningRequests.get(indexNode / 2 - 1).setDeliveryAddress(newAddress);
+            } else {
+                planningRequests.get(indexNode / 2).setPickupAddress(newAddress);
+            }
+
+            ShortestPath shortestPathToNode = listShortestPaths.stream().filter(x -> x.getEndNodeNumber() == indexNode).findFirst().get();
+            ShortestPath newShortestPathToNode = Dijkstra.compute(intersections, new ArrayList<>(List.of(newAddress)), shortestPathToNode.getStartAddress()).get(0);
+            shortestPathToNode.setEndAddress(newAddress);
+            shortestPathToNode.setListSegments(newShortestPathToNode.getListSegments());
+            shortestPathToNode.setPathLength(newShortestPathToNode.getPathLength());
+
+            ShortestPath shortestPathFromNode = listShortestPaths.stream().filter(x -> x.getStartNodeNumber() == indexNode).findFirst().get();
+            ShortestPath newShortestPathFromNode = Dijkstra.compute(intersections, new ArrayList<>(List.of(shortestPathFromNode.getEndAddress())), newAddress).get(0);
+            shortestPathFromNode.setStartAddress(newAddress);
+            shortestPathFromNode.setListSegments(newShortestPathFromNode.getListSegments());
+            shortestPathFromNode.setPathLength(newShortestPathFromNode.getPathLength());
+
+            updateLength();
+            updateTimes();
+            notifyObservers();
         }
-
-        ShortestPath shortestPathToNode = listShortestPaths.stream().filter(x -> x.getEndNodeNumber() == indexNode).findFirst().get();
-        ShortestPath newShortestPathToNode = Dijkstra.compute(intersections, new ArrayList<>(List.of(newAddress)), shortestPathToNode.getStartAddress()).get(0);
-        shortestPathToNode.setEndAddress(newAddress);
-        shortestPathToNode.setListSegments(newShortestPathToNode.getListSegments());
-        shortestPathToNode.setPathLength(newShortestPathToNode.getPathLength());
-
-        ShortestPath shortestPathFromNode = listShortestPaths.stream().filter(x -> x.getStartNodeNumber() == indexNode).findFirst().get();
-        ShortestPath newShortestPathFromNode = Dijkstra.compute(intersections, new ArrayList<>(List.of(shortestPathFromNode.getEndAddress())), newAddress).get(0);
-        shortestPathFromNode.setStartAddress(newAddress);
-        shortestPathFromNode.setListSegments(newShortestPathFromNode.getListSegments());
-        shortestPathFromNode.setPathLength(newShortestPathFromNode.getPathLength());
-
-        updateLength();
-        updateTimes();
-        notifyObservers();
     }
 }
