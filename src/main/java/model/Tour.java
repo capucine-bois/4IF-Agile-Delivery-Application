@@ -13,7 +13,6 @@ import java.util.*;
  * which is the sum of the length of its paths and a departure's time.
  * As it extends Observable, an instance can notify observer when their attributes change.
  */
-@SuppressWarnings("ALL")
 public class Tour extends Observable {
 
     /* ATTRIBUTES */
@@ -40,11 +39,6 @@ public class Tour extends Observable {
      * The time of ending for the tour
      */
     private String arrivalTime;
-
-    /**
-     * A list which is empty if all request of the planning request are in the same scc of the depot. Otherwise, it contains all intersections not in the same scc of the depot
-     */
-    private ArrayList<Intersection> intersectionsUnreachableFromDepot;
 
     /**
      * Parser used to convert a Calendar object into a string (to show date and time).
@@ -86,7 +80,6 @@ public class Tour extends Observable {
     public Tour() {
         planningRequests = new ArrayList<>();
         listShortestPaths = new ArrayList<>();
-        intersectionsUnreachableFromDepot = new ArrayList<>();
         tourComputed = false;
         newRequest = null;
     }
@@ -116,8 +109,8 @@ public class Tour extends Observable {
         return listShortestPaths;
     }
 
-    public ArrayList<Intersection> getIntersectionsUnreachableFromDepot() {
-        return intersectionsUnreachableFromDepot;
+    public SimpleDateFormat getParser() {
+        return parser;
     }
 
     public boolean isDeliveryBeforePickup() {
@@ -183,8 +176,6 @@ public class Tour extends Observable {
             calendar.add(Calendar.SECOND, (int) metersToSeconds(path.getPathLength()));
             String arrivalTime = parser.format(calendar.getTime());
 
-            System.out.println("EndNode: " + path.getEndNodeNumber());
-
             int processDuration;
             if (path.getEndNodeNumber() != 0) {
                 boolean endAddressIsPickup = path.getEndNodeNumber()%2 == 1;
@@ -212,7 +203,6 @@ public class Tour extends Observable {
                     currentRequest.setDeliveryDepartureTime(departureTime);
                 }
             } else {
-                System.out.println("Depot!");
                 this.arrivalTime = arrivalTime;
             }
 
@@ -234,14 +224,18 @@ public class Tour extends Observable {
     public void clearLists() {
         planningRequests.clear();
         listShortestPaths.clear();
-        intersectionsUnreachableFromDepot.clear();
     }
 
     /**
      * Fill the list with intersections which are not in the same strongly connected components than depot
      */
-    public void checkIntersectionsUnreachable(List<Intersection> allIntersectionsList) {
-        intersectionsUnreachableFromDepot = StronglyConnectedComponents.getAllUnreachableIntersections((ArrayList<Intersection>) allIntersectionsList,depotAddress, planningRequests);
+    public boolean checkIntersectionsUnreachable(List<Intersection> allIntersectionsList) {
+        ArrayList<Intersection> intersectionsToTest = new ArrayList<>();
+        for(Request req : planningRequests) {
+            intersectionsToTest.add(req.getPickupAddress());
+            intersectionsToTest.add(req.getDeliveryAddress());
+        }
+        return (StronglyConnectedComponents.getAllUnreachableIntersections((ArrayList<Intersection>) allIntersectionsList,depotAddress, intersectionsToTest).isEmpty());
     }
 
     /**
@@ -558,12 +552,10 @@ public class Tour extends Observable {
     /**
      * Change order of the tour to visit an intersection earlier.
      * Some paths are deleted, some are created to accomplish every request with the new order.
-     * @param indexIntersection current position of the Intersection in the Tour
+     * @param indexShortestPath current position of the shortest path in the Tour
      * @param allIntersections all intersections of the map
      */
-    public void moveIntersectionBefore(int indexIntersection, List<Intersection> allIntersections) {
-        System.out.println("Tour.moveIntersectionBefore");
-        System.out.println("indexIntersection = " + indexIntersection);
+    public void moveIntersectionBefore(int indexShortestPath, List<Intersection> allIntersections) {
 
         ArrayList<ShortestPath> deletedPaths = new ArrayList<>();
         ArrayList<Intersection> intersections = new ArrayList<>();
@@ -572,19 +564,19 @@ public class Tour extends Observable {
         this.deliveryBeforePickup = false;
 
         // sanity check
-        if (indexIntersection > 0 && indexIntersection < listShortestPaths.size()-1) {
+        if (indexShortestPath > 0 && indexShortestPath < listShortestPaths.size()-1) {
 
-            getIntersectionsAndOrderForFuturePaths(indexIntersection, intersections, newOrder);
+            getIntersectionsAndOrderForFuturePaths(indexShortestPath, intersections, newOrder);
 
             // remove paths from tour
-            deletedPaths.add(listShortestPaths.get(indexIntersection-1));
-            deletedPaths.add(listShortestPaths.get(indexIntersection));
-            deletedPaths.add(listShortestPaths.get(indexIntersection+1));
-            listShortestPaths.remove(indexIntersection-1);
-            listShortestPaths.remove(indexIntersection-1);
-            listShortestPaths.remove(indexIntersection-1);
+            deletedPaths.add(listShortestPaths.get(indexShortestPath-1));
+            deletedPaths.add(listShortestPaths.get(indexShortestPath));
+            deletedPaths.add(listShortestPaths.get(indexShortestPath+1));
+            listShortestPaths.remove(indexShortestPath-1);
+            listShortestPaths.remove(indexShortestPath-1);
+            listShortestPaths.remove(indexShortestPath-1);
 
-            recomputePathAfterMovingIntersection(indexIntersection, allIntersections, intersections, newOrder);
+            recomputePathAfterMovingIntersection(indexShortestPath, allIntersections, intersections, newOrder);
 
             // check if a delivery is before a pickup
             if (newOrder.get(2) == newOrder.get(1) - 1 && newOrder.get(1) % 2 == 0) {
@@ -642,37 +634,43 @@ public class Tour extends Observable {
     }
 
     public void changeAddress(int indexNode, Intersection newAddress, List<Intersection> intersections) {
-        if (indexNode % 2 == 0) {
-            planningRequests.get(indexNode/2 - 1).setDeliveryAddress(newAddress);
-        } else {
-            planningRequests.get(indexNode/2).setPickupAddress(newAddress);
+        // Sanity check
+        if(indexNode > 0 && indexNode <= planningRequests.size()*2) {
+            if (indexNode % 2 == 0) {
+                planningRequests.get(indexNode / 2 - 1).setDeliveryAddress(newAddress);
+            } else {
+                planningRequests.get(indexNode / 2).setPickupAddress(newAddress);
+            }
+
+            ShortestPath shortestPathToNode = listShortestPaths.stream().filter(x -> x.getEndNodeNumber() == indexNode).findFirst().get();
+            ShortestPath newShortestPathToNode = Dijkstra.compute(intersections, new ArrayList<>(List.of(newAddress)), shortestPathToNode.getStartAddress()).get(0);
+            shortestPathToNode.setEndAddress(newAddress);
+            shortestPathToNode.setListSegments(newShortestPathToNode.getListSegments());
+            shortestPathToNode.setPathLength(newShortestPathToNode.getPathLength());
+
+            ShortestPath shortestPathFromNode = listShortestPaths.stream().filter(x -> x.getStartNodeNumber() == indexNode).findFirst().get();
+            ShortestPath newShortestPathFromNode = Dijkstra.compute(intersections, new ArrayList<>(List.of(shortestPathFromNode.getEndAddress())), newAddress).get(0);
+            shortestPathFromNode.setStartAddress(newAddress);
+            shortestPathFromNode.setListSegments(newShortestPathFromNode.getListSegments());
+            shortestPathFromNode.setPathLength(newShortestPathFromNode.getPathLength());
+
+            updateLength();
+            updateTimes();
+            notifyObservers();
         }
-
-        ShortestPath shortestPathToNode = listShortestPaths.stream().filter(x -> x.getEndNodeNumber() == indexNode).findFirst().get();
-        ShortestPath newShortestPathToNode = Dijkstra.compute(intersections, new ArrayList<>(List.of(newAddress)), shortestPathToNode.getStartAddress()).get(0);
-        shortestPathToNode.setEndAddress(newAddress);
-        shortestPathToNode.setListSegments(newShortestPathToNode.getListSegments());
-        shortestPathToNode.setPathLength(newShortestPathToNode.getPathLength());
-
-        ShortestPath shortestPathFromNode = listShortestPaths.stream().filter(x -> x.getStartNodeNumber() == indexNode).findFirst().get();
-        ShortestPath newShortestPathFromNode = Dijkstra.compute(intersections, new ArrayList<>(List.of(shortestPathFromNode.getEndAddress())), newAddress).get(0);
-        shortestPathFromNode.setStartAddress(newAddress);
-        shortestPathFromNode.setListSegments(newShortestPathFromNode.getListSegments());
-        shortestPathFromNode.setPathLength(newShortestPathFromNode.getPathLength());
-
-        updateLength();
-        updateTimes();
-        notifyObservers();
     }
 
     public void changeProcessTime(int indexNode, int newTime) {
-        if (indexNode % 2 == 0) {
-            planningRequests.get(indexNode/2 - 1).setDeliveryDuration(newTime);
-        } else {
-            planningRequests.get(indexNode/2).setPickupDuration(newTime);
-        }
+        // Sanity check
+        if(indexNode > 0 && indexNode <= planningRequests.size()*2 ) {
+            if (indexNode % 2 == 0) {
+                planningRequests.get(indexNode / 2 - 1).setDeliveryDuration(newTime);
+            } else {
+                planningRequests.get(indexNode / 2).setPickupDuration(newTime);
+            }
 
-        updateTimes();
-        notifyObservers();
+            updateTimes();
+            notifyObservers();
+        }
     }
 }

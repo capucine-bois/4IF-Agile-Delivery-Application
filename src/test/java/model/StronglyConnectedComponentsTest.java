@@ -120,8 +120,13 @@ class StronglyConnectedComponentsTest {
         listRequest.add(r3);
         listRequest.add(r4);
         listRequest.add(r5);
+        ArrayList<Intersection> intersectionsToTest = new ArrayList<>();
+        for(Request req : listRequest ) {
+            intersectionsToTest.add(req.getPickupAddress());
+            intersectionsToTest.add(req.getDeliveryAddress());
+        }
 
-        ArrayList<Intersection> listUnreachable = StronglyConnectedComponents.getAllUnreachableIntersections(listIntersection, i0,listRequest);
+        ArrayList<Intersection> listUnreachable = StronglyConnectedComponents.getAllUnreachableIntersections(listIntersection, i0,intersectionsToTest);
         assertTrue(listUnreachable.contains(i6),"One way intersection (return) need to be is the unreachable list");
         assertTrue(listUnreachable.contains(i7),"One way intersection (first way) need to be is the unreachable list");
         assertTrue(listUnreachable.contains(i8),"Isolated point need to be is the unreachable list");

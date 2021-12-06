@@ -51,5 +51,6 @@ public class AddRequestState extends State{
         } else {
             window.displayErrorMessage("Process times must be positive integers.");
         }
+        window.setRedoButtonState(false);
     }
 }

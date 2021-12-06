@@ -1,8 +1,9 @@
 package controller;
 
-import model.CityMap;
-import model.Tour;
+import model.*;
 import view.Window;
+
+import java.util.ArrayList;
 
 public class DeliveryAddressSelectionState extends State {
 
@@ -14,10 +15,17 @@ public class DeliveryAddressSelectionState extends State {
 
     @Override
     public void leftClickOnIntersection(int indexIntersection, CityMap cityMap, Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {
-        window.exitSelectionMode();
-        // TODO: check if address chosen is in the same scc as the depot address
-        tour.getNewRequest().setDeliveryAddress(cityMap.getIntersections().get(indexIntersection));
-        controller.setCurrentState(controller.addRequestState);
-        tour.notifyObservers();
+
+        ArrayList<Intersection> intersectionsToTest = new ArrayList<>();
+        intersectionsToTest.add(cityMap.getIntersections().get(indexIntersection));
+        if (!StronglyConnectedComponents.getAllUnreachableIntersections((ArrayList<Intersection>) cityMap.getIntersections(), tour.getDepotAddress(), intersectionsToTest).isEmpty()) {
+            window.displayErrorMessage("The selected address is unreachable.");
+        } else {
+            window.exitSelectionMode();
+            tour.getNewRequest().setDeliveryAddress(cityMap.getIntersections().get(indexIntersection));
+            controller.setCurrentState(controller.addRequestState);
+            tour.notifyObservers();
+        }
+
     }
 }

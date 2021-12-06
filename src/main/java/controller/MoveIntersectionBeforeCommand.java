@@ -13,19 +13,19 @@ public class MoveRequestBeforeCommand implements Command {
     private final int indexIntersection;
     private final List<Intersection> intersections;
 
-    public MoveRequestBeforeCommand(Tour tour, int indexIntersection, List<Intersection> intersections) {
+    public MoveIntersectionBeforeCommand(Tour tour, int indexShortestPath, List<Intersection> intersections) {
         this.tour = tour;
-        this.indexIntersection = indexIntersection;
+        this.indexShortestPath = indexShortestPath;
         this.intersections = intersections;
     }
 
     @Override
     public void doCommand() {
-        tour.moveIntersectionBefore(indexIntersection, intersections);
+        tour.moveIntersectionBefore(indexShortestPath, intersections);
     }
 
     @Override
     public void undoCommand() {
-        tour.moveIntersectionBefore(indexIntersection, intersections);
+        tour.moveIntersectionBefore(indexShortestPath, intersections);
     }
 }

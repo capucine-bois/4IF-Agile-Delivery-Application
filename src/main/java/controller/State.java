@@ -6,6 +6,7 @@ import xml.ExceptionXML;
 import xml.XMLDeserializer;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,12 +36,16 @@ public abstract class State {
             window.showRequestsPanel();
             window.setEnabledRequests(false);
             window.setEnabledTour(false);
+            window.setRedoButtonState(false);
+            window.setUndoButtonState(false);
             tour.setTourComputed(false);
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
                 cityMap.clearLists();
                 tour.clearLists();
                 listOfCommands.reset();
+                window.setRedoButtonState(false);
+                window.setUndoButtonState(false);
                 window.displayErrorMessage(e.getMessage());
                 window.setDefaultButtonStates(new boolean[]{true, false, false});
                 controller.setCurrentState(controller.initialState);
@@ -66,15 +71,22 @@ public abstract class State {
         try {
             Request.lastColor = Color.red;
             XMLDeserializer.loadRequests(tour, cityMap);
-            tour.checkIntersectionsUnreachable(cityMap.getIntersections());
-            if (!tour.getIntersectionsUnreachableFromDepot().isEmpty()) {
-                throw new ExceptionXML("An address in the planning is unreachable.");
+            if (!tour.checkIntersectionsUnreachable(cityMap.getIntersections())) {
+                window.displayErrorMessage("An address in the planning is unreachable.");
+                Request.lastColor = Color.red;
+                tour.clearLists();
+                window.setDefaultButtonStates(new boolean[]{true, true, false});
+                controller.setCurrentState(controller.mapLoadedState);
+                window.setEnabledRequests(false);
+            } else {
+                window.setDefaultButtonStates(new boolean[]{true, true, true});
+                controller.setCurrentState(controller.requestsLoadedState);
             }
-            window.setDefaultButtonStates(new boolean[]{true, true, true});
-            controller.setCurrentState(controller.requestsLoadedState);
             listOfCommands.reset();
             window.showRequestsPanel();
             window.setEnabledTour(false);
+            window.setRedoButtonState(false);
+            window.setUndoButtonState(false);
             tour.setTourComputed(false);
             controller.getListOfCommands().reset();
         } catch (Exception e) {
@@ -82,6 +94,8 @@ public abstract class State {
                 Request.lastColor = Color.red;
                 tour.clearLists();
                 listOfCommands.reset();
+                window.setRedoButtonState(false);
+                window.setUndoButtonState(false);
                 window.displayErrorMessage(e.getMessage());
                 window.setDefaultButtonStates(new boolean[]{true, true, false});
                 controller.setCurrentState(controller.mapLoadedState);
@@ -260,6 +274,8 @@ public abstract class State {
         if (l.size() == 0 || l.getCurrentIndex() >= l.size()-1) {
             window.setRedoButtonState(false);
         }
+
+        window.setUndoButtonState(true);
     }
 
     public void enterMouseOnTourIntersection(int indexShortestPath, Window window) {}

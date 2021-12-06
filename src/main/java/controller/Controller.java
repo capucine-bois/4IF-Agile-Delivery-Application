@@ -199,18 +199,18 @@ public class Controller {
 
     /**
      * For a computed tour, change order by visiting an intersection (pickup or delivery address) earlier.
-     * @param indexIntersection the intersection to visit earlier
+     * @param indexShortestPath the intersection to visit earlier
      */
-    public void moveIntersectionBefore(int indexIntersection) {
-        currentState.moveIntersectionBefore(listOfCommands, tour, indexIntersection, cityMap.getIntersections(), window);
+    public void moveIntersectionBefore(int indexShortestPath) {
+        currentState.moveIntersectionBefore(listOfCommands, tour, indexShortestPath, cityMap.getIntersections(), window);
     }
 
     /**
      * For a computed tour, change order by visiting an intersection (pickup or delivery address) later.
-     * @param indexIntersection the intersection to visit later
+     * @param indexShortestPath the intersection to visit later
      */
-    public void moveIntersectionAfter(int indexIntersection) {
-        currentState.moveIntersectionAfter(listOfCommands, tour, indexIntersection, cityMap.getIntersections(), window);
+    public void moveIntersectionAfter(int indexShortestPath) {
+        currentState.moveIntersectionAfter(listOfCommands, tour, indexShortestPath, cityMap.getIntersections(), window);
     }
 
     /**

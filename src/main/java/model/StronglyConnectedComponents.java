@@ -12,10 +12,10 @@ public class StronglyConnectedComponents {
      * Check if the intersections present in the planning are reachable
      * @param listIntersection the list of all intersections
      * @param depot the depot (start and end) address
-     * @param planning the list of all requests
+     * @param intersectionsToTest the list of intersections in requests
      * @return true if there are in the same strongly connected part, false otherwise
      */
-    public static ArrayList<Intersection> getAllUnreachableIntersections(ArrayList<Intersection> listIntersection, Intersection depot, ArrayList<Request> planning) {
+    public static ArrayList<Intersection> getAllUnreachableIntersections(ArrayList<Intersection> listIntersection, Intersection depot, ArrayList<Intersection> intersectionsToTest) {
 
         ArrayList<Intersection> intersectionsNotWithDepot = new ArrayList<>();
         ArrayList<Integer> [] listVertex = new ArrayList[listIntersection.size()];
@@ -42,7 +42,7 @@ public class StronglyConnectedComponents {
                 DFSrec(graphTranspose, num[j], color, colorMap);
                 set = (ArrayList<Integer>) colorMap.keySet().stream().filter(x -> colorMap.get(x)==2).collect(Collectors.toList());
                 if(set.contains((int)depot.getId())) {
-                    checkIntersectionsWithDepot(set,intersectionsNotWithDepot, planning);
+                    checkIntersectionsWithDepot(set,intersectionsNotWithDepot, intersectionsToTest);
                     break;
                 }
             }
@@ -54,14 +54,12 @@ public class StronglyConnectedComponents {
      * Check if all the intersections of the planning are in the same strongly connected components of the depot
      * @param scc the strongly connected component which contains the depot
      * @param intersectionsNotWithDepot the list we fill with all intersection present in the planning but not in scc
-     * @param planning the planning containing the requests
+     * @param intersectionsToTest the list containing the intersections of a, or more, request
      */
-    private static void checkIntersectionsWithDepot(ArrayList<Integer> scc, ArrayList<Intersection> intersectionsNotWithDepot, ArrayList<Request> planning) {
-        for(Request req : planning) {
-            if(!scc.contains((int)req.getDeliveryAddress().getId()))
-                intersectionsNotWithDepot.add(req.getDeliveryAddress());
-            if(!scc.contains((int)req.getPickupAddress().getId()))
-                intersectionsNotWithDepot.add(req.getPickupAddress());
+    private static void checkIntersectionsWithDepot(ArrayList<Integer> scc, ArrayList<Intersection> intersectionsNotWithDepot, ArrayList<Intersection> intersectionsToTest) {
+        for(Intersection intersection : intersectionsToTest) {
+            if(!scc.contains((int)intersection.getId()))
+                intersectionsNotWithDepot.add(intersection);
         }
     }
 
