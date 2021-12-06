@@ -297,30 +297,28 @@ public class TextualView extends JPanel implements Observer {
         Calendar cal1 = Calendar.getInstance();
         Calendar cal2 = Calendar.getInstance();
         try {
-            cal1.setTime(sdf.parse(tour.getArrivalTime()+":00"));
-            cal2.setTime(sdf.parse(tour.getDepartureTime()+":00"));// all done
+            cal1.setTime(sdf.parse(tour.getDepartureTime()+":00"));
+            cal2.setTime(sdf.parse(tour.getArrivalTime()+":00"));
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        int hours = 0;
-        int minutes = 0;
-        int currentHours1 = cal1.get(Calendar.HOUR);
-        int currentHours2 = cal2.get(Calendar.HOUR);
-
-        int currentMinutes1 = 60 - cal1.get(Calendar.MINUTE);
-        int currentMinutes2 = cal2.get(Calendar.MINUTE);
+        int hours, minutes;
+        int currentHoursDeparture = cal1.get(Calendar.HOUR_OF_DAY) + 1;
+        int currentHoursArrival = cal2.get(Calendar.HOUR_OF_DAY);
+        int currentMinutesDeparture = 60 - cal1.get(Calendar.MINUTE);
+        int currentMinutesArrival = cal2.get(Calendar.MINUTE);
 
 
-        if(currentHours2<currentHours1){
-            hours = 23 - currentHours1 + currentHours2;
+        if(currentHoursArrival<currentHoursDeparture){
+            hours = 24 - currentHoursDeparture + currentHoursArrival;
         }else{
-            hours = currentHours2 + currentHours1;
+            hours = currentHoursArrival - currentHoursDeparture;
         }
 
-        minutes = currentMinutes1+currentMinutes2;
+        minutes = currentMinutesDeparture+currentMinutesArrival;
         if (minutes>=60){
             hours ++;
-            minutes = minutes %60;
+            minutes = minutes - 60;
         }
 
         return hours +":" + minutes;
