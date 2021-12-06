@@ -8,9 +8,9 @@ import java.util.List;
 /**
  * Move an intersection to later.
  */
-public class MoveRequestBeforeCommand implements Command {
+public class MoveIntersectionBeforeCommand implements Command {
     private final Tour tour;
-    private final int indexIntersection;
+    private final int indexShortestPath;
     private final List<Intersection> intersections;
 
     public MoveIntersectionBeforeCommand(Tour tour, int indexShortestPath, List<Intersection> intersections) {
