@@ -51,7 +51,6 @@ public class Window extends JFrame {
     public Window(CityMap cityMap, Tour tour, Controller controller) throws IOException, FontFormatException {
         MouseListener mouseListener = new MouseListener(controller);
         buttonListener = new ButtonListener(controller);
-        ComponentListener componentListener = new ComponentListener(this, graphicalView);
         graphicalView = new GraphicalView(cityMap, tour, mouseListener);
         textualView = new TextualView(tour, this, mouseListener, buttonListener);
         popUpView = new PopUpView(this, mouseListener, buttonListener);

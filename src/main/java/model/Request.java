@@ -64,7 +64,7 @@ public class Request {
     /**
      * The color of the request.
      */
-    private Color color;
+    private final Color color;
 
     public static Color lastColor = Color.red;
 

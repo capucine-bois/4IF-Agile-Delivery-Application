@@ -24,9 +24,6 @@ public class MouseListener extends MouseAdapter {
         this.graphicalView = graphicalView;
     }
 
-    public void setTextualView(TextualView textualView) {
-    }
-
     @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {

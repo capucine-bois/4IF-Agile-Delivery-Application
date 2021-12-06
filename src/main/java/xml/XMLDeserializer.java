@@ -225,9 +225,6 @@ public class XMLDeserializer {
      */
     public static void parseXMLRequests(Tour tour, CityMap cityMap, Document document) throws ExceptionXML {
 
-        // Hashmap to detect duplicate
-        HashMap<Long,ArrayList<Long>> listRequest = new HashMap<>();
-
         NodeList nodeRequest = document.getElementsByTagName("request");
         for (int x = 0, size = nodeRequest.getLength(); x < size; x++) {
             long pickupAddressId = Long.parseLong(nodeRequest.item(x).getAttributes().getNamedItem("pickupAddress").getNodeValue());

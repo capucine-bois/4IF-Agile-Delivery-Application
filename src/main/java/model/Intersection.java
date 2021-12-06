@@ -15,17 +15,17 @@ public class Intersection {
     /**
      * The id of the intersection
      */
-    private long id;
+    private final long id;
 
     /**
      * The intersection's latitude
      */
-    private double latitude;
+    private final double latitude;
 
     /**
      * The intersection's longitude
      */
-    private double longitude;
+    private final double longitude;
 
     /**
      * All segments which start from the intersection

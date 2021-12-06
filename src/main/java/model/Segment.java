@@ -11,22 +11,22 @@ public class Segment {
     /**
      * The length of the segment
      */
-    private double length;
+    private final double length;
 
     /**
      * The segment's name
      */
-    private String name;
+    private final String name;
 
     /**
      * The intersection where the segment ends
      */
-    private Intersection destination;
+    private final Intersection destination;
 
     /**
      * The intersection where the segment starts
      */
-    private Intersection origin;
+    private final Intersection origin;
 
     /* CONSTRUCTORS */
 

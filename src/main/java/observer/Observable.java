@@ -31,7 +31,6 @@ public class Observable {
 
     /**
      * Notify every observer by calling their update method.
-     * @param arg notification data
      */
     public void notifyObservers(Object arg) {
         for (Observer o : obs)
