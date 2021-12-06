@@ -12,7 +12,7 @@ public class SeqIter implements Iterator<Integer> {
     /**
      * The vertex a vertex can reach
      */
-    private Integer[] candidates;
+    private final Integer[] candidates;
 
     /**
      * The number of vertex to visit remaining

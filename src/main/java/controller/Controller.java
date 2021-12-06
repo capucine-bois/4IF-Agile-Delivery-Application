@@ -2,8 +2,6 @@ package controller;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import model.*;
 import view.Window;
@@ -14,10 +12,10 @@ import view.Window;
 public class Controller {
 
     private State currentState;
-    private Window window;
-    private CityMap cityMap;
-    private Tour tour;
-    private ListOfCommands listOfCommands;
+    private final Window window;
+    private final CityMap cityMap;
+    private final Tour tour;
+    private final ListOfCommands listOfCommands;
 
     // Instances associated with each possible state of the controller
     protected final InitialState initialState = new InitialState();
@@ -148,7 +146,7 @@ public class Controller {
 
     /**
      * Called when mouse leave a request on the textual view.
-     * @param indexRequest
+     * @param indexRequest the request the mouse left
      */
     public void exitMouseOnRequest(int indexRequest) {
         currentState.exitMouseOnRequest(indexRequest, tour, window);
@@ -156,7 +154,7 @@ public class Controller {
 
     /**
      * Called when mouse leave an intersection on the textual view.
-     * @param indexShortestPath
+     * @param indexShortestPath the shortest path the mouse left
      */
     public void exitMouseOnTourIntersection(int indexShortestPath) {
         currentState.exitMouseOnTourIntersection(indexShortestPath, tour, window);

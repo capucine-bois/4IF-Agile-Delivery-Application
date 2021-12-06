@@ -4,7 +4,6 @@ import model.CityMap;
 import model.Tour;
 import view.Window;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AddRequestState extends State{

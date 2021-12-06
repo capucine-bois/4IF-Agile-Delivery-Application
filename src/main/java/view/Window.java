@@ -12,6 +12,7 @@ import java.util.ArrayList;
 /**
  * GUI for the application.
  */
+@SuppressWarnings("JavaDoc")
 public class Window extends JFrame {
 
     // Titles of window buttons
@@ -30,17 +31,12 @@ public class Window extends JFrame {
     private JPanel popUpGraphicalView;
     private JLabel popUpGraphicalViewMessage;
     private JButton popUpGraphicalViewButton;
-    private GraphicalView graphicalView;
-    private TextualView textualView;
-    private PopUpView popUpView;
-    private CityMap cityMap;
-    private Tour tour;
+    private final GraphicalView graphicalView;
+    private final TextualView textualView;
+    private final PopUpView popUpView;
 
     // Listeners
-    private ButtonListener buttonListener;
-    private MouseListener mouseListener;
-    private ComponentListener componentListener;
-    private KeyboardListener keyboardListener;
+    private final ButtonListener buttonListener;
 
     private final String[] buttonTexts = new String[]{LOAD_MAP, LOAD_REQUEST, COMPUTE_TOUR, UNDO, REDO};
     private boolean[] defaultButtonStates = new boolean[]{true, false, false, false, false};
@@ -54,16 +50,13 @@ public class Window extends JFrame {
      * @throws FontFormatException raised if text font can't be loaded
      */
     public Window(CityMap cityMap, Tour tour, Controller controller) throws IOException, FontFormatException {
-        mouseListener = new MouseListener(controller);
-        buttonListener = new ButtonListener(controller, this);
-        componentListener = new ComponentListener(this, graphicalView);
-        graphicalView = new GraphicalView(cityMap, tour, this, mouseListener);
+        MouseListener mouseListener = new MouseListener(controller);
+        buttonListener = new ButtonListener(controller);
+        graphicalView = new GraphicalView(cityMap, tour, mouseListener);
         textualView = new TextualView(tour, this, mouseListener, buttonListener);
         popUpView = new PopUpView(this, mouseListener, buttonListener);
-        keyboardListener = new KeyboardListener(controller);
+        KeyboardListener keyboardListener = new KeyboardListener(controller);
         addKeyListener(keyboardListener);
-        this.cityMap = cityMap;
-        this.tour = tour;
         createHeader();
         createGraphicalView();
         int minimumWindowWidth = 800;

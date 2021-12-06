@@ -12,7 +12,7 @@ public class MinIter implements Iterator<Integer> {
     /**
      * The vertices a vertex can reach, ordered by ascending cost
      */
-    private PriorityQueue<Integer> candidates;
+    private final PriorityQueue<Integer> candidates;
 
     /**
      * Create an iterator to traverse the set of vertices in <code>unvisited</code>

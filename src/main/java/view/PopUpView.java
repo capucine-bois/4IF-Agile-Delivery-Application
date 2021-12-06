@@ -11,17 +11,17 @@ public class PopUpView {
 
     protected final static String CLOSE = "Close";
 
-    private JPanel popUpPanel;
+    private final JPanel popUpPanel;
     private JLabel message;
     private JButton button;
-    private Window window;
+    private final Window window;
 
-    private ButtonListener buttonListener;
+    private final ButtonListener buttonListener;
 
     /**
      * Constructor
      * @param window the window
-     * @param mouseListener
+     * @param mouseListener the mouse listener
      * @throws IOException raised if font file can't be found
      * @throws FontFormatException raised if font can't be loaded
      */
@@ -79,10 +79,6 @@ public class PopUpView {
         message.setText("<html><p style='text-align: center;'>" + messageContent + "</p></html>");
         message.setHorizontalAlignment(SwingConstants.CENTER);
         popUpPanel.setVisible(true);
-    }
-
-    public boolean isHidden() {
-        return !popUpPanel.isVisible();
     }
 
     public void setVisible(boolean visible) {

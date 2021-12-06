@@ -205,9 +205,7 @@ public class Tour extends Observable {
             } else {
                 this.arrivalTime = arrivalTime;
             }
-
         }
-
     }
 
     /**
@@ -227,7 +225,7 @@ public class Tour extends Observable {
     }
 
     /**
-     * Fill the list of intersections which are not in the same strongly connected components than depot
+     * Fill the list with intersections which are not in the same strongly connected components than depot
      */
     public boolean checkIntersectionsUnreachable(List<Intersection> allIntersectionsList) {
         ArrayList<Intersection> intersectionsToTest = new ArrayList<>();
@@ -247,11 +245,10 @@ public class Tour extends Observable {
 
         processDijkstraToComputeTour(allIntersectionsList, listNodes);
         TSP tsp = new TSP3();
-        Graph g = new CompleteGraph(listNodes, this);
+        Graph g = new CompleteGraph(listNodes);
 
         // Run Tour
         tsp.searchSolution(1000000, g, this);
-
     }
 
     /**
@@ -297,12 +294,9 @@ public class Tour extends Observable {
 
     /**
      * get all useful end points for the intersections of the current request (at index i)
-     * @param listUsefulEndPointsForDepot
      * @param i current index in main loop
      * @param pickupReq1
      * @param deliveryReq1
-     * @param listUsefulEndPointsPickUp
-     * @param listUsefulEndPointsDelivery
      */
     private void identifyUsefulEndPoints(ArrayList<Intersection> listUsefulEndPointsForDepot, int i, Intersection pickupReq1, Intersection deliveryReq1, ArrayList<Intersection> listUsefulEndPointsPickUp, ArrayList<Intersection> listUsefulEndPointsDelivery) {
         listUsefulEndPointsPickUp.add(deliveryReq1);
@@ -323,9 +317,9 @@ public class Tour extends Observable {
 
     /**
      *
-     * @param listNodes
-     * @param startTime
-     * @param tsp
+     * @param listNodes the list with all nodes in the tour
+     * @param startTime the start time of the tour
+     * @param tsp the TSP used to compute the tour
      */
     public void updateTourInformation(ArrayList<Node> listNodes, long startTime, TSP tsp) {
         this.setTourLength(tsp.getSolutionCost());
@@ -347,28 +341,15 @@ public class Tour extends Observable {
             shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i]);
             shortestPathToAdd.setEndNodeNumber(intersectionsOrder[i+1]);
             listShortestPaths.add(shortestPathToAdd);
-            calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
-            int indexRequest = intersectionsOrder[i+1]%2 == 0 ? intersectionsOrder[i+1]/2 - 1 : intersectionsOrder[i+1]/2;
-            Request requestEndPath = planningRequests.get(indexRequest);
-            if (intersectionsOrder[i+1]%2 == 1) {
-                requestEndPath.setPickupArrivalTime(parser.format(calendar.getTime()));
-                calendar.add(Calendar.SECOND, requestEndPath.getPickupDuration());
-                requestEndPath.setPickupDepartureTime(parser.format(calendar.getTime()));
-            } else {
-                requestEndPath.setDeliveryArrivalTime(parser.format(calendar.getTime()));
-                calendar.add(Calendar.SECOND, requestEndPath.getDeliveryDuration());
-                requestEndPath.setDeliveryDepartureTime(parser.format(calendar.getTime()));
-            }
             if(i==intersectionsOrder.length-2) {
                 shortestPathToAdd = listNodes.get(intersectionsOrder[i+1]).getListArcs().stream().filter(x -> x.getEndAddress()==depotAddress).findFirst().get();
                 shortestPathToAdd.setStartNodeNumber(intersectionsOrder[i+1]);
                 shortestPathToAdd.setEndNodeNumber(0);
                 listShortestPaths.add(shortestPathToAdd);
-                calendar.add(Calendar.SECOND, (int) metersToSeconds(shortestPathToAdd.getPathLength()));
-                arrivalTime = parser.format(calendar.getTime());
             }
         }
 
+        updateTimes();
         notifyObservers();
     }
 
@@ -416,7 +397,7 @@ public class Tour extends Observable {
      * Insert a request to an already computed tour (after deleted a request).
      * Position of intersections are stored in Request.
      * Some paths are deleted, some are created to accomplish every request including the new one.
-     * @param indexRequest
+     * @param indexRequest the index
      * @param requestToInsert request to insert
      */
     public void insertRequest(int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery, Request requestToInsert, List<Intersection> allIntersections) {
@@ -503,7 +484,6 @@ public class Tour extends Observable {
      * @param indexShortestPathToPickup
      * @param indexShortestPathToDelivery
      * @param allIntersections all the intersections of the map
-     * @return deleted paths
      */
     public void removeRequest(int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery, List<Intersection> allIntersections) {
         System.out.println("Tour.removeRequest");

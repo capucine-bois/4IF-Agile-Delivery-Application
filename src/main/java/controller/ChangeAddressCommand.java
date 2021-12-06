@@ -1,18 +1,17 @@
 package controller;
 
 import model.Intersection;
-import model.Request;
 import model.Tour;
 
 import java.util.List;
 
 public class ChangeAddressCommand implements Command {
 
-    private Tour tour;
-    private int indexNode;
-    private Intersection formerAddress;
-    private Intersection newAddress;
-    private List<Intersection> intersections;
+    private final Tour tour;
+    private final int indexNode;
+    private final Intersection formerAddress;
+    private final Intersection newAddress;
+    private final List<Intersection> intersections;
 
     public ChangeAddressCommand(Tour tour, int indexNode, Intersection formerAddress, Intersection newAddress, List<Intersection> intersections) {
         this.tour = tour;

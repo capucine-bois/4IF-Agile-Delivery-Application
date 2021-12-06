@@ -1,11 +1,9 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
- * The graphe used in TSP
+ * The graph used in TSP
  */
 public class CompleteGraph implements Graph {
 
@@ -14,31 +12,27 @@ public class CompleteGraph implements Graph {
     /**
      * A list of nodes
      */
-    ArrayList<Node> listNodesGraph;
+    final ArrayList<Node> listNodesGraph;
 
     /**
      * The number of address in the planning request
      */
-    int nbVertices;
+    final int nbVertices;
 
     /**
-     * The cost of a travel between two nodes in each direction. -1 if the travel isn't possible
+     * The cost of travel between two nodes in each direction. -1 if the travel isn't possible
      */
-    double[][] cost;
-
-    /**
-     * The tour object to verify if the path are possible
-     */
-    private Tour tour;
+    final double[][] cost;
 
     /**
      * Create a complete directed graph such that each edge has a weight according to the cost of each arc
-     * @param tour the tour
      * @param listNodes the list of nodes
      */
-    public CompleteGraph(ArrayList<Node> listNodes, Tour tour){
+    public CompleteGraph(ArrayList<Node> listNodes){
         this.listNodesGraph=listNodes;
-        this.tour = tour;
+        /*
+          The tour object to verify if the path are possible
+         */
         this.nbVertices = listNodesGraph.size();
         cost = new double[nbVertices][nbVertices];
         for (int i=0; i<nbVertices; i++){
@@ -67,18 +61,6 @@ public class CompleteGraph implements Graph {
             }
         }
         return retour;
-    }
-
-    @Override
-    public Integer[] getDestinationsInOrder(int currentVertex) {
-        Node currentNode = listNodesGraph.get(currentVertex);
-        Integer[] destinations = null;
-        int i = 0;
-        for (ShortestPath arc : currentNode.getListArcs()){
-            destinations[i] = arc.getEndNodeNumber();
-            i++;
-        }
-        return destinations;
     }
 
     @Override

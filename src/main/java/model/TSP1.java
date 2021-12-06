@@ -8,7 +8,7 @@ import java.util.Iterator;
  */
 public class TSP1 extends TemplateTSP {
     @Override
-    protected double bound(Integer currentVertex, Collection<Integer> unvisited, Collection<Integer> visited, Graph g) {
+    protected double bound(Integer currentVertex, Collection<Integer> unvisited, Graph g) {
         return 0;
     }
 

@@ -1,7 +1,6 @@
 package model;
 
 import java.awt.*;
-import java.util.Calendar;
 
 /**
  * A request represents pickup and delivery (both at the same time).
@@ -13,7 +12,7 @@ public class Request {
     /* ATTRIBUTES */
 
     /**
-     * The duration it takes to pickup the package when the delivery person is at the pickup address.
+     * The duration it takes to pick up the package when the delivery person is at the pickup address.
      */
     private int pickupDuration;
 
@@ -65,7 +64,7 @@ public class Request {
     /**
      * The color of the request.
      */
-    private Color color;
+    private final Color color;
 
     public static Color lastColor = Color.red;
 
@@ -184,10 +183,6 @@ public class Request {
 
     public void setDeliverySelected(boolean deliverySelected) {
         this.deliverySelected = deliverySelected;
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
     }
 
     /**

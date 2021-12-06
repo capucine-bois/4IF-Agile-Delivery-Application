@@ -1,7 +1,5 @@
 package controller;
 
-import model.CityMap;
-import model.Intersection;
 import model.Request;
 import model.Tour;
 import view.Window;

@@ -26,11 +26,6 @@ public abstract class TemplateTSP implements TSP {
     private double bestSolCost;
 
     /**
-     * The time limit before which we want a solution
-     */
-    private int timeLimit;
-
-    /**
      * The start time of computing
      */
     private long startTime;
@@ -38,7 +33,9 @@ public abstract class TemplateTSP implements TSP {
     public void searchSolution(int timeLimit, Graph g, Tour tour){
         if (timeLimit <= 0) return;
         startTime = System.currentTimeMillis();
-        this.timeLimit = timeLimit;
+        /*
+          The time limit before which we want a solution
+         */
         this.g = g;
         bestSol = new Integer[g.getNbVertices()];
         Collection<Integer> unvisited = new ArrayList<>(g.getNbVertices() - 1);
@@ -50,13 +47,6 @@ public abstract class TemplateTSP implements TSP {
         tour.setTourComputed(true);
     }
 
-    public Integer getSolution(int i){
-         if (g != null && i>=0 && i<g.getNbVertices())
-            return bestSol[i];
-
-        return -1;
-    }
-
     public double getSolutionCost(){
         if (g != null)
             return bestSolCost;
@@ -65,18 +55,18 @@ public abstract class TemplateTSP implements TSP {
 
     /**
      * Method that must be defined in TemplateTSP subclasses
-     * @param currentVertex
-     * @param unvisited
+     * @param currentVertex the vertex from which the evaluation begin
+     * @param unvisited the unvisited vertices
      * @return a lower bound of the cost of paths in <code>g</code> starting from <code>currentVertex</code>, visiting
-     * every vertex in <code>unvisited</code> exactly once, and returning back to vertex <code>0</code>.
+     * every vertex in <code>unvisited</code> exactly once, and returning to vertex <code>0</code>.
      */
-    protected abstract double bound(Integer currentVertex, Collection<Integer> unvisited, Collection<Integer> visited, Graph g);
+    protected abstract double bound(Integer currentVertex, Collection<Integer> unvisited, Graph g);
 
     /**
      * Method that must be defined in TemplateTSP subclasses
-     * @param currentVertex
-     * @param unvisited
-     * @param g
+     * @param currentVertex the current vertex in TSP
+     * @param unvisited the unvisited vertices
+     * @param g the graph with all the costs
      * @return an iterator for visiting all vertices in <code>unvisited</code> which are successors of <code>currentVertex</code>
      */
     protected abstract Iterator<Integer> iterator(Integer currentVertex, Collection<Integer> unvisited, Graph g);
@@ -87,7 +77,7 @@ public abstract class TemplateTSP implements TSP {
      * @param unvisited the set of vertex that have not yet been visited
      * @param visited the sequence of vertices that have been already visited (including currentVertex)
      * @param currentCost the cost of the path corresponding to <code>visited</code>
-     * @param tour
+     * @param tour the last computed tour
      */
     private void branchAndBound(int currentVertex, Collection<Integer> unvisited,
                                 Collection<Integer> visited, double currentCost, Tour tour){
@@ -103,7 +93,7 @@ public abstract class TemplateTSP implements TSP {
                     tour.notifyObservers();
                 }
             }
-        } else if (currentCost+bound(currentVertex,unvisited, visited, g) < bestSolCost){
+        } else if (currentCost+bound(currentVertex,unvisited, g) < bestSolCost){
             Iterator<Integer> it = iterator(currentVertex, unvisited, g);
             while (it.hasNext()){
                 Integer nextVertex = it.next();
