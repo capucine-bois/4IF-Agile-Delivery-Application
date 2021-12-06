@@ -17,6 +17,7 @@ import observer.Observer;
  * Textual element on the GUI.
  * Used to display requests.
  */
+@SuppressWarnings("JavaDoc")
 public class TextualView extends JPanel implements Observer {
 
     // Titles of textual view buttons
@@ -84,7 +85,6 @@ public class TextualView extends JPanel implements Observer {
         timeFields = new ArrayList<>();
         addRequestButtons = new ArrayList<>();
         backgroundTourPanelButtons = new ArrayList<>();
-        mouseListener.setTextualView(this);
         this.mouseListener = mouseListener;
         this.buttonListener = buttonListener;
         this.window = w;
@@ -303,6 +303,8 @@ public class TextualView extends JPanel implements Observer {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        assert date2 != null;
+        assert date1 != null;
         int totalDuration = (int) (date2.getTime() - date1.getTime())/60000;
         int hours = totalDuration / 60; //since both are ints, you get an int
         int minutes = totalDuration % 60;
@@ -443,6 +445,7 @@ public class TextualView extends JPanel implements Observer {
      * @param parentPanel parent panel
      * @param segments segments to display
      */
+    @SuppressWarnings("GrazieInspection")
     private void displaySegments(JPanel parentPanel, ArrayList<Segment> segments) {
         JPanel segmentsPanel = new JPanel();
         segmentsPanel.setLayout(new BoxLayout(segmentsPanel, BoxLayout.Y_AXIS));
@@ -783,10 +786,10 @@ public class TextualView extends JPanel implements Observer {
     /**
      * Method called by observable instances when the textual view must be updated.
      * @param o observable instance which send the notification
-     * @param arg notification data
+     *
      */
     @Override
-    public void update(Observable o, Object arg) {
+    public void update(Observable o) {
         if (o.equals(tour)) {
             displayTextualView();
         }
@@ -807,6 +810,7 @@ public class TextualView extends JPanel implements Observer {
     /**
      * Switch to requests panel.
      */
+    @SuppressWarnings("GrazieInspection")
     public void showRequestsPanel() {
         changeButton(tourHeader, requestsHeader);
         cardLayout.show(cardLayoutPanel, "requests");

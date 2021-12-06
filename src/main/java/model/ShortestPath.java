@@ -12,7 +12,7 @@ public class ShortestPath implements Comparable<ShortestPath> {
     /* ATTRIBUTES */
 
     /**
-     * The length of the shortes path
+     * The length of the shorts path
      */
     private double pathLength;
 
@@ -155,7 +155,6 @@ public class ShortestPath implements Comparable<ShortestPath> {
             return delta;
         }
         //case where delta == 0
-        int delta2 = (int)(this.startAddress.getLatitude() - other.startAddress.getLatitude());
-        return delta2;
+        return (int)(this.startAddress.getLatitude() - other.startAddress.getLatitude());
     }
 }

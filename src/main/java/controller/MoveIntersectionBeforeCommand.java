@@ -1,20 +1,17 @@
 package controller;
 
 import model.Intersection;
-import model.Request;
-import model.ShortestPath;
 import model.Tour;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Move an intersection to later.
  */
 public class MoveIntersectionBeforeCommand implements Command {
-    private Tour tour;
-    private int indexShortestPath;
-    private List<Intersection> intersections;
+    private final Tour tour;
+    private final int indexShortestPath;
+    private final List<Intersection> intersections;
 
     public MoveIntersectionBeforeCommand(Tour tour, int indexShortestPath, List<Intersection> intersections) {
         this.tour = tour;

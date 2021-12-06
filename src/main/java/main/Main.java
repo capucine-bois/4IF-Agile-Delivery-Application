@@ -3,7 +3,6 @@ package main;
 import controller.Controller;
 import model.CityMap;
 import model.Tour;
-import view.Window;
 
 import java.awt.*;
 import java.io.IOException;
@@ -18,7 +17,7 @@ public class Main {
      * Main method.
      * @param args the arguments
      */
-    public static void main(String[] args) throws IOException, FontFormatException, InterruptedException {
+    public static void main(String[] args) throws IOException, FontFormatException {
         CityMap cityMap = new CityMap();
         Tour tour = new Tour();
         new Controller(cityMap, tour) ;

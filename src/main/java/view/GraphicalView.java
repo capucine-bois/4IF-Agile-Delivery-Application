@@ -10,7 +10,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Graphical element on the GUI.
@@ -26,8 +25,8 @@ public class GraphicalView extends JPanel implements Observer {
     private double scale = 1;
     private int originX = allBorders;
     private int originY = allBorders;
-    private CityMap cityMap;
-    private Tour tour;
+    private final CityMap cityMap;
+    private final Tour tour;
     private boolean canZoom = true;
     private int previousMouseX;
     private int previousMouseY;
@@ -45,16 +44,12 @@ public class GraphicalView extends JPanel implements Observer {
     private boolean selectionMode;
     private int radiusForSelection;
 
-    // listeners
-    private MouseListener mouseListener;
-
     /**
      * Create the graphical view
      * @param cityMap the city map
      * @param tour the tour
-     * @param w the window
      */
-    public GraphicalView(CityMap cityMap, Tour tour, Window w, MouseListener mouseListener) {
+    public GraphicalView(CityMap cityMap, Tour tour, MouseListener mouseListener) {
         setBackground(Constants.COLOR_5);
         setBorder(new CompoundBorder(BorderFactory.createLineBorder(Constants.COLOR_1, firstBorder),BorderFactory.createLineBorder(Constants.COLOR_4, secondBorder)));
         cityMap.addObserver(this);
@@ -62,7 +57,7 @@ public class GraphicalView extends JPanel implements Observer {
         this.cityMap = cityMap;
         this.tour = tour;
         mouseListener.setGraphicalView(this);
-        this.mouseListener = mouseListener;
+        // listeners
         addMouseWheelListener(mouseListener);
         addMouseListener(mouseListener);
         addMouseMotionListener(mouseListener);
@@ -273,6 +268,7 @@ public class GraphicalView extends JPanel implements Observer {
      * @param strokeSize size of segments
      * @param displayRoadNames boolean to control road name display
      */
+    @SuppressWarnings("GrazieInspection")
     private void displayShortestPaths(ShortestPath shortestPath, boolean conditionToDisplay, Color color, float strokeSize, boolean displayRoadNames) {
         if (conditionToDisplay) {
             for (Segment segment : shortestPath.getListSegments()) {
@@ -340,6 +336,7 @@ public class GraphicalView extends JPanel implements Observer {
      * @param destinationY y position of destination
      * @param shortestPath whether the segment is included in a shortest path (of the computed tour) or not
      */
+    @SuppressWarnings("GrazieInspection")
     private void displayRoadName(Graphics2D g2, String name, int originX, int destinationX, int originY, int destinationY, boolean shortestPath) {
         double oppositeSide = destinationY - originY;
         double adjacentSide = destinationX - originX;
@@ -438,10 +435,10 @@ public class GraphicalView extends JPanel implements Observer {
      * Method called by observable instances when the graphical view must be updated.
      * Redraw every element (by calling paintComponent method).
      * @param o observable instance which send the notification
-     * @param arg notification data
+     *
      */
     @Override
-    public void update(Observable o, Object arg) {
+    public void update(Observable o) {
         if (o.equals(cityMap)) {
             scale = 1;
         }
@@ -543,7 +540,7 @@ public class GraphicalView extends JPanel implements Observer {
      */
     private boolean checkCursorOnIcon(int x, int y, String iconName) {
         boolean cursorOnIcon = true;
-        BufferedImage image = null;
+        BufferedImage image;
         try {
             image = Constants.getImage(iconName);
             x = (x * (image.getWidth())) / 40;
@@ -571,7 +568,7 @@ public class GraphicalView extends JPanel implements Observer {
     }
 
     public boolean isSelectionMode() {
-        return selectionMode;
+        return !selectionMode;
     }
 
     public int findIntersection(int x, int y) {

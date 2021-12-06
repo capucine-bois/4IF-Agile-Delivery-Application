@@ -1,27 +1,18 @@
 package model;
 
-import java.util.Collection;
-
 public interface Graph {
 
-    public abstract int getNbVertices();
+    int getNbVertices();
 
 
-    public abstract double getCost(int i, int j);
+    double getCost(int i, int j);
 
     /**
      * Check if the intersections in parameter make a possible path
-     * @param i
-     * @param j
+     * @param i origin intersection
+     * @param j end intersection
      * @return boolean
      */
-    public abstract boolean isArc(int i, int j);
-
-    /**
-     * Return the destinations of a Node in order
-     * @param currentVertex
-     * @return
-     */
-    public abstract Integer[] getDestinationsInOrder(int currentVertex);
+    boolean isArc(int i, int j);
 
 }

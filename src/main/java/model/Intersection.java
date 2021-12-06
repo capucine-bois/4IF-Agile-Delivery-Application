@@ -15,22 +15,22 @@ public class Intersection {
     /**
      * The id of the intersection
      */
-    private long id;
+    private final long id;
 
     /**
      * The intersection's latitude
      */
-    private double latitude;
+    private final double latitude;
 
     /**
      * The intersection's longitude
      */
-    private double longitude;
+    private final double longitude;
 
     /**
      * All segments which start from the intersection
      */
-    private List<Segment> adjacentSegments;
+    private final List<Segment> adjacentSegments;
 
     /**
      * Complete constructor
@@ -49,25 +49,13 @@ public class Intersection {
         return id;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
     public double getLatitude() {
         return latitude;
     }
 
 
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
     public double getLongitude() {
         return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
     }
 
     public List<Segment> getAdjacentSegments() {

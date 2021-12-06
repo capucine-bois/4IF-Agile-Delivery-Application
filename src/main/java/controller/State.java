@@ -22,7 +22,7 @@ public abstract class State {
      * @param tour the tour to clear
      * @param window the window where to show map and popup messages
      * @param controller application controller
-     * @param listOfCommands
+     * @param listOfCommands list of all commands (used for undo and redo)
      */
     public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {}
 
@@ -63,7 +63,7 @@ public abstract class State {
      * @param tour the tour structure to fill
      * @param window the window where to show map and popup messages
      * @param controller application controller
-     * @param listOfCommands
+     * @param listOfCommands list of all commands (used for undo and redo)
      */
     public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {}
 
@@ -215,17 +215,17 @@ public abstract class State {
 
     /**
      *
-     * @param indexShortestPath
-     * @param tour
-     * @param controller
+     * @param indexShortestPath the index of the shortest path clicked
+     * @param tour the current computed tour
+     * @param controller the application controller
      */
     public void leftClickOnShortestPath(int indexShortestPath, Tour tour, Controller controller) {}
 
     /**
      *
-     * @param indexShortestPath
-     * @param tour
-     * @param controller
+     * @param indexShortestPath the index of the shortest path clicked
+     * @param tour the current computed tour
+     * @param controller the application controller
      */
     protected void defaultLeftClickOnShortestPath(int indexShortestPath, Tour tour, Controller controller) {
         for (Request request : tour.getPlanningRequests()) {

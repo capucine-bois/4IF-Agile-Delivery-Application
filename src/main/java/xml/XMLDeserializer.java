@@ -1,6 +1,5 @@
 package xml;
 
-import java.awt.*;
 import java.io.File;
 import java.util.*;
 
@@ -59,7 +58,7 @@ public class XMLDeserializer {
      * Create a Document instance for file parameter.
      * @param file the file
      * @return the document
-     * @throws Exception raised if the file can't be parsed and converted into a XML Document instance.
+     * @throws Exception raised if the file can't be parsed and converted into an XML Document instance.
      */
     public static Document extractDocument(File file) throws Exception {
         Document docParsed;
@@ -93,20 +92,21 @@ public class XMLDeserializer {
      */
     public static void parseXMLIntersections(Document document, CityMap cityMap) throws ExceptionXML {
         NodeList intersectionNodes = document.getElementsByTagName("intersection");
-        Map<Double,ArrayList<Double>> coordonateDictionnary = new HashMap<>();
+        Map<Double,ArrayList<Double>> coordinateDictionary = new HashMap<>();
         long index = 0;
         for (int x = 0, size = intersectionNodes.getLength(); x < size; x++) {
             double latitude = Double.parseDouble(intersectionNodes.item(x).getAttributes().getNamedItem("latitude").getNodeValue());
             double longitude = Double.parseDouble(intersectionNodes.item(x).getAttributes().getNamedItem("longitude").getNodeValue());
             long idMap = Long.parseLong(intersectionNodes.item(x).getAttributes().getNamedItem("id").getNodeValue());
             // check duplicate
-            boolean isKeyPresent = coordonateDictionnary.containsKey(latitude);
+            boolean isKeyPresent = coordinateDictionary.containsKey(latitude);
             if(isKeyPresent){
-                ArrayList<Double> list = coordonateDictionnary.get(latitude);
+                ArrayList<Double> list = coordinateDictionary.get(latitude);
                 boolean acceptIntersection = true;
                 for(double longitu : list){
-                    if(longitu == longitude) {
+                    if (longitu == longitude) {
                         acceptIntersection = false;
+                        break;
                     }
                 }
                 if(acceptIntersection){
@@ -117,7 +117,7 @@ public class XMLDeserializer {
             } else {
                 ArrayList<Double> list = new ArrayList<>();
                 list.add(longitude);
-                coordonateDictionnary.put(latitude,list);
+                coordinateDictionary.put(latitude,list);
             }
             // create the intersection object and add it to the city map
             Intersection i1 = new Intersection(index, latitude, longitude);
@@ -139,7 +139,7 @@ public class XMLDeserializer {
      */
     public static void parseXMLSegments(Document document, CityMap cityMap) throws ExceptionXML{
         NodeList nodeSegment = document.getElementsByTagName("segment");
-        HashMap<Long,ArrayList<Long>> idIntersectionsDictionnary = new HashMap<>();
+        HashMap<Long,ArrayList<Long>> idIntersectionsDictionary = new HashMap<>();
         for (int x = 0, size = nodeSegment.getLength(); x < size; x++) {
             long destinationId = Long.parseLong(nodeSegment.item(x).getAttributes().getNamedItem("destination").getNodeValue());
             double length = Double.parseDouble(nodeSegment.item(x).getAttributes().getNamedItem("length").getNodeValue());
@@ -155,9 +155,9 @@ public class XMLDeserializer {
                 Intersection origin = cityMap.getIntersections().stream().filter(i->i.getId()==newOriginId).findFirst().get();
                 Intersection destination = cityMap.getIntersections().stream().filter(i->i.getId()==newDestinationId).findFirst().get();
                 // check duplicate
-                boolean isKeyPresent = idIntersectionsDictionnary.containsKey(newOriginId);
+                boolean isKeyPresent = idIntersectionsDictionary.containsKey(newOriginId);
                 if(isKeyPresent){
-                    ArrayList<Long> listDestIds = idIntersectionsDictionnary.get(newOriginId);
+                    ArrayList<Long> listDestIds = idIntersectionsDictionary.get(newOriginId);
                     for(long dest: listDestIds){
                         if(dest == newDestinationId){
                             throw new ExceptionXML("The selected map contains a duplicate road which origin identifier is : "+ originId + " and destination identifier is : " + destinationId);
@@ -166,7 +166,7 @@ public class XMLDeserializer {
                 }else{
                     ArrayList<Long> listDestinationsId = new ArrayList<>();
                     listDestinationsId.add(newDestinationId);
-                    idIntersectionsDictionnary.put(newOriginId,listDestinationsId);
+                    idIntersectionsDictionary.put(newOriginId,listDestinationsId);
                 }
 
                 // create the Segment object and add it to the city map
@@ -224,9 +224,6 @@ public class XMLDeserializer {
      * @throws ExceptionXML raised if requests intersections can't be found in cityMap parameter.
      */
     public static void parseXMLRequests(Tour tour, CityMap cityMap, Document document) throws ExceptionXML {
-
-        // Hashmap to detect duplicate
-        HashMap<Long,ArrayList<Long>> listRequest = new HashMap<>();
 
         NodeList nodeRequest = document.getElementsByTagName("request");
         for (int x = 0, size = nodeRequest.getLength(); x < size; x++) {

@@ -11,22 +11,22 @@ public class Segment {
     /**
      * The length of the segment
      */
-    private double length;
+    private final double length;
 
     /**
      * The segment's name
      */
-    private String name;
+    private final String name;
 
     /**
      * The intersection where the segment ends
      */
-    private Intersection destination;
+    private final Intersection destination;
 
     /**
      * The intersection where the segment starts
      */
-    private Intersection origin;
+    private final Intersection origin;
 
     /* CONSTRUCTORS */
 
@@ -63,22 +63,6 @@ public class Segment {
     }
 
     /* SETTERS */
-
-    public void setLength(double length) {
-        this.length = length;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDestination(Intersection destination) {
-        this.destination = destination;
-    }
-
-    public void setOrigin(Intersection origin) {
-        this.origin = origin;
-    }
 
     /**
      * Check if two segments have the same attributes

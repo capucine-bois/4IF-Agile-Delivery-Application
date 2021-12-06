@@ -1,30 +1,18 @@
 package model;
 
 import org.junit.jupiter.api.*;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-import xml.ExceptionXML;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static xml.XMLDeserializer.deserializeMap;
-import static xml.XMLDeserializer.deserializeRequests;
 
 class TourTest {
     ArrayList<Intersection> listIntersection = new ArrayList<>();
     Tour tour = new Tour();
     CityMap cityMap = new CityMap();
-    ArrayList<ShortestPath> paths = new ArrayList<>();
     ArrayList<Request> listRequest;
     static Instant startedAt;
 
