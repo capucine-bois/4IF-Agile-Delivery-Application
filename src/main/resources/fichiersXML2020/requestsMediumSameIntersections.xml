@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<planningRequest>
+<depot address="4150019167" departureTime="8:0:0"/>
+<request pickupAddress="21992645" deliveryAddress="55444215" pickupDuration="360" deliveryDuration="480"/>
+<request pickupAddress="4150019167" deliveryAddress="1400900990" pickupDuration="120" deliveryDuration="420"/>
+</planningRequest>
