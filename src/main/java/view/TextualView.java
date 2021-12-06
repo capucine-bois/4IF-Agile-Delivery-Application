@@ -303,10 +303,19 @@ public class TextualView extends JPanel implements Observer {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        int totalDuration = (int) (date2.getTime() - date1.getTime())/60000;
-        int hours = totalDuration / 60; //since both are ints, you get an int
-        int minutes = totalDuration % 60;
-        return hours +":"+ minutes;
+        int hours = 0;
+        int currentHour1 = (int) (date1.getTime()/3600000);
+        int currentHour2 = (int) (date2.getTime()/3600000);
+        if(date2.getTime()<date1.getTime()){
+
+
+            hours = 23 - currentHour1 + currentHour2;
+
+        }else {
+            hours = currentHour2-currentHour1;
+        }
+
+        return hours +":";
     }
 
     /**
