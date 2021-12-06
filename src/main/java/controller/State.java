@@ -21,24 +21,26 @@ public abstract class State {
      * @param tour the tour to clear
      * @param window the window where to show map and popup messages
      * @param controller application controller
+     * @param listOfCommands
      */
-    public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {}
+    public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {}
 
-    public void defaultLoadMap(CityMap cityMap, Tour tour, Window window, Controller controller) {
+    public void defaultLoadMap(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
         try {
             XMLDeserializer.loadMap(cityMap);
             window.setDefaultButtonStates(new boolean[]{true, true, false});
             controller.setCurrentState(controller.mapLoadedState);
             tour.clearLists();
+            listOfCommands.reset();
             window.showRequestsPanel();
             window.setEnabledRequests(false);
             window.setEnabledTour(false);
             tour.setTourComputed(false);
-            controller.getListOfCommands().reset();
         } catch (Exception e) {
             if(!e.getMessage().equals("Cancel opening file")) {
                 cityMap.clearLists();
                 tour.clearLists();
+                listOfCommands.reset();
                 window.displayErrorMessage(e.getMessage());
                 window.setDefaultButtonStates(new boolean[]{true, false, false});
                 controller.setCurrentState(controller.initialState);
@@ -52,14 +54,15 @@ public abstract class State {
 
     /**
      * Loading a planning requests (pickup and deliveries) from XML file.
-     * @param tour the tour structure to fill
      * @param cityMap the map with the intersections
+     * @param tour the tour structure to fill
      * @param window the window where to show map and popup messages
      * @param controller application controller
+     * @param listOfCommands
      */
-    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {}
+    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {}
 
-    protected void defaultLoadRequests(CityMap cityMap, Tour tour, Window window, Controller controller) {
+    protected void defaultLoadRequests(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
         try {
             Request.lastColor = Color.red;
             XMLDeserializer.loadRequests(tour, cityMap);
@@ -69,6 +72,7 @@ public abstract class State {
             }
             window.setDefaultButtonStates(new boolean[]{true, true, true});
             controller.setCurrentState(controller.requestsLoadedState);
+            listOfCommands.reset();
             window.showRequestsPanel();
             window.setEnabledTour(false);
             tour.setTourComputed(false);
@@ -77,6 +81,7 @@ public abstract class State {
             if(!e.getMessage().equals("Cancel opening file")) {
                 Request.lastColor = Color.red;
                 tour.clearLists();
+                listOfCommands.reset();
                 window.displayErrorMessage(e.getMessage());
                 window.setDefaultButtonStates(new boolean[]{true, true, false});
                 controller.setCurrentState(controller.mapLoadedState);
@@ -267,7 +272,7 @@ public abstract class State {
 
     public void stopTourComputation(Tour tour) {}
 
-    public void deleteRequest(Tour tour, Request requestToDelete, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l, Controller controller) {}
+    public void deleteRequest(Tour tour, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l, Controller controller) {}
 
     public void addRequest(Tour tour, Window window, Controller controller) {}
 
