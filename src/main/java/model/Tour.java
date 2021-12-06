@@ -652,7 +652,7 @@ public class Tour extends Observable {
 
     public void changeAddress(int indexNode, Intersection newAddress, List<Intersection> intersections) {
         // Sanity check
-        if(indexNode > 0 && indexNode < planningRequests.size()*2) {
+        if(indexNode > 0 && indexNode <= planningRequests.size()*2) {
             if (indexNode % 2 == 0) {
                 planningRequests.get(indexNode / 2 - 1).setDeliveryAddress(newAddress);
             } else {
@@ -678,13 +678,16 @@ public class Tour extends Observable {
     }
 
     public void changeProcessTime(int indexNode, int newTime) {
-        if (indexNode % 2 == 0) {
-            planningRequests.get(indexNode/2 - 1).setDeliveryDuration(newTime);
-        } else {
-            planningRequests.get(indexNode/2).setPickupDuration(newTime);
-        }
+        // Sanity check
+        if(indexNode > 0 && indexNode <= planningRequests.size()*2 ) {
+            if (indexNode % 2 == 0) {
+                planningRequests.get(indexNode / 2 - 1).setDeliveryDuration(newTime);
+            } else {
+                planningRequests.get(indexNode / 2).setPickupDuration(newTime);
+            }
 
-        updateTimes();
-        notifyObservers();
+            updateTimes();
+            notifyObservers();
+        }
     }
 }

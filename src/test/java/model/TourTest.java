@@ -112,7 +112,7 @@ class TourTest {
      */
     @Nested
     @DisplayName("Test on computeTour")
-    class computeTour {
+    class TestComputeTour {
         @Test
         @DisplayName("Normal scenario")
         void computeTourNormal() {
@@ -168,7 +168,7 @@ class TourTest {
      */
     @Nested
     @DisplayName("Test on insertRequest")
-    class insertRequest {
+    class TestInsertRequest {
 
         @BeforeEach
         public void setList() {
@@ -405,7 +405,7 @@ class TourTest {
      */
     @Nested
     @DisplayName("Test on moveIntersectionBefore")
-    class moveIntersectionBefore {
+    class TestMoveIntersectionBefore {
 
         @BeforeEach
         public void setList() {
@@ -501,7 +501,7 @@ class TourTest {
      */
     @Nested
     @DisplayName("Test on removeRequest")
-    class removeRequest {
+    class TestRemoveRequest {
 
         @BeforeEach
         public void setList() {
@@ -518,7 +518,7 @@ class TourTest {
 
         @Test
         @DisplayName("Normal scenario")
-        void removeRequest() {
+        void removeRequestNormal() {
 
 
             // Method to test
@@ -554,7 +554,7 @@ class TourTest {
      */
     @Nested
     @DisplayName("Test on moveIntersectionBefore")
-    class changeAddress {
+    class TestChangeAddress {
 
         @BeforeEach
         public void setList() {
@@ -682,6 +682,63 @@ class TourTest {
             assertEquals(3,newListShortestPath.get(0).getEndAddress().getId());
             assertEquals(3,newListShortestPath.get(1).getStartAddress().getId());
             assertEquals(1,newListShortestPath.get(1).getEndAddress().getId());
+
+        }
+
+    }
+
+
+
+    /**
+     * Method to test:
+     * changeProcessTime()
+     *
+     * What it does:
+     * Change address of an intersection
+     */
+    @Nested
+    @DisplayName("Test on changeProcessTime")
+    class TestChangeProcessTime {
+
+        @Test
+        @DisplayName("Normal scenario")
+        void changeProcessTimeNormal(){
+            tour.changeProcessTime(3,10000);
+            assertEquals(180,tour.getPlanningRequests().get(0).getPickupDuration());
+            assertEquals(240,tour.getPlanningRequests().get(0).getDeliveryDuration());
+            assertEquals(10000,tour.getPlanningRequests().get(1).getPickupDuration());
+            assertEquals(185,tour.getPlanningRequests().get(1).getDeliveryDuration());
+        }
+
+        @Test
+        @DisplayName("Out index")
+        void changeProcessOutIndex(){
+            tour.changeProcessTime(33,10000);
+            assertEquals(180,tour.getPlanningRequests().get(0).getPickupDuration());
+            assertEquals(240,tour.getPlanningRequests().get(0).getDeliveryDuration());
+            assertEquals(90,tour.getPlanningRequests().get(1).getPickupDuration());
+            assertEquals(185,tour.getPlanningRequests().get(1).getDeliveryDuration());
+        }
+
+        @Test
+        @DisplayName("First index")
+        void changeProcessFirstIndex(){
+            tour.changeProcessTime(0,10000);
+            assertEquals(180,tour.getPlanningRequests().get(0).getPickupDuration());
+            assertEquals(240,tour.getPlanningRequests().get(0).getDeliveryDuration());
+            assertEquals(90,tour.getPlanningRequests().get(1).getPickupDuration());
+            assertEquals(185,tour.getPlanningRequests().get(1).getDeliveryDuration());
+
+        }
+
+        @Test
+        @DisplayName("Last index")
+        void changeProcessLastIndex(){
+            tour.changeProcessTime(9,10000);
+            assertEquals(180,tour.getPlanningRequests().get(0).getPickupDuration());
+            assertEquals(240,tour.getPlanningRequests().get(0).getDeliveryDuration());
+            assertEquals(90,tour.getPlanningRequests().get(1).getPickupDuration());
+            assertEquals(185,tour.getPlanningRequests().get(1).getDeliveryDuration());
 
         }
 
