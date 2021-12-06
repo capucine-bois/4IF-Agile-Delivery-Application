@@ -2,7 +2,6 @@ package controller;
 
 import model.*;
 import view.Window;
-import xml.ExceptionXML;
 
 import java.util.ArrayList;
 

@@ -53,17 +53,14 @@ public class SelectedRequestState extends State {
 
     @Override
     public void deleteRequest(Tour tour, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l, Controller controller) {
-        Request requestToDelete = tour.getPlanningRequests().get(indexRequest);
-        int indexShortestPathToPickup = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 1).findFirst().get());
-        int indexShortestPathToDelivery = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 2).findFirst().get());
-        l.add(new ReverseCommand(new AddCommand(tour, requestToDelete, allIntersections,indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery)));
-        window.setUndoButtonState(true);
+        Request requestToDelete = processDeleteRequest(tour, indexRequest, allIntersections, window, l);
         if (requestToDelete.isPickupSelected() && requestToDelete.isDeliverySelected()) {
             controller.setCurrentState(controller.requestsComputedState);
         }
         window.setRedoButtonState(false);
 
     }
+
 
     @Override
     public void enterMouseOnRequest(int indexRequest, Window window) {

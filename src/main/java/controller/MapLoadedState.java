@@ -2,11 +2,9 @@ package controller;
 
 import model.*;
 import view.Window;
-import xml.ExceptionXML;
 import xml.XMLDeserializer;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 /**
  * Map loaded state. State of the application when map has been loaded.

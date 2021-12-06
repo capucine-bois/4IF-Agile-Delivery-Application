@@ -2,11 +2,9 @@ package controller;
 
 import model.*;
 import view.Window;
-import xml.ExceptionXML;
 import xml.XMLDeserializer;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -315,7 +313,16 @@ public abstract class State {
     public void deleteRequest(Tour tour, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l, Controller controller) {
     }
 
-    public void addRequest(Tour tour, Window window, Controller controller) {
+    public Request processDeleteRequest(Tour tour, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l) {
+        Request requestToDelete = tour.getPlanningRequests().get(indexRequest);
+        int indexShortestPathToPickup = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 1).findFirst().get());
+        int indexShortestPathToDelivery = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 2).findFirst().get());
+        l.add(new ReverseCommand(new AddCommand(tour, requestToDelete, allIntersections, indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery)));
+        window.setUndoButtonState(true);
+        return requestToDelete;
+    }
+
+        public void addRequest(Tour tour, Window window, Controller controller) {
     }
 
     public void chooseAddress(int indexButton, Window window, Controller controller) {
