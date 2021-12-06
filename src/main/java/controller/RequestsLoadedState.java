@@ -45,7 +45,6 @@ public class RequestsLoadedState extends State {
                 window.setDefaultButtonStates(new boolean[]{true, true, true});
                 controller.setCurrentState(controller.requestsLoadedState);
             }
-            tour.notifyObservers();
         });
         TSPThread.start();
     }

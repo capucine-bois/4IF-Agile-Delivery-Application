@@ -253,4 +253,9 @@ public class Controller {
     public void saveTime(String time) {
         currentState.saveTime(time, tour, window, listOfCommands, this);
     }
+
+    public void arrowKeyPressed(boolean up){
+        currentState.arrowKeyPressed(up, cityMap, tour, listOfCommands, window);
+    }
+
 }

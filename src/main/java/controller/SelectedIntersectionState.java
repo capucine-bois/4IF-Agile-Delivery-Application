@@ -105,4 +105,21 @@ public class SelectedIntersectionState extends State {
         controller.setCurrentState(controller.changeProcessTimeState);
         window.setRedoButtonState(false);
     }
+
+    @Override
+    public void arrowKeyPressed(boolean up, CityMap cityMap, Tour tour, ListOfCommands listOfCommands, Window window){
+        Request requestToUpdate = tour.getPlanningRequests().stream().filter(x -> x.isPickupSelected() || x.isDeliverySelected()).findFirst().get();
+        int indexRequest = tour.getPlanningRequests().indexOf(requestToUpdate);
+        ShortestPath shortestPathSelected;
+        if (requestToUpdate.isPickupSelected()) {
+            shortestPathSelected = tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 1).findFirst().get();
+        } else {
+            shortestPathSelected = tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 2).findFirst().get();
+        }
+        if (up) {
+            moveIntersectionBefore(listOfCommands, tour, tour.getListShortestPaths().indexOf(shortestPathSelected), cityMap.getIntersections(), window);
+        } else {
+            moveIntersectionAfter(listOfCommands, tour, tour.getListShortestPaths().indexOf(shortestPathSelected), cityMap.getIntersections(), window);
+        }
+    }
 }
