@@ -215,7 +215,24 @@ class StronglyConnectedComponentsTest {
         listIntersection.add(i7);
         listIntersection.add(i8);
 
-        List<Integer>[] transposedGraph = StronglyConnectedComponents.getTranspose(listIntersection);
+        List<Integer>[] transposedGraph = new List[listIntersection.size()];
+        for (int i = 0; i < listIntersection.size(); i++) {
+            transposedGraph[i] = new ArrayList<>();
+        }
+        transposedGraph[0].add(5);
+        transposedGraph[0].add(6);
+        transposedGraph[1].add(3);
+        transposedGraph[1].add(5);
+        transposedGraph[2].add(4);
+        transposedGraph[3].add(1);
+        transposedGraph[3].add(5);
+        transposedGraph[4].add(2);
+        transposedGraph[4].add(5);
+        transposedGraph[5].add(0);
+        transposedGraph[5].add(1);
+        transposedGraph[5].add(3);
+        transposedGraph[5].add(4);
+        transposedGraph[7].add(0);
 
         Integer [] color = new Integer[listIntersection.size()];
         Arrays.fill(color, 0);

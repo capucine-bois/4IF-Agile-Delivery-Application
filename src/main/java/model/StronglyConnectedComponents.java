@@ -138,21 +138,22 @@ public class StronglyConnectedComponents {
     }
 
     /**
-     * Put in black the vertices of the graph for a same strongly connected component
+     * Put in black the vertices of the graph that are reachable from origin
+     * Is used to blacken the SCC once other vertices are removed
      * @param graph the transposed graph
-     * @param vertex entry point of the DFS
+     * @param origin entry point of the DFS
      * @param color the array with color of each vertex
      * @param colorMap a map with the id of each intersection and its color
      */
-    public static void DFSrec(List<Integer> [] graph, int vertex, Integer [] color,  Map<Integer, Integer> colorMap) {
-        color[vertex] = 1;
-        colorMap.replace(vertex, 1);
-        for(int i=0; i<graph[vertex].size(); i++) {
-            if(color[graph[vertex].get(i)]==0) {
-                DFSrec(graph, graph[vertex].get(i),color, colorMap);
+    public static void DFSrec(List<Integer> [] graph, int origin, Integer [] color,  Map<Integer, Integer> colorMap) {
+        color[origin] = 1;
+        colorMap.replace(origin, 1);
+        for(int i=0; i<graph[origin].size(); i++) {
+            if(color[graph[origin].get(i)]==0) {
+                DFSrec(graph, graph[origin].get(i),color, colorMap);
             }
         }
-        color[vertex] = 2;
-        colorMap.replace(vertex, 2);
+        color[origin] = 2;
+        colorMap.replace(origin, 2);
     }
 }
