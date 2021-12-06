@@ -35,6 +35,7 @@ public class MapLoadedState extends State {
             window.setEnabledRequests(true);
             window.showRequestsPanel();
         } catch (Exception e) {
+            listOfCommands.reset();
             if(!e.getMessage().equals("Cancel opening file")) {
                 tour.clearLists();
                 window.displayErrorMessage(e.getMessage());
