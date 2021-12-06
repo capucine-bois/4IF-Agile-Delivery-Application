@@ -6,7 +6,6 @@ import java.util.ArrayList;
  * A node is an Intersection in a planning with his list of shortest path to the other points of the planning
  * It also has a number, useful to make the graphe of TSP
  */
-@SuppressWarnings("ALL")
 public class Node {
 
     /* ATTRIBUTES */

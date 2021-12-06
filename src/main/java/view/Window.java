@@ -12,7 +12,6 @@ import java.util.ArrayList;
 /**
  * GUI for the application.
  */
-@SuppressWarnings("JavaDoc")
 public class Window extends JFrame {
 
     // Titles of window buttons

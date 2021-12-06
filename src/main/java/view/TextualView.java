@@ -15,7 +15,6 @@ import observer.Observer;
  * Textual element on the GUI.
  * Used to display requests.
  */
-@SuppressWarnings("JavaDoc")
 public class TextualView extends JPanel implements Observer {
 
     // Titles of textual view buttons
@@ -422,7 +421,6 @@ public class TextualView extends JPanel implements Observer {
      * @param parentPanel parent panel
      * @param segments segments to display
      */
-    @SuppressWarnings("GrazieInspection")
     private void displaySegments(JPanel parentPanel, ArrayList<Segment> segments) {
         JPanel segmentsPanel = new JPanel();
         segmentsPanel.setLayout(new BoxLayout(segmentsPanel, BoxLayout.Y_AXIS));
@@ -787,7 +785,6 @@ public class TextualView extends JPanel implements Observer {
     /**
      * Switch to requests panel.
      */
-    @SuppressWarnings("GrazieInspection")
     public void showRequestsPanel() {
         changeButton(tourHeader, requestsHeader);
         cardLayout.show(cardLayoutPanel, "requests");

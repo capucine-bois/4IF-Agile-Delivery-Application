@@ -10,7 +10,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 @DisplayName("DijkstraTest test case")
 public class DijkstraTest {
     static Instant startedAt;
@@ -106,7 +105,6 @@ public class DijkstraTest {
      * What it does:
      * Compute shortest paths from one origin intersection
      */
-    @SuppressWarnings("GrazieInspection")
     @Nested
     @DisplayName("Test on dijkstra")
     class TestDijkstra {

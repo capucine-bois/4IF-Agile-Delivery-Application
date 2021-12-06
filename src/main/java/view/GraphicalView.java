@@ -268,7 +268,6 @@ public class GraphicalView extends JPanel implements Observer {
      * @param strokeSize size of segments
      * @param displayRoadNames boolean to control road name display
      */
-    @SuppressWarnings("GrazieInspection")
     private void displayShortestPaths(ShortestPath shortestPath, boolean conditionToDisplay, Color color, float strokeSize, boolean displayRoadNames) {
         if (conditionToDisplay) {
             for (Segment segment : shortestPath.getListSegments()) {
@@ -336,7 +335,6 @@ public class GraphicalView extends JPanel implements Observer {
      * @param destinationY y position of destination
      * @param shortestPath whether the segment is included in a shortest path (of the computed tour) or not
      */
-    @SuppressWarnings("GrazieInspection")
     private void displayRoadName(Graphics2D g2, String name, int originX, int destinationX, int originY, int destinationY, boolean shortestPath) {
         double oppositeSide = destinationY - originY;
         double adjacentSide = destinationX - originX;
