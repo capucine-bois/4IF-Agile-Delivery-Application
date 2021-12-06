@@ -61,6 +61,8 @@ public class SelectedRequestState extends State {
         if (requestToDelete.isPickupSelected() && requestToDelete.isDeliverySelected()) {
             controller.setCurrentState(controller.requestsComputedState);
         }
+        window.setRedoButtonState(false);
+
     }
 
     @Override
@@ -83,6 +85,7 @@ public class SelectedRequestState extends State {
         window.setEnabledTour(false);
         window.setDefaultButtonStates(new boolean[]{false, false, false});
         controller.setCurrentState(controller.addRequestState);
+        window.setRedoButtonState(false);
         tour.notifyObservers();
     }
 }
