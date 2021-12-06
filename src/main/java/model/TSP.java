@@ -11,20 +11,20 @@ public interface TSP {
      * @param timeLimit
      * @param g
      */
-    public void searchSolution(int timeLimit, Graph g, Tour tour);
+    void searchSolution(int timeLimit, Graph g, Tour tour);
 
     /**
      * @param i
      * @return the ith visited vertex in the solution computed by <code>searchSolution</code>
      * (-1 if <code>searchSolution</code> has not been called yet, or if i < 0 or i >= g.getNbSommets())
      */
-    public Integer getSolution(int i);
+    Integer getSolution(int i);
 
     /**
      * @return the total cost of the solution computed by <code>searchSolution</code>
      * (-1 if <code>searchSolution</code> has not been called yet).
      */
-    public double getSolutionCost();
+    double getSolutionCost();
 
-    public Integer[] getBestSol();
+    Integer[] getBestSol();
 }

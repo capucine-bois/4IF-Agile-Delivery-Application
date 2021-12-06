@@ -1,11 +1,8 @@
 package controller;
 
 import model.Intersection;
-import model.Request;
-import model.ShortestPath;
 import model.Tour;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

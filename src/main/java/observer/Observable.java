@@ -18,7 +18,7 @@ public class Observable {
      * Default constructor. Initialize collection of observers as an empty ArrayList.
      */
     public Observable() {
-        obs = new ArrayList<Observer>();
+        obs = new ArrayList<>();
     }
 
     /**

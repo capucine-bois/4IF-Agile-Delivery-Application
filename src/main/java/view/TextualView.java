@@ -303,6 +303,8 @@ public class TextualView extends JPanel implements Observer {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        assert date2 != null;
+        assert date1 != null;
         int totalDuration = (int) (date2.getTime() - date1.getTime())/60000;
         int hours = totalDuration / 60; //since both are ints, you get an int
         int minutes = totalDuration % 60;

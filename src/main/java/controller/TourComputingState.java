@@ -1,6 +1,5 @@
 package controller;
 
-import model.CityMap;
 import model.Request;
 import model.ShortestPath;
 import model.Tour;

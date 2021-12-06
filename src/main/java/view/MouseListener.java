@@ -15,7 +15,6 @@ public class MouseListener extends MouseAdapter {
 
     private Controller controller;
     private GraphicalView graphicalView;
-    private TextualView textualView;
 
     public MouseListener(Controller controller) {
         this.controller = controller;
@@ -26,7 +25,6 @@ public class MouseListener extends MouseAdapter {
     }
 
     public void setTextualView(TextualView textualView) {
-        this.textualView = textualView;
     }
 
     @Override
@@ -37,7 +35,7 @@ public class MouseListener extends MouseAdapter {
             } else if (TextualView.tourIntersectionsPanels.contains((JPanel) e.getSource())) {
                 controller.leftClickOnTourIntersection(TextualView.tourIntersectionsPanels.indexOf((JPanel) e.getSource()));
             } else if (graphicalView.contains(e.getX(), e.getY())) {
-                if (!graphicalView.isSelectionMode()) {
+                if (graphicalView.isSelectionMode()) {
                     int indexIcon = graphicalView.findIcon(e.getX(), e.getY());
                     if (indexIcon != -1) controller.leftClickOnIcon(indexIcon);
                 } else {
@@ -70,7 +68,7 @@ public class MouseListener extends MouseAdapter {
     public void mouseMoved(MouseEvent e) {
         graphicalView.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         if (graphicalView.contains(e.getX(), e.getY())) {
-            if (!graphicalView.isSelectionMode()) {
+            if (graphicalView.isSelectionMode()) {
                 int indexIcon = graphicalView.findIcon(e.getX(), e.getY());
                 if (indexIcon != -1) graphicalView.setCursor(new Cursor(Cursor.HAND_CURSOR));
             } else {

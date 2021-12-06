@@ -1,9 +1,6 @@
 package controller;
 
-import model.Intersection;
 import model.Tour;
-
-import java.util.List;
 
 public class ChangeProcessTimeCommand implements Command {
 

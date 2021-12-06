@@ -1,7 +1,6 @@
 package model;
 
 import java.awt.*;
-import java.util.Calendar;
 
 /**
  * A request represents pickup and delivery (both at the same time).

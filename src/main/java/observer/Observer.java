@@ -9,5 +9,5 @@ public interface Observer {
      * @param observed observable instance which send the notification
      * @param arg notification data
      */
-    public void update(Observable observed, Object arg);
+    void update(Observable observed, Object arg);
 }

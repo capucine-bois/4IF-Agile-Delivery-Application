@@ -2,8 +2,6 @@ package controller;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import model.*;
 import view.Window;

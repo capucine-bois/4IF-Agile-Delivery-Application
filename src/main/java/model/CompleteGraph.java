@@ -1,8 +1,6 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * The graphe used in TSP
@@ -27,18 +25,15 @@ public class CompleteGraph implements Graph {
     double[][] cost;
 
     /**
-     * The tour object to verify if the path are possible
-     */
-    private Tour tour;
-
-    /**
      * Create a complete directed graph such that each edge has a weight according to the cost of each arc
      * @param tour the tour
      * @param listNodes the list of nodes
      */
     public CompleteGraph(ArrayList<Node> listNodes, Tour tour){
         this.listNodesGraph=listNodes;
-        this.tour = tour;
+        /**
+         * The tour object to verify if the path are possible
+         */
         this.nbVertices = listNodesGraph.size();
         cost = new double[nbVertices][nbVertices];
         for (int i=0; i<nbVertices; i++){
@@ -75,6 +70,7 @@ public class CompleteGraph implements Graph {
         Integer[] destinations = null;
         int i = 0;
         for (ShortestPath arc : currentNode.getListArcs()){
+            assert destinations != null;
             destinations[i] = arc.getEndNodeNumber();
             i++;
         }

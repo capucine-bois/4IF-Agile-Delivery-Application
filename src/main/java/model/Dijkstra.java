@@ -1,7 +1,6 @@
 package model;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Implementation of the dijkstra algorithm
@@ -39,9 +38,9 @@ public class Dijkstra {
         }
 
         @Override
-        /**
-         * Compare method used by PriorityQueue
-         * @param o1 undeterminedIntersection to compare
+        /*
+          Compare method used by PriorityQueue
+          @param o1 undeterminedIntersection to compare
          * @param o2 undeterminedIntersection to compare
          * @return 0,1 or -1 to sort the PriorityQueue
          */
@@ -64,19 +63,19 @@ public class Dijkstra {
 
         int intersectionsSize = listIntersections.size();
 
-        /**
-         * Initiate PriorityQueue ( for undetermined Intersection )
-         * O(logN) worst case insertion
-         * Keep the minimum distance on top of the queue
-        * */
+        /*
+          Initiate PriorityQueue ( for undetermined Intersection )
+          O(logN) worst case insertion
+          Keep the minimum distance on top of the queue
+         */
         PriorityQueue<undeterminedIntersection> undeterminedIntersection = new PriorityQueue<>(intersectionsSize, new undeterminedIntersection());
 
         // Datatype
-        /**
-         *  We take advantage of having intersections that start with index 0 to be able to directly
-         *  access the distance, the parent and whether the path of the intersection is determined or not.
-         *  O(1) access
-         * */
+        /*
+           We take advantage of having intersections that start with index 0 to be able to directly
+           access the distance, the parent and whether the path of the intersection is determined or not.
+           O(1) access
+          */
         boolean[] settledNodes = new boolean[intersectionsSize];
         double [] distance = new double[intersectionsSize];
         int [] parent = new int[intersectionsSize];

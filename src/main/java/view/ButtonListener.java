@@ -2,7 +2,6 @@ package view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Objects;
 
 import controller.Controller;
 
@@ -21,10 +20,6 @@ public class ButtonListener implements ActionListener {
      */
     private Controller controller;
 
-    /**
-     * The window
-     */
-    private Window window;
     private PopUpView popUpView;
 
     /**
@@ -33,7 +28,9 @@ public class ButtonListener implements ActionListener {
      */
     public ButtonListener(Controller controller, Window window){
         this.controller = controller;
-        this.window = window;
+        /**
+         * The window
+         */
     }
 
     public void setPopUpView(PopUpView popUpView) {
@@ -77,9 +74,7 @@ public class ButtonListener implements ActionListener {
                     controller.moveIntersectionAfter(TextualView.goDownButtons.indexOf((JButton) e.getSource()));
                 }
             }
-            case PopUpView.CLOSE -> {
-                popUpView.setVisible(false);
-            }
+            case PopUpView.CLOSE -> popUpView.setVisible(false);
         }
     }
 

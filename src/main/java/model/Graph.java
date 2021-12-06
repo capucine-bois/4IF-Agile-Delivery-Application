@@ -1,13 +1,11 @@
 package model;
 
-import java.util.Collection;
-
 public interface Graph {
 
-    public abstract int getNbVertices();
+    int getNbVertices();
 
 
-    public abstract double getCost(int i, int j);
+    double getCost(int i, int j);
 
     /**
      * Check if the intersections in parameter make a possible path
@@ -15,13 +13,13 @@ public interface Graph {
      * @param j
      * @return boolean
      */
-    public abstract boolean isArc(int i, int j);
+    boolean isArc(int i, int j);
 
     /**
      * Return the destinations of a Node in order
      * @param currentVertex
      * @return
      */
-    public abstract Integer[] getDestinationsInOrder(int currentVertex);
+    Integer[] getDestinationsInOrder(int currentVertex);
 
 }

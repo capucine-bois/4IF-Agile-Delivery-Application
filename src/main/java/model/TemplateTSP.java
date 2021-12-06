@@ -26,11 +26,6 @@ public abstract class TemplateTSP implements TSP {
     private double bestSolCost;
 
     /**
-     * The time limit before which we want a solution
-     */
-    private int timeLimit;
-
-    /**
      * The start time of computing
      */
     private long startTime;
@@ -38,7 +33,9 @@ public abstract class TemplateTSP implements TSP {
     public void searchSolution(int timeLimit, Graph g, Tour tour){
         if (timeLimit <= 0) return;
         startTime = System.currentTimeMillis();
-        this.timeLimit = timeLimit;
+        /**
+         * The time limit before which we want a solution
+         */
         this.g = g;
         bestSol = new Integer[g.getNbVertices()];
         Collection<Integer> unvisited = new ArrayList<>(g.getNbVertices() - 1);

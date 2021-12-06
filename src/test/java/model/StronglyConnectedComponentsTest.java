@@ -186,9 +186,6 @@ class StronglyConnectedComponentsTest {
 
         List<Integer>[] transposedGraph = StronglyConnectedComponents.getTranspose(listIntersection);
 
-        /*for (int i = 0; i < transposedGraph.length; i++){
-            System.out.println(i+" : "+transposedGraph[i].toString());
-        }*/
         assertTrue(transposedGraph[0].contains(5),"Two way intersection was not transposed correctly");
         assertTrue(transposedGraph[0].contains(6),"One way intersection was not transposed correctly");
         assertTrue(transposedGraph[8].isEmpty(),"Isolated intersection was not transposed correctly");

@@ -13,7 +13,7 @@ public class ListOfCommands {
 
     public ListOfCommands(){
         currentIndex = -1;
-        list = new LinkedList<Command>();
+        list = new LinkedList<>();
     }
 
     /**

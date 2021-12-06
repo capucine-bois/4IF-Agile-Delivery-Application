@@ -1,11 +1,14 @@
 package xml;
 
+import java.io.Serial;
+
 /**
  * Exception raised when XML parsing fails.
  */
 public class ExceptionXML extends Exception {
 
-	private static final long serialVersionUID = 1L;
+	@Serial
+    private static final long serialVersionUID = 1L;
 
 	/**
 	 * Constructor. Call constructor of Exception using message parameter.

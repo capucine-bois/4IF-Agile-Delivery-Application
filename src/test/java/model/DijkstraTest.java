@@ -1,7 +1,7 @@
 package model;
 
 import org.junit.jupiter.api.*;
-import java.awt.*;
+
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 @DisplayName("DijkstraTest test case")
 public class DijkstraTest {
-    private Tour tour ;
     private CityMap cityMap ;
     private ArrayList<Intersection> listUsefulPointsSameDeliveries;
     private ArrayList<Request> listRequest;
@@ -34,7 +34,7 @@ public class DijkstraTest {
 
     @BeforeEach
     public void resetCityMap() {
-        tour = new Tour();
+        Tour tour = new Tour();
         cityMap = new CityMap();
         listRequest = new ArrayList<>();
         listUsefulPointsSameDeliveries = new ArrayList<>();

@@ -1,6 +1,5 @@
 package xml;
 
-import java.awt.*;
 import java.io.File;
 import java.util.*;
 
@@ -105,8 +104,9 @@ public class XMLDeserializer {
                 ArrayList<Double> list = coordonateDictionnary.get(latitude);
                 boolean acceptIntersection = true;
                 for(double longitu : list){
-                    if(longitu == longitude) {
+                    if (longitu == longitude) {
                         acceptIntersection = false;
+                        break;
                     }
                 }
                 if(acceptIntersection){

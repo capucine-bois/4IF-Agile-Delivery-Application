@@ -10,7 +10,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Graphical element on the GUI.
@@ -45,9 +44,6 @@ public class GraphicalView extends JPanel implements Observer {
     private boolean selectionMode;
     private int radiusForSelection;
 
-    // listeners
-    private MouseListener mouseListener;
-
     /**
      * Create the graphical view
      * @param cityMap the city map
@@ -62,7 +58,7 @@ public class GraphicalView extends JPanel implements Observer {
         this.cityMap = cityMap;
         this.tour = tour;
         mouseListener.setGraphicalView(this);
-        this.mouseListener = mouseListener;
+        // listeners
         addMouseWheelListener(mouseListener);
         addMouseListener(mouseListener);
         addMouseMotionListener(mouseListener);
@@ -543,7 +539,7 @@ public class GraphicalView extends JPanel implements Observer {
      */
     private boolean checkCursorOnIcon(int x, int y, String iconName) {
         boolean cursorOnIcon = true;
-        BufferedImage image = null;
+        BufferedImage image;
         try {
             image = Constants.getImage(iconName);
             x = (x * (image.getWidth())) / 40;
@@ -571,7 +567,7 @@ public class GraphicalView extends JPanel implements Observer {
     }
 
     public boolean isSelectionMode() {
-        return selectionMode;
+        return !selectionMode;
     }
 
     public int findIntersection(int x, int y) {

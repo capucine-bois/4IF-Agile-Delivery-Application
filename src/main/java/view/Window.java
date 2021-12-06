@@ -33,14 +33,9 @@ public class Window extends JFrame {
     private GraphicalView graphicalView;
     private TextualView textualView;
     private PopUpView popUpView;
-    private CityMap cityMap;
-    private Tour tour;
 
     // Listeners
     private ButtonListener buttonListener;
-    private MouseListener mouseListener;
-    private ComponentListener componentListener;
-    private KeyboardListener keyboardListener;
 
     private final String[] buttonTexts = new String[]{LOAD_MAP, LOAD_REQUEST, COMPUTE_TOUR, UNDO, REDO};
     private boolean[] defaultButtonStates = new boolean[]{true, false, false, false, false};
@@ -54,16 +49,14 @@ public class Window extends JFrame {
      * @throws FontFormatException raised if text font can't be loaded
      */
     public Window(CityMap cityMap, Tour tour, Controller controller) throws IOException, FontFormatException {
-        mouseListener = new MouseListener(controller);
+        MouseListener mouseListener = new MouseListener(controller);
         buttonListener = new ButtonListener(controller, this);
-        componentListener = new ComponentListener(this, graphicalView);
+        ComponentListener componentListener = new ComponentListener(this, graphicalView);
         graphicalView = new GraphicalView(cityMap, tour, this, mouseListener);
         textualView = new TextualView(tour, this, mouseListener, buttonListener);
         popUpView = new PopUpView(this, mouseListener, buttonListener);
-        keyboardListener = new KeyboardListener(controller);
+        KeyboardListener keyboardListener = new KeyboardListener(controller);
         addKeyListener(keyboardListener);
-        this.cityMap = cityMap;
-        this.tour = tour;
         createHeader();
         createGraphicalView();
         int minimumWindowWidth = 800;
