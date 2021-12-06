@@ -103,26 +103,19 @@ public class SelectedIntersectionState extends State {
     }
 
     @Override
-    public void arrowKeyUp(Tour tour, ListOfCommands listOfCommands, List<Intersection> allIntersections, Window window){
+    public void arrowKeyPressed(boolean up, CityMap cityMap, Tour tour, ListOfCommands listOfCommands, Window window){
         Request requestToUpdate = tour.getPlanningRequests().stream().filter(x -> x.isPickupSelected() || x.isDeliverySelected()).findFirst().get();
-        int index = tour.getPlanningRequests().indexOf(requestToUpdate);
+        int indexRequest = tour.getPlanningRequests().indexOf(requestToUpdate);
+        ShortestPath shortestPathSelected;
         if (requestToUpdate.isPickupSelected()) {
-            index = index * 2 + 1;
+            shortestPathSelected = tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 1).findFirst().get();
         } else {
-            index = index * 2 + 2;
+            shortestPathSelected = tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 2).findFirst().get();
         }
-        moveIntersectionBefore(listOfCommands, tour, index, allIntersections, window);
-    }
-
-    @Override
-    public void arrowKeyDown(Tour tour, ListOfCommands listOfCommands, List<Intersection> allIntersections, Window window){
-        Request requestToUpdate = tour.getPlanningRequests().stream().filter(x -> x.isPickupSelected() || x.isDeliverySelected()).findFirst().get();
-        int index = tour.getPlanningRequests().indexOf(requestToUpdate);
-        if (requestToUpdate.isPickupSelected()) {
-            index = index * 2 + 1;
+        if (up) {
+            moveIntersectionBefore(listOfCommands, tour, tour.getListShortestPaths().indexOf(shortestPathSelected), cityMap.getIntersections(), window);
         } else {
-            index = index * 2 + 2;
+            moveIntersectionAfter(listOfCommands, tour, tour.getListShortestPaths().indexOf(shortestPathSelected), cityMap.getIntersections(), window);
         }
-        moveIntersectionAfter(listOfCommands, tour, index, allIntersections, window);
     }
 }

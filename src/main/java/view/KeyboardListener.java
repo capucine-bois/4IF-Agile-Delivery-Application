@@ -31,12 +31,12 @@ public class KeyboardListener extends KeyAdapter {
             controller.redo();
 
         if(e.getKeyCode() == KeyEvent.VK_UP ){
-            controller.arrowKeyUp();
+            controller.arrowKeyPressed(true);
 
         }
 
         if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            controller.arrowKeyDown();
+            controller.arrowKeyPressed(false);
         }
 
 

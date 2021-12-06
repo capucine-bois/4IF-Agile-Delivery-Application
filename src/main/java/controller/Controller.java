@@ -254,11 +254,8 @@ public class Controller {
         currentState.saveTime(time, tour, window, listOfCommands, this);
     }
 
-    public void arrowKeyUp(){
-        currentState.arrowKeyUp(tour, listOfCommands, cityMap.getIntersections(), window);
+    public void arrowKeyPressed(boolean up){
+        currentState.arrowKeyPressed(up, cityMap, tour, listOfCommands, window);
     }
 
-    public void arrowKeyDown(){
-        currentState.arrowKeyDown(tour, listOfCommands, cityMap.getIntersections(), window);
-    }
 }

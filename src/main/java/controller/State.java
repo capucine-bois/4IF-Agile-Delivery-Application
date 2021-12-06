@@ -323,8 +323,6 @@ public abstract class State {
     public void saveTime(String time, Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {
     }
 
-    public void arrowKeyUp(Tour tour, ListOfCommands listOfCommands, List<Intersection> allIntersections, Window window) {}
-
-    public void arrowKeyDown(Tour tour, ListOfCommands listOfCommands, List<Intersection> allIntersections, Window window) {}
+    public void arrowKeyPressed(boolean up, CityMap map, Tour tour, ListOfCommands listOfCommands, Window window) {}
 
 }
