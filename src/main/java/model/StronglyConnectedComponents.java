@@ -1,9 +1,6 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -15,8 +12,10 @@ public class StronglyConnectedComponents {
     }
 
     /**
-     * Check if the two intersections in parameter are in the same strongly connected part
+     * Check if the intersections present in the planning are reachable
      * @param listIntersection the list of all intersections
+     * @param depot the depot (start and end) address
+     * @param planning the list of all requests
      * @return true if there are in the same strongly connected part, false otherwise
      */
     public static ArrayList<Intersection> getAllUnreachableIntersections(ArrayList<Intersection> listIntersection, Intersection depot, ArrayList<Request> planning) {
@@ -28,25 +27,23 @@ public class StronglyConnectedComponents {
         List<Integer>[] graphTranspose = getTranspose(listIntersection);
 
         Integer [] color = new Integer[graphTranspose.length];
-        for(int i=0; i<color.length; i++) {
-            color[i] = 0;
-        }
+        Arrays.fill(color, 0);
 
         for(int j = num.length-1; j>=0; j--) {
-            ArrayList<Integer> set = new ArrayList<>();
+            ArrayList<Integer> set;
 
             if(color[num[j]]==0) {
                 // map with the id of an intersection and the color
-                Map<Integer, Integer> B = new HashMap<>();
+                Map<Integer, Integer> colorMap = new HashMap<>();
                 for(int k=0; k<color.length; k++) {
                     if(color[k]==0) {
-                        B.put(k,0);
+                        colorMap.put(k,0);
                     }
                 }
 
 
-                DFSrec(graphTranspose, num[j], color, B);
-                set = (ArrayList<Integer>) B.keySet().stream().filter(x -> B.get(x)==2).collect(Collectors.toList());
+                DFSrec(graphTranspose, num[j], color, colorMap);
+                set = (ArrayList<Integer>) colorMap.keySet().stream().filter(x -> colorMap.get(x)==2).collect(Collectors.toList());
                 if(set.contains((int)depot.getId())) {
                     checkIntersectionsWithDepot(set,intersectionsNotWithDepot, planning);
                     break;
@@ -60,7 +57,7 @@ public class StronglyConnectedComponents {
      * Check if all the intersections of the planning are in the same strongly connected components of the depot
      * @param scc the strongly connected component which contains the depot
      * @param intersectionsNotWithDepot the list we fill with all intersection present in the planning but not in scc
-     * @param planning the planning request
+     * @param planning the planning containing the requests
      */
     private static void checkIntersectionsWithDepot(ArrayList<Integer> scc, ArrayList<Intersection> intersectionsNotWithDepot, ArrayList<Request> planning) {
         for(Request req : planning) {
@@ -75,7 +72,7 @@ public class StronglyConnectedComponents {
      * Return an array with a predecessor for each intersection
      * @param listIntersections list of all intersections
      * @param listVertex an empty list to fill
-     * @param color an array with the color of the vertex
+     * @param color an array with the color of the vertices
      * @return a list of dijkstra object (thus each will have his parent)
      */
     public static Integer[] foretDFSnum(ArrayList<Intersection> listIntersections, ArrayList<Integer> [] listVertex, Integer [] color) {
@@ -125,7 +122,7 @@ public class StronglyConnectedComponents {
 
     /**
      * function to get transpose of graph
-     * @param listIntersection
+     * @param listIntersection list of all intersections
      * @return an array of list of successor
      */
     public static List<Integer>[] getTranspose(ArrayList<Intersection> listIntersection)
@@ -133,7 +130,7 @@ public class StronglyConnectedComponents {
         int V = listIntersection.size();
         List<Integer>[] g = new List[V];
         for (int i = 0; i < V; i++)
-            g[i] = new ArrayList<Integer>();
+            g[i] = new ArrayList<>();
         for (int v = 0; v < V; v++)
             for (int i = 0; i < listIntersection.get(v).getAdjacentSegments().size(); i++)
                 g[(int)listIntersection.get(v).getAdjacentSegments().get(i).getDestination().getId()].add(v);
@@ -141,20 +138,22 @@ public class StronglyConnectedComponents {
     }
 
     /**
-     * Put in black the vertex of the graph for a same strongly connected component
-     * @param graph the transpose graph
-     * @param vertex
+     * Put in black the vertices of the graph that are reachable from origin
+     * Is used to blacken the SCC once other vertices are removed
+     * @param graph the transposed graph
+     * @param origin entry point of the DFS
      * @param color the array with color of each vertex
+     * @param colorMap a map with the id of each intersection and its color
      */
-    public static void DFSrec(List<Integer> [] graph, int vertex, Integer [] color,  Map<Integer, Integer> B) {
-        color[vertex] = 1;
-        B.replace(vertex, 1);
-        for(int i=0; i<graph[vertex].size(); i++) {
-            if(color[graph[vertex].get(i)]==0) {
-                DFSrec(graph, graph[vertex].get(i),color, B);
+    public static void DFSrec(List<Integer> [] graph, int origin, Integer [] color,  Map<Integer, Integer> colorMap) {
+        color[origin] = 1;
+        colorMap.replace(origin, 1);
+        for(int i=0; i<graph[origin].size(); i++) {
+            if(color[graph[origin].get(i)]==0) {
+                DFSrec(graph, graph[origin].get(i),color, colorMap);
             }
         }
-        color[vertex] = 2;
-        B.replace(vertex, 2);
+        color[origin] = 2;
+        colorMap.replace(origin, 2);
     }
 }
