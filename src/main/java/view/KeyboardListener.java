@@ -5,6 +5,8 @@ import java.awt.event.KeyEvent;
 
 import controller.Controller;
 
+import javax.swing.*;
+
 /**
  * Listener to handle keyboard events.
  */
@@ -27,6 +29,17 @@ public class KeyboardListener extends KeyAdapter {
 
         if (e.getKeyCode() == 90 && e.isControlDown() && e.isShiftDown())
             controller.redo();
+
+        if(e.getKeyCode() == KeyEvent.VK_UP ){
+            controller.arrowKeyUp();
+
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+            controller.arrowKeyDown();
+        }
+
+
 
     }
 

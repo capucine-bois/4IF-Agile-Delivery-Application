@@ -101,4 +101,28 @@ public class SelectedIntersectionState extends State {
         window.setDefaultButtonStates(new boolean[]{false, false, false});
         controller.setCurrentState(controller.changeProcessTimeState);
     }
+
+    @Override
+    public void arrowKeyUp(Tour tour, ListOfCommands listOfCommands, List<Intersection> allIntersections, Window window){
+        Request requestToUpdate = tour.getPlanningRequests().stream().filter(x -> x.isPickupSelected() || x.isDeliverySelected()).findFirst().get();
+        int index = tour.getPlanningRequests().indexOf(requestToUpdate);
+        if (requestToUpdate.isPickupSelected()) {
+            index = index * 2 + 1;
+        } else {
+            index = index * 2 + 2;
+        }
+        moveIntersectionBefore(listOfCommands, tour, index, allIntersections, window);
+    }
+
+    @Override
+    public void arrowKeyDown(Tour tour, ListOfCommands listOfCommands, List<Intersection> allIntersections, Window window){
+        Request requestToUpdate = tour.getPlanningRequests().stream().filter(x -> x.isPickupSelected() || x.isDeliverySelected()).findFirst().get();
+        int index = tour.getPlanningRequests().indexOf(requestToUpdate);
+        if (requestToUpdate.isPickupSelected()) {
+            index = index * 2 + 1;
+        } else {
+            index = index * 2 + 2;
+        }
+        moveIntersectionAfter(listOfCommands, tour, index, allIntersections, window);
+    }
 }

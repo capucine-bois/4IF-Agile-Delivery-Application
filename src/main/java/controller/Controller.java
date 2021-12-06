@@ -253,4 +253,12 @@ public class Controller {
     public void saveTime(String time) {
         currentState.saveTime(time, tour, window, listOfCommands, this);
     }
+
+    public void arrowKeyUp(){
+        currentState.arrowKeyUp(tour, listOfCommands, cityMap.getIntersections(), window);
+    }
+
+    public void arrowKeyDown(){
+        currentState.arrowKeyDown(tour, listOfCommands, cityMap.getIntersections(), window);
+    }
 }
