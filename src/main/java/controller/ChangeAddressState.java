@@ -19,7 +19,7 @@ public class ChangeAddressState extends State {
     public void leftClickOnIntersection(int indexIntersection, CityMap cityMap, Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {
 
         ArrayList<Intersection> intersectionsToTest = new ArrayList<>();
-        intersectionsToTest.add(cityMap.getIntersections().stream().filter(x -> x.getId()==indexIntersection).findFirst().get());
+        intersectionsToTest.add(cityMap.getIntersections().get(indexIntersection));
         if (!StronglyConnectedComponents.getAllUnreachableIntersections((ArrayList<Intersection>) cityMap.getIntersections(), tour.getDepotAddress(), intersectionsToTest).isEmpty()) {
             window.displayErrorMessage("The selected address is unreachable.");
         } else {
