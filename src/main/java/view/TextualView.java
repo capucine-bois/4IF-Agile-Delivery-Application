@@ -85,7 +85,6 @@ public class TextualView extends JPanel implements Observer {
         timeFields = new ArrayList<>();
         addRequestButtons = new ArrayList<>();
         backgroundTourPanelButtons = new ArrayList<>();
-        mouseListener.setTextualView(this);
         this.mouseListener = mouseListener;
         this.buttonListener = buttonListener;
         this.window = w;
