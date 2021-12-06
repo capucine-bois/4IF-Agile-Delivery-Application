@@ -146,7 +146,7 @@ public class Controller {
 
     /**
      * Called when mouse leave a request on the textual view.
-     * @param indexRequest
+     * @param indexRequest the request the mouse left
      */
     public void exitMouseOnRequest(int indexRequest) {
         currentState.exitMouseOnRequest(indexRequest, tour, window);
@@ -154,7 +154,7 @@ public class Controller {
 
     /**
      * Called when mouse leave an intersection on the textual view.
-     * @param indexShortestPath
+     * @param indexShortestPath the shortest path the mouse left
      */
     public void exitMouseOnTourIntersection(int indexShortestPath) {
         currentState.exitMouseOnTourIntersection(indexShortestPath, tour, window);
