@@ -72,7 +72,7 @@ class TourTest {
         Segment s12 = new Segment(118,"oulevard Vivier-Pat",i3,i5);
         // Setup request
         Request r1 = new Request(180,240,i2,i3);
-        Request r2 = new Request(90,185,i4,i5);
+        Request r2 = new Request(95,185,i4,i5);
         i1.addAdjacentSegment(s2);
         i2.addAdjacentSegment(s3);
         i2.addAdjacentSegment(s9);
@@ -158,6 +158,50 @@ class TourTest {
             assertTrue(listShortestPaths.isEmpty(),"List of shortest must be empty");
         }
     }
+
+
+    /**
+     * Method to test:
+     * updateTimes()
+     *
+     * What it does:
+     * Update all durations
+     */
+    @Nested
+    @DisplayName("Test on updateTimes")
+    class updateTimes {
+        @Test
+        @DisplayName("Normal scenario")
+        void updateTimesNormal() {
+            listIntersection = (ArrayList<Intersection>) cityMap.getIntersections();
+            ArrayList<Segment> emptySegmentList = new ArrayList<>();
+            // create the previous list of shortest path (before adding a request)
+            ShortestPath sh1 = new ShortestPath(143,emptySegmentList, listIntersection.get(0), listIntersection.get(3));
+            sh1.setStartNodeNumber(0);
+            sh1.setEndNodeNumber(3);
+            tour.addShortestPaths(sh1);
+            ShortestPath sh2 = new ShortestPath(16,emptySegmentList, listIntersection.get(3), listIntersection.get(1));
+            sh2.setStartNodeNumber(3);
+            sh2.setEndNodeNumber(1);
+            tour.addShortestPaths(sh2);
+            ShortestPath sh3 = new ShortestPath(86,emptySegmentList, listIntersection.get(1), listIntersection.get(4));
+            sh3.setStartNodeNumber(1);
+            sh3.setEndNodeNumber(4);
+            tour.addShortestPaths(sh3);
+            ShortestPath sh4 = new ShortestPath(118,emptySegmentList, listIntersection.get(4), listIntersection.get(2));
+            sh4.setStartNodeNumber(4);
+            sh4.setEndNodeNumber(2);
+            tour.addShortestPaths(sh4);
+            ShortestPath sh5 = new ShortestPath(202,emptySegmentList, listIntersection.get(2), listIntersection.get(0));
+            sh5.setStartNodeNumber(2);
+            sh5.setEndNodeNumber(0);
+            tour.addShortestPaths(sh5);
+            tour.updateTimes();
+            assertEquals("08:13",tour.getArrivalTime(),"Arrival time isn't right.");
+
+        }
+    }
+
 
     /**
      * Method to test:
@@ -617,10 +661,6 @@ class TourTest {
             assertEquals(6,newListShortestPath.get(0).getEndAddress().getId(),"New address isn't right");
             assertEquals(6,newListShortestPath.get(1).getStartAddress().getId(),"New address isn't right");
             assertEquals(1,newListShortestPath.get(1).getEndAddress().getId());
-
-
-
-
         }
 
         @Test
