@@ -44,6 +44,8 @@ public abstract class State {
                 cityMap.clearLists();
                 tour.clearLists();
                 listOfCommands.reset();
+                window.setRedoButtonState(false);
+                window.setUndoButtonState(false);
                 window.displayErrorMessage(e.getMessage());
                 window.setDefaultButtonStates(new boolean[]{true, false, false});
                 controller.setCurrentState(controller.initialState);
@@ -92,6 +94,8 @@ public abstract class State {
                 Request.lastColor = Color.red;
                 tour.clearLists();
                 listOfCommands.reset();
+                window.setRedoButtonState(false);
+                window.setUndoButtonState(false);
                 window.displayErrorMessage(e.getMessage());
                 window.setDefaultButtonStates(new boolean[]{true, true, false});
                 controller.setCurrentState(controller.mapLoadedState);
