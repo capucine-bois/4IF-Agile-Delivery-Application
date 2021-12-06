@@ -125,7 +125,7 @@ class TourTest {
             ArrayList<ShortestPath> listShortestPaths = tour.getListShortestPaths();
             double tourLength = tour.getTourLength();
 
-            
+
             // Check answer
             assertEquals(tourLength,565,"Length of the best path isn't find ");
             assertEquals(listShortestPaths.get(0).getStartAddress().getId(), 0,"Start point isn't right");
@@ -198,6 +198,7 @@ class TourTest {
             listIntersection.get(0).addAdjacentSegment(s15);
             listIntersection.get(5).addAdjacentSegment(s16);
             Request r3 = new Request(180,240,i7,listIntersection.get(5));
+            //tour.getPlanningRequests().add(r3);
 
             long lastPointBeforeDepot = tour.getListShortestPaths().get(tour.getListShortestPaths().size()-1).getStartAddress().getId();
 
@@ -469,7 +470,7 @@ class TourTest {
         }
 
         @Test
-        @DisplayName("Move delivery before last intersection")
+        @DisplayName("Move before last intersection")
         void moveBeforeDelivery(){
             // Method to test
             tour.moveIntersectionBefore(5,listIntersection);
@@ -543,6 +544,149 @@ class TourTest {
 
         }
     }
+
+    /**
+     * Method to test:
+     * changeAddress()
+     *
+     * What it does:
+     * Change address of an intersection
+     */
+    @Nested
+    @DisplayName("Test on moveIntersectionBefore")
+    class changeAddress {
+
+        @BeforeEach
+        public void setList() {
+            listIntersection = (ArrayList<Intersection>) cityMap.getIntersections();
+            ArrayList<Segment> emptyListSegment = new ArrayList<>();
+            // create the previous list of shortest path (before adding a request)
+            tour.addShortestPaths(new ShortestPath(143,emptyListSegment, listIntersection.get(0), listIntersection.get(3)));
+            tour.addShortestPaths(new ShortestPath(16,emptyListSegment, listIntersection.get(3), listIntersection.get(1)));
+            tour.addShortestPaths(new ShortestPath(86,emptyListSegment, listIntersection.get(1), listIntersection.get(4)));
+            tour.addShortestPaths(new ShortestPath(118,emptyListSegment, listIntersection.get(4), listIntersection.get(2)));
+            tour.addShortestPaths(new ShortestPath(202,emptyListSegment, listIntersection.get(2), listIntersection.get(0)));
+            listRequest = tour.getPlanningRequests();
+            tour.getListShortestPaths().get(0).setStartNodeNumber(0);
+            tour.getListShortestPaths().get(0).setEndNodeNumber(3);
+            tour.getListShortestPaths().get(1).setStartNodeNumber(3);
+            tour.getListShortestPaths().get(1).setEndNodeNumber(1);
+            tour.getListShortestPaths().get(2).setStartNodeNumber(1);
+            tour.getListShortestPaths().get(2).setEndNodeNumber(4);
+            tour.getListShortestPaths().get(3).setStartNodeNumber(4);
+            tour.getListShortestPaths().get(3).setEndNodeNumber(2);
+            tour.getListShortestPaths().get(4).setStartNodeNumber(2);
+            tour.getListShortestPaths().get(4).setEndNodeNumber(0);
+
+            // Add intersection and segment
+            Intersection i7 = new Intersection(6,45.759,4.8703);
+            listIntersection.add(i7);
+            Segment s13 = new Segment(75,"Rue du Dauphiné",listIntersection.get(0),i7);
+            Segment s14 = new Segment(5,"Rue du Dauphin",listIntersection.get(5),i7);
+            Segment s15 = new Segment(75,"Rue de l'Orque",i7,listIntersection.get(0));
+            Segment s16 = new Segment(5,"Rue du Bélouga",i7,listIntersection.get(5));
+            i7.addAdjacentSegment(s13);
+            i7.addAdjacentSegment(s14);
+            listIntersection.get(0).addAdjacentSegment(s15);
+            listIntersection.get(5).addAdjacentSegment(s16);
+
+            for(ShortestPath s : tour.getListShortestPaths()){
+                System.out.println(s.getStartAddress().getId()+"----"+s.getEndAddress().getId());
+            }
+
+
+        }
+
+        @Test
+        @DisplayName("Normal scenario")
+        void changeAddressNormal(){
+
+
+            // Method to test
+            tour.changeAddress(3,listIntersection.get(6),listIntersection);
+
+
+            // Check answer
+            ArrayList<ShortestPath> newListShortestPath = tour.getListShortestPaths();
+
+            System.out.println("New shortest path:");
+            for(ShortestPath s : newListShortestPath){
+                System.out.println(s.getStartAddress().getId()+"----"+s.getEndAddress().getId());
+            }
+            assertEquals(0,newListShortestPath.get(0).getStartAddress().getId(),"Start must be intersection 0");
+            assertEquals(6,newListShortestPath.get(0).getEndAddress().getId(),"New address isn't right");
+            assertEquals(6,newListShortestPath.get(1).getStartAddress().getId(),"New address isn't right");
+            assertEquals(1,newListShortestPath.get(1).getEndAddress().getId());
+
+
+
+
+        }
+
+        @Test
+        @DisplayName("Index out of range")
+        void changeAddressIndexOut(){
+
+            // Method to test
+            tour.changeAddress(11,listIntersection.get(6),listIntersection);
+
+            // Check answer
+            ArrayList<ShortestPath> newListShortestPath = tour.getListShortestPaths();
+
+            System.out.println("New shortest path:");
+            for(ShortestPath s : newListShortestPath){
+                System.out.println(s.getStartAddress().getId()+"----"+s.getEndAddress().getId());
+            }
+        }
+
+        @Test
+        @DisplayName("First intersection (depot)")
+        void changeAddressFirst(){
+            Intersection i = new Intersection(6,45.2314,31.1234);
+            listIntersection = (ArrayList<Intersection>) cityMap.getIntersections();
+
+            // Method to test
+            tour.changeAddress(0,i,listIntersection);
+
+            // Check answer
+            ArrayList<ShortestPath> newListShortestPath = tour.getListShortestPaths();
+
+            System.out.println("New shortest path:");
+            for(ShortestPath s : newListShortestPath){
+                System.out.println(s.getStartAddress().getId()+"----"+s.getEndAddress().getId());
+            }
+            assertEquals(0,newListShortestPath.get(0).getStartAddress().getId(),"Start must be intersection 0");
+            assertEquals(3,newListShortestPath.get(0).getEndAddress().getId());
+            assertEquals(3,newListShortestPath.get(1).getStartAddress().getId());
+            assertEquals(1,newListShortestPath.get(1).getEndAddress().getId());
+        }
+
+        @Test
+        @DisplayName("Last intersection (depot)")
+        void changeAddressLast(){
+            Intersection i = new Intersection(6,45.2314,31.1234);
+            listIntersection = (ArrayList<Intersection>) cityMap.getIntersections();
+
+            // Method to test
+            tour.changeAddress(9,listIntersection.get(6),listIntersection);
+
+            // Check answer
+            ArrayList<ShortestPath> newListShortestPath = tour.getListShortestPaths();
+
+            System.out.println("New shortest path:");
+            for(ShortestPath s : newListShortestPath){
+                System.out.println(s.getStartAddress().getId()+"----"+s.getEndAddress().getId());
+            }
+
+            assertEquals(0,newListShortestPath.get(0).getStartAddress().getId(),"Start must be intersection 0");
+            assertEquals(3,newListShortestPath.get(0).getEndAddress().getId());
+            assertEquals(3,newListShortestPath.get(1).getStartAddress().getId());
+            assertEquals(1,newListShortestPath.get(1).getEndAddress().getId());
+
+        }
+
+    }
+
 
 
 }
