@@ -138,21 +138,37 @@ public class GraphicalView extends JPanel implements Observer {
 
         double viewWidth = g.getClipBounds().width - allBorders * 2;
         double viewHeight = g.getClipBounds().height - allBorders * 2;
-        if (viewWidth >= viewHeight) {
+
+        if (widthDistance > heightDistance) {
             width = viewWidth * scale;
             height = width * proportion;
-            while (scale * proportion < 1) {
-                zoom((int) (viewWidth/2), (int) (viewHeight/2), -1);
-                width = viewWidth * scale;
-                height = width * proportion;
-            }
         } else {
             height = viewHeight * scale;
             width = height / proportion;
-            while (scale / proportion < 1) {
-                zoom((int) (viewWidth/2), (int) (viewHeight/2), -1);
-                height = viewHeight * scale;
-                width = height / proportion;
+        }
+
+        System.out.println("scale : " + scale);
+        System.out.println("w : " + (viewWidth - width));
+        System.out.println("h : " + (viewHeight - height));
+        System.out.println(proportion);
+        System.out.println(viewHeight/viewWidth);
+        if (width <= viewWidth || height <= viewHeight) {
+            if (viewHeight/viewWidth <= proportion) {
+                if (widthDistance > heightDistance) {
+                    width = viewWidth;
+                    height = width * proportion;
+                } else {
+                    height = viewHeight;
+                    width = height / proportion;
+                }
+            } else {
+                if (widthDistance > heightDistance) {
+                    height = viewHeight;
+                    width = height / proportion;
+                } else {
+                    width = viewWidth;
+                    height = width * proportion;
+                }
             }
         }
 
@@ -160,6 +176,8 @@ public class GraphicalView extends JPanel implements Observer {
         if (originY > allBorders) originY = allBorders;
         if (originX + width - allBorders < viewWidth) originX = (int) (viewWidth - width + allBorders);
         if (originY + height - allBorders < viewHeight) originY = (int) (viewHeight - height + allBorders);
+        if (width <= viewWidth) originX = (int) (allBorders + (viewWidth - width)/2);
+        if (height <= viewHeight) originY = (int) (allBorders + (viewHeight - height)/2);
 
         displaySegmentsForEachOrigin(intersections, Constants.COLOR_6, (float) (scale + 2), false);
         displaySegmentsForEachOrigin(intersections, Constants.COLOR_7, (float) scale, true);
@@ -466,7 +484,7 @@ public class GraphicalView extends JPanel implements Observer {
                     originX -= (x - originX) * (zoomCoefficient - 1);
                     originY -= (y - originY) * (zoomCoefficient - 1);
                     repaint();
-                } else if (rotation > 0 && scale > 1 && !(viewWidth >= viewHeight && (scale/zoomCoefficient) * proportion < 1) && !(viewWidth <= viewHeight && (scale/zoomCoefficient) / proportion < 1)) {
+                } else if (rotation > 0 && !(width <= viewWidth && height <= viewHeight)) {
                     scale /= zoomCoefficient;
                     originX += (x - originX) - (x - originX) / zoomCoefficient;
                     originY += (y - originY) - (y - originY) / zoomCoefficient;
