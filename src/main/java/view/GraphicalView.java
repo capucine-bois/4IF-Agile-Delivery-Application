@@ -252,18 +252,8 @@ public class GraphicalView extends JPanel implements Observer {
      */
     private void displaySegmentsForEachOrigin(List<Intersection> intersections, Color color, float strokeSize, boolean displayRoadNames) {
         for (Intersection origin : intersections) {
-            int originCoordinateX = getCoordinateX(origin);
-            int originCoordinateY = getCoordinateY(origin);
             for (Segment segment : origin.getAdjacentSegments()) {
-                int destinationCoordinateX = getCoordinateX(segment.getDestination());
-                int destinationCoordinateY = getCoordinateY(segment.getDestination());
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(color);
-                g2.setStroke(new BasicStroke(strokeSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
-                if (displayRoadNames) {
-                    displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY, false);
-                }
+                displaySegment(color, strokeSize, displayRoadNames, origin, segment, false);
             }
         }
     }
@@ -279,19 +269,34 @@ public class GraphicalView extends JPanel implements Observer {
     private void displayShortestPaths(ShortestPath shortestPath, boolean conditionToDisplay, Color color, float strokeSize, boolean displayRoadNames) {
         if (conditionToDisplay) {
             for (Segment segment : shortestPath.getListSegments()) {
-                int originCoordinateX = getCoordinateX(segment.getOrigin());
-                int originCoordinateY = getCoordinateY(segment.getOrigin());
-                int destinationCoordinateX = getCoordinateX(segment.getDestination());
-                int destinationCoordinateY = getCoordinateY(segment.getDestination());
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(color);
-                g2.setStroke(new BasicStroke(strokeSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
-                displayArrow(g2, originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
-                if (displayRoadNames) {
-                    displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY, true);
-                }
+                displaySegment(color, strokeSize, displayRoadNames, segment.getOrigin(), segment, true);
             }
+        }
+    }
+
+    /**
+     * Display a segment
+     * @param color color of the segment
+     * @param strokeSize size of segment
+     * @param displayRoadNames boolean to control road name display
+     * @param origin origin intersection of the segment
+     * @param segment segment object to display
+     * @param shortestPath boolean to check if it is a segment of a shortest path
+     */
+    private void displaySegment(Color color, float strokeSize, boolean displayRoadNames, Intersection origin, Segment segment, boolean shortestPath) {
+        int originCoordinateX = getCoordinateX(origin);
+        int originCoordinateY = getCoordinateY(origin);
+        int destinationCoordinateX = getCoordinateX(segment.getDestination());
+        int destinationCoordinateY = getCoordinateY(segment.getDestination());
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setColor(color);
+        g2.setStroke(new BasicStroke(strokeSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2.drawLine(originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+        if (shortestPath) {
+            displayArrow(g2, originCoordinateX, originCoordinateY, destinationCoordinateX, destinationCoordinateY);
+        }
+        if (displayRoadNames) {
+            displayRoadName(g2, segment.getName(), originCoordinateX, destinationCoordinateX, originCoordinateY, destinationCoordinateY, shortestPath);
         }
     }
 
