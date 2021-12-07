@@ -188,7 +188,7 @@ public class GraphicalView extends JPanel implements Observer {
                 displayShortestPaths(shortestPath, !oneShortestPathSelected || shortestPath.isSelected(), Constants.COLOR_9, (float) (scale), true);
             }
 
-            if (!tour.getPlanningRequests().isEmpty()) {
+            if (!tour.getPlanningRequests().isEmpty() || tour.isTourComputed()) {
                 boolean oneRequestPointSelected = tour.getPlanningRequests().stream().anyMatch(req -> req.isDeliverySelected() || req.isPickupSelected());
                 for (Request request : tour.getPlanningRequests()) {
 
