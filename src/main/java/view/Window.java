@@ -185,14 +185,11 @@ public class Window extends JFrame {
      * Reset buttons state corresponding to current state.
      */
     public void resetComponentsState() {
-        // buttons
         for (int i=0; i<buttons.size(); i++) {
             if (i < defaultButtonStates.length) {
                 buttons.get(i).setEnabled(defaultButtonStates[i]);
             }
         }
-        // city map zoom
-        graphicalView.setCanZoom(true);
     }
 
     /**

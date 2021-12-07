@@ -27,7 +27,6 @@ public class GraphicalView extends JPanel implements Observer {
     private int originY = allBorders;
     private final CityMap cityMap;
     private final Tour tour;
-    private boolean canZoom = true;
     private int previousMouseX;
     private int previousMouseY;
     private Font roadFont;
@@ -452,10 +451,6 @@ public class GraphicalView extends JPanel implements Observer {
         repaint();
     }
 
-    public void setCanZoom(boolean canZoom) {
-        this.canZoom = canZoom;
-    }
-
     /**
      * Zoom on map according to a specific scale.
      * Redraw every segment.
@@ -464,26 +459,23 @@ public class GraphicalView extends JPanel implements Observer {
      * @param rotation rotation angle
      */
     public void zoom(int x, int y, double rotation) {
-        if (canZoom) {
-            double viewWidth = g.getClipBounds().width - allBorders * 2;
-            double viewHeight = g.getClipBounds().height - allBorders * 2;
-            double zoomCoefficient = 1.2;
-            int zoomBorders = allBorders - fakeBorder;
-            if (x > zoomBorders && x < g.getClipBounds().width - zoomBorders && y > zoomBorders && y < g.getClipBounds().height - zoomBorders) {
-                if ((rotation < 0) && scale < 20) {
-                    scale *= zoomCoefficient;
-                    originX -= (x - originX) * (zoomCoefficient - 1);
-                    originY -= (y - originY) * (zoomCoefficient - 1);
-                    repaint();
-                } else if (rotation > 0 && scale > 1 && !(viewWidth >= viewHeight && (scale/zoomCoefficient) * proportion < 1) && !(viewWidth <= viewHeight && (scale/zoomCoefficient) / proportion < 1)) {
-                    scale /= zoomCoefficient;
-                    originX += (x - originX) - (x - originX) / zoomCoefficient;
-                    originY += (y - originY) - (y - originY) / zoomCoefficient;
-                    repaint();
-                }
+        double viewWidth = g.getClipBounds().width - allBorders * 2;
+        double viewHeight = g.getClipBounds().height - allBorders * 2;
+        double zoomCoefficient = 1.2;
+        int zoomBorders = allBorders - fakeBorder;
+        if (x > zoomBorders && x < g.getClipBounds().width - zoomBorders && y > zoomBorders && y < g.getClipBounds().height - zoomBorders) {
+            if ((rotation < 0) && scale < 20) {
+                scale *= zoomCoefficient;
+                originX -= (x - originX) * (zoomCoefficient - 1);
+                originY -= (y - originY) * (zoomCoefficient - 1);
+                repaint();
+            } else if (rotation > 0 && scale > 1 && !(viewWidth >= viewHeight && (scale/zoomCoefficient) * proportion < 1) && !(viewWidth <= viewHeight && (scale/zoomCoefficient) / proportion < 1)) {
+                scale /= zoomCoefficient;
+                originX += (x - originX) - (x - originX) / zoomCoefficient;
+                originY += (y - originY) - (y - originY) / zoomCoefficient;
+                repaint();
             }
         }
-
     }
 
     /**
