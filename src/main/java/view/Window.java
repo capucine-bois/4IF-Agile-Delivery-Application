@@ -165,7 +165,7 @@ public class Window extends JFrame {
      */
     public void setWindowSize(int windowWidth, int windowHeight) {
         int headerHeight = 50;
-        int textualViewWidth = 300;
+        int textualViewWidth = 320;
         setPreferredSize(new Dimension(windowWidth, windowHeight));
         header.setPreferredSize(new Dimension(windowWidth, headerHeight));
         textualView.setPreferredSize(new Dimension(textualViewWidth, windowHeight - headerHeight));
