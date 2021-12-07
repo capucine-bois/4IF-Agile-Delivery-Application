@@ -2,6 +2,7 @@ package xml;
 
 import java.io.File;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -67,7 +68,7 @@ public class XMLDeserializer {
             DocumentBuilder db = dbf.newDocumentBuilder();
             docParsed = db.parse(file);
         }catch(Exception e) {
-            throw new ExceptionXML("Bad extension");
+            throw new ExceptionXML("Malformed file");
         }
         return docParsed;
     }
@@ -227,6 +228,12 @@ public class XMLDeserializer {
 
         NodeList nodeRequest = document.getElementsByTagName("request");
         for (int x = 0, size = nodeRequest.getLength(); x < size; x++) {
+            Pattern pattern = Pattern.compile("^[0-9]*$");
+            boolean pickupDurationOK = pattern.matcher(nodeRequest.item(x).getAttributes().getNamedItem("pickupDuration").getNodeValue()).find();
+            boolean deliveryDurationOK = pattern.matcher(nodeRequest.item(x).getAttributes().getNamedItem("deliveryDuration").getNodeValue()).find();
+            if (!pickupDurationOK || !deliveryDurationOK) {
+                throw new ExceptionXML("One of the duration is not a positive integer.");
+            }
             long pickupAddressId = Long.parseLong(nodeRequest.item(x).getAttributes().getNamedItem("pickupAddress").getNodeValue());
             long deliveryAddressId = Long.parseLong(nodeRequest.item(x).getAttributes().getNamedItem("deliveryAddress").getNodeValue());
             int pickupDuration = Integer.parseInt(nodeRequest.item(x).getAttributes().getNamedItem("pickupDuration").getNodeValue());
