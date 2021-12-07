@@ -336,11 +336,7 @@ public class Tour extends Observable {
      */
     public void updateTourInformation(ArrayList<Node> listNodes, long startTime, TSP tsp) {
         this.setTourLength(tsp.getSolutionCost());
-        // print the cost of the solution and the TSP time
-        System.out.print("Solution of cost "+this.tourLength+" found in "
-                +(System.currentTimeMillis() - startTime)+"ms : ");
 
-        // print the solution with number which correspond to the order in the planning request
         Integer[] intersectionsOrder = tsp.getBestSol();
 
         listShortestPaths.clear();
