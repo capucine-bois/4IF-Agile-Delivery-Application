@@ -40,7 +40,8 @@ public class GraphicalView extends JPanel implements Observer {
     private double longitudeLength;
     private double width;
     private double height;
-    private double proportion;
+    private double whiteSpaceX;
+    private double whiteSpaceY;
     private boolean selectionMode;
     private int radiusForSelection;
 
@@ -134,7 +135,7 @@ public class GraphicalView extends JPanel implements Observer {
 
         double widthDistance = computeDistanceFromCoordinates(minLatitude, minLatitude, minLongitude, maxLongitude);
         double heightDistance = computeDistanceFromCoordinates(minLatitude, maxLatitude, minLongitude, minLongitude);
-        proportion = heightDistance/widthDistance;
+        double proportion = heightDistance / widthDistance;
 
         double viewWidth = g.getClipBounds().width - allBorders * 2;
         double viewHeight = g.getClipBounds().height - allBorders * 2;
@@ -167,12 +168,26 @@ public class GraphicalView extends JPanel implements Observer {
             }
         }
 
+        whiteSpaceX = 0;
+        whiteSpaceY = 0;
+        if (viewHeight/viewWidth <= proportion) {
+            if (widthDistance > heightDistance) {
+                whiteSpaceY = (viewHeight - viewWidth * proportion) * scale;
+            } else {
+                whiteSpaceX = (viewWidth - viewHeight / proportion) * scale;
+            }
+        } else {
+            if (widthDistance > heightDistance) {
+                whiteSpaceX = (viewWidth - viewHeight / proportion) * scale;
+            } else {
+                whiteSpaceY = (viewHeight - viewWidth * proportion) * scale;
+            }
+        }
+
         if (originX > allBorders) originX = allBorders;
         if (originY > allBorders) originY = allBorders;
-        if (originX + width - allBorders < viewWidth) originX = (int) (viewWidth - width + allBorders);
-        if (originY + height - allBorders < viewHeight) originY = (int) (viewHeight - height + allBorders);
-        if (width <= viewWidth) originX = (int) (allBorders + (viewWidth - width)/2);
-        if (height <= viewHeight) originY = (int) (allBorders + (viewHeight - height)/2);
+        if (originX + width + whiteSpaceX - allBorders < viewWidth) originX = (int) (viewWidth - width - whiteSpaceX + allBorders);
+        if (originY + height + whiteSpaceY - allBorders < viewHeight) originY = (int) (viewHeight - height - whiteSpaceY + allBorders);
 
         displaySegmentsForEachOrigin(intersections, Constants.COLOR_6, (float) (scale + 2), false);
         displaySegmentsForEachOrigin(intersections, Constants.COLOR_7, (float) scale, true);
@@ -383,7 +398,7 @@ public class GraphicalView extends JPanel implements Observer {
      */
     private int getCoordinateX(Intersection intersection) {
         double coordinateLongitude = intersection.getLongitude() - minLongitude;
-        return (int) ((coordinateLongitude * width) / longitudeLength) + originX;
+        return (int) ((coordinateLongitude * width) / longitudeLength + originX + whiteSpaceX/2);
     }
 
     /**
@@ -393,7 +408,7 @@ public class GraphicalView extends JPanel implements Observer {
      */
     private int getCoordinateY(Intersection intersection) {
         double coordinateLatitude = intersection.getLatitude() - minLatitude;
-        return (int) (height) - (int) ((coordinateLatitude * height) / latitudeLength) + originY;
+        return (int) (height - (coordinateLatitude * height) / latitudeLength + originY + whiteSpaceY/2);
     }
 
     /**
