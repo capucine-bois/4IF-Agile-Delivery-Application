@@ -55,7 +55,7 @@ public class TextualView extends JPanel implements Observer {
     private JPanel requestsMainPanel;
     private JPanel tourMainPanel;
     private JPanel addRequestPanel;
-    private boolean changeTimeMode;
+    private boolean changeTimeMode = false;
 
     // Listeners
     private final MouseListener mouseListener;
@@ -183,8 +183,11 @@ public class TextualView extends JPanel implements Observer {
             displayRequests();
             if (!tour.getListShortestPaths().isEmpty()) {
                 displayTourIntersections();
-                displayAddRequest();
             }
+        }
+        if (tour.isTourComputed()) {
+            requestsPanelWithAddButton.add(addRequest, BorderLayout.PAGE_END);
+            displayAddRequest();
         }
         revalidate();
         repaint();
@@ -202,9 +205,6 @@ public class TextualView extends JPanel implements Observer {
         displayDepotInformation(requestsMainPanel);
         requestsMainPanel.add(Box.createRigidArea(new Dimension(0, gap)));
         displayRequestsInformation(requestsMainPanel);
-        if (!tour.getListShortestPaths().isEmpty() && tour.isTourComputed()) {
-            requestsPanelWithAddButton.add(addRequest, BorderLayout.PAGE_END);
-        }
     }
 
     /**
