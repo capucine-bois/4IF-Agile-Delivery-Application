@@ -310,15 +310,16 @@ public abstract class State {
     public void stopTourComputation(Tour tour) {
     }
 
-    public void deleteRequest(Tour tour, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l, Controller controller) {
+    public void deleteRequest(int indexRequest, Tour tour, CityMap cityMap, Window window, ListOfCommands listOfCommands, Controller controller) {
     }
 
-    public Request processDeleteRequest(Tour tour, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l) {
+    public Request defaultDeleteRequest(int indexRequest, Tour tour, CityMap cityMap, Window window, ListOfCommands listOfCommands) {
         Request requestToDelete = tour.getPlanningRequests().get(indexRequest);
         int indexShortestPathToPickup = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 1).findFirst().get());
         int indexShortestPathToDelivery = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 2).findFirst().get());
-        l.add(new ReverseCommand(new AddCommand(tour, requestToDelete, allIntersections, indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery)));
+        listOfCommands.add(new ReverseCommand(new AddCommand(tour, requestToDelete, cityMap.getIntersections(), indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery)));
         window.setUndoButtonState(true);
+        window.setRedoButtonState(false);
         return requestToDelete;
     }
 

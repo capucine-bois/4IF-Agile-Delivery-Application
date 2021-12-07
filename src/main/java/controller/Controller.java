@@ -165,7 +165,7 @@ public class Controller {
      * @param indexRequest index of the request to delete
      */
     public void deleteRequest(int indexRequest) {
-        currentState.deleteRequest(tour, indexRequest, cityMap.getIntersections(), window, listOfCommands, this);
+        currentState.deleteRequest(indexRequest, tour, cityMap, window, listOfCommands, this);
     }
 
     /**

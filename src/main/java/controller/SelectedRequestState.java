@@ -3,8 +3,6 @@ package controller;
 import model.*;
 import view.Window;
 
-import java.util.List;
-
 /**
  * State when a request is selected.
  */
@@ -52,13 +50,19 @@ public class SelectedRequestState extends State {
     }
 
     @Override
-    public void deleteRequest(Tour tour, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l, Controller controller) {
-        Request requestToDelete = processDeleteRequest(tour, indexRequest, allIntersections, window, l);
+    public void deleteRequest(int indexRequest, Tour tour, CityMap cityMap, Window window, ListOfCommands listOfCommands, Controller controller) {
+        Request requestToDelete = defaultDeleteRequest(indexRequest, tour, cityMap, window, listOfCommands);
         if (requestToDelete.isPickupSelected() && requestToDelete.isDeliverySelected()) {
+            for (Request request : tour.getPlanningRequests()) {
+                request.setPickupSelected(false);
+                request.setDeliverySelected(false);
+            }
+            for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+                shortestPath.setSelected(false);
+            }
             controller.setCurrentState(controller.requestsComputedState);
+            tour.notifyObservers();
         }
-        window.setRedoButtonState(false);
-
     }
 
 

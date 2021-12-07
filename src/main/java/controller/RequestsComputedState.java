@@ -3,8 +3,6 @@ package controller;
 import model.*;
 import view.Window;
 
-import java.util.List;
-
 /**
  * Computed tour state.
  * State of the application when a tour has been computed and the textual view is displaying "Requests" tab.
@@ -52,12 +50,8 @@ public class RequestsComputedState extends State{
     }
 
     @Override
-    public void deleteRequest(Tour tour, int indexRequest, List<Intersection> allIntersections, Window window, ListOfCommands l, Controller controller) {
-        processDeleteRequest(tour, indexRequest, allIntersections, window, l);
-        if (tour.getPlanningRequests().isEmpty()) {
-            controller.setCurrentState(controller.mapLoadedState);
-        }
-        window.setRedoButtonState(false);
+    public void deleteRequest(int indexRequest, Tour tour, CityMap cityMap, Window window, ListOfCommands listOfCommands, Controller controller) {
+        defaultDeleteRequest(indexRequest, tour, cityMap, window, listOfCommands);
     }
 
     @Override

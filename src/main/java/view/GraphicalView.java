@@ -147,11 +147,6 @@ public class GraphicalView extends JPanel implements Observer {
             width = height / proportion;
         }
 
-        System.out.println("scale : " + scale);
-        System.out.println("w : " + (viewWidth - width));
-        System.out.println("h : " + (viewHeight - height));
-        System.out.println(proportion);
-        System.out.println(viewHeight/viewWidth);
         if (width <= viewWidth || height <= viewHeight) {
             if (viewHeight/viewWidth <= proportion) {
                 if (widthDistance > heightDistance) {
