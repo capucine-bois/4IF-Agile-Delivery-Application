@@ -87,7 +87,6 @@ public abstract class TemplateTSP implements TSP {
                 if (currentCost+g.getCost(currentVertex,0) < bestSolCost){
                     visited.toArray(bestSol);
                     bestSolCost = currentCost+g.getCost(currentVertex,0);
-                    System.out.println(Arrays.toString(bestSol));
                     CompleteGraph completeGraph = (CompleteGraph) g;
                     tour.updateTourInformation(completeGraph.listNodesGraph, startTime, this);
                     tour.notifyObservers();

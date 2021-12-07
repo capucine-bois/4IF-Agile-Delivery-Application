@@ -36,8 +36,6 @@ public class SeqIter implements Iterator<Integer> {
             }
         }
 
-        //System.out.println("Candidates SeqIter : \n" + Arrays.toString(candidates));
-
     }
 
     @Override

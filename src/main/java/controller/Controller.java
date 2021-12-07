@@ -51,7 +51,6 @@ public class Controller {
      * @param state the new current state
      */
     public void setCurrentState(State state) {
-        System.out.println("state = " + state);
         this.currentState = state;
     }
 

@@ -302,9 +302,6 @@ public class Tour extends Observable {
 
         listNodes.add(0, new Node(depotAddress, Dijkstra.compute(allIntersectionsList, listUsefulEndPointsForDepot, depotAddress)));
 
-        // print the time to compute Dijkstra
-        System.out.println("Dijkstra finished in "
-                + (System.currentTimeMillis() - startTimeDijkstra) + "ms\n");
     }
 
 
@@ -345,10 +342,6 @@ public class Tour extends Observable {
 
         // print the solution with number which correspond to the order in the planning request
         Integer[] intersectionsOrder = tsp.getBestSol();
-        for (Integer integer : intersectionsOrder) {
-            System.out.print(integer + "  ");
-        }
-        System.out.println("0");
 
         listShortestPaths.clear();
         for(int i=0; i< intersectionsOrder.length-1; i++) {
@@ -417,8 +410,6 @@ public class Tour extends Observable {
      * @param requestToInsert request to insert
      */
     public void insertRequest(int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery, Request requestToInsert, List<Intersection> allIntersections) {
-        System.out.println("Tour.putBackRequest");
-
         // add request
         planningRequests.add(indexRequest, requestToInsert);
         Intersection pickupAddress = requestToInsert.getPickupAddress();
@@ -502,12 +493,8 @@ public class Tour extends Observable {
      * @param allIntersections all the intersections of the map
      */
     public void removeRequest(int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery, List<Intersection> allIntersections) {
-        System.out.println("Tour.removeRequest");
-        System.out.println("before");
-
         // remove request
         planningRequests.remove(indexRequest);
-        System.out.println("hee");
         for (int i = 0; i < listShortestPaths.size() - 1; i++) {
             if (i != indexShortestPathToPickup + 1 && i != indexShortestPathToDelivery + 1) {
                 ShortestPath currentShortestPath = listShortestPaths.get(i);
