@@ -40,6 +40,7 @@ public class GraphicalView extends JPanel implements Observer {
     private double longitudeLength;
     private double width;
     private double height;
+    private double proportion;
     private double whiteSpaceX;
     private double whiteSpaceY;
     private boolean selectionMode;
@@ -135,52 +136,32 @@ public class GraphicalView extends JPanel implements Observer {
 
         double widthDistance = computeDistanceFromCoordinates(minLatitude, minLatitude, minLongitude, maxLongitude);
         double heightDistance = computeDistanceFromCoordinates(minLatitude, maxLatitude, minLongitude, minLongitude);
-        double proportion = heightDistance / widthDistance;
+        proportion = heightDistance / widthDistance;
 
         double viewWidth = g.getClipBounds().width - allBorders * 2;
         double viewHeight = g.getClipBounds().height - allBorders * 2;
-
-        if (widthDistance > heightDistance) {
-            width = viewWidth * scale;
-            height = width * proportion;
-        } else {
-            height = viewHeight * scale;
-            width = height / proportion;
-        }
-
-        if (width <= viewWidth || height <= viewHeight) {
-            if (viewHeight/viewWidth <= proportion) {
-                if (widthDistance > heightDistance) {
-                    width = viewWidth;
-                    height = width * proportion;
-                } else {
-                    height = viewHeight;
-                    width = height / proportion;
-                }
-            } else {
-                if (widthDistance > heightDistance) {
-                    height = viewHeight;
-                    width = height / proportion;
-                } else {
-                    width = viewWidth;
-                    height = width * proportion;
-                }
-            }
-        }
 
         whiteSpaceX = 0;
         whiteSpaceY = 0;
         if (viewHeight/viewWidth <= proportion) {
             if (widthDistance > heightDistance) {
-                whiteSpaceY = (viewHeight - viewWidth * proportion) * scale;
+                width = viewWidth * scale;
+                height = width * proportion;
+                whiteSpaceY = (viewHeight * scale - height);
             } else {
-                whiteSpaceX = (viewWidth - viewHeight / proportion) * scale;
+                height = viewHeight * scale;
+                width = height / proportion;
+                whiteSpaceX = (viewWidth * scale - width);
             }
         } else {
             if (widthDistance > heightDistance) {
-                whiteSpaceX = (viewWidth - viewHeight / proportion) * scale;
+                height = viewHeight * scale;
+                width = height / proportion;
+                whiteSpaceX = (viewWidth * scale - width);
             } else {
-                whiteSpaceY = (viewHeight - viewWidth * proportion) * scale;
+                width = viewWidth * scale;
+                height = width * proportion;
+                whiteSpaceY = (viewHeight * scale - height);
             }
         }
 
@@ -494,7 +475,7 @@ public class GraphicalView extends JPanel implements Observer {
                     originX -= (x - originX) * (zoomCoefficient - 1);
                     originY -= (y - originY) * (zoomCoefficient - 1);
                     repaint();
-                } else if (rotation > 0 && !(width <= viewWidth && height <= viewHeight)) {
+                } else if (rotation > 0 && scale > 1 && !(viewWidth >= viewHeight && (scale/zoomCoefficient) * proportion < 1) && !(viewWidth <= viewHeight && (scale/zoomCoefficient) / proportion < 1)) {
                     scale /= zoomCoefficient;
                     originX += (x - originX) - (x - originX) / zoomCoefficient;
                     originY += (y - originY) - (y - originY) / zoomCoefficient;
