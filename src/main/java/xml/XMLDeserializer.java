@@ -227,6 +227,9 @@ public class XMLDeserializer {
     public static void parseXMLRequests(Tour tour, CityMap cityMap, Document document) throws ExceptionXML {
 
         NodeList nodeRequest = document.getElementsByTagName("request");
+        if (nodeRequest.getLength() == 0) {
+            throw new ExceptionXML("No request is present in the selected file.");
+        }
         for (int x = 0, size = nodeRequest.getLength(); x < size; x++) {
             Pattern pattern = Pattern.compile("^[0-9]*$");
             boolean pickupDurationOK = pattern.matcher(nodeRequest.item(x).getAttributes().getNamedItem("pickupDuration").getNodeValue()).find();
