@@ -9,10 +9,11 @@ import java.util.regex.Pattern;
 public class ChangeProcessTimeState extends State {
 
     @Override
-    public void cancel(Tour tour, Window window, Controller controller) {
+    public void cancel(Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {
         window.exitChangeTimeMode();
         window.setDefaultButtonStates(new boolean[]{true, true, false});
         controller.setCurrentState(controller.selectedIntersectionState);
+        checkIfUndoOrRedoPossible(listOfCommands, window);
     }
 
     @Override
@@ -27,7 +28,7 @@ public class ChangeProcessTimeState extends State {
             } else {
                 listOfCommands.add(new ChangeProcessTimeCommand(tour, indexRequest * 2 + 2, requestToUpdate.getDeliveryDuration(), Integer.parseInt(time) * 60));
             }
-            window.setUndoButtonState(true);
+            checkIfUndoOrRedoPossible(listOfCommands, window);
             window.exitChangeTimeMode();
             window.setDefaultButtonStates(new boolean[]{true, true, false});
             controller.setCurrentState(controller.selectedIntersectionState);

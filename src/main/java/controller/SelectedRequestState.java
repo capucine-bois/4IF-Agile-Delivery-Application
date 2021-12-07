@@ -81,12 +81,6 @@ public class SelectedRequestState extends State {
 
     @Override
     public void addRequest(Tour tour, Window window, Controller controller) {
-        tour.setNewRequest(new Request());
-        window.showAddRequestPanel();
-        window.setEnabledTour(false);
-        window.setDefaultButtonStates(new boolean[]{false, false, false});
-        controller.setCurrentState(controller.addRequestState);
-        window.setRedoButtonState(false);
-        tour.notifyObservers();
+        defaultAddRequest(tour, window, controller);
     }
 }

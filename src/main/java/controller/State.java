@@ -279,20 +279,17 @@ public abstract class State {
 
     public void undo(ListOfCommands l, Window window) {
         l.undo();
-        if (l.size() == 0 || l.getCurrentIndex() < 0) {
-            window.setUndoButtonState(false);
-        }
-        window.setRedoButtonState(true);
+        checkIfUndoOrRedoPossible(l, window);
     }
 
     public void redo(ListOfCommands l, Window window) {
         l.redo();
+        checkIfUndoOrRedoPossible(l, window);
+    }
 
-        if (l.size() == 0 || l.getCurrentIndex() >= l.size() - 1) {
-            window.setRedoButtonState(false);
-        }
-
-        window.setUndoButtonState(true);
+    protected void checkIfUndoOrRedoPossible(ListOfCommands listOfCommands, Window window) {
+        window.setUndoButtonState(listOfCommands.undoPossible());
+        window.setRedoButtonState(listOfCommands.redoPossible());
     }
 
     public void enterMouseOnTourIntersection(int indexShortestPath, Window window) {
@@ -313,23 +310,33 @@ public abstract class State {
     public void deleteRequest(int indexRequest, Tour tour, CityMap cityMap, Window window, ListOfCommands listOfCommands, Controller controller) {
     }
 
-    public Request defaultDeleteRequest(int indexRequest, Tour tour, CityMap cityMap, Window window, ListOfCommands listOfCommands) {
+    protected Request defaultDeleteRequest(int indexRequest, Tour tour, CityMap cityMap, Window window, ListOfCommands listOfCommands) {
         Request requestToDelete = tour.getPlanningRequests().get(indexRequest);
         int indexShortestPathToPickup = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 1).findFirst().get());
         int indexShortestPathToDelivery = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 2).findFirst().get());
         listOfCommands.add(new ReverseCommand(new AddCommand(tour, requestToDelete, cityMap.getIntersections(), indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery)));
-        window.setUndoButtonState(true);
-        window.setRedoButtonState(false);
+        checkIfUndoOrRedoPossible(listOfCommands, window);
         return requestToDelete;
     }
 
-        public void addRequest(Tour tour, Window window, Controller controller) {
+    public void addRequest(Tour tour, Window window, Controller controller) {
+    }
+
+    protected void defaultAddRequest(Tour tour, Window window, Controller controller) {
+        tour.setNewRequest(new Request());
+        window.showAddRequestPanel();
+        window.setEnabledTour(false);
+        window.setDefaultButtonStates(new boolean[]{false, false, false});
+        controller.setCurrentState(controller.addRequestState);
+        window.setUndoButtonState(false);
+        window.setRedoButtonState(false);
+        tour.notifyObservers();
     }
 
     public void chooseAddress(int indexButton, Window window, Controller controller) {
     }
 
-    public void cancel(Tour tour, Window window, Controller controller) {
+    public void cancel(Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {
     }
 
     public void leftClickOnIntersection(int indexIntersection, CityMap cityMap, Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {

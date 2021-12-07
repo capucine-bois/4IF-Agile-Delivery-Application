@@ -74,16 +74,14 @@ public class SelectedIntersectionState extends State {
     public void moveIntersectionBefore(ListOfCommands l, Tour tour, int indexShortestPath,
                                        List<Intersection> allIntersections, Window window) {
         l.add(new MoveIntersectionBeforeCommand(tour, indexShortestPath, allIntersections, window));
-        window.setUndoButtonState(true);
-        window.setRedoButtonState(false);
+        checkIfUndoOrRedoPossible(l, window);
     }
 
     @Override
     public void moveIntersectionAfter(ListOfCommands l, Tour tour, int indexShortestPath,
                                       List<Intersection> allIntersections, Window window) {
         l.add(new ReverseCommand(new MoveIntersectionBeforeCommand(tour, indexShortestPath+1, allIntersections, window)));
-        window.setUndoButtonState(true);
-        window.setRedoButtonState(false);
+        checkIfUndoOrRedoPossible(l, window);
     }
 
     @Override
@@ -91,6 +89,7 @@ public class SelectedIntersectionState extends State {
         window.enterSelectionMode();
         window.setDefaultButtonStates(new boolean[]{false, false, false});
         controller.setCurrentState(controller.changeAddressState);
+        window.setUndoButtonState(false);
         window.setRedoButtonState(false);
     }
 
@@ -99,6 +98,7 @@ public class SelectedIntersectionState extends State {
         window.enterChangeTimeMode();
         window.setDefaultButtonStates(new boolean[]{false, false, false});
         controller.setCurrentState(controller.changeProcessTimeState);
+        window.setUndoButtonState(false);
         window.setRedoButtonState(false);
     }
 

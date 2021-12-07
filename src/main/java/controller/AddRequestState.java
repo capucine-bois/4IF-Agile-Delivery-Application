@@ -19,12 +19,13 @@ public class AddRequestState extends State{
     }
 
     @Override
-    public void cancel(Tour tour, Window window, Controller controller) {
+    public void cancel(Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {
         window.setEnabledTour(true);
         window.showRequestsPanel();
         tour.setNewRequest(null);
         window.setDefaultButtonStates(new boolean[]{true, true, false});
         controller.setCurrentState(controller.requestsComputedState);
+        checkIfUndoOrRedoPossible(listOfCommands, window);
         window.requestFocusInWindow();
         tour.notifyObservers();
     }
@@ -42,7 +43,7 @@ public class AddRequestState extends State{
             window.setEnabledTour(true);
             tour.setNewRequest(null);
             window.setDefaultButtonStates(new boolean[]{true, true, false});
-            window.setUndoButtonState(true);
+            checkIfUndoOrRedoPossible(listOfCommands, window);
             controller.setCurrentState(controller.requestsComputedState);
             window.requestFocusInWindow();
             tour.notifyObservers();
@@ -53,6 +54,5 @@ public class AddRequestState extends State{
         } else {
             window.displayErrorMessage("Process times must be positive integers.");
         }
-        window.setRedoButtonState(false);
     }
 }

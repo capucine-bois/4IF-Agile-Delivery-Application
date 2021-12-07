@@ -218,7 +218,7 @@ public class Controller {
     }
 
     public void cancel() {
-        currentState.cancel(tour, window, this);
+        currentState.cancel(tour, window, listOfCommands, this);
     }
 
     public void leftClickOnIntersection(int indexIntersection) {

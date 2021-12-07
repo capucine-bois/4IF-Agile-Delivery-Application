@@ -64,17 +64,13 @@ public class TourComputedState extends State {
     public void moveIntersectionBefore(ListOfCommands l, Tour tour, int indexShortestPath,
                                        List<Intersection> allIntersections, Window window) {
         l.add(new MoveIntersectionBeforeCommand(tour, indexShortestPath, allIntersections, window));
-        window.setUndoButtonState(true);
-        window.setRedoButtonState(false);
-
+        checkIfUndoOrRedoPossible(l, window);
     }
 
     @Override
     public void moveIntersectionAfter(ListOfCommands l, Tour tour, int indexShortestPath,
                                       List<Intersection> allIntersections, Window window) {
         l.add(new ReverseCommand(new MoveIntersectionBeforeCommand(tour, indexShortestPath+1, allIntersections, window)));
-        window.setUndoButtonState(true);
-        window.setRedoButtonState(false);
-
+        checkIfUndoOrRedoPossible(l, window);
     }
 }

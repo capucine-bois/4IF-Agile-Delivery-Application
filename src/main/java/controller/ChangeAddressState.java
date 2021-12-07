@@ -8,10 +8,11 @@ import java.util.ArrayList;
 public class ChangeAddressState extends State {
 
     @Override
-    public void cancel(Tour tour, Window window, Controller controller) {
+    public void cancel(Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {
         window.exitSelectionMode();
         window.setDefaultButtonStates(new boolean[]{true, true, false});
         controller.setCurrentState(controller.selectedIntersectionState);
+        checkIfUndoOrRedoPossible(listOfCommands, window);
     }
 
     @Override
@@ -31,7 +32,7 @@ public class ChangeAddressState extends State {
             } else {
                 listOfCommands.add(new ChangeAddressCommand(tour, indexRequest * 2 + 2, requestToUpdate.getDeliveryAddress(), newAddress, cityMap.getIntersections()));
             }
-            window.setUndoButtonState(true);
+            checkIfUndoOrRedoPossible(listOfCommands, window);
             window.setDefaultButtonStates(new boolean[]{true, true, false});
             controller.setCurrentState(controller.selectedIntersectionState);
         }

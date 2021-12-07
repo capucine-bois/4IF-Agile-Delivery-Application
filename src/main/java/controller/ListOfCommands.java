@@ -60,12 +60,11 @@ public class ListOfCommands {
         list.clear();
     }
 
-
-    public int getCurrentIndex() {
-        return currentIndex;
+    public boolean undoPossible() {
+        return currentIndex >= 0;
     }
 
-    public int size(){
-        return list.size();
+    public boolean redoPossible() {
+        return currentIndex < list.size() - 1;
     }
 }

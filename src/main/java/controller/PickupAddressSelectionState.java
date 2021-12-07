@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class PickupAddressSelectionState extends State {
 
     @Override
-    public void cancel(Tour tour, Window window, Controller controller) {
+    public void cancel(Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {
         window.exitSelectionMode();
         controller.setCurrentState(controller.addRequestState);
     }
