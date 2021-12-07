@@ -21,7 +21,6 @@ public class MapLoadedState extends State {
     @Override
     public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
         try {
-            listOfCommands.reset();
             Request.lastColor = Color.red;
             XMLDeserializer.loadRequests(tour, cityMap);
             if(tour.checkIntersectionsUnreachable(cityMap.getIntersections())) {
@@ -35,7 +34,6 @@ public class MapLoadedState extends State {
                 window.displayErrorMessage("An address in the planning is unreachable.");
             }
         } catch (Exception e) {
-            listOfCommands.reset();
             if(!e.getMessage().equals("Cancel opening file")) {
                 tour.clearLists();
                 window.displayErrorMessage(e.getMessage());

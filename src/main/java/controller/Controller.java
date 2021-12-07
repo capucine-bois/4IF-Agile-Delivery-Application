@@ -179,14 +179,14 @@ public class Controller {
      * Undo last command.
      */
     public void undo() {
-        currentState.undo(listOfCommands, window);
+        currentState.undo(tour, listOfCommands, window, this);
     }
 
     /**
      * Redo last command.
      */
     public void redo() {
-        currentState.redo(listOfCommands, window);
+        currentState.redo(tour, listOfCommands, window, this);
     }
 
     /**

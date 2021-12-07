@@ -73,4 +73,14 @@ public class TourComputedState extends State {
         l.add(new ReverseCommand(new MoveIntersectionBeforeCommand(tour, indexShortestPath+1, allIntersections, window)));
         checkIfUndoOrRedoPossible(l, window);
     }
+
+    @Override
+    public void undo(Tour tour, ListOfCommands l, Window window, Controller controller) {
+        defaultUndo(tour, l, window, controller);
+    }
+
+    @Override
+    public void redo(Tour tour, ListOfCommands l, Window window, Controller controller) {
+        defaultRedo(tour, l, window, controller);
+    }
 }

@@ -277,14 +277,31 @@ public abstract class State {
     public void exitMouseOnTourIntersection(int indexShortestPath, Tour tour, Window window) {
     }
 
-    public void undo(ListOfCommands l, Window window) {
+    public void undo(Tour tour, ListOfCommands l, Window window, Controller controller) {}
+
+    protected void defaultUndo(Tour tour, ListOfCommands l, Window window, Controller controller) {
         l.undo();
         checkIfUndoOrRedoPossible(l, window);
+        resetSelectionRequestAndShortestPath(tour);
     }
 
-    public void redo(ListOfCommands l, Window window) {
+    public void redo(Tour tour, ListOfCommands l, Window window, Controller controller) {}
+
+    public void defaultRedo(Tour tour, ListOfCommands l, Window window, Controller controller) {
         l.redo();
         checkIfUndoOrRedoPossible(l, window);
+        resetSelectionRequestAndShortestPath(tour);
+    }
+
+    protected void resetSelectionRequestAndShortestPath(Tour tour) {
+        for (Request request : tour.getPlanningRequests()) {
+            request.setPickupSelected(false);
+            request.setDeliverySelected(false);
+        }
+        for (ShortestPath shortestPath : tour.getListShortestPaths()) {
+            shortestPath.setSelected(false);
+        }
+        tour.notifyObservers();
     }
 
     protected void checkIfUndoOrRedoPossible(ListOfCommands listOfCommands, Window window) {
@@ -323,6 +340,7 @@ public abstract class State {
     }
 
     protected void defaultAddRequest(Tour tour, Window window, Controller controller) {
+        resetSelectionRequestAndShortestPath(tour);
         tour.setNewRequest(new Request());
         window.showAddRequestPanel();
         window.setEnabledTour(false);

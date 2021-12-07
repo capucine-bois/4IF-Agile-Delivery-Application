@@ -51,4 +51,16 @@ public class PathDetailsComputedState extends State {
         controller.setCurrentState(controller.tourComputedState);
     }
 
+    @Override
+    public void undo(Tour tour, ListOfCommands l, Window window, Controller controller) {
+        defaultUndo(tour, l, window, controller);
+        controller.setCurrentState(controller.tourComputedState);
+    }
+
+    @Override
+    public void redo(Tour tour, ListOfCommands l, Window window, Controller controller) {
+        defaultRedo(tour, l, window, controller);
+        controller.setCurrentState(controller.tourComputedState);
+    }
+
 }
