@@ -54,7 +54,7 @@ public class Window extends JFrame {
         graphicalView = new GraphicalView(cityMap, tour, mouseListener);
         textualView = new TextualView(tour, this, mouseListener, buttonListener);
         popUpView = new PopUpView(this, mouseListener, buttonListener);
-        KeyboardListener keyboardListener = new KeyboardListener(controller);
+        KeyboardListener keyboardListener = new KeyboardListener(popUpView, controller);
         addKeyListener(keyboardListener);
         createHeader();
         createGraphicalView();

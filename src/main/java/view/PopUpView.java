@@ -84,4 +84,8 @@ public class PopUpView {
     public void setVisible(boolean visible) {
         popUpPanel.setVisible(visible);
     }
+
+    public boolean isVisible() {
+        return popUpPanel.isVisible();
+    }
 }

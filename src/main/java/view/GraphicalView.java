@@ -574,7 +574,7 @@ public class GraphicalView extends JPanel implements Observer {
         repaint();
     }
 
-    public boolean isSelectionMode() {
+    public boolean isNotInSelectionMode() {
         return !selectionMode;
     }
 
