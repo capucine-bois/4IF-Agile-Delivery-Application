@@ -62,6 +62,7 @@ public class Window extends JFrame {
         int minimumWindowHeight = 550;
         setMinimumSize(new Dimension(minimumWindowWidth, minimumWindowHeight));
         setWindowSize(minimumWindowWidth, minimumWindowHeight);
+        setTitle("Deliver' IF");
         setVisible(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
@@ -135,7 +136,7 @@ public class Window extends JFrame {
      * @throws FontFormatException raised if font can't be loaded
      */
     private void addAppName() throws IOException, FontFormatException {
-        JLabel appNameLabel = new JLabel("Application Name");
+        JLabel appNameLabel = new JLabel("Deliver' IF");
         appNameLabel.setForeground(Constants.COLOR_3);
         appNameLabel.setFont(Constants.getFont("DMSans-Bold.ttf", 14));
         appNameLabel.setBorder(BorderFactory.createEmptyBorder(0,20,0,20));
