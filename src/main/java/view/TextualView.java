@@ -228,14 +228,10 @@ public class TextualView extends JPanel implements Observer {
             Map<String, String> requestInformation = new HashMap<>();
             String pickupCoordinates = request.getPickupAddress().getLatitude() + ", " + request.getPickupAddress().getLongitude();
             String deliveryCoordinates = request.getDeliveryAddress().getLatitude() + ", " + request.getDeliveryAddress().getLongitude();
-            String pickupDuration = request.getPickupDuration() / 60 + " min " + request.getPickupDuration() % 60 + " s";
-            if (request.getPickupDuration() % 60 == 0) pickupDuration = pickupDuration.substring(0, pickupDuration.lastIndexOf("0"));
-            String deliveryDuration = request.getDeliveryDuration() / 60 + " min " + request.getDeliveryDuration() % 60 + " s";
-            if (request.getDeliveryDuration() % 60 == 0) deliveryDuration = deliveryDuration.substring(0, deliveryDuration.lastIndexOf("0"));
             requestInformation.put("Pickup address", pickupCoordinates);
-            requestInformation.put("Pickup duration", pickupDuration);
+            requestInformation.put("Pickup duration", request.getPickupDuration() / 60 + " min ");
             requestInformation.put("Delivery address", deliveryCoordinates);
-            requestInformation.put("Delivery duration", deliveryDuration);
+            requestInformation.put("Delivery duration", request.getDeliveryDuration() / 60 + " min ");
             displayRequestPanel(parentPanel, requestInformation, request.getColor(), request.isPickupSelected() && request.isDeliverySelected());
             parentPanel.add(Box.createRigidArea(new Dimension(0, gap)));
         }
