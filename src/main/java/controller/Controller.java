@@ -168,7 +168,7 @@ public class Controller {
     }
 
     /**
-     * Add a request in an already computed tour.
+     * Start the process of adding a request.
      *
      */
     public void addRequest() {
@@ -224,6 +224,11 @@ public class Controller {
         currentState.leftClickOnIntersection(indexIntersection, cityMap, tour, window, listOfCommands, this);
     }
 
+    /**
+     * Add a request to an already computed tour.
+     * @param pickupTime
+     * @param deliveryTime
+     */
     public void insertRequest(String pickupTime, String deliveryTime) {
         currentState.insertRequest(pickupTime, deliveryTime, cityMap, tour, window, listOfCommands, this);
     }

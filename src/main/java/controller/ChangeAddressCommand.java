@@ -13,6 +13,14 @@ public class ChangeAddressCommand implements Command {
     private final Intersection newAddress;
     private final List<Intersection> intersections;
 
+    /**
+     * Create the command which change the address of an intersection in a request
+     * @param tour
+     * @param indexNode
+     * @param formerAddress
+     * @param newAddress
+     * @param intersections
+     */
     public ChangeAddressCommand(Tour tour, int indexNode, Intersection formerAddress, Intersection newAddress, List<Intersection> intersections) {
         this.tour = tour;
         this.indexNode = indexNode;

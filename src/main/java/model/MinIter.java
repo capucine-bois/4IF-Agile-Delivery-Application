@@ -47,7 +47,4 @@ public class MinIter implements Iterator<Integer> {
     @Override
     public void remove() {}
 
-
-
-
 }

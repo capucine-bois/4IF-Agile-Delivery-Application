@@ -16,11 +16,10 @@ public class StronglyConnectedComponents {
      * @return true if there are in the same strongly connected part, false otherwise
      */
     public static ArrayList<Intersection> getAllUnreachableIntersections(ArrayList<Intersection> listIntersection, Intersection depot, ArrayList<Intersection> intersectionsToTest) {
-
         ArrayList<Intersection> intersectionsNotWithDepot = new ArrayList<>();
         ArrayList<Integer> [] listVertex = new ArrayList[listIntersection.size()];
         Integer [] colorDFSnum = new Integer[listIntersection.size()];
-        Integer [] num  = foretDFSnum(listIntersection, listVertex, colorDFSnum);
+        Integer [] num  = DFSnumForest(listIntersection, listVertex, colorDFSnum);
         List<Integer>[] graphTranspose = getTranspose(listIntersection);
 
         Integer [] color = new Integer[graphTranspose.length];
@@ -28,7 +27,6 @@ public class StronglyConnectedComponents {
 
         for(int j = num.length-1; j>=0; j--) {
             ArrayList<Integer> set;
-
             if(color[num[j]]==0) {
                 // map with the id of an intersection and the color
                 Map<Integer, Integer> colorMap = new HashMap<>();
@@ -37,8 +35,6 @@ public class StronglyConnectedComponents {
                         colorMap.put(k,0);
                     }
                 }
-
-
                 DFSrec(graphTranspose, num[j], color, colorMap);
                 set = (ArrayList<Integer>) colorMap.keySet().stream().filter(x -> colorMap.get(x)==2).collect(Collectors.toList());
                 if(set.contains((int)depot.getId())) {
@@ -70,7 +66,7 @@ public class StronglyConnectedComponents {
      * @param color an array with the color of the vertices
      * @return a list of dijkstra object (thus each will have his parent)
      */
-    public static Integer[] foretDFSnum(ArrayList<Intersection> listIntersections, ArrayList<Integer> [] listVertex, Integer [] color) {
+    public static Integer[] DFSnumForest(ArrayList<Intersection> listIntersections, ArrayList<Integer> [] listVertex, Integer [] color) {
         Integer [] num = new Integer[listIntersections.size()];
         int index = 0;
         for(Intersection intersection : listIntersections) {

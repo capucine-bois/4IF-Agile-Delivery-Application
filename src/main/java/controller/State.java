@@ -13,19 +13,6 @@ import java.util.List;
  */
 public abstract class State {
 
-    /**
-     * Loading a map (intersections and segments) from XML file.
-     * Deserialize XML map file selected by user and returned by GUI window.
-     *
-     * @param cityMap        the map structure to fill
-     * @param tour           the tour to clear
-     * @param window         the window where to show map and popup messages
-     * @param controller     application controller
-     * @param listOfCommands
-     */
-    public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
-    }
-
     public void defaultLoadMap(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
         try {
             XMLDeserializer.loadMap(cityMap);
@@ -55,18 +42,6 @@ public abstract class State {
                 tour.setTourComputed(false);
             }
         }
-    }
-
-    /**
-     * Loading a planning requests (pickup and deliveries) from XML file.
-     *
-     * @param cityMap        the map with the intersections
-     * @param tour           the tour structure to fill
-     * @param window         the window where to show map and popup messages
-     * @param controller     application controller
-     * @param listOfCommands
-     */
-    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
     }
 
     protected void defaultLoadRequests(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {
@@ -112,46 +87,6 @@ public abstract class State {
     }
 
     /**
-     * Compute tour to accomplish all the requests as fast as possible (solving TSP problem).
-     *
-     * @param cityMap    the city map which contains the list of intersections of the map file
-     * @param tour       the tour which contains all the requests
-     * @param controller the controller of our application
-     */
-    public void computeTour(CityMap cityMap, Tour tour, Window window, Controller controller) {
-    }
-
-    /**
-     * Display requests on the textual view.
-     *
-     * @param tour       tour with the requests to show
-     * @param window     the GUI
-     * @param controller application controller
-     */
-    public void showRequestsPanel(Tour tour, Window window, Controller controller) {
-    }
-
-    /**
-     * Display tour intersections and paths on the textual view.
-     *
-     * @param tour       tour with the intersections and the paths to show
-     * @param window     the GUI
-     * @param controller application controller
-     */
-    public void showTourPanel(Tour tour, Window window, Controller controller) {
-    }
-
-    /**
-     * Called when user clicks on a request on the textual view.
-     *
-     * @param indexRequest index of the clicked request
-     * @param tour         tour with the clicked request
-     * @param controller   application controller
-     */
-    public void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {
-    }
-
-    /**
      * Default behaviour when users click on a request on the textual view.
      * Set request to selected or not (if it was already), and update GUI to change its background.
      *
@@ -181,16 +116,6 @@ public abstract class State {
             }
         }
         tour.notifyObservers();
-    }
-
-    /**
-     * Called when user clicks on an intersection on the textual view.
-     *
-     * @param indexShortestPath index of the clicked
-     * @param tour              tour with the intersections and the paths to show
-     * @param controller        application controller
-     */
-    public void leftClickOnTourIntersection(int indexShortestPath, Tour tour, Controller controller) {
     }
 
     /**
@@ -227,19 +152,6 @@ public abstract class State {
         return pickupWasSelected || deliveryWasSelected;
     }
 
-    /**
-     * @param indexShortestPath
-     * @param tour
-     * @param controller
-     */
-    public void leftClickOnShortestPath(int indexShortestPath, Tour tour, Controller controller) {
-    }
-
-    /**
-     * @param indexShortestPath
-     * @param tour
-     * @param controller
-     */
     protected void defaultLeftClickOnShortestPath(int indexShortestPath, Tour tour, Controller controller) {
         for (Request request : tour.getPlanningRequests()) {
             request.setPickupSelected(false);
@@ -265,29 +177,14 @@ public abstract class State {
         tour.notifyObservers();
     }
 
-    public void goBackToTour(Tour tour, Controller controller) {
-    }
-
-    public void leftClickOnIcon(int indexIcon, Tour tour, Controller controller) {
-    }
-
-    public void enterMouseOnRequest(int indexRequest, Window window) {
-    }
-
-    public void exitMouseOnTourIntersection(int indexShortestPath, Tour tour, Window window) {
-    }
-
-    public void undo(Tour tour, ListOfCommands l, Window window, Controller controller) {}
-
-    protected void defaultUndo(Tour tour, ListOfCommands l, Window window, Controller controller) {
+    protected void defaultUndo(Tour tour, ListOfCommands l, Window window) {
         l.undo();
         checkIfUndoOrRedoPossible(l, window);
         resetSelectionRequestAndShortestPath(tour);
     }
 
-    public void redo(Tour tour, ListOfCommands l, Window window, Controller controller) {}
 
-    public void defaultRedo(Tour tour, ListOfCommands l, Window window, Controller controller) {
+    public void defaultRedo(Tour tour, ListOfCommands l, Window window) {
         l.redo();
         checkIfUndoOrRedoPossible(l, window);
         resetSelectionRequestAndShortestPath(tour);
@@ -309,24 +206,6 @@ public abstract class State {
         window.setRedoButtonState(listOfCommands.redoPossible());
     }
 
-    public void enterMouseOnTourIntersection(int indexShortestPath, Window window) {
-    }
-
-    public void exitMouseOnRequest(int indexRequest, Tour tour, Window window) {
-    }
-
-    public void moveIntersectionBefore(ListOfCommands l, Tour tour, int indexIntersection, List<Intersection> allIntersections, Window window) {
-    }
-
-    public void moveIntersectionAfter(ListOfCommands l, Tour tour, int indexIntersection, List<Intersection> allIntersections, Window window) {
-    }
-
-    public void stopTourComputation(Tour tour) {
-    }
-
-    public void deleteRequest(int indexRequest, Tour tour, CityMap cityMap, Window window, ListOfCommands listOfCommands, Controller controller) {
-    }
-
     protected Request defaultDeleteRequest(int indexRequest, Tour tour, CityMap cityMap, Window window, ListOfCommands listOfCommands) {
         Request requestToDelete = tour.getPlanningRequests().get(indexRequest);
         int indexShortestPathToPickup = tour.getListShortestPaths().indexOf(tour.getListShortestPaths().stream().filter(x -> x.getEndNodeNumber() == indexRequest * 2 + 1).findFirst().get());
@@ -334,9 +213,6 @@ public abstract class State {
         listOfCommands.add(new ReverseCommand(new AddCommand(tour, requestToDelete, cityMap.getIntersections(), indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery)));
         checkIfUndoOrRedoPossible(listOfCommands, window);
         return requestToDelete;
-    }
-
-    public void addRequest(Tour tour, Window window, Controller controller) {
     }
 
     protected void defaultAddRequest(Tour tour, Window window, Controller controller) {
@@ -351,27 +227,116 @@ public abstract class State {
         tour.notifyObservers();
     }
 
-    public void chooseAddress(int indexButton, Window window, Controller controller) {
-    }
+    /**
+     * Loading a planning requests (pickup and deliveries) from XML file.
+     *
+     * @param cityMap        the map with the intersections
+     * @param tour           the tour structure to fill
+     * @param window         the window where to show map and popup messages
+     * @param controller     application controller
+     * @param listOfCommands
+     */
+    public void loadRequests(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {}
 
-    public void cancel(Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {
-    }
+    /**
+     * Loading a map (intersections and segments) from XML file.
+     * Deserialize XML map file selected by user and returned by GUI window.
+     *
+     * @param cityMap        the map structure to fill
+     * @param tour           the tour to clear
+     * @param window         the window where to show map and popup messages
+     * @param controller     application controller
+     * @param listOfCommands
+     */
+    public void loadMap(CityMap cityMap, Tour tour, Window window, Controller controller, ListOfCommands listOfCommands) {}
 
-    public void leftClickOnIntersection(int indexIntersection, CityMap cityMap, Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {
-    }
+    /**
+     * Called when user clicks on an intersection on the textual view.
+     *
+     * @param indexShortestPath index of the clicked
+     * @param tour              tour with the intersections and the paths to show
+     * @param controller        application controller
+     */
+    public void leftClickOnTourIntersection(int indexShortestPath, Tour tour, Controller controller) {}
 
-    public void insertRequest(String pickupTime, String deliveryTime, CityMap cityMap, Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {
-    }
+    public void chooseAddress(int indexButton, Window window, Controller controller) {}
 
-    public void changeAddress(Window window, Controller controller) {
-    }
+    public void cancel(Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {}
 
-    public void changeTime(Window window, Controller controller) {
-    }
+    public void leftClickOnIntersection(int indexIntersection, CityMap cityMap, Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {}
 
-    public void saveTime(String time, Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {
-    }
+    public void insertRequest(String pickupTime, String deliveryTime, CityMap cityMap, Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {}
+
+    public void changeAddress(Window window, Controller controller) {}
+
+    public void changeTime(Window window, Controller controller) {}
+
+    public void saveTime(String time, Tour tour, Window window, ListOfCommands listOfCommands, Controller controller) {}
 
     public void arrowKeyPressed(boolean up, CityMap map, Tour tour, ListOfCommands listOfCommands, Window window) {}
+
+    public void enterMouseOnTourIntersection(int indexShortestPath, Window window) {}
+
+    public void exitMouseOnRequest(int indexRequest, Tour tour, Window window) {}
+
+    public void moveIntersectionBefore(ListOfCommands l, Tour tour, int indexIntersection, List<Intersection> allIntersections, Window window) {}
+
+    public void moveIntersectionAfter(ListOfCommands l, Tour tour, int indexIntersection, List<Intersection> allIntersections, Window window) {}
+
+    public void stopTourComputation(Tour tour) {}
+
+    public void addRequest(Tour tour, Window window, Controller controller) {}
+
+    public void deleteRequest(int indexRequest, Tour tour, CityMap cityMap, Window window, ListOfCommands listOfCommands, Controller controller) {}
+
+    public void redo(Tour tour, ListOfCommands l, Window window, Controller controller) {}
+
+    public void undo(Tour tour, ListOfCommands l, Window window, Controller controller) {}
+
+    public void goBackToTour(Tour tour, Controller controller) {}
+
+    public void leftClickOnIcon(int indexIcon, Tour tour, Controller controller) {}
+
+    public void enterMouseOnRequest(int indexRequest, Window window) {}
+
+    public void exitMouseOnTourIntersection(int indexShortestPath, Tour tour, Window window) {}
+
+    public void leftClickOnShortestPath(int indexShortestPath, Tour tour, Controller controller) {}
+
+    /**
+     * Compute tour to accomplish all the requests as fast as possible (solving TSP problem).
+     *
+     * @param cityMap    the city map which contains the list of intersections of the map file
+     * @param tour       the tour which contains all the requests
+     * @param controller the controller of our application
+     */
+    public void computeTour(CityMap cityMap, Tour tour, Window window, Controller controller) {}
+
+    /**
+     * Display requests on the textual view.
+     *
+     * @param tour       tour with the requests to show
+     * @param window     the GUI
+     * @param controller application controller
+     */
+    public void showRequestsPanel(Tour tour, Window window, Controller controller) {}
+
+    /**
+     * Display tour intersections and paths on the textual view.
+     *
+     * @param tour       tour with the intersections and the paths to show
+     * @param window     the GUI
+     * @param controller application controller
+     */
+    public void showTourPanel(Tour tour, Window window, Controller controller) {}
+
+    /**
+     * Called when user clicks on a request on the textual view.
+     *
+     * @param indexRequest index of the clicked request
+     * @param tour         tour with the clicked request
+     * @param controller   application controller
+     */
+    public void leftClickOnRequest(int indexRequest, Tour tour, Controller controller) {}
 
 }

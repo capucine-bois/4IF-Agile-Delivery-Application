@@ -17,5 +17,4 @@ public class TSP1 extends TemplateTSP {
         return new SeqIter(unvisited, currentVertex, g);
     }
 
-
 }

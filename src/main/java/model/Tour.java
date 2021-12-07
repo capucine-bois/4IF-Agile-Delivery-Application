@@ -336,10 +336,9 @@ public class Tour extends Observable {
      */
     public void updateTourInformation(ArrayList<Node> listNodes, long startTime, TSP tsp) {
         this.setTourLength(tsp.getSolutionCost());
-
         Integer[] intersectionsOrder = tsp.getBestSol();
-
         listShortestPaths.clear();
+
         for(int i=0; i< intersectionsOrder.length-1; i++) {
             Intersection end  = listNodes.get(intersectionsOrder[i+1]).getIntersection();
             ShortestPath shortestPathToAdd = listNodes.get(intersectionsOrder[i]).getListArcs().stream().filter(x -> x.getEndAddress()==end).findFirst().get();
@@ -353,7 +352,6 @@ public class Tour extends Observable {
                 listShortestPaths.add(shortestPathToAdd);
             }
         }
-
         updateTimes();
         notifyObservers();
     }
@@ -403,7 +401,10 @@ public class Tour extends Observable {
      * Position of intersections are stored in Request.
      * Some paths are deleted, some are created to accomplish every request including the new one.
      * @param indexRequest
-     * @param requestToInsert request to insert
+     * @param indexShortestPathToPickup
+     * @param indexShortestPathToDelivery
+     * @param requestToInsert
+     * @param allIntersections
      */
     public void insertRequest(int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery, Request requestToInsert, List<Intersection> allIntersections) {
         // add request
@@ -426,6 +427,15 @@ public class Tour extends Observable {
         int nodeNumberBeforeDelivery = listShortestPaths.get(indexShortestPathToDeliveryToUpdate).getStartNodeNumber();
         nodeNumberBeforeDelivery = nodeNumberBeforeDelivery > indexRequest * 2 ? nodeNumberBeforeDelivery + 2 : nodeNumberBeforeDelivery;
 
+        processShortestPaths(indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery, allIntersections, pickupAddress, deliveryAddress, indexShortestPathToPickupToUpdate, indexShortestPathToDeliveryToUpdate);
+        putShortestPathInPlace(indexRequest, indexShortestPathToPickup, indexShortestPathToDelivery, allIntersections, pickupAddress, deliveryAddress, addressBeforePickup, nodeNumberBeforePickup, addressBeforeDelivery, nodeNumberBeforeDelivery);
+
+        updateLength();
+        updateTimes();
+        notifyObservers();
+    }
+
+    private void processShortestPaths(int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery, List<Intersection> allIntersections, Intersection pickupAddress, Intersection deliveryAddress, int indexShortestPathToPickupToUpdate, int indexShortestPathToDeliveryToUpdate) {
         for (int i = 0; i < listShortestPaths.size(); i++) {
             ShortestPath currentShortestPath = listShortestPaths.get(i);
             if (i == indexShortestPathToPickupToUpdate || i == indexShortestPathToDeliveryToUpdate) {
@@ -441,7 +451,9 @@ public class Tour extends Observable {
                 currentShortestPath.setEndNodeNumber(currentShortestPath.getEndNodeNumber() + 2);
             }
         }
+    }
 
+    private void putShortestPathInPlace(int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery, List<Intersection> allIntersections, Intersection pickupAddress, Intersection deliveryAddress, Intersection addressBeforePickup, int nodeNumberBeforePickup, Intersection addressBeforeDelivery, int nodeNumberBeforeDelivery) {
         if (Math.abs(indexShortestPathToDelivery - indexShortestPathToPickup) == 1) {
             if (indexShortestPathToPickup < indexShortestPathToDelivery) {
                 addShortestPath(indexShortestPathToPickup, allIntersections, pickupAddress, deliveryAddress, indexRequest * 2 + 1, indexRequest * 2 + 2);
@@ -459,10 +471,6 @@ public class Tour extends Observable {
                 addShortestPath(indexShortestPathToPickup, allIntersections, addressBeforePickup, pickupAddress, nodeNumberBeforePickup, indexRequest * 2 + 1);
             }
         }
-
-        updateLength();
-        updateTimes();
-        notifyObservers();
     }
 
     private void addShortestPath(int indexToAdd, List<Intersection> allIntersections, Intersection startAddress, Intersection endAddress, int startNodeNumber, int endNodeNumber) {
@@ -503,12 +511,8 @@ public class Tour extends Observable {
                     }
                     setCurrentShortestPathDelete(allIntersections, currentShortestPath, nextShortestPath);
                 }
-                if (currentShortestPath.getStartNodeNumber() > indexRequest * 2) {
-                    currentShortestPath.setStartNodeNumber(currentShortestPath.getStartNodeNumber() - 2);
-                }
-                if (currentShortestPath.getEndNodeNumber() > indexRequest * 2) {
-                    currentShortestPath.setEndNodeNumber(currentShortestPath.getEndNodeNumber() - 2);
-                }
+                if (currentShortestPath.getStartNodeNumber() > indexRequest * 2) currentShortestPath.setStartNodeNumber(currentShortestPath.getStartNodeNumber() - 2);
+                if (currentShortestPath.getEndNodeNumber() > indexRequest * 2) currentShortestPath.setEndNodeNumber(currentShortestPath.getEndNodeNumber() - 2);
             }
         }
 
@@ -539,16 +543,13 @@ public class Tour extends Observable {
      * @param allIntersections all intersections of the map
      */
     public void moveIntersectionBefore(int indexShortestPath, List<Intersection> allIntersections) {
-
         ArrayList<ShortestPath> deletedPaths = new ArrayList<>();
         ArrayList<Intersection> intersections = new ArrayList<>();
         ArrayList<Integer> newOrder = new ArrayList<>();
-
         this.deliveryBeforePickup = false;
 
         // sanity check
         if (indexShortestPath > 0 && indexShortestPath < listShortestPaths.size()-1) {
-
             getIntersectionsAndOrderForFuturePaths(indexShortestPath, intersections, newOrder);
 
             // remove paths from tour
@@ -560,11 +561,8 @@ public class Tour extends Observable {
             listShortestPaths.remove(indexShortestPath-1);
 
             recomputePathAfterMovingIntersection(indexShortestPath, allIntersections, intersections, newOrder);
-
             // check if a delivery is before a pickup
-            if (newOrder.get(2) == newOrder.get(1) - 1 && newOrder.get(1) % 2 == 0) {
-                this.deliveryBeforePickup = true;
-            }
+            if (newOrder.get(2) == newOrder.get(1) - 1 && newOrder.get(1) % 2 == 0) this.deliveryBeforePickup = true;
 
             updateLength();
             updateTimes();

@@ -9,5 +9,4 @@ public class TSP3 extends TSP2 {
         return new MinIter(unvisited, currentVertex, g);
     }
 
-
 }

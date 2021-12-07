@@ -52,7 +52,4 @@ public class SeqIter implements Iterator<Integer> {
     @Override
     public void remove() {}
 
-
-
-
 }

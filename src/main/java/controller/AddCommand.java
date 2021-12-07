@@ -16,9 +16,13 @@ public class AddCommand implements Command {
     private final int indexShortestPathToDelivery;
 
     /**
-     * Create the command which delete a request
-     * @param tour the tour to modify
-     * @param request the request to delete
+     * Create the command which add a request
+     * @param tour current Tour
+     * @param request request to add
+     * @param intersections list of all intersections
+     * @param indexRequest
+     * @param indexShortestPathToPickup
+     * @param indexShortestPathToDelivery
      */
     public AddCommand(Tour tour, Request request, List<Intersection> intersections, int indexRequest, int indexShortestPathToPickup, int indexShortestPathToDelivery) {
         this.tour = tour;

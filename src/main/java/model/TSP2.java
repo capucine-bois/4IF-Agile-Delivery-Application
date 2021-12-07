@@ -3,10 +3,14 @@ package model;
 import java.util.Collection;
 
 public class TSP2 extends TSP1 {
-    /*
-    Custom bound method.
-    Evaluate the lower bound by summing the minimal costs from current vertex and all unvisited vertices
-    to vertex 0 or any other unvisited vertices.
+    /**
+     * Custom bound method.
+     * Evaluate the lower bound by summing the minimal costs from current vertex and all unvisited vertices
+     * to vertex 0 or any other unvisited vertices.
+     * @param currentVertex
+     * @param unvisited
+     * @param g
+     * @return
      */
     @Override
     protected double bound(Integer currentVertex, Collection<Integer> unvisited, Graph g) {
@@ -33,6 +37,5 @@ public class TSP2 extends TSP1 {
 
         return evaluation;
     }
-
 
 }

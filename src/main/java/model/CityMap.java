@@ -74,14 +74,6 @@ public class CityMap extends Observable {
         dictionaryId.clear();
     }
 
-    /* GETTERS */
-
-    public List<Intersection> getIntersections() {
-        return intersections;
-    }
-
-
-
     /**
      * Check if two citymaps have the same attributes
      * @param o the object to compare
@@ -98,5 +90,10 @@ public class CityMap extends Observable {
         return check;
     }
 
+    /* GETTERS */
+
+    public List<Intersection> getIntersections() {
+        return intersections;
+    }
 
 }

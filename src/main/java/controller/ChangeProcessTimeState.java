@@ -6,6 +6,10 @@ import view.Window;
 
 import java.util.regex.Pattern;
 
+/**
+ * State of the application when the user wants to change the process time
+ * of a selected pickup or delivery address on the Textual View Tour.
+ */
 public class ChangeProcessTimeState extends State {
 
     @Override

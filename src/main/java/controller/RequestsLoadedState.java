@@ -4,7 +4,7 @@ import model.*;
 import view.Window;
 
 /**
- * Request loaded state. State when the application has successfully loaded requests.
+ * State when the application has successfully loaded requests.
  */
 public class RequestsLoadedState extends State {
 

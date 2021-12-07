@@ -121,13 +121,13 @@ public class SelectedIntersectionState extends State {
 
     @Override
     public void undo(Tour tour, ListOfCommands l, Window window, Controller controller) {
-        defaultUndo(tour, l, window, controller);
+        defaultUndo(tour, l, window);
         controller.setCurrentState(controller.tourComputedState);
     }
 
     @Override
     public void redo(Tour tour, ListOfCommands l, Window window, Controller controller) {
-        defaultRedo(tour, l, window, controller);
+        defaultRedo(tour, l, window);
         controller.setCurrentState(controller.tourComputedState);
     }
 }

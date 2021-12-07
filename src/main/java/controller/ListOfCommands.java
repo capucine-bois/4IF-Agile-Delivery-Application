@@ -4,7 +4,7 @@ package controller;
 import java.util.LinkedList;
 
 /**
- * Represent every command done, and that can be canceled, redone or undone.
+ * Represents every command done, each command can be canceled, redone or undone.
  */
 public class ListOfCommands {
     private final LinkedList<Command> list;

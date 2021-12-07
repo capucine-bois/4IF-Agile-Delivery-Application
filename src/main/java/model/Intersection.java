@@ -53,7 +53,6 @@ public class Intersection {
         return latitude;
     }
 
-
     public double getLongitude() {
         return longitude;
     }

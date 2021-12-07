@@ -156,7 +156,7 @@ class StronglyConnectedComponentsTest {
 
         ArrayList[] listVertex = new ArrayList[listIntersection.size()];
         Integer[] colorDFSnum = new Integer[listIntersection.size()];
-        Integer[] numForet = StronglyConnectedComponents.foretDFSnum(listIntersection, listVertex, colorDFSnum);
+        Integer[] numForet = StronglyConnectedComponents.DFSnumForest(listIntersection, listVertex, colorDFSnum);
 
         //System.out.println(Arrays.toString(numForet));
         assertEquals(3, numForet[0], "Wrong forest num order");

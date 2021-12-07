@@ -5,7 +5,7 @@ import model.Tour;
 import view.Window;
 
 /**
- * Initial state. State of the application when its launches, and when map is not loaded.
+ * Initial state. State of the application when it launches and when map is not loaded.
  */
 public class InitialState extends State {
 

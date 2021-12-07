@@ -92,6 +92,7 @@ public class ShortestPath implements Comparable<ShortestPath> {
     public boolean isSelected() {
         return selected;
     }
+
     /* SETTERS */
 
     public void setPathLength(double pathLength) {

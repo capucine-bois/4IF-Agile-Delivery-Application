@@ -4,7 +4,6 @@ import model.*;
 import view.Window;
 
 /**
- * Computed tour state.
  * State of the application when a tour has been computed and the textual view is displaying "Requests" tab.
  */
 public class RequestsComputedState extends State{
@@ -61,11 +60,11 @@ public class RequestsComputedState extends State{
 
     @Override
     public void undo(Tour tour, ListOfCommands l, Window window, Controller controller) {
-        defaultUndo(tour, l, window, controller);
+        defaultUndo(tour, l, window);
     }
 
     @Override
     public void redo(Tour tour, ListOfCommands l, Window window, Controller controller) {
-        defaultRedo(tour, l, window, controller);
+        defaultRedo(tour, l, window);
     }
 }

@@ -6,7 +6,6 @@ import view.Window;
 import java.util.List;
 
 /**
- * Computed tour state.
  * State of the application when a tour has been computed and the textual view is displaying "Tour" tab.
  */
 public class TourComputedState extends State {
@@ -76,11 +75,11 @@ public class TourComputedState extends State {
 
     @Override
     public void undo(Tour tour, ListOfCommands l, Window window, Controller controller) {
-        defaultUndo(tour, l, window, controller);
+        defaultUndo(tour, l, window);
     }
 
     @Override
     public void redo(Tour tour, ListOfCommands l, Window window, Controller controller) {
-        defaultRedo(tour, l, window, controller);
+        defaultRedo(tour, l, window);
     }
 }

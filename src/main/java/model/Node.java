@@ -39,5 +39,4 @@ public class Node {
         return intersection;
     }
 
-
 }

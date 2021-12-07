@@ -9,6 +9,14 @@ public class ChangeProcessTimeCommand implements Command {
     private final int oldTime;
     private final int newTime;
 
+    /**
+     * Create the command which add change the process time of a
+     * delivery address or a pickup address
+     * @param tour
+     * @param indexNode
+     * @param oldTime
+     * @param newTime
+     */
     public ChangeProcessTimeCommand(Tour tour, int indexNode, int oldTime, int newTime) {
         this.tour = tour;
         this.indexNode = indexNode;

@@ -8,6 +8,10 @@ import view.Window;
 
 import java.util.ArrayList;
 
+/**
+ * State of the application when the user wants to add a request a
+ * is selecting the pickup address on the map.
+ */
 public class PickupAddressSelectionState extends State {
 
     @Override

@@ -65,7 +65,6 @@ public class SelectedRequestState extends State {
         }
     }
 
-
     @Override
     public void enterMouseOnRequest(int indexRequest, Window window) {
         window.colorRequestPanelOnMouseEntered(indexRequest);
@@ -86,13 +85,13 @@ public class SelectedRequestState extends State {
 
     @Override
     public void undo(Tour tour, ListOfCommands l, Window window, Controller controller) {
-        defaultUndo(tour, l, window, controller);
+        defaultUndo(tour, l, window);
         controller.setCurrentState(controller.requestsComputedState);
     }
 
     @Override
     public void redo(Tour tour, ListOfCommands l, Window window, Controller controller) {
-        defaultRedo(tour, l, window, controller);
+        defaultRedo(tour, l, window);
         controller.setCurrentState(controller.requestsComputedState);
     }
 }
