@@ -25,6 +25,7 @@ public class AddRequestState extends State{
         tour.setNewRequest(null);
         window.setDefaultButtonStates(new boolean[]{true, true, false});
         controller.setCurrentState(controller.requestsComputedState);
+        window.requestFocusInWindow();
         tour.notifyObservers();
     }
 
@@ -43,6 +44,7 @@ public class AddRequestState extends State{
             window.setDefaultButtonStates(new boolean[]{true, true, false});
             window.setUndoButtonState(true);
             controller.setCurrentState(controller.requestsComputedState);
+            window.requestFocusInWindow();
             tour.notifyObservers();
         } else if (tour.getNewRequest().getPickupAddress() == null) {
             window.displayErrorMessage("No pickup address selected.");

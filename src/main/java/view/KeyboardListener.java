@@ -14,7 +14,7 @@ public class KeyboardListener extends KeyAdapter {
      * Application controller.
      */
     private final Controller controller;
-    private PopUpView popUpView;
+    private final PopUpView popUpView;
 
     public KeyboardListener(PopUpView popUpView, Controller controller){
         this.controller = controller;
@@ -25,11 +25,13 @@ public class KeyboardListener extends KeyAdapter {
     public void keyPressed(KeyEvent e) {
 
         if (!popUpView.isVisible()) {
-            if (e.getKeyCode() == 90 && e.isControlDown())
+            if (e.getKeyCode() == 90 && e.isControlDown() && !e.isShiftDown()) {
                 controller.undo();
+            }
 
-            if (e.getKeyCode() == 90 && e.isControlDown() && e.isShiftDown())
+            if (e.getKeyCode() == 90 && e.isControlDown() && e.isShiftDown()) {
                 controller.redo();
+            }
 
             if (e.getKeyCode() == KeyEvent.VK_UP) {
                 controller.arrowKeyPressed(true);

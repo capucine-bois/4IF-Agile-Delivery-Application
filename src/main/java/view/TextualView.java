@@ -641,6 +641,8 @@ public class TextualView extends JPanel implements Observer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        moveButton.setFocusable(false);
+        moveButton.setFocusPainted(false);
         moveButton.setBorder(BorderFactory.createEmptyBorder());
         if (selected) moveButton.setBackground(Constants.COLOR_12);
         else moveButton.setBackground(Constants.COLOR_2);
