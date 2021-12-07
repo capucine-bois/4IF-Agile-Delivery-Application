@@ -11,28 +11,22 @@ public class Node {
     /* ATTRIBUTES */
 
     /**
-     * A number used in the graph. We put the number in the same order as the planning request
-     */
-    private int number;
-
-    /**
      * The list of shortest path from the intersection to the other intersections in the planning
      */
-    private ArrayList<ShortestPath> listArcs;
+    private final ArrayList<ShortestPath> listArcs;
 
     /**
      * The intersection
      */
-    private Intersection intersection;
+    private final Intersection intersection;
 
     /**
      * Complete constructor
      * @param intersection intersection itself
      * @param listArcs list of shortest paths
-     * @param number number
      */
-    public Node(Intersection intersection, ArrayList<ShortestPath> listArcs, int number) {
-        this.number = number;
+    public Node(Intersection intersection, ArrayList<ShortestPath> listArcs) {
+        //A number used in the graph. We put the number in the same order as the planning request
         this.listArcs = listArcs;
         this.intersection = intersection;
     }

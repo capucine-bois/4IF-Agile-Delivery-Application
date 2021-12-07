@@ -5,8 +5,6 @@ import java.awt.event.KeyEvent;
 
 import controller.Controller;
 
-import javax.swing.*;
-
 /**
  * Listener to handle keyboard events.
  */

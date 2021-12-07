@@ -119,10 +119,6 @@ public class Tour extends Observable {
         return listShortestPaths;
     }
 
-    public SimpleDateFormat getParser() {
-        return parser;
-    }
-
     public boolean isDeliveryBeforePickup() {
         return deliveryBeforePickup;
     }
@@ -300,11 +296,11 @@ public class Tour extends Observable {
             ArrayList<ShortestPath> shortestPathsFromPickUp = Dijkstra.compute(allIntersectionsList, listUsefulEndPointsPickUp, pickupReq1);
             ArrayList<ShortestPath> shortestPathsFromDelivery = Dijkstra.compute(allIntersectionsList, listUsefulEndPointsDelivery, deliveryReq1);
 
-            listNodes.add(new Node(pickupReq1, shortestPathsFromPickUp, i + 1));
-            listNodes.add(new Node(deliveryReq1, shortestPathsFromDelivery, i + 2));
+            listNodes.add(new Node(pickupReq1, shortestPathsFromPickUp));
+            listNodes.add(new Node(deliveryReq1, shortestPathsFromDelivery));
         }
 
-        listNodes.add(0, new Node(depotAddress, Dijkstra.compute(allIntersectionsList, listUsefulEndPointsForDepot, depotAddress), 0));
+        listNodes.add(0, new Node(depotAddress, Dijkstra.compute(allIntersectionsList, listUsefulEndPointsForDepot, depotAddress)));
 
         // print the time to compute Dijkstra
         System.out.println("Dijkstra finished in "
