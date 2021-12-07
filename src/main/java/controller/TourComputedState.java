@@ -63,10 +63,8 @@ public class TourComputedState extends State {
     @Override
     public void moveIntersectionBefore(ListOfCommands l, Tour tour, int indexShortestPath,
                                        List<Intersection> allIntersections, Window window) {
-        l.add(new MoveIntersectionBeforeCommand(tour, indexShortestPath, allIntersections));
+        l.add(new MoveIntersectionBeforeCommand(tour, indexShortestPath, allIntersections, window));
         window.setUndoButtonState(true);
-        if (tour.isDeliveryBeforePickup())
-            window.displayErrorMessage("WARNING: A delivery address is visited before its pickup address!");
         window.setRedoButtonState(false);
 
     }
@@ -74,10 +72,8 @@ public class TourComputedState extends State {
     @Override
     public void moveIntersectionAfter(ListOfCommands l, Tour tour, int indexShortestPath,
                                       List<Intersection> allIntersections, Window window) {
-        l.add(new ReverseCommand(new MoveIntersectionBeforeCommand(tour, indexShortestPath+1, allIntersections)));
+        l.add(new ReverseCommand(new MoveIntersectionBeforeCommand(tour, indexShortestPath+1, allIntersections, window)));
         window.setUndoButtonState(true);
-        if (tour.isDeliveryBeforePickup())
-            window.displayErrorMessage("WARNING: A delivery address is visited before its pickup address!");
         window.setRedoButtonState(false);
 
     }
