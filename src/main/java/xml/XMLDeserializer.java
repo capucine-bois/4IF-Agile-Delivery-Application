@@ -31,7 +31,7 @@ public class XMLDeserializer {
             cityMap.clearLists();
             deserializeMap(cityMap, document);
         } else {
-            throw new ExceptionXML("Bad document");
+            throw new ExceptionXML("Bad document.");
         }
     }
 
@@ -51,7 +51,7 @@ public class XMLDeserializer {
             tour.clearLists();
             deserializeRequests(tour, cityMap, document);
         } else {
-            throw new ExceptionXML("Bad document");
+            throw new ExceptionXML("Bad document.");
         }
     }
 
@@ -93,9 +93,13 @@ public class XMLDeserializer {
      */
     public static void parseXMLIntersections(Document document, CityMap cityMap) throws ExceptionXML {
         NodeList intersectionNodes = document.getElementsByTagName("intersection");
+        if (intersectionNodes.getLength() == 0) throw new ExceptionXML("No intersection found in the selected file.");
         Map<Double,ArrayList<Double>> coordinateDictionary = new HashMap<>();
         long index = 0;
         for (int x = 0, size = intersectionNodes.getLength(); x < size; x++) {
+            if (!intersectionNodes.item(x).getParentNode().equals(document.getDocumentElement())) {
+                throw new ExceptionXML("Malformed file.");
+            }
             double latitude = Double.parseDouble(intersectionNodes.item(x).getAttributes().getNamedItem("latitude").getNodeValue());
             double longitude = Double.parseDouble(intersectionNodes.item(x).getAttributes().getNamedItem("longitude").getNodeValue());
             long idMap = Long.parseLong(intersectionNodes.item(x).getAttributes().getNamedItem("id").getNodeValue());
@@ -140,8 +144,12 @@ public class XMLDeserializer {
      */
     public static void parseXMLSegments(Document document, CityMap cityMap) throws ExceptionXML{
         NodeList nodeSegment = document.getElementsByTagName("segment");
+        if (nodeSegment.getLength() == 0) throw new ExceptionXML("No segments found in the selected file.");
         HashMap<Long,ArrayList<Long>> idIntersectionsDictionary = new HashMap<>();
         for (int x = 0, size = nodeSegment.getLength(); x < size; x++) {
+            if (!nodeSegment.item(x).getParentNode().equals(document.getDocumentElement())) {
+                throw new ExceptionXML("Malformed file.");
+            }
             long destinationId = Long.parseLong(nodeSegment.item(x).getAttributes().getNamedItem("destination").getNodeValue());
             double length = Double.parseDouble(nodeSegment.item(x).getAttributes().getNamedItem("length").getNodeValue());
             String name = nodeSegment.item(x).getAttributes().getNamedItem("name").getNodeValue();
@@ -194,6 +202,12 @@ public class XMLDeserializer {
             parseXMLRequests(tour, cityMap, document);
             // parse XMLDepot
             NodeList nodeDepot = document.getElementsByTagName("depot");
+            if (nodeDepot.getLength() > 1) {
+                throw new ExceptionXML("More than one depot have been found.");
+            }
+            if (!nodeDepot.item(0).getParentNode().equals(document.getDocumentElement())) {
+                throw new ExceptionXML("Malformed file.");
+            }
             long address = Long.parseLong(nodeDepot.item(0).getAttributes().getNamedItem("address").getNodeValue());
             long newAddress;
             if(cityMap.containsDictionaryIdKey(address)){
@@ -202,8 +216,19 @@ public class XMLDeserializer {
                 throw new ExceptionXML("The depot address is not an intersection of the city map.");
             }
             String departureTime = nodeDepot.item(0).getAttributes().getNamedItem("departureTime").getNodeValue();
-            Optional<Intersection> optionalDepotAddress = cityMap.getIntersections().stream().filter(i->i.getId() == newAddress).findFirst();
+            Pattern pattern = Pattern.compile("^[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}$");
+            boolean departureTimeOK = false;
+            if (pattern.matcher(departureTime).find()) {
+                int hour = Integer.parseInt(departureTime.substring(0, departureTime.indexOf(":")));
+                int minutes = Integer.parseInt(departureTime.substring(departureTime.indexOf(":") + 1, departureTime.lastIndexOf(":")));
+                int seconds = Integer.parseInt(departureTime.substring(departureTime.lastIndexOf(":") + 1));
+                if (hour < 24 && minutes < 60 && seconds < 60) {
+                    departureTimeOK = true;
+                }
+            }
+            if (!departureTimeOK) throw new ExceptionXML("The departure time is not readable.");
 
+            Optional<Intersection> optionalDepotAddress = cityMap.getIntersections().stream().filter(i->i.getId() == newAddress).findFirst();
             if (optionalDepotAddress.isPresent()) {
                 Intersection depotAddress = optionalDepotAddress.get();
                 // set the Tour object
@@ -228,9 +253,13 @@ public class XMLDeserializer {
 
         NodeList nodeRequest = document.getElementsByTagName("request");
         if (nodeRequest.getLength() == 0) {
-            throw new ExceptionXML("No request is present in the selected file.");
+            throw new ExceptionXML("No request found in the selected file.");
         }
         for (int x = 0, size = nodeRequest.getLength(); x < size; x++) {
+            if (!nodeRequest.item(x).getParentNode().equals(document.getDocumentElement())) {
+                throw new ExceptionXML("Malformed file.");
+            }
+
             Pattern pattern = Pattern.compile("^[0-9]*$");
             boolean pickupDurationOK = pattern.matcher(nodeRequest.item(x).getAttributes().getNamedItem("pickupDuration").getNodeValue()).find();
             boolean deliveryDurationOK = pattern.matcher(nodeRequest.item(x).getAttributes().getNamedItem("deliveryDuration").getNodeValue()).find();
